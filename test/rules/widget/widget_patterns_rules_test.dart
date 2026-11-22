@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/android_manifest_utils.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_avoid_prefer_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
@@ -628,6 +629,53 @@ void main() {
         expect(rule.impact, LintImpact.info);
       },
     );
+
+    // FP regression: manifest already declares RECORD_AUDIO -> no reminder.
+    // Uses a real temp project because the decision reads the manifest file.
+    group('RequirePermissionManifestAndroidRule manifest awareness', () {
+      late Directory root;
+      late String dartFile;
+
+      setUp(() {
+        AndroidManifestChecker.clearCache();
+        root = Directory.systemTemp.createTempSync('perm_manifest_');
+        File('${root.path}/pubspec.yaml').writeAsStringSync('name: x\n');
+        Directory('${root.path}/lib').createSync();
+        dartFile = '${root.path}/lib/main.dart';
+      });
+
+      tearDown(() {
+        AndroidManifestChecker.clearCache();
+        root.deleteSync(recursive: true);
+      });
+
+      void writeManifest(String body) {
+        final dir = Directory('${root.path}/android/app/src/main')
+          ..createSync(recursive: true);
+        File('${dir.path}/AndroidManifest.xml').writeAsStringSync(
+          '<manifest>$body<application/></manifest>',
+        );
+      }
+
+      test('silent when manifest declares the permission', () {
+        writeManifest(
+          '<uses-permission android:name="android.permission.RECORD_AUDIO"/>',
+        );
+        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+            isFalse);
+      });
+
+      test('reminds when manifest declares no permissions', () {
+        writeManifest('');
+        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+            isTrue);
+      });
+
+      test('silent when there is no manifest', () {
+        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+            isFalse);
+      });
+    });
 
     testRule(
       'RequirePermissionPlistIosRule',

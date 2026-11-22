@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Що нового в v16"
+      "title": "Що нового"
     },
     "hero": {
       "subtitle": "Ця версія змінює за замовчуванням двигун діагностики. Прочитайте це перед тим, як продовжувати роботу — це вплине на те, що ви побачите в панелі Помилок."
@@ -2291,7 +2291,7 @@
     },
     "community": {
       "issues": "{count} проблем",
-      "prs": "{count} PRs (профілактичні зв'язки)",
+      "prs": "{count} PR",
       "activity90d": "90d: випуски {closed} закриті, {merged} PR об’єднані",
       "lastCommit": "Останній заклад: Last commit. {time} _ПХО__ ПхО__",
       "archived": "Репозиторій архівується.",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Виконання pub get… ({elapsed}s)",
       "progressConfigWrite": "Написання конфігурації… ({elapsed}s)",
       "progressAnalysis": "Виконання аналізу… ({elapsed}s)",
-      "progressBaseline": "Виконання базового сканування… ({elapsed}s)"
+      "progressBaseline": "Виконання базового сканування… ({elapsed}s)",
+      "analysisScanning": "Сканування робочої області… {percent}% (проблем поки що: {count})"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Встановити аналіз ланки",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Версія плагіну не узгоджена",
     "driftRowDescription": "analysis_options.yaml каже {configured}, pubspec.lock піни {pinned}. Натисніть, щоб синхронізувати.",
     "driftSynced": "analysis_options.yaml плагін версії оновлено до {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints безкоштовний і має відкритий код. Швидка оцінка або відгук допомагає іншим розробникам його знайти, а відгуки та звіти про помилки на GitHub роблять його кращим.",
+      "marketplace": "Оцінити в Marketplace",
+      "openVsx": "Оцінити в Open VSX",
+      "never": "Більше не питати"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Оцінити в VS Code Marketplace",
+        "description": "Залиште оцінку, щоб інші розробники знайшли Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Оцінити в Open VSX",
+        "description": "Залиште оцінку у відкритому реєстрі"
+      }
+    },
+    "welcome": {
+      "header": "Безкоштовно, з відкритим кодом і для спільноти",
+      "body": "Saropa Lints має відкритий код і завжди матиме. Швидка оцінка допомагає іншим розробникам його знайти. Знайшли помилку або маєте ідею функції? Створіть issue — кожен звіт робить інструмент кращим для всіх.",
+      "marketplace": "Оцінити в VS Code Marketplace",
+      "openVsx": "Оцінити в Open VSX",
+      "issues": "Повідомити про проблему на GitHub"
+    }
   }
 }

@@ -225,13 +225,19 @@ class _NavigationContextVisitor extends RecursiveAstVisitor<void> {
   void visitAwaitExpression(AwaitExpression node) {
     // Check if this await is on a navigation method
     final Expression expression = node.expression;
+    // FIX (false positive): visit the awaited call's own children FIRST. The
+    // `context` argument of `await Navigator.maybePop(context)` is evaluated
+    // BEFORE the suspension, so it is not a post-await use. Previously the
+    // flag was armed before descending, so the navigator call itself was
+    // reported even when `if (!context.mounted) return;` preceded it.
+    super.visitAwaitExpression(node);
     if (expression is MethodInvocation) {
       if (_navigationMethods.contains(expression.methodName.name)) {
+        // Arm the post-await state only after the awaited call is visited.
         _hasAwaitedNavigation = true;
         _hasMountedCheck = false;
       }
     }
-    super.visitAwaitExpression(node);
   }
 
   @override

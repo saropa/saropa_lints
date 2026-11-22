@@ -365,4 +365,35 @@ void main() {
       expect(countRequiredCaptureGroups(r'(a|(b(c|d)))'), 1);
     });
   });
+
+  group('avoid_implicitly_nullable_extension_types fixture', () {
+    // FP regression: non-nullable (incl. generic list) representation types
+    // must stay un-annotated in the fixture, while nullable / bare type-param
+    // representations must carry expect_lint.
+    final src = File(
+      'example/lib/type/avoid_implicitly_nullable_extension_types_fixture.dart',
+    ).readAsStringSync().replaceAll('\r\n', '\n');
+
+    test('generic non-nullable representation is a GOOD case', () {
+      final idx = src.indexOf('_GoodETGenericList<T>._(List<Map<String, T>>');
+      expect(idx, greaterThan(0));
+      // The preceding line must not be an expect_lint marker.
+      final before = src.substring(0, idx).trimRight().split('\n').last;
+      expect(before.contains('expect_lint'), isFalse);
+    });
+
+    test('nullable and type-parameter representations are BAD cases', () {
+      const marker = r'expect_lint: avoid_implicitly_nullable_extension_types\n';
+      expect(
+        RegExp(marker + r'extension type _BadET1224\(int\? value\)')
+            .hasMatch(src),
+        isTrue,
+      );
+      expect(
+        RegExp(marker + r'extension type _BadETParam<T>\(T value\)')
+            .hasMatch(src),
+        isTrue,
+      );
+    });
+  });
 }

@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "O que há de novo na v16"
+      "title": "Novidades"
     },
     "hero": {
       "subtitle": "Essa versão altera o motor de diagnóstico padrão. Leia isso antes de continuar trabalhando — isso afeta o que você verá no painel Problemas."
@@ -80,7 +80,7 @@
       "subtitle": "{count} achados · {timestamp}",
       "baselineSubtitle": "Comparado à baseline de {date}",
       "searchPlaceholder": "Filtrar por regra, arquivo ou mensagem…",
-      "filterTier": "Tier",
+      "filterTier": "Nível",
       "filterSeverity": "Gravidade da gravidade.",
       "filterImpact": "O impacto do impacto de impacto.",
       "filterBaselineStatus": "Linha de base",
@@ -93,7 +93,7 @@
       "colLine": "Linha linha linha linha.",
       "colRule": "Regra",
       "colSeverity": "Gravidade da gravidade.",
-      "colTier": "Tier",
+      "colTier": "Nível",
       "colMessage": "Mensagem de mensagem da mensagem.",
       "empty": "Nenhum resultado encontrado — o projeto está limpo.",
       "filteredEmpty": "Nenhum resultado corresponde aos filtros atuais.",
@@ -281,7 +281,7 @@
       "enableTitle": "Reativar esta regra — remove a sobrescrita no analysis_options_custom.yaml e reexecuta a análise"
     },
     "tab": {
-      "tier": "Tier",
+      "tier": "Nível",
       "packs": "Pacotes de regras packs.",
       "overrides": "Anulações de prioridades.",
       "sdk": "Implementação do SDK",
@@ -413,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "Nível: {tier} · Pista: {lane}",
-      "descriptionNoLane": "Tier: Nível de nível. {tier} É um termo usado para descrever a"
+      "descriptionNoLane": "Nível: {tier}"
     },
     "controls": {
       "laneLight": "Light — ~200 regras em-editor, restante ao salvar",
@@ -566,7 +566,7 @@
       "archived": "ARQUIVADO — repositório é somente leitura",
       "knownIssue": "Questão conhecida: {reason}",
       "unused": "Não utilizado — nenhuma importação detectada",
-      "fix": "⁇  correção: {version}"
+      "fix": "— correção: {version}"
     },
     "versionGap": {
       "versionTitle": "Versão Gap versão Gap.",
@@ -692,7 +692,7 @@
       },
       "project": {
         "version": "Versão versão versões versão",
-        "tier": "Tier",
+        "tier": "Nível",
         "vibrancy": "Vibrância",
         "packages": "Packages escaneados",
         "packagesSuppressed": "{count} ({suppressed} suprimido)",
@@ -999,7 +999,7 @@
       "owasp": "OWASP",
       "ruleType": "Tipo de regra tipo de regla",
       "ruleStatus": "Regra status de regra.",
-      "tier": "Tier",
+      "tier": "Nível",
       "pack": "Embalagem (s)"
     },
     "seg": {
@@ -2291,7 +2291,7 @@
     },
     "community": {
       "issues": "{count} problemas",
-      "prs": "{count} PRs de comunicação social.",
+      "prs": "{count} PRs",
       "activity90d": "90d: {closed} questões fechadas, {merged} PRs fundidas.",
       "lastCommit": "Última commit: {time}",
       "archived": "O repositório é arquivado.",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Executando pub get… ({elapsed}s)",
       "progressConfigWrite": "Escrevendo config... ({elapsed}s)",
       "progressAnalysis": "Análise em execução… ({elapsed}s)",
-      "progressBaseline": "Escaneando baseline... ({elapsed}s)"
+      "progressBaseline": "Escaneando baseline... ({elapsed}s)",
+      "analysisScanning": "Analisando o workspace… {percent}% ({count} problemas até agora)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Definição de Análise de Faixa",
@@ -2943,12 +2944,12 @@
       "tipDisagree": "pubspec.yaml e analysis_options.yaml nomeam versões diferentes de saropa_lints. O editor usa a versão do plugin ({plugin}); os comandos da linha de comando usam a versão pubspec.yaml ({pubspec}).",
       "tipNeither": "saropa_lints não está configurado neste projeto: ele não é uma dependência em pubspec.yaml nem um plugin em analysis_options.yaml.",
       "tipLocalSource": "saropa_lints vem de um caminho local ou fonte git, então a extensão mostra apenas fatos e não altera nada.",
-      "tipDartTooOld": "The plugin route in analysis_options.yaml needs a newer Dart SDK than this project has, so the editor cannot load the plugin."
+      "tipDartTooOld": "A rota de plugin em analysis_options.yaml precisa de um Dart SDK mais novo do que o deste projeto, então o editor não consegue carregar o plugin."
     },
     "recommend": {
       "latestOk": "saropa_lints {version} é a nova versão e funciona com esse projeto. Use ^{version}.",
       "alreadyCorrect": "Este projeto já utiliza a configuração recomendada saropa_lints. Nenhuma ação é necessária.",
-      "needsNewerDart": "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "needsNewerDart": "O saropa_lints {newest} precisa de um Dart SDK mais novo do que o deste projeto ({dart}). Mantenha ^{chosen} ou atualize o Flutter para usar o {newest}.",
       "metaExcludesPin": "saropa_lints {newest} precisa de uma versão mais recente do pacote meta do que seus Flutter SDK pins ({pin}). Mantenha ^{chosen}, ou atualize Flutter para usar {newest}.",
       "packageHoldsAnalyzer": "O pacote {package} impede o analisador, então saropa_lints {newest} não pode ser instalado. Use ^{chosen}, ou atualize {package} para usar {newest}.",
       "noVersionResolves": "Nenhuma versão saropa_lints pode ser instalada como dependência porque {package} requer um analisador mais antigo. A rota do plugin ainda funciona.",
@@ -2988,7 +2989,7 @@
       "fixes": "Como corrigir",
       "apply": "Aplicar",
       "applying": "Aplicando...",
-      "preview": "Preview diff",
+      "preview": "Pré-visualizar diff",
       "refresh": "Rever",
       "diffTitle": "{file}: alteração proposta de versão",
       "staleReloaded": "O projeto mudou enquanto você estava olhando para essa carta, então nada foi aplicado. Revise o conselho atualizado e clique em Aplicar novamente.",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Versão do plugin fora de sincronia",
     "driftRowDescription": "analysis_options.yaml diz {configured}, pubspec.lock pins {pinned}. Clique para sincronizar.",
     "driftSynced": "Versão do plugin analysis_options.yaml atualizada para {pinned}"
+  },
+  "rate": {
+    "nudge": {
+      "message": "O Saropa Lints é gratuito e de código aberto. Uma avaliação ou resenha rápida ajuda outros desenvolvedores a descobri-lo, e feedback e relatórios de bugs no GitHub o mantêm em constante melhoria.",
+      "marketplace": "Avaliar no Marketplace",
+      "openVsx": "Avaliar no Open VSX",
+      "never": "Não perguntar novamente"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Avaliar no VS Code Marketplace",
+        "description": "Deixe uma avaliação para ajudar outros desenvolvedores a encontrar o Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Avaliar no Open VSX",
+        "description": "Deixe uma avaliação no registro aberto"
+      }
+    },
+    "welcome": {
+      "header": "Gratuito, de código aberto e feito para a comunidade",
+      "body": "O Saropa Lints é de código aberto e sempre será. Uma avaliação rápida ajuda outros desenvolvedores a descobri-lo. Encontrou um bug ou tem uma ideia de recurso? Abra uma issue — cada relatório melhora a ferramenta para todos.",
+      "marketplace": "Avaliar no VS Code Marketplace",
+      "openVsx": "Avaliar no Open VSX",
+      "issues": "Relatar um problema no GitHub"
+    }
   }
 }

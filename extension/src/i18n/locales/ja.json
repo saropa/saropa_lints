@@ -2483,7 +2483,8 @@
       "progressPubGet": "pub getを実行中…（{elapsed}s）",
       "progressConfigWrite": "設定を書いている…（{elapsed}s）",
       "progressAnalysis": "解析中… ({elapsed}s)",
-      "progressBaseline": "ベースラインスキャンを実行中…（{elapsed}s）"
+      "progressBaseline": "ベースラインスキャンを実行中…（{elapsed}s）",
+      "analysisScanning": "ワークスペースをスキャン中… {percent}%（これまでに {count} 件の問題）"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: アナリシスレーンの設定",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "プラグインバージョンが同期していない",
     "driftRowDescription": "analysis_options.yaml は {configured} と pubspec.lock ピン {pinned} です。同期するにはクリックしてください。",
     "driftSynced": "analysis_options.yamlプラグインバージョンが{pinned}に更新されました。"
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints は無料のオープンソースです。簡単な評価やレビューは他の開発者が見つける助けになり、GitHub へのフィードバックやバグ報告は改善につながります。",
+      "marketplace": "Marketplace で評価",
+      "openVsx": "Open VSX で評価",
+      "never": "今後は確認しない"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "VS Code Marketplace で評価",
+        "description": "評価して、他の開発者が Saropa Lints を見つけやすくしましょう"
+      },
+      "openVsx": {
+        "label": "Open VSX で評価",
+        "description": "オープンレジストリで評価する"
+      }
+    },
+    "welcome": {
+      "header": "無料・オープンソースで、コミュニティのために作られています",
+      "body": "Saropa Lints はオープンソースであり、これからもそうあり続けます。簡単な評価は他の開発者が見つける助けになります。バグや機能のアイデアがありましたか？ issue を作成してください。すべての報告がツールをより良くします。",
+      "marketplace": "VS Code Marketplace で評価",
+      "openVsx": "Open VSX で評価",
+      "issues": "GitHub で問題を報告"
+    }
   }
 }

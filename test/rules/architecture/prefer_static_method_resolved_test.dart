@@ -167,6 +167,49 @@ class Counter {
       expect(codes, isNot(contains('prefer_static_method')));
     });
 
+    test('does NOT flag a method that only calls another instance method '
+        'as an argument (unawaited-style wrapper)', () async {
+      final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
+void sink(Object? o) {}
+
+class S {
+  int _n = 0;
+  void onChanged() => sink(reload());
+  int reload() => _n;
+}
+''');
+      expect(codes, isNot(contains('prefer_static_method')));
+    });
+
+    test('does NOT flag a state-free method invoked through an instance '
+        'receiver from another class (making it static breaks callers)',
+        () async {
+      final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
+class Button {
+  int buildTile(int a) => a + 1;
+}
+
+class Host {
+  final Button button = Button();
+  int use() => button.buildTile(2);
+}
+''');
+      expect(codes, isNot(contains('prefer_static_method')));
+    });
+
+    test('does NOT flag a state-free method invoked on a constructor-call '
+        'receiver', () async {
+      final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
+class Util {
+  int twice(int a) => a * 2;
+}
+
+int use() => Util().twice(1) + 0;
+''');
+      // Instance receiver `Util()` is an instance call site.
+      expect(codes, isNot(contains('prefer_static_method')));
+    });
+
     test('does NOT flag explicit this.field access', () async {
       final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
 class Counter {

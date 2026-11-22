@@ -2543,11 +2543,30 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  /// Whether the reminder is warranted for the project containing [filePath].
+  ///
+  /// True only when an AndroidManifest.xml exists but declares no
+  /// `<uses-permission>` at all. An import alone does not say which
+  /// permission is needed, so any declared permission means the developer has
+  /// already handled the manifest; a missing manifest (package, non-Android
+  /// project) means there is nothing to confirm, mirroring the iOS sibling.
+  static bool shouldRemind(String filePath) {
+    final manifest = AndroidManifestChecker.forFile(filePath);
+    if (manifest == null || !manifest.hasManifest) return false;
+    return !manifest.containsRaw('<uses-permission');
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // FP fix: the rule used to report every permission_handler import without
+    // ever opening the manifest, so projects that already declared their
+    // permissions still got the reminder. Now stay silent when the manifest
+    // is absent (nothing to confirm) or already declares permissions.
+    if (!shouldRemind(context.filePath)) return;
+
     bool reported = false;
 
     context.addImportDirective((ImportDirective node) {

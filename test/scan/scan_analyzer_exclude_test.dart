@@ -134,6 +134,8 @@ void main() {
       excludeGlobs: loadAnalyzerExcludes(tempDir.path),
     );
     expect(files, hasLength(1));
-    expect(files.single, endsWith('lib/app.dart'));
+    // Production returns native paths (backslashes on Windows) because callers
+    // open them as files; compare in posix form so the test is OS-neutral.
+    expect(files.single.replaceAll(r'\', '/'), endsWith('lib/app.dart'));
   });
 }

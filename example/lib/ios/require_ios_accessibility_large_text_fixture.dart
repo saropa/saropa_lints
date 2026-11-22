@@ -107,10 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 
-// BAD: Should trigger require_ios_accessibility_large_text
+// BAD: Should trigger require_ios_accessibility_large_text.
+// A bare TextStyle with no known scaling consumer is still reported.
 // expect_lint: require_ios_accessibility_large_text
 void _bad910() {
-  Text('Hello', style: TextStyle(fontSize: 14));
+  final style = TextStyle(fontSize: 14);
 }
 
 // GOOD: Should NOT trigger require_ios_accessibility_large_text
@@ -151,21 +152,21 @@ void _goodFinalVariable(double fontSize) {
 // BAD: bare double literal — still a hardcoded value.
 // expect_lint: require_ios_accessibility_large_text
 void _badDoubleLiteral() {
-  Text('Hello', style: TextStyle(fontSize: 14.0));
+  final style = TextStyle(fontSize: 14.0);
 }
 
 // BAD: negated literal — still hardcoded, must recurse through the
 // PrefixExpression to find the literal underneath.
 // expect_lint: require_ios_accessibility_large_text
 void _badNegatedLiteral() {
-  Text('Hello', style: TextStyle(fontSize: -(14.0)));
+  final style = TextStyle(fontSize: -(14.0));
 }
 
 // BAD: arithmetic on two literals — both operands are hardcoded, so
 // the whole expression is a hardcoded font size.
 // expect_lint: require_ios_accessibility_large_text
 void _badArithmeticOnLiterals() {
-  Text('Hello', style: TextStyle(fontSize: 14 * 2));
+  final style = TextStyle(fontSize: 14 * 2);
 }
 
 // BAD: top-level const identifier — a const is fixed at compile time,
@@ -173,7 +174,7 @@ void _badArithmeticOnLiterals() {
 const double kBadFontSize = 14.0;
 // expect_lint: require_ios_accessibility_large_text
 void _badConstIdentifier() {
-  Text('Hello', style: TextStyle(fontSize: kBadFontSize));
+  final style = TextStyle(fontSize: kBadFontSize);
 }
 
 // BAD: static const field accessed via a prefixed/property expression —
@@ -185,5 +186,35 @@ class _AppFontSizes {
 
 // expect_lint: require_ios_accessibility_large_text
 void _badConstStaticField() {
-  Text('Hello', style: TextStyle(fontSize: _AppFontSizes.small));
+  final style = TextStyle(fontSize: _AppFontSizes.small);
+}
+
+// GOOD (FP regression): TextPainter with a textScaler scales the literal
+// fontSize, so the literal is correct. Must NOT trigger.
+void _goodTextPainterWithScaler() {
+  final painter = TextPainter(
+    text: TextSpan(text: 'label', style: TextStyle(fontSize: 11)),
+    textScaler: MediaQuery.textScalerOf(context),
+    textDirection: TextDirection.ltr,
+  )..layout();
+}
+
+// GOOD (FP regression): Text applies the ambient TextScaler. Must NOT trigger.
+void _goodTextAmbientScaler() {
+  Text('Hello', style: TextStyle(fontSize: 14));
+}
+
+// BAD: TextPainter without a textScaler never scales the literal.
+void _badTextPainterNoScaler() {
+  final painter = TextPainter(
+    // expect_lint: require_ios_accessibility_large_text
+    text: TextSpan(text: 'label', style: TextStyle(fontSize: 11)),
+    textDirection: TextDirection.ltr,
+  );
+}
+
+// BAD: consumer pins scaling off, so the literal is genuinely fixed.
+// expect_lint: require_ios_accessibility_large_text
+void _badTextNoScaling() {
+  Text('Hello', style: TextStyle(fontSize: 14), textScaler: TextScaler.noScaling);
 }

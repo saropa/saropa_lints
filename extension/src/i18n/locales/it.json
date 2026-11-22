@@ -566,7 +566,7 @@
       "archived": "ARCHIVIATO — repository è di sola lettura",
       "knownIssue": "Problema noto: {reason}",
       "unused": "Non utilizzato — nessun import rilevato",
-      "fix": "⁇  correzione: {version}"
+      "fix": "— correzione: {version}"
     },
     "versionGap": {
       "versionTitle": "Versione di Differenza",
@@ -701,7 +701,7 @@
         "findings": "Risultati delle ricerche.",
         "updates": "Aggiornamenti disponibili",
         "actionItems": "Punti d'azione",
-        "route": "Route"
+        "route": "Percorso"
       },
       "findings": {
         "allErrors": "{count} findings (tutti gli errori)",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Esecuzione di pub get… ({elapsed}s)",
       "progressConfigWrite": "Scrittura configurazione… ({elapsed}s)",
       "progressAnalysis": "Analisi in corso… ({elapsed}s)",
-      "progressBaseline": "Scansione baseline in corso… ({elapsed}s)"
+      "progressBaseline": "Scansione baseline in corso… ({elapsed}s)",
+      "analysisScanning": "Scansione dell’area di lavoro… {percent}% ({count} problemi finora)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Analisi Set Lane",
@@ -2860,8 +2861,8 @@
   "blastRadius": {
     "label": {
       "upgrade": "Aggiornare l'upgrade.",
-      "breaks": "Rompe",
-      "breaksLower": "rompe",
+      "breaks": "Incompatibilità",
+      "breaksLower": "incompatibilità",
       "upgradeNotRecommended": "⚠️ Aggiornamento non consigliato"
     },
     "notRecommended": "Aggiornamento non consigliato",
@@ -2903,7 +2904,7 @@
     "diffTitle": "Regola rinomina: {file}",
     "confirm": "Applica rinomine delle regole al file(s) {count}? Le differenze sono aperte per la revisione.",
     "apply": "Applica",
-    "progress": "Migrating renamed rules",
+    "progress": "Migrazione delle regole rinominate",
     "applied": "Regole di riferimento aggiornate {hits} in {count} file(s): {files}.",
     "bareNames": "Non modificato (ignora commenti senza il prefisso saropa_lints): {items}.",
     "clashes": "Entrambi il nome della regola vecchio e nuovo sono impostati, per favore unisci a mano: {items}",
@@ -2933,7 +2934,7 @@
       "pubspecUnlocked": "saropa_lints: pubspec (non bloccato ancora)",
       "plugin": "saropa_lints: plugin route {version}",
       "both": "saropa_lints: pubspec + plugin {version}",
-      "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (disagree)",
+      "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (discordanti)",
       "neither": "saropa_lints: non configurato",
       "localSource": "saropa_lints: sorgente locale",
       "dartTooOld": "saropa_lints: plugin necessita di una versione più recente di Dart",
@@ -2995,7 +2996,7 @@
       "loadFailed": "Non è stato possibile verificare la compatibilità della versione: {detail}",
       "routeLabel": "Installa route",
       "routes": {
-        "dependency": "Dependency in pubspec.yaml",
+        "dependency": "Dipendenza in pubspec.yaml",
         "plugin": "Plugin in analysis_options.yaml solo",
         "both": "Dipendenze e plugin",
         "none": "Nessun cambiamento possibile"
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Versione del plugin non sincronizzata",
     "driftRowDescription": "analysis_options.yaml dice {configured}, pubspec.lock pin {pinned}. Clicca per sincronizzare.",
     "driftSynced": "La versione del plugin analysis_options.yaml è stata aggiornata a {pinned}"
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints è gratuito e open source. Una valutazione o recensione rapida aiuta altri sviluppatori a scoprirlo, e feedback e segnalazioni di bug su GitHub lo migliorano continuamente.",
+      "marketplace": "Valuta su Marketplace",
+      "openVsx": "Valuta su Open VSX",
+      "never": "Non chiedere più"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Valuta su VS Code Marketplace",
+        "description": "Lascia una valutazione per aiutare altri sviluppatori a trovare Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Valuta su Open VSX",
+        "description": "Lascia una valutazione sul registro aperto"
+      }
+    },
+    "welcome": {
+      "header": "Gratuito, open source e creato per la community",
+      "body": "Saropa Lints è open source e lo sarà sempre. Una valutazione rapida aiuta altri sviluppatori a scoprirlo. Hai trovato un bug o hai un’idea per una funzionalità? Apri una issue: ogni segnalazione migliora lo strumento per tutti.",
+      "marketplace": "Valuta su VS Code Marketplace",
+      "openVsx": "Valuta su Open VSX",
+      "issues": "Segnala un problema su GitHub"
+    }
   }
 }

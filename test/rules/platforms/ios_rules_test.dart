@@ -553,6 +553,22 @@ void main() {
       expect(fixtures, isNotEmpty);
     });
 
+    // FP regression: a literal fontSize consumed by a TextPainter with a
+    // textScaler (or by Text, which applies the ambient scaler) is correct
+    // and must not fire. The fixture must keep both GOOD cases alongside
+    // the BAD cases (no scaler / scaling pinned off) so the exemption stays
+    // narrow.
+    test('require_ios_accessibility_large_text fixture covers scaler FP', () {
+      final src = File(
+        'example/lib/ios/require_ios_accessibility_large_text_fixture.dart',
+      ).readAsStringSync();
+      expect(src, contains('_goodTextPainterWithScaler'));
+      expect(src, contains('textScaler: MediaQuery.textScalerOf(context)'));
+      expect(src, contains('_goodTextAmbientScaler'));
+      expect(src, contains('_badTextPainterNoScaler'));
+      expect(src, contains('_badTextNoScaling'));
+    });
+
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/ios/${fixture}_fixture.dart');

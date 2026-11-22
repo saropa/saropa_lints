@@ -114,6 +114,31 @@ void _bad4() {
   GestureDetector(onTap: () => doSomething(), child: MyWidget());
 }
 
+// GOOD: ancestor Semantics supplies onTap, detector is a pointer hit-box only.
+void _goodSemanticsAncestor() {
+  Semantics(
+    button: true,
+    label: 'Select slot',
+    onTap: () => doSomething(),
+    child: ExcludeSemantics(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => doSomething(),
+        child: SizedBox(width: 48, height: 48),
+      ),
+    ),
+  );
+}
+
+// GOOD: opaque detector over an invisible SizedBox hit region.
+void _goodInvisibleHitRegion() {
+  GestureDetector(
+    behavior: HitTestBehavior.opaque,
+    onTap: () => doSomething(),
+    child: SizedBox(width: 48, height: 48),
+  );
+}
+
 // GOOD: Should NOT trigger avoid_gesture_only_interactions
 void _good4() {
   Focus(

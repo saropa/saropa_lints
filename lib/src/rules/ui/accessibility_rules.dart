@@ -780,6 +780,15 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
         current = current.parent;
       }
 
+      // FP fix: an ancestor Semantics that supplies onTap/onLongPress already
+      // exposes the action to assistive tech (the GestureDetector is then only
+      // a pointer hit-box, often wrapped in ExcludeSemantics), and an opaque
+      // SizedBox/ColoredBox hit region has no visible child to focus.
+      if (!hasKeyboardSupport &&
+          (_hasSemanticsActionAncestor(node) || _isInvisibleHitRegion(node))) {
+        return;
+      }
+
       if (!hasKeyboardSupport) {
         // Check if GestureDetector has interactive callbacks
         final bool hasInteractiveCallback = node.argumentList.arguments.any((
@@ -799,6 +808,46 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when an ancestor `Semantics` declares `onTap` or `onLongPress`.
+  /// WHY: that Semantics node is the accessible action; the detector below it
+  /// only handles pointer input, so flagging it is a false positive.
+  static bool _hasSemanticsActionAncestor(AstNode start) {
+    AstNode? current = start.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression &&
+          current.constructorName.type.element?.name == 'Semantics') {
+        for (final Argument arg in current.argumentList.arguments) {
+          if (arg is NamedArgument) {
+            final String name = arg.name.lexeme;
+            if (name == 'onTap' || name == 'onLongPress') return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// True when the detector is `behavior: HitTestBehavior.opaque` over a
+  /// `SizedBox`/`ColoredBox` child: an invisible hit area with nothing to
+  /// focus, ripple or hover, so keyboard support cannot be attached to it.
+  static bool _isInvisibleHitRegion(InstanceCreationExpression node) {
+    bool opaque = false;
+    bool boxChild = false;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is! NamedArgument) continue;
+      final String name = arg.name.lexeme;
+      final Expression value = arg.argumentExpression;
+      if (name == 'behavior') {
+        opaque = value.toSource().endsWith('HitTestBehavior.opaque');
+      } else if (name == 'child' && value is InstanceCreationExpression) {
+        final String? childName = value.constructorName.type.element?.name;
+        boxChild = childName == 'SizedBox' || childName == 'ColoredBox';
+      }
+    }
+    return opaque && boxChild;
   }
 }
 
@@ -3476,15 +3525,21 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_animatedWidgets.contains(typeName)) return;
 
-      // Check if duration references disableAnimations
+      // Check if duration references a reduce-motion preference. FP fix: the
+      // old literal `contains` checks missed project helpers such as
+      // `MotionPreferenceUtils.isMotionReduced(context)`, so correctly gated
+      // durations were reported. Use the shared name pattern (also covers
+      // `isMotionReduced`, `reducedMotion`, `reduceMotion`) instead.
       for (final Argument arg in node.argumentList.arguments) {
         if (arg is NamedArgument && arg.name.lexeme == 'duration') {
           final String durationSource = arg.argumentExpression.toSource();
-          if (durationSource.contains('disableAnimations') ||
-              durationSource.contains('reduceMotion') ||
-              durationSource.contains('accessibleNavigation')) {
+          if (reducedMotionPreferencePattern.hasMatch(
+            durationSource,
+          )) {
             return; // Good - respects preference
           }
+          // An explicit zero duration is already "no motion"; nothing to gate.
+          if (durationSource == 'Duration.zero') return;
         }
       }
 
@@ -3507,14 +3562,18 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
   }
 }
 
+/// Single source of truth for reduce-motion names, shared by the rule's
+/// duration check and the class-wide identifier finder. Includes
+/// `motionReduced` so project helpers named `isMotionReduced` are recognized
+/// (previously a false positive). Public so unit tests can exercise it.
+final RegExp reducedMotionPreferencePattern = RegExp(
+  r'disableAnimations|accessibleNavigation|reduce[d]?Motion|motionReduced',
+  caseSensitive: false,
+);
+
 /// Finds an identifier (never a comment or string) naming the reduced-motion
 /// preference or a `settle` helper (`toastPlayOrSettle`, not `settlement`).
 class _ReducedMotionIdentifierFinder extends RecursiveAstVisitor<void> {
-  static final RegExp _preference = RegExp(
-    r'disableAnimations|accessibleNavigation|reduce[d]?Motion',
-    caseSensitive: false,
-  );
-
   // `settle` as a whole camelCase/snake word: not `settlement`.
   static final RegExp _settle = RegExp(
     r'(?<![a-zA-Z])settle(?![a-z])|Settle(?![a-z])',
@@ -3524,7 +3583,7 @@ class _ReducedMotionIdentifierFinder extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (_preference.hasMatch(node.name) || _settle.hasMatch(node.name)) {
+    if (reducedMotionPreferencePattern.hasMatch(node.name) || _settle.hasMatch(node.name)) {
       found = true;
     }
   }

@@ -262,3 +262,39 @@ class _BadObserverExtraMethodState extends State<MyWidget>
   @override
   Widget build(BuildContext context) => const SizedBox.shrink();
 }
+
+// GOOD: an @override member that implements a user-defined mixin's abstract
+// hook must not fire — its public name and visibility are dictated by the
+// mixin contract, so the author cannot make it private. Previously only
+// Flutter-SDK supertypes were exempt, so this same-package mixin case was a
+// false positive.
+mixin PaletteAnimationMixin<T extends StatefulWidget> on State<T> {
+  AnimationController get paletteController;
+}
+
+class _GoodUserMixinOverrideState extends State<MyWidget>
+    with PaletteAnimationMixin<MyWidget> {
+  late final AnimationController _c;
+
+  @override
+  AnimationController get paletteController => _c;
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+// BAD: a public member that is NOT an @override is still flagged, even on a
+// class that mixes in a user-defined mixin.
+class _BadUserMixinExtraState extends State<MyWidget>
+    with PaletteAnimationMixin<MyWidget> {
+  late final AnimationController _c;
+
+  @override
+  AnimationController get paletteController => _c;
+
+  // expect_lint: avoid_public_members_in_states
+  void leak() {}
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}

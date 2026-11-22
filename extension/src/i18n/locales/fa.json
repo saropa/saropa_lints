@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "چه چیز جدید است"
+      "title": "تازه‌ها"
     },
     "hero": {
       "subtitle": "این انتشار تغییرات موتور تشخیص پیش‌فرض را اعمال می‌کند. قبل از ادامه کار، این مطلب را بخوانید — آنچه در پنل مشکلات دیده می‌شود تحت تأثیر آن است."
@@ -830,7 +830,7 @@
       "added": "فایل‌های نظارت‌کننده {count} به تنظیمات فضای کاری افزوده شدند."
     },
     "nestedRoots": {
-      "prompt": "{folders} شامل {count} ریشه بسته Dart تو در تو است که git آن‌ها را نادیده می‌گیرد. هر یک به‌عنوان یک زمینه جداگانه تحلیل می‌شود و می‌تواند حافظه سرور تحلیل را بیش از حد افزایش دهد.",
+      "prompt": "{folders} شامل {count} ریشهٔ بستهٔ Dart تودرتو است که git آن‌ها را نادیده می‌گیرد. هر کدام به‌عنوان زمینهٔ جداگانه تحلیل می‌شود و می‌تواند حافظهٔ سرور تحلیل را متورم کند.",
       "fix": "تحلیل از آن خارج کنید",
       "dismiss": "اخراج از کار",
       "fixed": "فایل {folders} از تحلیل و نظارت بر فایل ها استثناء شده است."
@@ -2483,7 +2483,8 @@
       "progressPubGet": "اجرای pub get... ({elapsed}s)",
       "progressConfigWrite": "نوشتن پیکربندی... ({elapsed}s)",
       "progressAnalysis": "تحلیل در حال اجرا است... ({elapsed}s)",
-      "progressBaseline": "اسکن پایه‌ای در حال اجرا است... ({elapsed}s)"
+      "progressBaseline": "اسکن پایه‌ای در حال اجرا است... ({elapsed}s)",
+      "analysisScanning": "در حال پویش فضای کاری… {percent}٪ ({count} مشکل تا اینجا)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: تنظیم خط تحلیل",
@@ -2948,7 +2949,7 @@
     "recommend": {
       "latestOk": "saropa_lints {version} نسخه جدیدترین و با این پروژه سازگار است. از ^{version} استفاده کنید.",
       "alreadyCorrect": "این پروژه قبلاً از پیکربندی پیشنهادی saropa_lints استفاده می‌کند. عملیاتی نیاز نیست.",
-      "needsNewerDart": "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "needsNewerDart": "saropa_lints {newest} به Dart SDK جدیدتری نیاز دارد از آنچه این پروژه دارد ({dart}). ^{chosen} را نگه دارید یا Flutter را برای استفاده از {newest} ارتقا دهید.",
       "metaExcludesPin": "saropa_lints {newest} یک پکیج متنا با نسخه جدیدتر نیاز دارد تا Flutter SDK پین های شما ({pin}) باشد. ^{chosen} را حفظ کنید یا Flutter را به روز رسانی کنید تا از {newest} استفاده کنید.",
       "packageHoldsAnalyzer": "بسته {package} تحلیل کننده را متوقف می کند، بنابراین saropa_lints {newest} نصب نمی شود. از ^{chosen} استفاده کنید، یا {package} را به‌روز رسانی کنید تا از {newest} استفاده کنید.",
       "noVersionResolves": "هیچ نسخه saropa_lints قابل نصب به عنوان وابسته ای نیست زیرا {package} نیاز به یک تحلیلگر قدیمی دارد. مسیر پلاگین هنوز کار می کند.",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "ورسیون پلاگین غیر همگام است",
     "driftRowDescription": "analysis_options.yaml می گوید {configured}، pubspec.lock پین ها {pinned} است. کلیک کنید تا هم ارزی انجام شود.",
     "driftSynced": "analysis_options.yaml پلاگین ورژن به‌روزرسانی شد به {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints رایگان و متن‌باز است. یک امتیاز یا نقد سریع به توسعه‌دهندگان دیگر کمک می‌کند آن را پیدا کنند، و بازخورد و گزارش خطا در GitHub آن را بهتر و بهتر می‌کند.",
+      "marketplace": "امتیاز در Marketplace",
+      "openVsx": "امتیاز در Open VSX",
+      "never": "دوباره نپرس"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "امتیاز در VS Code Marketplace",
+        "description": "امتیاز بدهید تا توسعه‌دهندگان دیگر Saropa Lints را پیدا کنند"
+      },
+      "openVsx": {
+        "label": "امتیاز در Open VSX",
+        "description": "در رجیستری آزاد امتیاز بدهید"
+      }
+    },
+    "welcome": {
+      "header": "رایگان، متن‌باز و ساخته‌شده برای جامعه",
+      "body": "Saropa Lints متن‌باز است و همیشه خواهد بود. یک امتیاز سریع به توسعه‌دهندگان دیگر کمک می‌کند آن را پیدا کنند. خطایی پیدا کردید یا ایده‌ای برای قابلیت جدید دارید؟ یک issue باز کنید — هر گزارش ابزار را برای همه بهتر می‌کند.",
+      "marketplace": "امتیاز در VS Code Marketplace",
+      "openVsx": "امتیاز در Open VSX",
+      "issues": "گزارش مشکل در GitHub"
+    }
   }
 }

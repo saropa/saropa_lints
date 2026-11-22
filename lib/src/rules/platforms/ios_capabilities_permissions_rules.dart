@@ -2754,8 +2754,74 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
         current = current.parent;
       }
 
+      // FP fix: a literal fontSize is correct when the consuming widget
+      // or painter applies a TextScaler (Text/RichText apply the ambient
+      // one; TextPainter applies its `textScaler:`). Only report when the
+      // consumer is absent/unknown or explicitly disables scaling.
+      if (_consumerAppliesScaling(node)) {
+        return;
+      }
+
       reporter.atNode(node);
     });
+  }
+
+  /// Consumers that scale text: widgets apply the ambient scaler,
+  /// `TextPainter` applies the one passed via `textScaler:`.
+  static const Set<String> _ambientScalingConsumers = {
+    'Text',
+    'RichText',
+    'SelectableText',
+  };
+
+  /// Whether the nearest scaling-relevant ancestor of [style] scales it.
+  ///
+  /// Walks outward from the TextStyle. `TextSpan` is transparent (it only
+  /// carries the style; the owning Text/RichText/TextPainter decides).
+  /// Returns false when no known consumer is found, so unattached styles
+  /// are still reported.
+  static bool _consumerAppliesScaling(AstNode style) {
+    AstNode? current = style.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String name = current.typeName;
+        if (name == 'TextPainter') {
+          // TextPainter scales only when given a textScaler (not noScaling).
+          final Expression? scaler = current.getNamedParameterValue(
+            'textScaler',
+          );
+          return scaler != null && !_disablesScaling(scaler);
+        }
+        if (_ambientScalingConsumers.contains(name)) {
+          // Ambient scaling applies unless the call opts out locally.
+          return !_hasScalingOptOut(current);
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Whether [consumer] passes a `textScaler:` that disables scaling or a
+  /// legacy `textScaleFactor: 1` (a deliberate pin is a stated reason to
+  /// keep reporting the literal, per the rule's contract).
+  static bool _hasScalingOptOut(InstanceCreationExpression consumer) {
+    final Expression? scaler = consumer.getNamedParameterValue('textScaler');
+    if (scaler != null && _disablesScaling(scaler)) return true;
+    final Expression? factor = consumer.getNamedParameterValue(
+      'textScaleFactor',
+    );
+    if (factor == null) return false;
+    final String src = factor.toSource().trim();
+    return src == '1.0' || src == '1';
+  }
+
+  /// Whether a `textScaler:` argument expression turns scaling off.
+  // endsWith/equality instead of contains(): a substring match would also hit
+  // unrelated identifiers (anti-pattern guard in test/integrity).
+  static bool _disablesScaling(Expression scaler) {
+    final String src = scaler.toSource().trim();
+    return src == 'noScaling' || src.endsWith('.noScaling');
   }
 
   /// Max recursion depth for [_isHardcodedNumeric] — prevents stack

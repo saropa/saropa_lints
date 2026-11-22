@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "v16 新增内容"
+      "title": "新增功能"
     },
     "hero": {
       "subtitle": "此版本更改了默认的诊断引擎。在继续工作前请阅读此内容——它会影响你在问题面板中看到的内容。"
@@ -2483,7 +2483,8 @@
       "progressPubGet": "正在运行 pub get… ({elapsed}s)",
       "progressConfigWrite": "编写配置… ({elapsed}s)",
       "progressAnalysis": "分析中… ({elapsed}s)",
-      "progressBaseline": "正在运行基线扫描… ({elapsed}s)"
+      "progressBaseline": "正在运行基线扫描… ({elapsed}s)",
+      "analysisScanning": "正在扫描工作区… {percent}%（目前 {count} 个问题）"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: 设置分析车道",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "插件版本不同步",
     "driftRowDescription": "analysis_options.yaml 说明 {configured}，pubspec.lock 引脚 {pinned}。点击同步。",
     "driftSynced": "analysis_options.yaml插件版本更新到{pinned}。"
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints 免费且开源。快速评分或评论能帮助其他开发者发现它，而在 GitHub 上的反馈和错误报告会让它不断改进。",
+      "marketplace": "在 Marketplace 上评分",
+      "openVsx": "在 Open VSX 上评分",
+      "never": "不再询问"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "在 VS Code Marketplace 上评分",
+        "description": "留下评分，帮助其他开发者找到 Saropa Lints"
+      },
+      "openVsx": {
+        "label": "在 Open VSX 上评分",
+        "description": "在开放注册表上留下评分"
+      }
+    },
+    "welcome": {
+      "header": "免费、开源，为社区而建",
+      "body": "Saropa Lints 是开源的，并将永远如此。快速评分能帮助其他开发者发现它。发现了错误或有功能想法？请提交 issue——每一份报告都会让这个工具对所有人更好。",
+      "marketplace": "在 VS Code Marketplace 上评分",
+      "openVsx": "在 Open VSX 上评分",
+      "issues": "在 GitHub 上报告问题"
+    }
   }
 }

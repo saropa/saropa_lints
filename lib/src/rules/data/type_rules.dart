@@ -334,19 +334,21 @@ class AvoidDynamicRule extends SaropaLintRule {
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
-/// Extension types that don't implement Object can be implicitly nullable,
-/// which may lead to unexpected behavior.
+/// Extension types whose representation type is nullable (`int?`) or a bare
+/// type parameter (`T`) can be implicitly nullable, which may lead to
+/// unexpected behavior. Non-nullable representations (`int`, `List<T>`) are
+/// not flagged.
 ///
 /// ### Example
 ///
 /// #### BAD:
 /// ```dart
-/// extension type UserId(int id) { } // Implicitly nullable
+/// extension type UserId(int? id) { } // Implicitly nullable
 /// ```
 ///
 /// #### GOOD:
 /// ```dart
-/// extension type UserId(int id) implements Object { }
+/// extension type UserId(int id) { }
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
@@ -398,9 +400,32 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 
       if (!implementsObject) {
         final primaryCtor = node.primaryConstructor;
+        // FP fix: an extension type is only "implicitly nullable" when its
+        // representation type can be null (e.g. `int?`) or is a bare type
+        // parameter (`T` may be instantiated with a nullable type). A
+        // non-nullable representation such as `List<PopupMenuEntry<T>>` or
+        // `int` yields a non-nullable extension type, so reporting it was
+        // wrong. Unresolvable representation types are skipped (no evidence).
+        if (!_representationMayBeNullable(primaryCtor)) return;
         reporter.atToken(primaryCtor.typeName, code);
       }
     });
+  }
+
+  /// True when the primary constructor's representation type is nullable or a
+  /// bare type parameter, i.e. the extension type can end up nullable.
+  static bool _representationMayBeNullable(
+    PrimaryConstructorDeclaration ctor,
+  ) {
+    final NodeList<FormalParameter> params = ctor.formalParameters.parameters;
+    if (params.isEmpty) return false;
+    final FormalParameter param = params.first;
+    // Only a declared (resolved) representation type is inspected; an
+    // untyped/unresolved parameter is not reported.
+    final DartType? type = param.type?.type;
+    if (type == null) return false;
+    return type is TypeParameterType ||
+        type.nullabilitySuffix == NullabilitySuffix.question;
   }
 
   /// True when [type] is an interface type that is itself a subtype of
@@ -3646,7 +3671,16 @@ class InvalidRecordFieldNameRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
-  static bool _tokenIsReservedKeyword(Token t) => t.type is Keyword;
+  /// True only for RESERVED words (`if`, `class`, `null`, ...).
+  ///
+  /// WHY: the previous check was `t.type is Keyword`, which is also true for
+  /// built-in and contextual keywords such as `when`, `on`, `show`, `async`.
+  /// Those are legal record field names (e.g. `({DateTime when, bool isMoved})`
+  /// dictated by a called API), so flagging them was a false positive.
+  static bool isReservedKeywordToken(Token t) =>
+      t.keyword?.isReservedWord ?? false;
+
+  static bool _tokenIsReservedKeyword(Token t) => isReservedKeywordToken(t);
 
   @override
   void runWithReporter(

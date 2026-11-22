@@ -107,10 +107,19 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_implicitly_nullable_extension_types
 // expect_lint: avoid_implicitly_nullable_extension_types
-extension type _BadET1224(int value) {} // No implements Object — nullable
+extension type _BadET1224(int? value) {} // Nullable representation, no implements Object
+
+// BAD: bare type parameter representation can be instantiated with a nullable type.
+// expect_lint: avoid_implicitly_nullable_extension_types
+extension type _BadETParam<T>(T value) {}
 
 // GOOD: Should NOT trigger avoid_implicitly_nullable_extension_types
-extension type _GoodET1224(int value) implements Object {} // Safe
+extension type _GoodET1224(int? value) implements Object {} // Safe
+
+// GOOD (FP regression): non-nullable representation is already non-nullable,
+// including parameterized generics like List<Foo<T>>.
+extension type _GoodETNonNull(int value) {}
+extension type _GoodETGenericList<T>._(List<Map<String, T>> entries) {}
 
 // GOOD: implements a non-nullable interface, so it is already a subtype of Object.
 extension type _GoodETList(List<int> _list) implements List<int> {}

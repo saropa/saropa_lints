@@ -122,6 +122,28 @@ void _good24() {
   );
 }
 
+// GOOD: duration gated through a project helper (isMotionReduced).
+void _goodHelper() {
+  AnimatedOpacity(
+    opacity: 1,
+    duration: MotionPreferenceUtils.isMotionReduced(context)
+        ? Duration.zero
+        : Duration(milliseconds: 300),
+  );
+}
+
+// GOOD: transition whose class collapses the controller via a helper.
+class _HelperMotionState extends State<StatefulWidget> {
+  void initState() {
+    if (MotionPreferenceUtils.isMotionReduced(context)) {
+      _controller.value = 1;
+    }
+  }
+
+  Widget build(BuildContext context) =>
+      FadeTransition(opacity: _opacity, child: child);
+}
+
 // BAD: transition in a class with no reduced-motion handling.
 class _BadMotionState extends State<StatefulWidget> {
   Widget build(BuildContext context) =>

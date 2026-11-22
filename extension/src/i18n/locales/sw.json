@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Sikilizaji ya v16"
+      "title": "Mapya"
     },
     "hero": {
       "subtitle": "Unganisha hali ya kipindi kwa kuzungumza kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kip."
@@ -80,7 +80,7 @@
       "subtitle": "Vitu vya {count} · {timestamp}",
       "baselineSubtitle": "Kati ya mbingu wa mbele ya {date}",
       "searchPlaceholder": "Tafuta kwa kiroho, kifilamu, au kipamia…",
-      "filterTier": "Tier",
+      "filterTier": "Daraja",
       "filterSeverity": "Ugumu wa Hali.",
       "filterImpact": "Athari za athari ya athari.",
       "filterBaselineStatus": "Mshirika wa asili",
@@ -93,7 +93,7 @@
       "colLine": "Mstari",
       "colRule": "Kanuni",
       "colSeverity": "Ugumu wa Hali.",
-      "colTier": "Tier",
+      "colTier": "Daraja",
       "colMessage": "Ujumbe ujumbe ujumbe ujumbe.",
       "empty": "Hakuna matokeo — project inaheshima.",
       "filteredEmpty": "Hakuna matokeo ya kujifunza kwa filtrasi ya sasa.",
@@ -136,7 +136,7 @@
       "progressTitle": "Saropa Lints: kusimamia project kato kato",
       "progressMessage": "Faili za {scanned}/{total} imelazimika, {issues} maslahi (maslahi) yamebadilika"
     },
-    "legacyKeyWarning": "saropaLints.scanOnSave.enabled has no effect — scan-on-save is controlled entirely by saropaLints.enabled. Remove the unused key from your settings."
+    "legacyKeyWarning": "saropaLints.scanOnSave.enabled haina athari — uchanganuzi wakati wa kuhifadhi unadhibitiwa kabisa na saropaLints.enabled. Ondoa ufunguo huo usiotumika kwenye mipangilio yako."
   },
   "featureInventory": {
     "export": {
@@ -231,7 +231,7 @@
     "disableAll": "Disable all - Kuzima yote.",
     "noMatch": "Hakuna style rules match.",
     "desc": {
-      "ordering_sorting": "Aina ya wanachama, vigezo, mashamba na funguo za ramani kwa mpangilio unaoweza kutabiriwa. Makelele sana kwenye code iliyopo  ⁇ bora kwenye nambari mpya au hazina ndogo.",
+      "ordering_sorting": "Hupanga washiriki, vigezo, sehemu, na funguo za ramani kwa mpangilio unaotabirika. Ina kelele nyingi kwenye msimbo uliopo — bora kwa msimbo mpya au hazina ndogo.",
       "naming_conventions": "Kuita majina kwa faili, njia, isipokuwa, wito wa kurudi na matukio ya kuzuia na hali. Inaweza kuwa kelele kwenye codebases kubwa; kuwezesha hatua kwa hatua.",
       "boolean_naming": "Booleans lazima kutumia ni / ina / inaweza / inapaswa prefixes hivyo nia ni wazi katika masharti na APIs.",
       "code_style_preferences": "Kama kuzingia, kifungu, na kuzalisha kuzingia kwa njia ya kuzingia kwa kati, for-in, getter vs method, na shorthands mbalimbali.",
@@ -281,7 +281,7 @@
       "enableTitle": "Tumia kujaribu kifungu hiki - inakwama kifungu kwenye analysis_options_custom.yaml na inakwama kujaribu kifungu"
     },
     "tab": {
-      "tier": "Tier",
+      "tier": "Daraja",
       "packs": "Sheria pakiti vifurushi.",
       "overrides": "Overrides override inazuia.",
       "sdk": "Utoaji wa SDK",
@@ -413,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "Ngazi: {tier} · Lane: {lane}",
-      "descriptionNoLane": "Tier: Kiwango cha juu zaidi. {tier} _ PH0__ - Msaada wa kuokoa maisha."
+      "descriptionNoLane": "Daraja: {tier}"
     },
     "controls": {
       "laneLight": "Light — ~200 hadi kwenye editor, wengine kwenye kuzalisha",
@@ -692,7 +692,7 @@
       },
       "project": {
         "version": "Toleo toleo tolelo",
-        "tier": "Tier",
+        "tier": "Daraja",
         "vibrancy": "Vibra ya kifalme",
         "packages": "Paketi zilizoscaned",
         "packagesSuppressed": "{count} ({suppressed} imesha)",
@@ -701,7 +701,7 @@
         "findings": "Matokeo ya Uchunguzi.",
         "updates": "Matokeo ya kuzalisha ya kipindi ya kuzalisha",
         "actionItems": "Moto ya kazi",
-        "route": "Route"
+        "route": "Njia"
       },
       "findings": {
         "allErrors": "{count} findings (zote kifalme)",
@@ -999,7 +999,7 @@
       "owasp": "OWASP",
       "ruleType": "Aina ya sheria aina ya kanuni",
       "ruleStatus": "Kanuni ya hali ya hadhi.",
-      "tier": "Tier",
+      "tier": "Daraja",
       "pack": "Pack (((s) ya bidhaa."
     },
     "seg": {
@@ -1294,15 +1294,15 @@
       "disableButton": "Kifungua kileyo rule",
       "disableTitle": "Kifungua kifungua hiki kwa kujitokeza kwa project kimoja — inakwenda analysis_options_custom.yaml. Tafuta kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifung.",
       "enableButton": "Tumia kujaribu kifungua kipengele hiki",
-      "enableTitle": "Re-enable this rule — removes the override in analysis_options_custom.yaml. Run analysis again to see the change take effect."
+      "enableTitle": "Washa upya kanuni hii — huondoa ubatilishaji katika analysis_options_custom.yaml. Endesha uchanganuzi tena ili kuona mabadiliko yakitekelezwa."
     },
     "noData": {
       "heading": "Hakuna yetu kuzalishwa",
-      "body": "This rule hasn't fired anywhere in your workspace yet, so there's no specific problem or fix to show. Run analysis to see it in context, or check its rule pack below for what it looks for.",
-      "bodyDisabled": "This rule is currently disabled, so it won't appear in analysis results. Re-enable it above and run analysis to see what it catches.",
+      "body": "Kanuni hii haijawahi kuwaka popote kwenye nafasi yako ya kazi bado, kwa hivyo hakuna tatizo au suluhisho maalum la kuonyesha. Endesha uchanganuzi kuiona katika muktadha, au angalia kifurushi chake cha kanuni hapa chini kuona inachotafuta.",
+      "bodyDisabled": "Kanuni hii imezimwa sasa, kwa hivyo haitaonekana kwenye matokeo ya uchanganuzi. Iwashe tena hapo juu na uendeshe uchanganuzi kuona inachokamata.",
       "tierLine": "Inatoa kutumia tier: {tier}",
-      "packsLine": "Rule pack: {packs}",
-      "packsOverflow": "Rule pack: {packs} (+{count} more)"
+      "packsLine": "Kifurushi cha kanuni: {packs}",
+      "packsOverflow": "Kifurushi cha kanuni: {packs} (+{count} zaidi)"
     }
   },
   "triageDash": {
@@ -1973,7 +1973,7 @@
       },
       "impact": {
         "title": "Ripoti ya Athari (lakabu za urithi)",
-        "desc": "Matokeo ya kati ya matokeo ya Severity Report — impact_report ni jina la kati ya kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa k."
+        "desc": "Matokeo yanayofanana na Severity Report — impact_report ni jina la kabla ya 2026-06-05, linalobaki ili hati zilizopo na mazoea yaendelee kufanya kazi."
       },
       "qualityGate": {
         "title": "Lango la Ubora",
@@ -2095,7 +2095,7 @@
         "inThisProject": "Katika Mradi huu, katika mradi huu."
       },
       "value": {
-        "unverified": "⁇  (haijathibitishwa)",
+        "unverified": "— (haijathibitishwa)",
         "allPlatforms": "All All All",
         "yes": "Yes, yes, yes - Kinda.",
         "no": "Hapana, hapana, hakuna kitu kama hicho."
@@ -2199,7 +2199,7 @@
     },
     "action": {
       "killAll": "Ondoa Wote {name}",
-      "restartAll": "Tumia Kila Mwaka",
+      "restartAll": "Anzisha upya {name}",
       "killAllDescription": "Kupungua server LSP kwa kawaida. Plugin ya analizi na Scan Daemon huchukua kuchapwa kwa kawaida — tafuta toggle ON/OFF ya kila engine kwa kawaida.",
       "restartAllDescription": "Husimamisha na kuzindua upya Seva ya LSP (au kuiwasha ikiwa haifanyi kazi). Programu-jalizi ya Kichanganuzi na Changanua Daemon haziathiriwi - badala yake tumia kigeuzi cha KUWASHA/KUZIMA cha kila injini."
     },
@@ -2291,7 +2291,7 @@
     },
     "community": {
       "issues": "matatizo {count}",
-      "prs": "{count} PRs za _PH0_.",
+      "prs": "PR {count}",
       "activity90d": "90d: masuala ya {closed} yamefungwa, PRs za {merged} zimeunganishwa.",
       "lastCommit": "Last commit: {time} Mwisho kujitoa:",
       "archived": "Repository ni kumbukumbu zilizohifadhiwa.",
@@ -2469,7 +2469,7 @@
       "configUpdated": "Saropa Lints config updated (tier: tier: imefanywa kuwa ya kisasa) {tier}). kwa hiyo, ni lazima uwe na",
       "configWriteFailed": "Config write imeshindwa. {details}",
       "scaffoldGateTitle": "Composite analyzer Plugin jukwaa la ujenzi.",
-      "scaffoldGateDetail": "Hii huandika kifurushi kipya cha Dart chini ya eneo lako la kazi (pubspec.yaml, lib/main.dart, README): moja custom_lint Plugin ambayo inarekodi Saropa na huacha ndoano kwa sheria yako mwenyewe.\n\nTumia tu hii wakati unasafirisha sheria za mchanganuzi wa kawaida pamoja na Saropa. Mradi wa kawaida Saropa tu unaweza kuupuuza  ⁇  mchambuzi huruhusu kuingia moja kwa programu-jalizi kwa kila muktadha.\n\nIfuatayo: chagua folda inayohusiana na eneo la kazi. Ikiwa folda hiyo tayari ipo, utaulizwa kabla ya kuandika chochote.",
+      "scaffoldGateDetail": "Hii huandika kifurushi kipya cha Dart ndani ya nafasi yako ya kazi (pubspec.yaml, lib/main.dart, README): programu-jalizi moja ya custom_lint inayosajili Saropa na kuacha vishikio kwa kanuni zako mwenyewe.\n\nItumie tu unaposafirisha kanuni maalum za analyzer pamoja na Saropa. Miradi ya kawaida ya Saropa pekee inaweza kuruka hatua hii—analyzer inaruhusu ingizo moja la programu-jalizi kwa kila muktadha.\n\nInayofuata: chagua folda iliyo jamaa na nafasi ya kazi. Folda hiyo ikiwepo tayari, utaulizwa kabla ya chochote kuandikwa juu yake.",
       "actionContinue": "Endelea endelea endeleza endelea.",
       "actionOpenGuide": "Fungua mwongozo wa ufunguzi.",
       "scaffoldPathOutsideWorkspace": "Njia ya jukwaa la ujenzi lazima iwe ndani ya folda ya nafasi ya kazi.",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Kupata pub get… ({elapsed}s)",
       "progressConfigWrite": "Kushiriki config… ({elapsed}s)",
       "progressAnalysis": "Unganisha matokeo... ({elapsed}s)",
-      "progressBaseline": "Kupata skani ya mbingu... ({elapsed}s)"
+      "progressBaseline": "Kupata skani ya mbingu... ({elapsed}s)",
+      "analysisScanning": "Inakagua nafasi ya kazi… {percent}% (matatizo {count} hadi sasa)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Weka Njia ya Uchambuzi",
@@ -2861,7 +2862,7 @@
     "label": {
       "upgrade": "Upgrade Kuboresha.",
       "breaks": "Kubadilisha",
-      "breaksLower": "huvunja",
+      "breaksLower": "inavunja",
       "upgradeNotRecommended": "⚠️ Hesabu ya kushindia sio mazungumzaji"
     },
     "notRecommended": "Hakikisha kujaribu kuzalisha",
@@ -2895,9 +2896,9 @@
     }
   },
   "ruleMigration": {
-    "none": "No renamed rules need migrating.",
+    "none": "Hakuna kanuni zilizobadilishwa majina zinazohitaji kuhamishwa.",
     "noWorkspace": "Openda jumla ya Dart ya folder ya project ili kushinda jina ya rule.",
-    "pickTitle": "Migrate renamed rules",
+    "pickTitle": "Hamisha kanuni zilizobadilishwa majina",
     "pickPlaceholder": "Chagua faili ya kuzalishia",
     "fileHits": "{hits} changi",
     "diffTitle": "Rule ya uzalisho: {file}",
@@ -2935,14 +2936,14 @@
       "both": "saropa_lints: pubspec + plugin {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (sasa)",
       "neither": "saropa_lints: hakuna kuchaguliwa",
-      "localSource": "saropa_lints: local source",
+      "localSource": "saropa_lints: chanzo cha ndani",
       "dartTooOld": "saropa_lints: plugin inahitajika Dart ya kati ya muda mwingi",
       "tipPubspec": "Programu huu inaamalisha pubspec route: saropa_lints ina kuhusiana na pubspec.yaml. Unaweza kubofya diagnostics ya editor na njia ya kifalaki (dart run saropa_lints:init, scan, baseline).",
       "tipPlugin": "Project huu inapangisha plugin route: saropa_lints inapangisha kama plugin katika analysis_options.yaml. Unaweza kubofya diagnostics ya editor bila. Kipengele ya kipengele (dart run saropa_lints:init, scan, baseline) inapangisha saropa_lints katika pubspec.yaml.",
       "tipBoth": "Programu huu inatumia routes mbili na wanaamini. Unaweza kubofya diagnostics ya editor na njia ya kifalaki.",
       "tipDisagree": "pubspec.yaml na analysis_options.yaml inapangwa na saropa_lints mbalimbali. Editor ina kuzalishia version ya plugin ({plugin}); njia ya kifedha ina kuzalishia version ya pubspec.yaml ({pubspec}).",
       "tipNeither": "saropa_lints inatambulika katika project hili: it is neither a dependency in pubspec.yaml nor a plugin in analysis_options.yaml.",
-      "tipLocalSource": "saropa_lints comes from a local path or git source, so the extension shows facts only and changes nothing.",
+      "tipLocalSource": "saropa_lints inatoka kwenye njia ya ndani au chanzo cha git, kwa hivyo kiendelezi kinaonyesha ukweli tu na hakibadilishi chochote.",
       "tipDartTooOld": "Plugin ya route katika analysis_options.yaml inakwenda SDK ya mbele ya Dart kuliko yango ya project, kwa sababu editor hakupata plugin."
     },
     "recommend": {
@@ -2988,17 +2989,17 @@
       "fixes": "Kama nini kujaribu",
       "apply": "Tuma",
       "applying": "Kupangalia...",
-      "preview": "Preview diff",
+      "preview": "Hakiki diff",
       "refresh": "Tafuta tena",
       "diffTitle": "{file}: uwanja wa muda wa kujifunza",
       "staleReloaded": "Projecti ilifunguka wakati unakwenda kwenye kadi hii, kwa hiyo hadi kama walifunguka. Tafakari kwa matokeo ya kujifunza mpya na chini kikosa Apply tena.",
       "loadFailed": "Hakikisha kuhusika ya version: {detail}",
-      "routeLabel": "Install route",
+      "routeLabel": "Njia ya usakinishaji",
       "routes": {
-        "dependency": "Dependency in pubspec.yaml",
+        "dependency": "Tegemezi katika pubspec.yaml",
         "plugin": "Plugin katika analysis_options.yaml tamati",
         "both": "Dependensi na plugin",
-        "none": "No change possible"
+        "none": "Hakuna mabadiliko yanayowezekana"
       }
     },
     "apply": {
@@ -3007,13 +3008,13 @@
       "noChange": "Hakuna ajira ya kushirikisha faili.",
       "failedRestored": "Unganisha version ya kipindi kifanyikwa: {detail} pubspec.yaml na analysis_options.yaml walifanikiwa kwa maandishi yao ya kipindi kifurahi.",
       "failedNotRestored": "Unganisha version ya kipindi kifanyikwa: {detail} Kipindi ya faili haukufanywa kwa mstari; tafuta pubspec.yaml na analysis_options.yaml.",
-      "cancelledRestored": "The version change was cancelled. pubspec.yaml and analysis_options.yaml were restored to their previous content.",
+      "cancelledRestored": "Mabadiliko ya toleo yalighairiwa. pubspec.yaml na analysis_options.yaml zilirejeshwa kwenye maudhui yake ya awali.",
       "cancelledNotRestored": "Unganisha muda wa version ilifunguka, lakini faili zilisaidia kufungua kwa mhimili; tafuta pubspec.yaml na analysis_options.yaml."
     }
   },
   "lintsSwitch": {
     "statusOn": "Saropa Lints: Kwenye",
-    "statusOff": "Saropa Lints: Off",
+    "statusOff": "Saropa Lints: Imezimwa",
     "statusPartial": "Saropa Lints: Mwaka mmoja",
     "tooltipOn": "Saropa Lints ina (mipango na plugin ya analisi). Bonye kufuta.",
     "tooltipOff": "Saropa Lints inaoff (mipango na plugin ya analizi). Bonye kufungua.",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Sensu ya plugin bado kifupi",
     "driftRowDescription": "analysis_options.yaml ina ona {configured}, pubspec.lock pins {pinned}. Bonyekeza kujaribu.",
     "driftSynced": "Unganisha version ya plugin ya analysis_options.yaml kwa {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints ni bure na chanzo huria. Ukadiriaji au maoni ya haraka huwasaidia wasanidi wengine kuigundua — na maoni na ripoti za hitilafu kwenye GitHub huifanya iendelee kuwa bora.",
+      "marketplace": "Kadiria kwenye Marketplace",
+      "openVsx": "Kadiria kwenye Open VSX",
+      "never": "Usiulize tena"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Kadiria kwenye VS Code Marketplace",
+        "description": "Acha ukadiriaji ili kuwasaidia wasanidi wengine kupata Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Kadiria kwenye Open VSX",
+        "description": "Acha ukadiriaji kwenye rejista huria"
+      }
+    },
+    "welcome": {
+      "header": "Bure, chanzo huria, na imejengwa kwa ajili ya jamii",
+      "body": "Saropa Lints ni chanzo huria na daima itakuwa hivyo. Ukadiriaji wa haraka huwasaidia wasanidi wengine kuigundua. Umepata hitilafu au una wazo la kipengele? Fungua issue — kila ripoti inaboresha zana kwa kila mtu.",
+      "marketplace": "Kadiria kwenye VS Code Marketplace",
+      "openVsx": "Kadiria kwenye Open VSX",
+      "issues": "Ripoti tatizo kwenye GitHub"
+    }
   }
 }

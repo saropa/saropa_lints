@@ -2182,7 +2182,7 @@
         "analyzerPlugin": "מתבצע בתוך שרת האנליזה Dart — סקוויגלס חיים באדיטורขณะ שכתבת, אין צורך בסריקה. לחיצה על התoggle מחליפה את ההרחבות: בלוק ב analysis_options.yaml",
         "scanDaemon": "תהליך фонאי שמבצע סקרוי מחדש של כל הפרויקט בעת שמירה וכתוב דוחות/.saropa_lints/violations.json. כיבוי מסיר אותו; שמירה הבאה מ возращает אותו.",
         "lspServer": "חוקי קפדניים:\n1. החזיר רק את הגרסה המתרגמת של המחרוזת.\n2. אל תוסיף הסברים, הפתיחה, סימני מardown, או כיתובים מסביב.\n3. הטקסט עשוי להכיל תокני תחזיות: תוקני תחזיות. העתק כל אחד מהם לתרגום בדיוק כפי שנכתב, במקומו הgrammatically הנכון. אל תתרגם, תמחק או תפורמט תוקן.\n4. קריטי: כל אות של הפלט חייב להיות אות עברית. תרגל כל מילה לעברית — אל ת deix או תחליף כל מילה בlatin, תאי, ערבית, קירילית, קוריאנית, יפנית או כל שפה אחרת. רווחים, מספרים, תווים פיסוק ותוקני תחזיות הם היחסיים היחידים.\n\nטקסט: שרת שפה נפרד — מפרסם אבחנות ללוח בעיות עבור קבצים פתוחים וקבצים במרחב העבודה. לחיצה על כפתור מעדכנת את ההגדרה saropaLints.lspServer.enabled.",
-        "ci": "קורא וכותב את .github/workflows/saropa-lints.yml בעץ העבודה שלך כדי להפעיל או לכבות את זרימת העבודה של GitHub Actions הכלולה. זה משקף את הקובץ בענף הנוכחי שלך — העותק בענף ברירת המחדל הוא זה שבפועל שולט בבקשות המשיכה, והשניים עלולים להיבדל. ההחלפה לעולם לא מריצה או מוחקת את זרימת העבודה; אתה עדיין סוקר ומבצע commit לשינוי בעצמך."
+        "ci": "קורא וכותב את .github/workflows/saropa-lints.yml בעץ העבודה שלך כדי להפעיל או לכבות את תהליך העבודה המצורף של GitHub Actions. זה משקף את הקובץ בענף הנוכחי שלך — העותק בענף ברירת המחדל הוא זה שבפועל חוסם בקשות משיכה, ושניהם עשויים להיפרד. החלפת המצב אף פעם לא מריצה או מוחקת את תהליך העבודה; עדיין עליך לבדוק ולבצע commit לשינוי בעצמך."
       },
       "recommended": {
         "analyzerPlugin": "מומלץ: OFFขณะ ששרת LSP פעיל. הפעל ON (עם LSP OFF) אם כלל 규ל עוצר את הפעלה תחת LSP.",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "מבצעת pub get… ({elapsed}s)",
       "progressConfigWrite": "כתיבה של קובץ Yapı… ({elapsed}s)",
       "progressAnalysis": "ניתוח ביצועים... ({elapsed}s)",
-      "progressBaseline": "סריקה בסיסית בדיקה... ({elapsed}s)"
+      "progressBaseline": "סריקה בסיסית בדיקה... ({elapsed}s)",
+      "analysisScanning": "סורק את סביבת העבודה… {percent}% ({count} בעיות עד כה)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: הגדרת ניתוח מסלול",
@@ -2936,7 +2937,7 @@
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (לא מסכים)",
       "neither": "saropa_lints: לא מוגדר",
       "localSource": "saropa_lints: מקורות מקומיים",
-      "dartTooOld": "saropa_lints: plugin needs newer Dart",
+      "dartTooOld": "saropa_lints: התוסף דורש Dart חדש יותר",
       "tipPubspec": "הפרויקט משתמש בנתיב pubspec: saropa_lints הוא תלות ב pubspec.yaml. אתם מקבלים אזהרות מודעות ו명령ות שורת הפקודה (dart run saropa_lints:init, scan, baseline)",
       "tipPlugin": "הפרויקט משתמש בפלוגין מסלול: saropa_lints מוגדר כפלוגין ב analysis_options.yaml. אתם מקבלים אזהרות מודעה רק בתוך המודעה. הפקודות בשורת הפקודה (dart run saropa_lints:init, scan, baseline) דורשות saropa_lints ב pubspec.yaml.",
       "tipBoth": "הפרויקט משתמש בשתי דרכים והן מסכימות. אתה מקבל אזהרות מעריכה ו명령ים מהשורת הפקודות.",
@@ -2948,10 +2949,10 @@
     "recommend": {
       "latestOk": "saropa_lints {version} הוא הגרסה האחרונה והמתאימה לפרויקט זה. השתמש ב-^{version}.",
       "alreadyCorrect": "הפרויקט כבר משתמש בkonfigurasi המומלץ saropa_lints. אין צורך בפעולה.",
-      "needsNewerDart": "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "needsNewerDart": "saropa_lints {newest} דורש Dart SDK חדש יותר ממה שיש לפרויקט הזה ({dart}). השאירו ^{chosen}, או שדרגו את Flutter כדי להשתמש ב-{newest}.",
       "metaExcludesPin": "saropa_lints {newest} דורש חבילת מטא חדשה יותר מהשגרת Flutter שלך ({pin}). שמר על ^{chosen}, או העדכן Flutter כדי להשתמש ב-{newest}.",
       "packageHoldsAnalyzer": "החבילה {package} מונעת את האנליטיקס, ולכן saropa_lints {newest} לא יכולה להות установленת. השתמש ב-^{chosen}, או עדכן {package} כדי להשתמש ב-{newest}.",
-      "noVersionResolves": "No saropa_lints version can be installed as a dependency because {package} requires an older analyzer. The plugin route still works.",
+      "noVersionResolves": "לא ניתן להתקין אף גרסה של saropa_lints כתלות כי {package} דורשת analyzer ישן יותר. מסלול התוסף (plugin) עדיין עובד.",
       "noPluginResolves": "אף גרסה של saropa_lints לא יכולה להות установленת כתלות, וגם {version} לא עבר את הפותר של pub כמודול ({package} דרישה לאנליזר ישן). כלום לא השתנה.",
       "blockedUsePlugin": "{package} מונע את האנליטיקס, ולכן saropa_lints לא יכול להיות מותקן כתלות. מסלול הריפוס לא נפגע: קבע את גרסה הריפוס ב analysis_options.yaml ל {version}.",
       "editorVsCli": "העורך ישתמש בגרסה של התוסף {plugin}. שורת הפקודה (dart run saropa_lints:init, scan, baseline) ממשיכה להשתמש בגרסה pubspec.yaml של {pubspec}.",
@@ -2964,7 +2965,7 @@
       "noVersions": "אין גרסאות saropa_lints זמינות להמלצה.",
       "probeFailed": "לא ניתן לבדוק אילו גרסה של saropa_lints ניתן להשתמש בויקטוריה פרויקט כי לא רצה את כלים Dart ({detail}). ה確信 dart או flutter נמצאים ב-PATH שלך ואתה מחובר לרשת, ואז בדוק שוב.",
       "staleVersions": "רשימת הגרסאות לא יכולה להיות מודכנת (במצב לא מקוון), ולכן המלצות אלו עשויות להיות מיותרות.",
-      "blockerSdk": "saropa_lints {version} requires a newer Dart SDK than {dart}.",
+      "blockerSdk": "saropa_lints {version} דורש Dart SDK חדש יותר מ-{dart}.",
       "blockerMeta": "saropa_lints {version} אינו совместим с версией meta {pin}, которая установлена вашим Flutter SDK.",
       "blockerPackage": "{package} מונע התקנה על ידי דרישה לגרסה שונה של המפענח.",
       "fixFlutterUpgrade": "הפעלה flutter upgrade.",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "גרסה של.Plugin לא תואמת",
     "driftRowDescription": "analysis_options.yaml קובע {configured}, pubspec.lock פינים {pinned}. לחץ כדי לשלב.",
     "driftSynced": "גרסה-plugin analysis_options.yaml עודכנה ל-{pinned}"
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints הוא חינמי ובקוד פתוח. דירוג או ביקורת מהירים עוזרים למפתחים אחרים לגלות אותו, ומשוב ודיווחי באגים ב-GitHub משפרים אותו כל הזמן.",
+      "marketplace": "דרגו ב-Marketplace",
+      "openVsx": "דרגו ב-Open VSX",
+      "never": "אל תשאל שוב"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "דרגו ב-VS Code Marketplace",
+        "description": "השאירו דירוג כדי לעזור למפתחים אחרים למצוא את Saropa Lints"
+      },
+      "openVsx": {
+        "label": "דרגו ב-Open VSX",
+        "description": "השאירו דירוג ברישום הפתוח"
+      }
+    },
+    "welcome": {
+      "header": "חינמי, בקוד פתוח ונבנה עבור הקהילה",
+      "body": "Saropa Lints הוא בקוד פתוח, וכך יישאר תמיד. דירוג מהיר עוזר למפתחים אחרים לגלות אותו. מצאתם באג או יש לכם רעיון לתכונה? פתחו issue — כל דיווח משפר את הכלי עבור כולם.",
+      "marketplace": "דרגו ב-VS Code Marketplace",
+      "openVsx": "דרגו ב-Open VSX",
+      "issues": "דווחו על בעיה ב-GitHub"
+    }
   }
 }

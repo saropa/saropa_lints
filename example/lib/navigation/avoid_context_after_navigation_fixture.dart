@@ -119,6 +119,15 @@ void _bad502() async {
   }
 }
 
+// GOOD: context passed to the awaited navigator call itself is evaluated
+// before suspension, so it must NOT trigger avoid_context_after_navigation.
+void _good502Await() async {
+  Future<void> navigate() async {
+    if (!mounted) return;
+    await Navigator.maybePop(context);
+  }
+}
+
 // GOOD: Should NOT trigger avoid_context_after_navigation
 void _good502() async {
   Future<void> navigate() async {

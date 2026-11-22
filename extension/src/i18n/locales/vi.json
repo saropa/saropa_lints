@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Có gì mới trong v16"
+      "title": "Có gì mới"
     },
     "hero": {
       "subtitle": "Phiên bản này thay đổi động cơ chẩn đoán mặc định. Đọc trước khi tiếp tục làm việc — điều này ảnh hưởng đến những gì bạn sẽ thấy trong bảng Problems."
@@ -80,7 +80,7 @@
       "subtitle": "Kết quả {count} · {timestamp}",
       "baselineSubtitle": "So sánh với baseline từ {date}",
       "searchPlaceholder": "Lọc theo quy tắc, tệp hoặc thông báo…",
-      "filterTier": "Tier",
+      "filterTier": "Cấp",
       "filterSeverity": "Mức độ nghiêm trọng",
       "filterImpact": "Tác động tác động Impact impact",
       "filterBaselineStatus": "Đường cơ sở",
@@ -93,7 +93,7 @@
       "colLine": "Dòng Đường Đường",
       "colRule": "Quy tắc của quy định",
       "colSeverity": "Mức độ nghiêm trọng",
-      "colTier": "Tier",
+      "colTier": "Cấp",
       "colMessage": "Thông điệp Tin nhắn Gửi tin",
       "empty": "Không có phát hiện — dự án sạch sẽ.",
       "filteredEmpty": "Không có kết quả nào phù hợp với bộ lọc hiện tại.",
@@ -281,7 +281,7 @@
       "enableTitle": "Kích hoạt lại quy tắc này — loại bỏ sự ghi đè trong analysis_options_custom.yaml và chạy lại phân tích"
     },
     "tab": {
-      "tier": "Tier",
+      "tier": "Cấp",
       "packs": "Các gói quy tắc bao gồm các quy tắc.",
       "overrides": "Bỏ qua các lệnh thay thế",
       "sdk": "Triển khai SDK",
@@ -413,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "Cấp: {tier} · Làn đường: {lane}",
-      "descriptionNoLane": "Tier: cấp bậc nhất. {tier} là Phương pháp"
+      "descriptionNoLane": "Cấp: {tier}"
     },
     "controls": {
       "laneLight": "Light — ~200 quy tắc trong trình soạn thảo, còn lại khi lưu",
@@ -477,7 +477,7 @@
       "readmeImages": "README IMAGES (Ảnh chụp hình ảnh)"
     },
     "header": {
-      "logoAlt": "{name} logo của PH0",
+      "logoAlt": "Logo {name}",
       "grade": "Lớp {grade}",
       "licenseTitle": "Giấy phép License",
       "published": "Được xuất bản {date}"
@@ -692,7 +692,7 @@
       },
       "project": {
         "version": "Phiên bản Version Version",
-        "tier": "Tier",
+        "tier": "Cấp",
         "vibrancy": "Sức sống",
         "packages": "Packages được quét",
         "packagesSuppressed": "{count} ({suppressed} bị bỏ qua)",
@@ -701,7 +701,7 @@
         "findings": "Những phát hiện của các nhà nghiên cứu",
         "updates": "Cập nhật có sẵn",
         "actionItems": "Điều hành việc thực hiện",
-        "route": "Route"
+        "route": "Lộ trình"
       },
       "findings": {
         "allErrors": "{count} phát hiện (tất cả lỗi)",
@@ -722,7 +722,7 @@
         "scanDaemons": "Daemon quét bị bỏ rơi",
         "scanDaemonsValue": "{count}, sử dụng Clean Up để loại bỏ",
         "other": "Khác Dart",
-        "extHost": "Extension host",
+        "extHost": "Máy chủ tiện ích mở rộng",
         "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
         "ram": "Bộ nhớ RAM",
         "ramValue": "{free} không chứa {total}",
@@ -999,7 +999,7 @@
       "owasp": "OWASP",
       "ruleType": "Loại quy tắc loại luật",
       "ruleStatus": "Quy tắc về tình trạng của quy định",
-      "tier": "Tier",
+      "tier": "Cấp",
       "pack": "Gói (s)"
     },
     "seg": {
@@ -2198,7 +2198,7 @@
       "off": "TẮT"
     },
     "action": {
-      "killAll": "Giết tất cả",
+      "killAll": "Dừng tất cả {name}",
       "restartAll": "Khởi động lại {name}",
       "killAllDescription": "Buộc dừng chỉ Máy chủ LSP. Plugin Trình phân tích và Quét Daemon chưa thể bị tắt một cách độc lập - thay vào đó hãy sử dụng nút bật/tắt BẬT/TẮT riêng của từng công cụ.",
       "restartAllDescription": "Dừng và khởi chạy lại Máy chủ LSP (hoặc khởi động nó nếu nó không chạy). Plugin Trình phân tích và Quét Daemon không bị ảnh hưởng - thay vào đó hãy sử dụng nút BẬT/TẮT riêng của từng công cụ."
@@ -2325,7 +2325,7 @@
       "issues": "Các vấn đề về các vấn đề",
       "reportIssue": "Báo cáo báo cáo vấn đề"
     },
-    "logoAlt": "{packageName} logo của PH0",
+    "logoAlt": "Logo {packageName}",
     "readMore": "Nhiều hơn nhiều hơn nữa",
     "readmeImageAlt": "Readme hình ảnh README"
   },
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Đang chạy pub get… ({elapsed}s)",
       "progressConfigWrite": "Viết config… ({elapsed}s)",
       "progressAnalysis": "Đang phân tích... ({elapsed}s)",
-      "progressBaseline": "Đang chạy quét cơ sở... ({elapsed}s)"
+      "progressBaseline": "Đang chạy quét cơ sở... ({elapsed}s)",
+      "analysisScanning": "Đang quét workspace… {percent}% (đã có {count} vấn đề)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Thiết lập Phân tích Lane",
@@ -2861,7 +2862,7 @@
     "label": {
       "upgrade": "Nâng cấp nâng cấp Upgrade",
       "breaks": "Ngắt dòng",
-      "breaksLower": "làm hỏng",
+      "breaksLower": "thay đổi phá vỡ",
       "upgradeNotRecommended": "⚠️ Không khuyến nghị nâng cấp"
     },
     "notRecommended": "Không khuyến nghị nâng cấp",
@@ -2935,7 +2936,7 @@
       "both": "saropa_lints: pubspec + plugin {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (không đồng ý)",
       "neither": "saropa_lints: chưa được cấu hình",
-      "localSource": "saropa_lints: local source",
+      "localSource": "saropa_lints: nguồn cục bộ",
       "dartTooOld": "saropa_lints: plugin cần phiên bản Dart mới hơn",
       "tipPubspec": "Dự án này sử dụng pubspec route: saropa_lints là một dependency trong pubspec.yaml. Bạn nhận được các thông báo lỗi từ trình soạn thảo và các lệnh dòng lệnh (dart run saropa_lints:init, scan, baseline).",
       "tipPlugin": "Dự án này sử dụng plugin route: saropa_lints được thiết lập làm plugin trong analysis_options.yaml. Bạn chỉ nhận được thông báo lỗi từ trình soạn thảo. Các lệnh dòng lệnh (dart run saropa_lints:init, scan, baseline) cần saropa_lints trong pubspec.yaml.",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Phiên bản plugin không đồng bộ",
     "driftRowDescription": "analysis_options.yaml nói {configured}, pubspec.lock chân {pinned}. Nhấp để đồng bộ.",
     "driftSynced": "Cập nhật phiên bản plugin analysis_options.yaml lên {pinned}"
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints miễn phí và mã nguồn mở. Một đánh giá hoặc nhận xét nhanh giúp các nhà phát triển khác khám phá nó, còn phản hồi và báo cáo lỗi trên GitHub giúp nó ngày càng tốt hơn.",
+      "marketplace": "Đánh giá trên Marketplace",
+      "openVsx": "Đánh giá trên Open VSX",
+      "never": "Không hỏi lại"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Đánh giá trên VS Code Marketplace",
+        "description": "Để lại đánh giá để giúp các nhà phát triển khác tìm thấy Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Đánh giá trên Open VSX",
+        "description": "Để lại đánh giá trên registry mở"
+      }
+    },
+    "welcome": {
+      "header": "Miễn phí, mã nguồn mở và xây dựng cho cộng đồng",
+      "body": "Saropa Lints là mã nguồn mở và sẽ luôn như vậy. Một đánh giá nhanh giúp các nhà phát triển khác khám phá nó. Bạn thấy lỗi hoặc có ý tưởng tính năng? Hãy mở một issue — mỗi báo cáo giúp công cụ tốt hơn cho mọi người.",
+      "marketplace": "Đánh giá trên VS Code Marketplace",
+      "openVsx": "Đánh giá trên Open VSX",
+      "issues": "Báo cáo sự cố trên GitHub"
+    }
   }
 }

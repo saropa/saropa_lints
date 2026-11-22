@@ -234,7 +234,7 @@
       "ordering_sorting": "멤버, 파라미터, 필드 및 맵 키를 정렬하여 예측 가능한 레이아웃을 제공합니다. 기존 코드에서는 매우 많은 경고 메시지가 발생하므로, 새 코드나 작은 저장소에서 가장 효과적입니다.",
       "naming_conventions": "파일, 메소드, 예외, 콜백 및 블록 이벤트와 상태의 이름을 지정합니다. 큰 코드베이스에서 시끄러운 것일 수 있습니다; 점진적으로 활성화하십시오.",
       "boolean_naming": "부울형은 is/has/can/should 접두사를 사용해야 하고, 따라서 조건과 API에서 의도성이 명확하다.",
-      "code_style_preferences": "반환, 조건 및 루프가 어떻게 쓰이는지  ⁇ 즉각적인 반환, 포인 (for-in), 게터 대 메소드 및 유사한 단축어.",
+      "code_style_preferences": "return, 조건문, 반복문을 작성하는 방식 — 즉시 반환, for-in, getter 대 메서드 및 유사한 축약형.",
       "function_parameter_style": "화살표 기능은 간결하고, 모든 이름을 가진 매개 변수와 인라인 콜백이 있고, 매개변수가 재배치되지 않을 때입니다.",
       "widget_style": "Flutter 위젯 선택 — SizedBox.square, center over align, spacing over SizedBox, 그리고 scroll에서 shrinkWrap 피하기. Flutter 프로젝트만.",
       "class_record_style": "클래스 대 레코드 반환 유형, 개인 하단 접두사 및 명확히 하는 곳에서는 이것을 명시합니다.",
@@ -715,7 +715,7 @@
       },
       "memory": {
         "saropa": "Saropa Lints",
-        "none": "none running",
+        "none": "실행 중인 항목 없음",
         "processes": "{count} 프로세스(들) · {size} RSS",
         "daemons": "Flutter 데몬",
         "daemonsValue": "{total} ({orphaned} 버려짐)",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "pub get 실행 중… ({elapsed}s)",
       "progressConfigWrite": "구성 파일 작성 중… ({elapsed}s)",
       "progressAnalysis": "분석 중입니다… ({elapsed}s)",
-      "progressBaseline": "기본 스캔 중… ({elapsed}s)"
+      "progressBaseline": "기본 스캔 중… ({elapsed}s)",
+      "analysisScanning": "작업 영역 검사 중… {percent}% (지금까지 문제 {count}개)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: 분석 라인 설정",
@@ -2628,7 +2629,7 @@
       "upgradeCheckerMinorUpdate": "사소한 업데이트는 작은 업데이트입니다.",
       "upgradeCheckerPatchUpdate": "패치 업데이트를 통해 팩트를 업데이트합니다.",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
-      "upgradeCheckerPubspecNotFound": "Saropa Lints: PH2__는 pubspec.yaml  ⁇ 을 업데이트할 수 없습니다. saropa_lints 항목은 발견되지 않았습니다.",
+      "upgradeCheckerPubspecNotFound": "Saropa Lints: pubspec.yaml을 업데이트할 수 없습니다 — saropa_lints 항목을 찾을 수 없습니다.",
       "upgradeCheckerCancelled": "Saropa Lints 업그레이드가 취소되었습니다. pubspec.yaml는 ^{version}로 업데이트되었습니다; `{cmd} pub get`을 실행하여 완료하거나 변경 사항을 되돌릴 수 있습니다.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: 게시 실패. {detail}",
       "upgradeCheckerCheckOutput": "출력을 확인합니다.",
@@ -2919,7 +2920,7 @@
       "routeDependency": "pubspec 라우트 (pubspec.yaml)",
       "routePlugin": "플러그인 라우트 (analysis_options.yaml)",
       "routeBoth": "두 라우트 (pubspec.yaml 및 analysis_options.yaml)",
-      "installedDisagree": "{pubspec} in pubspec.yaml and {plugin} in analysis_options.yaml",
+      "installedDisagree": "pubspec.yaml의 {pubspec}와 analysis_options.yaml의 {plugin}",
       "offer": "saropa_lints: 프로젝트는 {route}를 {installed}에서 사용하고 있습니다. {offered}는 사용 가능하며 Dart {dart}와 호환됩니다. 마이그레이션하시겠습니까?",
       "offerNoDart": "saropa_lints: 프로젝트는 {route}를 {installed}에서 사용하고 있습니다. {offered}는 사용 가능합니다. 이전하시겠습니까?",
       "offerRenames": "saropa_lints: 프로젝트는 {route}를 {installed}에서 사용하고 있습니다. {offered}는 사용 가능하며 Dart {dart}와 호환됩니다. {count} 규칙은 {installed} 이후로 이름이 변경되었습니다. 이전으로 이동하시겠습니까?",
@@ -2955,7 +2956,7 @@
       "noPluginResolves": "saropa_lints 버전은 의존성으로 설치할 수 없으며, {version}도 플러그인으로서 pub 솔버에서 통과하지 못했습니다 ({package}는 더 오래된 분석기를 필요로 합니다). 변경 사항은 없습니다.",
       "blockedUsePlugin": "{package}은 분석기를 뒤로 미루므로 saropa_lints는 의존성으로 설치할 수 없습니다. 플러그인 경로는 영향을 받지 않습니다: analysis_options.yaml에서 플러그인 버전을 {version}로 설정하세요.",
       "editorVsCli": "편집기는 플러그인 버전 {plugin}를 사용합니다. 명령행(dart run saropa_lints:init, scan, baseline)은 pubspec.yaml 버전 {pubspec}를 계속 사용합니다.",
-      "cliNeedsPubspec": "dart run saropa_lints:init, scan and baseline need saropa_lints in pubspec.yaml.",
+      "cliNeedsPubspec": "dart run saropa_lints:init, scan, baseline을 사용하려면 pubspec.yaml에 saropa_lints가 있어야 합니다.",
       "pluginUnverified": "플루그인 버전 {version}는 pub 솔버로 확인할 수 없습니다. Dart SDK 제약 조건에서만 추천됩니다.",
       "pluginOnly": "analysis_options.yaml 파일에서 saropa_lints 플러그인 버전을 {version}로 설정하세요.",
       "alignPlugin": "analysis_options.yaml 파일의 플러그인 버전 ({plugin})은 잠금된 saropa_lints 버전 ({locked})과 다릅니다. 플러그인 버전을 {locked}로 설정하세요.",
@@ -3012,8 +3013,8 @@
     }
   },
   "lintsSwitch": {
-    "statusOn": "Saropa Lints: On",
-    "statusOff": "Saropa Lints: Off",
+    "statusOn": "Saropa Lints: 켜짐",
+    "statusOff": "Saropa Lints: 꺼짐",
     "statusPartial": "Saropa Lints: 부분적으로 해제",
     "tooltipOn": "Saropa Lints는 켜져 있습니다(설정 및 분석기 플러그인). 끄려면 클릭하세요.",
     "tooltipOff": "Saropa Lints는 꺼짐 (설정 및 분석기 플러그인). 켜기 클릭",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "플러그인 버전 동기화되지 않음",
     "driftRowDescription": "analysis_options.yaml은 {configured}라고 말하고, pubspec.lock핀이 {pinned}입니다. 동기화하려면 클릭하세요.",
     "driftSynced": "analysis_options.yaml 플러그인 버전이 {pinned}로 업데이트되었습니다."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints는 무료 오픈 소스입니다. 간단한 평가나 리뷰는 다른 개발자가 찾는 데 도움이 되며, GitHub의 피드백과 버그 신고는 계속 더 나아지게 합니다.",
+      "marketplace": "Marketplace에서 평가",
+      "openVsx": "Open VSX에서 평가",
+      "never": "다시 묻지 않기"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "VS Code Marketplace에서 평가",
+        "description": "다른 개발자가 Saropa Lints를 찾을 수 있도록 평가를 남겨 주세요"
+      },
+      "openVsx": {
+        "label": "Open VSX에서 평가",
+        "description": "오픈 레지스트리에서 평가하기"
+      }
+    },
+    "welcome": {
+      "header": "무료 오픈 소스이며 커뮤니티를 위해 만들어졌습니다",
+      "body": "Saropa Lints는 오픈 소스이며 앞으로도 그럴 것입니다. 간단한 평가는 다른 개발자가 찾는 데 도움이 됩니다. 버그를 발견했거나 기능 아이디어가 있나요? 이슈를 열어 주세요. 모든 제보가 도구를 모두에게 더 좋게 만듭니다.",
+      "marketplace": "VS Code Marketplace에서 평가",
+      "openVsx": "Open VSX에서 평가",
+      "issues": "GitHub에 문제 신고"
+    }
   }
 }

@@ -4,7 +4,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:meta/meta.dart';
 
 import '../../async_context_utils.dart';
@@ -5185,28 +5184,11 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       if (!_isStateSubclass(node)) return;
 
       final Set<String> mixinExemptMethods = _mixinExemptMethods(node);
-      // Memoised per class, and deliberately *lazy*: resolving the class
-      // element and walking `allSupertypes` is the expensive part of this
-      // rule, but it is only ever consulted for a public `@override` member.
-      // Most `State` classes have none, so computing it eagerly forced
-      // element resolution on every single one for an answer nobody read.
-      // Every public `@override` member on the class shares the same answer,
-      // so the first one that asks pays for all of them.
-      final _LazyFlutterSdkContractMembers flutterSdkContractMembers =
-          _LazyFlutterSdkContractMembers(
-            () => _flutterSdkContractMembers(node.declaredFragment?.element),
-          );
-
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           _checkField(reporter, member);
         } else if (member is MethodDeclaration) {
-          _checkMethod(
-            reporter,
-            member,
-            mixinExemptMethods,
-            flutterSdkContractMembers,
-          );
+          _checkMethod(reporter, member, mixinExemptMethods);
         }
       }
     });
@@ -5263,15 +5245,13 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
 
   /// Flags a public (non-underscore) method unless it is one of the
   /// framework-mandated lifecycle overrides, a named framework-mixin
-  /// callback (`mixinExemptMethods`), a resolved Flutter SDK contract
-  /// override (`flutterSdkContractMembers`, see [_flutterSdkContractMembers]),
-  /// or explicitly marked as an intentional public surface via
-  /// `@visibleForTesting` / `@protected`.
+  /// callback (`mixinExemptMethods`), any `@override` member, or explicitly
+  /// marked as an intentional public surface via `@visibleForTesting` /
+  /// `@protected`.
   void _checkMethod(
     SaropaDiagnosticReporter reporter,
     MethodDeclaration node,
     Set<String> mixinExemptMethods,
-    _LazyFlutterSdkContractMembers flutterSdkContractMembers,
   ) {
     final String name = node.name.lexeme;
     if (name.startsWith('_')) return;
@@ -5291,73 +5271,17 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       return;
     }
 
-    // Resolved fallback for framework contracts not in the hand-maintained
-    // _mixinRequiredMethodsByType table: an @override method whose exact
-    // name is declared on some non-State, non-Object supertype that lives
-    // in the Flutter SDK itself means the SDK — not this class's author —
-    // mandates the public spelling, so it is out of scope for this rule the
-    // same way build()/initState() are. Only trusted for package:flutter /
-    // dart:ui supertypes: a same-named member declared in the app's own
-    // code is exactly the encapsulation leak this rule exists to catch, so
-    // it must still be flagged even though it is also an @override.
-    if (_hasAnnotation(node.metadata, 'override')) {
-      // First read of `.value` is what triggers the supertype walk — see the
-      // laziness note at the construction site.
-      final _FlutterSdkContractMembers contract =
-          flutterSdkContractMembers.value;
-      final bool isSdkContract = node.isGetter
-          ? contract.getters.contains(name)
-          : contract.methods.contains(name);
-      if (isSdkContract) return;
-    }
+    // FALSE-POSITIVE FIX: any `@override` member is exempt. An override's
+    // name and visibility are dictated by the supertype (Flutter SDK, a
+    // user-defined mixin's abstract hook, or an app base class), so the
+    // author cannot make it private or rename it. The old check only trusted
+    // Flutter-SDK supertypes and still flagged overrides of a same-package
+    // mixin contract (e.g. `mixin M on State<T> { Foo get hook; }`). Any
+    // genuinely leaky public member is still reported where it is *declared*
+    // (the mixin or base class), not at each forced implementation site.
+    if (_hasAnnotation(node.metadata, 'override')) return;
 
     reporter.atToken(node.name);
-  }
-
-  /// Names of methods and getters that some Flutter-SDK-owned supertype of
-  /// [classElement] (excluding `State`/`Object` themselves) declares
-  /// directly — i.e. the set of public spellings the SDK, not this class's
-  /// author, mandates. Computed once per class (walking `allSupertypes` is
-  /// the expensive part) rather than once per candidate member, since every
-  /// public `@override` member on the class shares the same answer. Empty
-  /// whenever [classElement] is unavailable, e.g. because the analysis
-  /// context has no Flutter SDK resolved — the syntactic
-  /// [_mixinExemptMethods] table remains the primary path for that case.
-  _FlutterSdkContractMembers _flutterSdkContractMembers(
-    InterfaceElement? classElement,
-  ) {
-    if (classElement == null) {
-      return const _FlutterSdkContractMembers(<String>{}, <String>{});
-    }
-
-    final Set<String> methodNames = <String>{};
-    final Set<String> getterNames = <String>{};
-    for (final InterfaceType supertype in classElement.allSupertypes) {
-      final String? supertypeName = supertype.element.name;
-      if (supertypeName == null ||
-          supertypeName == 'State' ||
-          supertypeName == 'Object') {
-        continue;
-      }
-
-      final Uri libraryUri = supertype.element.library.uri;
-      final bool isFlutterSdk =
-          (libraryUri.scheme == 'package' &&
-              libraryUri.pathSegments.isNotEmpty &&
-              libraryUri.pathSegments.first == 'flutter') ||
-          (libraryUri.scheme == 'dart' && libraryUri.path == 'ui');
-      if (!isFlutterSdk) continue;
-
-      for (final MethodElement method in supertype.methods) {
-        final String? methodName = method.name;
-        if (methodName != null) methodNames.add(methodName);
-      }
-      for (final GetterElement getter in supertype.getters) {
-        final String? getterName = getter.name;
-        if (getterName != null) getterNames.add(getterName);
-      }
-    }
-    return _FlutterSdkContractMembers(methodNames, getterNames);
   }
 
   /// True when [metadata] carries an annotation literally named [name]
@@ -5368,29 +5292,4 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   bool _hasAnnotation(NodeList<Annotation> metadata, String name) {
     return metadata.any((Annotation a) => a.name.name == name);
   }
-}
-
-/// Method and getter names declared directly on a Flutter-SDK-owned
-/// supertype of a `State` class, split by member kind so a getter name
-/// cannot be mistaken for a method name (or vice versa) from an unrelated
-/// SDK interface. Produced once per class by
-/// [AvoidPublicMembersInStatesRule._flutterSdkContractMembers].
-class _FlutterSdkContractMembers {
-  const _FlutterSdkContractMembers(this.methods, this.getters);
-
-  final Set<String> methods;
-  final Set<String> getters;
-}
-
-/// Defers [AvoidPublicMembersInStatesRule._flutterSdkContractMembers] — and
-/// the element resolution it needs — until a member actually asks for it,
-/// then caches the answer for the rest of the class. A `State` class with no
-/// public `@override` member never triggers the supertype walk at all.
-class _LazyFlutterSdkContractMembers {
-  _LazyFlutterSdkContractMembers(this._compute);
-
-  final _FlutterSdkContractMembers Function() _compute;
-  _FlutterSdkContractMembers? _cached;
-
-  _FlutterSdkContractMembers get value => _cached ??= _compute();
 }

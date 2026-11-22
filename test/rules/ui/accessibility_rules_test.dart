@@ -226,6 +226,28 @@ void main() {
       () => PreferSemanticsSortRule(),
     );
   });
+  group('avoid_motion_without_reduce - helper recognition', () {
+    // FP regression: project helpers like isMotionReduced must count as guards.
+    test('matches project helper isMotionReduced', () {
+      expect(
+        reducedMotionPreferencePattern.hasMatch(
+          'MotionPreferenceUtils.isMotionReduced(context) ? Duration.zero : d',
+        ),
+        isTrue,
+      );
+    });
+    test('still matches built-in names', () {
+      for (final s in ['x.disableAnimations', 'reduceMotion', 'reducedMotion']) {
+        expect(reducedMotionPreferencePattern.hasMatch(s), isTrue, reason: s);
+      }
+    });
+    test('does not match unrelated durations', () {
+      expect(
+        reducedMotionPreferencePattern.hasMatch('Duration(milliseconds: 500)'),
+        isFalse,
+      );
+    });
+  });
   group('Accessibility Rules - Fixture Verification', () {
     final fixtureDir = Directory('example/lib/accessibility');
     final fixtures = discoverFixtures(fixtureDir);
@@ -240,6 +262,28 @@ void main() {
         expect(file.existsSync(), isTrue);
       });
     }
+  });
+
+  // FP regression: avoid_gesture_only_interactions must not fire when an
+  // ancestor Semantics exposes onTap or the detector is an invisible hit box.
+  // The fixture carries the GOOD cases (no expect_lint above them).
+  group('avoid_gesture_only_interactions - Semantics/hit-region FP', () {
+    final String src = File(
+      'example/lib/accessibility/avoid_gesture_only_interactions_fixture.dart',
+    ).readAsStringSync();
+
+    test('fixture covers Semantics-ancestor good case', () {
+      final int i = src.indexOf('void _goodSemanticsAncestor');
+      expect(i, greaterThan(0));
+      // The line above the GOOD function must not be an expect_lint marker.
+      expect(src.substring(i - 120, i).contains('expect_lint'), isFalse);
+    });
+
+    test('fixture covers invisible hit-region good case', () {
+      final int i = src.indexOf('void _goodInvisibleHitRegion');
+      expect(i, greaterThan(0));
+      expect(src.substring(i - 120, i).contains('expect_lint'), isFalse);
+    });
   });
 
   // Stub-only behavior tests were removed from this file. Keep rule metadata

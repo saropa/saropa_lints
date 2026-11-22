@@ -422,6 +422,18 @@ class AvoidShadowingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  /// Test hook: returns the names of declarations in [body] that the rule
+  /// would flag given [outer] names already in scope. Exists because reporting
+  /// needs a live reporter, which a plain parsed AST cannot provide.
+  static List<String> shadowedNamesForTesting(
+    FunctionBody body,
+    Set<String> outer,
+  ) {
+    final _ShadowingChecker checker = _ShadowingChecker(null, _code, {...outer});
+    body.accept(checker);
+    return checker.flagged;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -440,7 +452,8 @@ class AvoidShadowingRule extends SaropaLintRule {
       if (params != null) {
         for (final FormalParameter param in params.parameters) {
           final String? name = param.name?.lexeme;
-          if (name != null) {
+          // Wildcard `_` params are non-binding; never seed them as outer names.
+          if (name != null && name != '_') {
             checker.outerNames.add(name);
           }
         }
@@ -462,7 +475,8 @@ class AvoidShadowingRule extends SaropaLintRule {
       if (params != null) {
         for (final FormalParameter param in params.parameters) {
           final String? name = param.name?.lexeme;
-          if (name != null) {
+          // Wildcard `_` params are non-binding; never seed them as outer names.
+          if (name != null && name != '_') {
             checker.outerNames.add(name);
           }
         }
@@ -476,15 +490,27 @@ class AvoidShadowingRule extends SaropaLintRule {
 class _ShadowingChecker extends RecursiveAstVisitor<void> {
   _ShadowingChecker(this.reporter, this.code, this.outerNames);
 
-  final SaropaDiagnosticReporter reporter;
+  /// Null only in unit tests (see [AvoidShadowingRule.shadowedNamesForTesting]).
+  final SaropaDiagnosticReporter? reporter;
   final LintCode code;
   final Set<String> outerNames;
+
+  /// Names flagged so far; lets tests assert behavior without a reporter.
+  final List<String> flagged = <String>[];
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
     final String name = node.name.lexeme;
+    // FP fix: Dart 3 wildcard `_` is non-binding (never introduces a name), so
+    // it can neither shadow nor be shadowed. Skip it and keep it out of
+    // outerNames so later `_` locals are not flagged against it.
+    if (name == '_') {
+      super.visitVariableDeclaration(node);
+      return;
+    }
     if (outerNames.contains(name)) {
-      reporter.atNode(node);
+      flagged.add(name);
+      reporter?.atNode(node);
     } else {
       outerNames.add(name);
     }
@@ -494,8 +520,14 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
   @override
   void visitDeclaredIdentifier(DeclaredIdentifier node) {
     final String name = node.name.lexeme;
+    // Same wildcard exemption as visitVariableDeclaration (`for (final _ in x)`).
+    if (name == '_') {
+      super.visitDeclaredIdentifier(node);
+      return;
+    }
     if (outerNames.contains(name)) {
-      reporter.atNode(node);
+      flagged.add(name);
+      reporter?.atNode(node);
     } else {
       outerNames.add(name);
     }
@@ -506,7 +538,8 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
   void visitFunctionDeclarationStatement(FunctionDeclarationStatement node) {
     final String name = node.functionDeclaration.name.lexeme;
     if (outerNames.contains(name)) {
-      reporter.atNode(node.functionDeclaration, code);
+      flagged.add(name);
+      reporter?.atNode(node.functionDeclaration, code);
     } else {
       outerNames.add(name);
     }

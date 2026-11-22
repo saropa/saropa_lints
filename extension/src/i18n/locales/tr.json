@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "v16'da Ne Yeni?"
+      "title": "Yenilikler"
     },
     "hero": {
       "subtitle": "Bu sürüm, varsayılan tanımlama makinelerini değiştirir. Devam etmeden önce okuyun — bu, Problems bölmesinde ne göreceğinize etki eder."
@@ -719,7 +719,7 @@
         "processes": "{count} işlem(ler)i · {size} RSS",
         "daemons": "Flutter daemonlar",
         "daemonsValue": "{total} ({orphaned} izole)",
-        "scanDaemons": "Orphaned scan daemons",
+        "scanDaemons": "Sahipsiz tarama arka plan süreçleri",
         "scanDaemonsValue": "{count}, temizleme kullanarak öldürün",
         "other": "Diğer Dart",
         "extHost": "Eklenti ana bilgisayarı",
@@ -2198,7 +2198,7 @@
       "off": "KAPALI"
     },
     "action": {
-      "killAll": "Kilitle",
+      "killAll": "Tüm {name} süreçlerini sonlandır",
       "restartAll": "{name} yeniden başlat",
       "killAllDescription": "Yalnızca LSP Sunucusunu zorla durdurur. Analizör Eklentisi ve Tarama Daemon henüz bağımsız olarak sonlandırılamaz; bunun yerine her motorun kendi AÇIK/KAPALI geçişini kullanın.",
       "restartAllDescription": "LSP Sunucusunu durdurur ve yeniden başlatır (veya çalışmıyorsa başlatır). Analizör Eklentisi ve Tarama Daemon etkilenmez; bunun yerine her motorun kendi AÇIK/KAPALI geçişini kullanın."
@@ -2483,7 +2483,8 @@
       "progressPubGet": "pub get çalıştırılıyor… ({elapsed}s)",
       "progressConfigWrite": "Yazılım yapılandırması… ({elapsed}s)",
       "progressAnalysis": "Analiz çalıştırılıyor… ({elapsed}s)",
-      "progressBaseline": "Temel tarama çalıştırılıyor… ({elapsed}s)"
+      "progressBaseline": "Temel tarama çalıştırılıyor… ({elapsed}s)",
+      "analysisScanning": "Çalışma alanı taranıyor… %{percent} (şu ana kadar {count} sorun)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Analiz Yolu Belirle",
@@ -2517,7 +2518,7 @@
       "crossFileHtmlReportGenerated": "Çapraz dosya HTML raporu oluşturuldu.",
       "actionOpenInBrowser": "Tarayıcıda açın.",
       "actionOpenFile": "Open File Açık Dosya dosyası",
-      "crossFileSnapshotFailed": "Dosya çapraz fotoğrafı başarısız oldu: {message} _PH0___ -Hepimiz birer insanız.",
+      "crossFileSnapshotFailed": "Dosyalar arası anlık görüntü başarısız: {message}",
       "crossFileSnapshotNoJson": "Dosya çapraz fotoğraf tamamlandı ancak JSON dosyası bulunamadı.",
       "crossFileSnapshotWritten": "Cross-file snapshot yazılı raporları/.saropa_lints/cross_file_snapshot.json için",
       "crossFileNoWorkspace": "Saropa Lints: Dart/Flutter çalışma alanı bulunamadı. Öncelikle pubspec.yaml ile bir proje açın.",
@@ -2861,12 +2862,12 @@
     "label": {
       "upgrade": "Yükseltme Geliştirme Güncelleme",
       "breaks": "Kırık",
-      "breaksLower": "bozar",
+      "breaksLower": "uyumsuzluklar",
       "upgradeNotRecommended": "⚠️ Yükseltme önerilmez"
     },
     "notRecommended": "Güncelleme önerilmez",
     "skipReason": "güncelleme önerilmiyor: {summary}",
-    "sdkBlock": "{pkg} {to} için {dep} {range} gerekir; Flutter {dep} sürümünü {pinned} olarak sabitler",
+    "sdkBlock": "{pkg} {to} için {dep} {range} gerekir; Flutter {dep} {pinned} sürümüne sabitler",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) — {chain} üzerinden",
     "unverified": "Güncelleme kontrolü tamamlanamadı: {to} için bağımlılık verileri alınamadı",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Eklenti sürümü senkron değil",
     "driftRowDescription": "analysis_options.yaml derki {configured}, pubspec.lock pinleri {pinned}. Synchronize etmek için tıklayın.",
     "driftSynced": "analysis_options.yaml eklentisi sürümü {pinned}'e güncellendi."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints ücretsiz ve açık kaynaklıdır. Hızlı bir puan veya yorum diğer geliştiricilerin onu keşfetmesine yardımcı olur; GitHub’daki geri bildirimler ve hata raporları da onu sürekli geliştirir.",
+      "marketplace": "Marketplace’te puanla",
+      "openVsx": "Open VSX’te puanla",
+      "never": "Bir daha sorma"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "VS Code Marketplace’te puanla",
+        "description": "Diğer geliştiricilerin Saropa Lints’i bulmasına yardımcı olmak için puan verin"
+      },
+      "openVsx": {
+        "label": "Open VSX’te puanla",
+        "description": "Açık kayıt defterinde puan verin"
+      }
+    },
+    "welcome": {
+      "header": "Ücretsiz, açık kaynaklı ve topluluk için geliştirildi",
+      "body": "Saropa Lints açık kaynaklıdır ve hep öyle kalacak. Hızlı bir puan diğer geliştiricilerin onu keşfetmesine yardımcı olur. Bir hata mı buldunuz ya da özellik fikriniz mi var? Bir issue açın — her rapor aracı herkes için daha iyi yapar.",
+      "marketplace": "VS Code Marketplace’te puanla",
+      "openVsx": "Open VSX’te puanla",
+      "issues": "GitHub’da sorun bildir"
+    }
   }
 }

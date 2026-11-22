@@ -15,5 +15,12 @@
 // stream.distinct().listen((value) {
 //   setState(() => _value = value); // only rebuilds on actual changes
 // });
+//
+// GOOD (false-positive regression): payload-less refresh signal. Every event
+// carries the same value, so .distinct() would drop all but the first and
+// stop the refresh. The listener ignores its parameter, so no lint.
+// prefChanged.stream.listen((_) {
+//   setState(() => _reloadCounter++);
+// });
 
 void main() {}

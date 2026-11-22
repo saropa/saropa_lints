@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "¿Qué hay de nuevo?"
+      "title": "Novedades"
     },
     "hero": {
       "subtitle": "Esta versión cambia el motor de diagnóstico por defecto. Lee esto antes de seguir trabajando — afecta lo que verás en el panel de Problemas."
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Ejecutando pub get… ({elapsed}s)",
       "progressConfigWrite": "Escribiendo configuración… ({elapsed}s)",
       "progressAnalysis": "Análisis en ejecución… ({elapsed}s)",
-      "progressBaseline": "Ejecutando escaneo de base… ({elapsed}s)"
+      "progressBaseline": "Ejecutando escaneo de base… ({elapsed}s)",
+      "analysisScanning": "Analizando el espacio de trabajo… {percent} % ({count} problemas hasta ahora)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Establecer Análisis de Vía",
@@ -2860,7 +2861,7 @@
   "blastRadius": {
     "label": {
       "upgrade": "Actualizar actualizaciones.",
-      "breaks": "Rompe",
+      "breaks": "Incompatibles",
       "breaksLower": "rompe",
       "upgradeNotRecommended": "⚠️ No se recomienda la actualización"
     },
@@ -2998,7 +2999,7 @@
         "dependency": "Dependencia en pubspec.yaml",
         "plugin": "Plugin en analysis_options.yaml solo",
         "both": "Dependencia y plugin",
-        "none": "No change possible"
+        "none": "No es posible ningún cambio"
       }
     },
     "apply": {
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Versión del plugin desincronizada",
     "driftRowDescription": "analysis_options.yaml dice {configured}, pubspec.lock pines {pinned}. Haga clic para sincronizar.",
     "driftSynced": "analysis_options.yaml plugin versión actualizada a {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints es gratuito y de código abierto. Una valoración o reseña rápida ayuda a otros desarrolladores a descubrirlo, y los comentarios e informes de errores en GitHub lo mejoran cada día.",
+      "marketplace": "Valorar en Marketplace",
+      "openVsx": "Valorar en Open VSX",
+      "never": "No volver a preguntar"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Valorar en VS Code Marketplace",
+        "description": "Deja una valoración para ayudar a otros desarrolladores a encontrar Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Valorar en Open VSX",
+        "description": "Deja una valoración en el registro abierto"
+      }
+    },
+    "welcome": {
+      "header": "Gratis, de código abierto y hecho para la comunidad",
+      "body": "Saropa Lints es de código abierto y siempre lo será. Una valoración rápida ayuda a otros desarrolladores a descubrirlo. ¿Encontraste un error o tienes una idea? Abre una incidencia: cada informe mejora la herramienta para todos.",
+      "marketplace": "Valorar en VS Code Marketplace",
+      "openVsx": "Valorar en Open VSX",
+      "issues": "Informar de un problema en GitHub"
+    }
   }
 }

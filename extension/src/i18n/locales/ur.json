@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "نیا کیا ہے v16 میں"
+      "title": "نیا کیا ہے"
     },
     "hero": {
       "subtitle": "یہ ریلیز ڈیفالٹ ڈیانوستک انجن کو تبدیل کردی ہے۔ اپنی کام کرنے سے پہلے اس کا پڑھ لیجیے — یہ آپ کو Problems پنل میں دکھائی دینے والی چیز کو متاثر کرے گی۔"
@@ -2469,7 +2469,7 @@
       "configUpdated": "Saropa Lints config اپ ڈیٹ کیا گیا (tier: {tier}).پھر اس نے کہا کہ وہ کیا کر رہا ہے.",
       "configWriteFailed": "کنفیگریشن لکھنے میں ناکامی۔ {details}",
       "scaffoldGateTitle": "جامع تجزیہ پلگ ان سکیفولڈ",
-      "scaffoldGateDetail": "یہ آپ کے کام کی جگہ (pubspec.yaml، lib/main.dart، README) کے تحت ایک نیا Dart پیکج لکھتا ہے: ایک کسٹم_لنٹ پلگ ان جو Saropa کو رجسٹر کرتا ہے اور اپنے قوانین کے لئے ہکس چھوڑ دیتا ہے۔\n\nصرف اس وقت استعمال کریں جب آپ Saropa کے ساتھ مل کر کسٹم تجزیہ کار قواعد بھیجیں۔ عام Saropa-صرف منصوبوں کو اس پر کود کر سکتے ہیں  ⁇ تحلیل کار فی سیاق و سباق ایک واحد پلگ ان اندراج کی اجازت دیتا ہے.\n\nاگلا: اگلے: ایک ورک اسپیس رشتہ دار فولڈر منتخب کریں۔ اگر یہ فولڈر پہلے سے موجود ہے تو ، کسی بھی چیز کو اوور رائٹ کرنے سے پہلے آپ سے پوچھا جائے گا۔",
+      "scaffoldGateDetail": "یہ آپ کے ورک اسپیس کے اندر ایک نیا Dart پیکیج لکھتا ہے (pubspec.yaml، lib/main.dart، README): ایک custom_lint پلگ اِن جو Saropa کو رجسٹر کرتا ہے اور آپ کے اپنے رولز کے لیے ہُکس چھوڑتا ہے۔\n\nاسے صرف تب استعمال کریں جب آپ Saropa کے ساتھ حسبِ ضرورت analyzer رولز شپ کریں۔ عام صرف-Saropa پروجیکٹس اسے چھوڑ سکتے ہیں—analyzer ہر کانٹیکسٹ میں صرف ایک پلگ اِن اندراج کی اجازت دیتا ہے۔\n\nاگلا مرحلہ: ورک اسپیس سے متعلق ایک فولڈر منتخب کریں۔ اگر وہ فولڈر پہلے سے موجود ہو تو کچھ بھی اوور رائٹ ہونے سے پہلے آپ سے پوچھا جائے گا۔",
       "actionContinue": "جاری رکھیں جاری رکھیں مسلسل",
       "actionOpenGuide": "کھولیں گائیڈ گائیڈز",
       "scaffoldPathOutsideWorkspace": "اسکیلپنگ کا راستہ ورک اسپیس فولڈر کے اندر ہونا چاہئے۔",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "پبل گیٹ کر رہے ہیں... ({elapsed}s)",
       "progressConfigWrite": "لکھنا کنفیگ... ({elapsed}s)",
       "progressAnalysis": "تحلیل کر رہے ہیں... ({elapsed}s)",
-      "progressBaseline": "اسکن بنیادی حد تک جاری ہے... ({elapsed}s)"
+      "progressBaseline": "اسکن بنیادی حد تک جاری ہے... ({elapsed}s)",
+      "analysisScanning": "ورک اسپیس اسکین ہو رہا ہے… {percent}% (اب تک {count} مسائل)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: تحلیل کرنے والی لین",
@@ -2943,7 +2944,7 @@
       "tipDisagree": "pubspec.yaml اور analysis_options.yaml نام مختلف saropa_lints ورژن ہیں۔ ایڈیٹر پلاگن ورژن ({plugin}) کا استعمال کرتا ہے؛ کمینڈ لائن کمینڈز pubspec.yaml ورژن ({pubspec}) کا استعمال کرتے ہیں۔",
       "tipNeither": "saropa_lints اس پروجیکٹ میں سیٹ اپ نہیں ہے: اس کو pubspec.yaml کی ت依賴 نہیں ہے اور analysis_options.yaml میں ایک پلگ ان نہیں ہے۔",
       "tipLocalSource": "saropa_lints محلی پٹھی یا گٹ سourse سے آتا ہے، اس لیے ایکسٹینشن صرف حقائق دکھاتا ہے اور کچھ نہیں تبدیل کرتا۔",
-      "tipDartTooOld": "The plugin route in analysis_options.yaml needs a newer Dart SDK than this project has, so the editor cannot load the plugin."
+      "tipDartTooOld": "analysis_options.yaml میں پلگ اِن روٹ کو اس پروجیکٹ کے مقابلے میں نئے Dart SDK کی ضرورت ہے، اس لیے ایڈیٹر پلگ اِن لوڈ نہیں کر سکتا۔"
     },
     "recommend": {
       "latestOk": "saropa_lints {version} نیا ریلیز ہے اور اس پروجیکٹ کے ساتھ کام کرتا ہے۔ ^{version} استعمال کریں۔",
@@ -2988,7 +2989,7 @@
       "fixes": "کس طرح ترمیم کریں",
       "apply": "آپلیکیٹ",
       "applying": "کاریکیشن...",
-      "preview": "Preview diff",
+      "preview": "diff کا پیش منظر",
       "refresh": "دوبارہ جانچیں",
       "diffTitle": "{file}: پیش کی گئی نسخہ تبدیلی",
       "staleReloaded": "کرڈ کے دیکھنے کے دوران پروجیکٹ تبدیل ہو گیا ہے، اس لیے کچھ نہیں لاگو کیا گیا۔ اپڈیٹڈ مشورہ دیکھیں اور دوبارہ لاگو کریں۔",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "پلاگ ان ہیڈر ورژن اکیلے مطابق نہیں",
     "driftRowDescription": "analysis_options.yaml کہتا ہے {configured}، pubspec.lock پنسل {pinned}۔ سینکن کریں۔",
     "driftSynced": "analysis_options.yaml پلاگن ورژن اپ ڈیٹ کر دی گئی ہے {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints مفت اور اوپن سورس ہے۔ ایک فوری ریٹنگ یا جائزہ دوسرے ڈویلپرز کو اسے دریافت کرنے میں مدد دیتا ہے، اور GitHub پر رائے اور بگ رپورٹس اسے مسلسل بہتر بناتی ہیں۔",
+      "marketplace": "Marketplace پر ریٹ کریں",
+      "openVsx": "Open VSX پر ریٹ کریں",
+      "never": "دوبارہ نہ پوچھیں"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "VS Code Marketplace پر ریٹ کریں",
+        "description": "ریٹنگ دیں تاکہ دوسرے ڈویلپرز Saropa Lints تلاش کر سکیں"
+      },
+      "openVsx": {
+        "label": "Open VSX پر ریٹ کریں",
+        "description": "اوپن رجسٹری پر ریٹنگ دیں"
+      }
+    },
+    "welcome": {
+      "header": "مفت، اوپن سورس، اور کمیونٹی کے لیے بنایا گیا",
+      "body": "Saropa Lints اوپن سورس ہے اور ہمیشہ رہے گا۔ ایک فوری ریٹنگ دوسرے ڈویلپرز کو اسے دریافت کرنے میں مدد دیتی ہے۔ کوئی بگ ملا یا فیچر کا خیال ہے؟ ایک issue کھولیں — ہر رپورٹ ٹول کو سب کے لیے بہتر بناتی ہے۔",
+      "marketplace": "VS Code Marketplace پر ریٹ کریں",
+      "openVsx": "Open VSX پر ریٹ کریں",
+      "issues": "GitHub پر مسئلہ رپورٹ کریں"
+    }
   }
 }

@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Co nowego w wersji v16"
+      "title": "Co nowego"
     },
     "hero": {
       "subtitle": "Ta wersja zmienia domyślny silnik diagnostyczny. Przeczytaj to przed kontynuowaniem pracy — wpływa to na to, co zobaczysz w panelu Problemy."
@@ -80,7 +80,7 @@
       "subtitle": "Wyniki {count} · {timestamp}",
       "baselineSubtitle": "W porównaniu do podstawy z {date}",
       "searchPlaceholder": "Filtruj według reguły, pliku lub wiadomości…",
-      "filterTier": "Tier",
+      "filterTier": "Poziom",
       "filterSeverity": "Poważność Surowość",
       "filterImpact": "Wpływ wpływu Impact impact.",
       "filterBaselineStatus": "Podstawa",
@@ -93,7 +93,7 @@
       "colLine": "Linia Linia Linea Linię",
       "colRule": "Regulamin regulaminu",
       "colSeverity": "Poważność Surowość",
-      "colTier": "Tier",
+      "colTier": "Poziom",
       "colMessage": "Wiadomość Przesłanie Wiadomości",
       "empty": "Brak znalezisk — projekt jest czysty.",
       "filteredEmpty": "Brak wyników pasujących do obecnych filtrów.",
@@ -281,7 +281,7 @@
       "enableTitle": "Włącz ponownie tę regułę — usuwa nadpisanie w analysis_options_custom.yaml i ponownie uruchamia analizę"
     },
     "tab": {
-      "tier": "Tier",
+      "tier": "Poziom",
       "packs": "Pakiety reguł zawierają zasady.",
       "overrides": "Przełącza nadrzędne.",
       "sdk": "Rozpoczęcie wdrażania SDK",
@@ -395,7 +395,7 @@
     "watcher": {
       "title": "Watcher ignoruje",
       "hint": "Pliki i foldery, które monitor watcher plików VS Code powinien ignorować. Liczby pochodzą z skanu zagrożeń w przestrzeni roboczej; użyj List, aby zobaczyć ścieżki, a następnie wyklucz je z ostrzeżeń, które pokazuje skan.",
-      "scanning": "Scanning the workspace...",
+      "scanning": "Skanowanie obszaru roboczego...",
       "affected": "{count} dotknięty",
       "list": "Lista",
       "recommended": "Zalecane wykluczenia, które jeszcze nie są w files.watcherExclude"
@@ -413,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "Poziom: {tier} · Pasek: {lane}",
-      "descriptionNoLane": "Tier: poziom podstawowy. {tier} to odmiana _PH0_."
+      "descriptionNoLane": "Poziom: {tier}"
     },
     "controls": {
       "laneLight": "Light — ~200 reguł w edytorze, reszta przy zapisie",
@@ -692,7 +692,7 @@
       },
       "project": {
         "version": "Wersja wersja wersji",
-        "tier": "Tier",
+        "tier": "Poziom",
         "vibrancy": "Wibracja",
         "packages": "Pakiety skanowane",
         "packagesSuppressed": "{count} ({suppressed} wygaszony)",
@@ -999,7 +999,7 @@
       "owasp": "OWASP",
       "ruleType": "Rodzaj reguły Typ reguły",
       "ruleStatus": "Status reguły - Rule status.",
-      "tier": "Tier",
+      "tier": "Poziom",
       "pack": "Pakiet (y)"
     },
     "seg": {
@@ -2199,7 +2199,7 @@
     },
     "action": {
       "killAll": "Zabij Wszystko {name}",
-      "restartAll": "Uruchom ponownie wszystko",
+      "restartAll": "Uruchom ponownie {name}",
       "killAllDescription": "Zatrzymuje tylko serwer LSP. Wtyczka Analizatora i Skaner Daemon nie mogą być zakończone niezależnie — użyj włącznika ON/OFF każdego silnika zamiast tego.",
       "restartAllDescription": "Zatrzymuje i ponownie uruchamia serwer LSP (lub uruchamia go, jeśli nie działa). Wtyczka Analizatora i skaner Daemon nie są w tym przypadku wpływowane — zamiast tego użyj własnego przełącznika WŁ/WW dla każdego silnika."
     },
@@ -2291,7 +2291,7 @@
     },
     "community": {
       "issues": "{count} problemów",
-      "prs": "{count} PRs (public relations) - to relacje publiczne.",
+      "prs": "{count} PR-ów",
       "activity90d": "90d: zamknięto emisje {closed}, połączono PRs {merged}.",
       "lastCommit": "Ostatni wpis: {time}",
       "archived": "Repozytorium jest archiwizowane.",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Uruchamianie pub get… ({elapsed}s)",
       "progressConfigWrite": "Zapisywanie konfiguracji… ({elapsed}s)",
       "progressAnalysis": "Analiza w trakcie… ({elapsed}s)",
-      "progressBaseline": "Uruchamianie podstawowego skanowania… ({elapsed}s)"
+      "progressBaseline": "Uruchamianie podstawowego skanowania… ({elapsed}s)",
+      "analysisScanning": "Skanowanie obszaru roboczego… {percent}% (dotąd problemów: {count})"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Ustawienia Analizy Kanału",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Wersja wtyczki niezgodna z aktualnym stanem",
     "driftRowDescription": "analysis_options.yaml mówi {configured}, pubspec.lock pinów {pinned}. Kliknij, aby zsynchronizować.",
     "driftSynced": "Aktualizacja wersji wtyczki analysis_options.yaml do {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints jest darmowy i open source. Szybka ocena lub recenzja pomaga innym programistom go odkryć, a opinie i zgłoszenia błędów na GitHubie sprawiają, że jest coraz lepszy.",
+      "marketplace": "Oceń w Marketplace",
+      "openVsx": "Oceń w Open VSX",
+      "never": "Nie pytaj ponownie"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Oceń w VS Code Marketplace",
+        "description": "Zostaw ocenę, aby pomóc innym programistom znaleźć Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Oceń w Open VSX",
+        "description": "Zostaw ocenę w otwartym rejestrze"
+      }
+    },
+    "welcome": {
+      "header": "Darmowe, open source i stworzone dla społeczności",
+      "body": "Saropa Lints jest open source i zawsze będzie. Szybka ocena pomaga innym programistom go odkryć. Znalazłeś błąd lub masz pomysł na funkcję? Otwórz zgłoszenie — każde zgłoszenie ulepsza narzędzie dla wszystkich.",
+      "marketplace": "Oceń w VS Code Marketplace",
+      "openVsx": "Oceń w Open VSX",
+      "issues": "Zgłoś problem na GitHubie"
+    }
   }
 }

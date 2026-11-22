@@ -165,3 +165,15 @@ void mixedCaseExample() {
 
   print(outerValue);
 }
+
+/// Wildcard `_` locals - should NOT trigger (Dart 3 non-binding wildcard
+/// never shadows and is never shadowed, even when repeated in nested scopes)
+void wildcardLocalExample() {
+  final bool _ = true; // OK: wildcard
+  void inner() {
+    final bool _ = false; // OK: wildcard is non-binding
+  }
+
+  for (final _ in [1, 2]) {} // OK: wildcard loop variable
+  inner();
+}

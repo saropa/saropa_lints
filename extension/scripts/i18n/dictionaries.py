@@ -30,6 +30,20 @@ DO_NOT_TRANSLATE: list[str] = [
     "Vibrancy",
     # Dart analyzer comment directive — literal code syntax, never translated.
     "// ignore_for_file:",
+    # Version-source labels: "saropa_lints" and "pubspec"/"plugin route" are
+    # config-file / package identifiers, not prose. setdefault keeps any locale
+    # that already carries a curated translation.
+    "saropa_lints: pubspec {version}",
+    "saropa_lints: pubspec + plugin {version}",
+    "saropa_lints: plugin route {version}",
+    # Memory readout: RSS and heap are process-metric terms, universally English.
+    "{rss} RSS · {heap} / {heapTotal} heap",
+    # Product/protocol names and abbreviations written the same worldwide.
+    "WASM",
+    "GitHub Actions CI",
+    "+docs",
+    "N/A",
+    "UPDATE",
 ]
 
 # Words that are spelled identically in specific locales (cognates, loanwords,
@@ -51,6 +65,9 @@ COGNATES: dict[str, list[str]] = {
     # security jargon (e.g. "baseline di sicurezza"); both locale files
     # already keep "Drift"/"auth" untranslated in the same UI area.
     "baseline": ["it", "nl"],
+    # "dev" = dev-dependency / dev channel tag; kept as the code-level token in
+    # locales where MT returned it unchanged.
+    "dev": ["id", "it", "ko", "nl", "pt", "ru", "sw", "tr", "vi"],
 }
 
 # cspell:disable
@@ -1797,6 +1814,15 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
 }
+
+# Merge hand-written translations (manual_translations.py) first, with setdefault so
+# any older curated entry for the same source string still wins.
+from manual_translations import build as _build_manual  # noqa: E402
+from manual_translations_gaps import build as _build_gaps  # noqa: E402
+
+for _loc, _entries in [*_build_manual().items(), *_build_gaps().items()]:
+    for _src, _tr in _entries.items():
+        TRANSLATIONS.setdefault(_loc, {}).setdefault(_src, _tr)
 
 # Merge DO_NOT_TRANSLATE passthroughs into every locale that doesn't already
 # have a curated entry for the string. Runs once at import time.

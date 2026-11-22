@@ -4296,10 +4296,35 @@ class PreferStreamDistinctRule extends SaropaLintRule {
 
     final callback = args.first;
     if (callback is FunctionExpression) {
+      // FP fix: a listener that ignores its event value (`(_) => reload()`)
+      // is consuming a payload-less "something changed" signal. .distinct()
+      // would drop every repeat of the same value and silence the refresh,
+      // so the suggestion would break working code.
+      if (_ignoresEventParameter(callback)) return false;
+
       final body = callback.body.toSource();
       return body.contains('setState');
     }
     return false;
+  }
+
+  /// True when [callback] never reads its event parameter: no parameter at
+  /// all, a wildcard name (`_`, `__`), or a named parameter that the body
+  /// never references.
+  bool _ignoresEventParameter(FunctionExpression callback) {
+    final params = callback.parameters?.parameters;
+    // No parameter list or an empty one: nothing from the event is used.
+    if (params == null || params.isEmpty) return true;
+
+    final name = params.first.name?.lexeme;
+    if (name == null) return true;
+    // Wildcard names (`_`, `__`) are the idiomatic "ignored" marker.
+    if (RegExp(r'^_+$').hasMatch(name)) return true;
+
+    // Named but unused: word-boundary match so `value` does not match
+    // `valueX` or a substring of another identifier.
+    final used = RegExp('\\b${RegExp.escape(name)}\\b');
+    return !used.hasMatch(callback.body.toSource());
   }
 }
 

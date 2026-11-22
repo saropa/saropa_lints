@@ -27,6 +27,8 @@ void _write(String path, String content) {
     ..writeAsStringSync(content);
 }
 
+// Production returns native-separator paths (callers open them as files), so
+// expectations are compared in posix form to stay OS-neutral.
 void main() {
   late Directory repo;
 
@@ -54,20 +56,21 @@ void main() {
 
   test('from the repository root, lists every changed Dart file', () {
     final files = gitChangedDartFiles(repo.path, 'base');
-    expect(files.map((f) => p.relative(f, from: repo.path)).toSet(), {
-      'packages/app/lib/a.dart',
-      'packages/app/lib/new.dart',
-      'tool/b.dart',
-    });
+    expect(
+      files
+          .map((f) => p.relative(f, from: repo.path).replaceAll(r'\', '/'))
+          .toSet(),
+      {'packages/app/lib/a.dart', 'packages/app/lib/new.dart', 'tool/b.dart'},
+    );
   });
 
   test('from a subdirectory, lists only its files, at paths that exist', () {
     final app = p.join(repo.path, 'packages', 'app');
     final files = gitChangedDartFiles(app, 'base');
-    expect(files.map((f) => p.relative(f, from: app)).toSet(), {
-      'lib/a.dart',
-      'lib/new.dart',
-    });
+    expect(
+      files.map((f) => p.relative(f, from: app).replaceAll(r'\', '/')).toSet(),
+      {'lib/a.dart', 'lib/new.dart'},
+    );
     for (final file in files) {
       expect(File(file).existsSync(), isTrue, reason: file);
     }

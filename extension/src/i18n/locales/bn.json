@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "ভিভিআই ১৬ এ কি নতুন আছে?"
+      "title": "নতুন কী আছে"
     },
     "hero": {
       "subtitle": "এই রিলেস ডিফল্ট ডায়নোস্টিক ইঞ্জিন পরিবর্তন করে। আপনি কাজ করতে আগে পড়ুন — এটি আপনি প্রোবলেম প্যানেলে দেখতে যাচ্ছেন কী তা নির্ধারণ করে।"
@@ -394,7 +394,7 @@
     },
     "watcher": {
       "title": "ওবাচার এক্সক্লুড করে",
-      "hint": "Files and folders VS Code's file watcher should ignore. Counts come from the workspace hazard scan; use List to see the paths, then exclude them from the warning that scan shows.",
+      "hint": "VS Code-এর ফাইল ওয়াচারের যে ফাইল ও ফোল্ডার উপেক্ষা করা উচিত। সংখ্যাগুলো ওয়ার্কস্পেস হ্যাজার্ড স্ক্যান থেকে আসে; পথগুলো দেখতে List ব্যবহার করুন, তারপর স্ক্যানের সতর্কতা থেকে সেগুলো বাদ দিন।",
       "scanning": "কাজ করছে...",
       "affected": "{count} প্রভাবিত",
       "list": "তালিকা",
@@ -2149,7 +2149,7 @@
   "debug": {
     "section": {
       "engines": "ডায়নোস্টিক ইঞ্জিনগুলি",
-      "enginesRecommendation": "Recommended: LSP Server ON (default, beta), Scan on Save ON, Live Analysis OFF (LSP already covers live diagnostics; both on may show duplicates), GitHub Actions CI ON only if you want pull requests gated. If a rule stops firing under LSP, turn Live Analysis ON and LSP Server OFF.",
+      "enginesRecommendation": "প্রস্তাবিত: LSP Server চালু (ডিফল্ট, বিটা), Scan on Save চালু, Live Analysis বন্ধ (LSP ইতিমধ্যে লাইভ ডায়াগনস্টিক কভার করে; দুটি চালু থাকলে ডুপ্লিকেট দেখা যেতে পারে), পুল রিকোয়েস্ট গেট করতে চাইলেই কেবল GitHub Actions CI চালু। LSP-তে কোনো রুল কাজ না করলে Live Analysis চালু এবং LSP Server বন্ধ করুন।",
       "log": "লগ"
     },
     "engine": {
@@ -2215,7 +2215,7 @@
       "lspDisabledPrompt": "এলএসপি সার্ভার সেটিংসে (সারোপা লিন্টস. এলএসপি সার্ভার. এনাবলড) অক্ষম করা হয়েছে। সক্রিয় করুন এবং শুরু করুন?",
       "lspEnableButton": "Enable সক্ষম করুন সক্রিয় করুন",
       "lspStopped": "এলএসপি সার্ভার: বন্ধ হয়ে গেল।",
-      "lspStartFailed": "LSP Server: failed to start (see the error message and the Saropa Lints LSP output channel).",
+      "lspStartFailed": "LSP সার্ভার: চালু করা যায়নি (ত্রুটির বার্তা এবং Saropa Lints LSP আউটপুট চ্যানেল দেখুন)।",
       "analyzerToggleOn": "এনালাইজার প্লাগইন: সক্রিয় করা হচ্ছে…",
       "analyzerToggleOff": "এনালাইজার প্লাগইন: অক্ষম করা হচ্ছে...",
       "daemonToggleOn": "Daemon স্ক্যান করুন: আবার শুরু হচ্ছে...",
@@ -2236,7 +2236,7 @@
       "openWorkflowFailed": "{path} খুলতে পারিনি।",
       "publish": {
         "heading": "এই পরিবর্তন প্রকাশ করুন",
-        "introEnable": "আপনার ওয়ার্কিং ট্রিতে {path} লেখা হয়েছে। এটি {base}-এ না পৌঁছানো পর্যন্ত CI-তে কিছুই চলবে না। এই কমান্ডগুলো এটিকে {branch} নামের নতুন ব্রাঞ্চে রাখে এবং রিভিউয়ের জন্য একটি পুল রিকোয়েস্ট খোলে — নিজে চালান, অথবা বোতাম চাপুন, Saropa Lints ঠিক এই কমান্ডগুলোই চালাবে।",
+        "introEnable": "{path} আপনার ওয়ার্কিং ট্রিতে লেখা হয়েছে। এটি {base}-এ না আসা পর্যন্ত CI-তে কিছু চলবে না। এই কমান্ডগুলো এটিকে {branch} নামের নতুন ব্রাঞ্চে রাখে এবং রিভিউয়ের জন্য একটি পুল রিকোয়েস্ট খোলে — নিজে চালান, অথবা বোতামে চাপ দিন, Saropa Lints ঠিক এগুলোই চালাবে।",
         "introDisable": "{path} আপনার কাজের গাছে সম্পাদিত হয়েছে এবং সব কাজ বন্ধ করে দেয়। CI এই পর্যন্ত চালু থাকে যতক্ষণ না {base} পৌঁছে। এই কমান্ডগুলি পরিবর্তনটি একটি নতুন শাখায় যেখানে নাম দেয়া হয়েছে {branch} এবং একটি পুল রিকুয়েস্ট খুলে দেয় — আপনি নিজে চালান, অথবা বুটন চাপুন এবং Saropa Lints ঠিক এইগুলি চালাবে। যদি আপনি CI কে মুক্তিমুক্ত করতে চান, তবে রিপোজিটরির Actions ট্যাব থেকে কার্যপ্রণালীটি অক্ষম করুন।",
         "commandsLabel": "কমান্ডস কম্যান্ডস",
         "copy": "কপি,কপি,অনুলিপি করে দিন।",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "পাব গেট চালানো হচ্ছে… ({elapsed}s)",
       "progressConfigWrite": "লিখন কনফিগ... ({elapsed}s)",
       "progressAnalysis": "অ্যানালাইসিস চালানো হচ্ছে... ({elapsed}s)",
-      "progressBaseline": "বেসলাইন স্ক্যান চালানো হচ্ছে… ({elapsed}s)"
+      "progressBaseline": "বেসলাইন স্ক্যান চালানো হচ্ছে… ({elapsed}s)",
+      "analysisScanning": "ওয়ার্কস্পেস স্ক্যান করা হচ্ছে… {percent}% (এখন পর্যন্ত {count}টি সমস্যা)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: অ্যানালাইসিস লেন",
@@ -2919,7 +2920,7 @@
       "routeDependency": "পাবসেপসি রুট (pubspec.yaml)",
       "routePlugin": "প্লাগইন রুট (analysis_options.yaml)",
       "routeBoth": "উভয় রুট (pubspec.yaml এবং analysis_options.yaml)",
-      "installedDisagree": "{pubspec} in pubspec.yaml and {plugin} in analysis_options.yaml",
+      "installedDisagree": "pubspec.yaml-এ {pubspec} এবং analysis_options.yaml-এ {plugin}",
       "offer": "saropa_lints: আপনার প্রকল্প {route} ব্যবহার করে {installed}। {offered} উপলব্ধ এবং আপনার Dart {dart} সাথে কাজ করে। স্থানান্তরিত করুন?",
       "offerNoDart": "saropa_lints: আপনার প্রকল্প {route} ব্যবহার করে {installed}। {offered} উপলব্ধ। স্থানান্তরিত করুন?",
       "offerRenames": "saropa_lints: আপনার প্রকল্প {route} ব্যবহার করে {installed}। {offered} উপলব্ধ এবং আপনার Dart {dart} সাথে কাজ করে। {count} নিয়ম সাথে {installed} থেকে পুনরায় নামকরণ করা হয়েছে। স্থানান্তরিত করুন?",
@@ -2949,7 +2950,7 @@
       "latestOk": "saropa_lints {version} হল সবচেয়ে নতুন রিলিজ এবং এটি এই প্রকল্পের সাথে কাজ করে। ^{version} ব্যবহার করুন।",
       "alreadyCorrect": "এই প্রকল্পটি ইতিমধ্যে পরামর্শ দেওয়া হয়েছে saropa_lints কনফিগারেশন। কোনও ক্রিয়া প্রয়োজন নয়।",
       "needsNewerDart": "saropa_lints {newest} এর জন্য একটি নতুন খুব আপডেট করা হয়েছে Dart SDK প্রয়োজন ({dart})। ^{chosen} বজায় রাখুন, অথবা Flutter আপগ্রেড করুন যাতে {newest} ব্যবহার করা যায়।",
-      "metaExcludesPin": "saropa_lints {newest} needs a newer meta package than your Flutter SDK pins ({pin}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "metaExcludesPin": "saropa_lints {newest}-এর জন্য আপনার Flutter SDK যে meta প্যাকেজ পিন করেছে ({pin}) তার চেয়ে নতুন সংস্করণ দরকার। ^{chosen} রাখুন, অথবা {newest} ব্যবহার করতে Flutter আপগ্রেড করুন।",
       "packageHoldsAnalyzer": "প্যাকেজ {package} এনালাইজারকে পিছনে রাখে, তাই saropa_lints {newest} ইনস্টল করা যাবে না। ^{chosen} ব্যবহার করুন, বা {package} আপডেট করে {newest} ব্যবহার করুন।",
       "noVersionResolves": "কোনও saropa_lints ভার্সন ডিপেন্ডেন্সি হিসাবে ইনস্টল করা যাবে না কারণ {package} একটি পুরানো এনালাইজার প্রয়োজন করে। প্লাগইন রুট এখনও কাজ করে।",
       "noPluginResolves": "কোনও saropa_lints ভার্সন ডিপেনডেন্সি হিসাবে ইনস্টল করা যাবে না, এবং {version} একটি প্লাগইন হিসাবে পাব সলভার দ্বারা পাস করেনি ({package} একটি পুরাতন এনালাইজার প্রয়োজন)। কিছু পরিবর্তন হয়নি।",
@@ -2962,7 +2963,7 @@
       "localSource": "saropa_lints একটি স্থানীয় {source} সূত্র থেকে আসে, তাই এক্সটেনশন কেবলমাত্র তথ্য প্রদর্শন করে কিছু পরিবর্তন করে না।",
       "noCompatible": "এই প্রকল্পের Dart SDK এর সাথে কাজ করে না কোন প্রকাশিত saropa_lints সংস্করণ।",
       "noVersions": "কোনো saropa_lints ভার্সন পরামর্শ দেওয়ার জন্য উপলব্ধ নেই।",
-      "probeFailed": "Could not check which saropa_lints version this project can use because the Dart tooling did not run ({detail}). Make sure dart or flutter is on your PATH and you are online, then re-check.",
+      "probeFailed": "Dart টুলিং চালু না হওয়ায় ({detail}) এই প্রকল্প কোন saropa_lints সংস্করণ ব্যবহার করতে পারে তা যাচাই করা যায়নি। নিশ্চিত করুন dart বা flutter আপনার PATH-এ আছে এবং আপনি অনলাইনে আছেন, তারপর আবার যাচাই করুন।",
       "staleVersions": "এই পরামর্শটি অফলাইনে আপডেট করা যায়নি, তাই এটি পুরোনো হতে পারে।",
       "blockerSdk": "saropa_lints {version} একটি নতুন Dart SDK চায় {dart}",
       "blockerMeta": "saropa_lints {version} মেটা ভার্সন {pin} দ্বারা আপনার Flutter SDK দ্বারা পিন করা হয়েছে তার সাথে সংঘাত হয়।",
@@ -2977,7 +2978,7 @@
     },
     "card": {
       "heading": "সংস্করণ সামঞ্জস্যতা",
-      "loading": "Checking which saropa_lints version this project can use...",
+      "loading": "এই প্রকল্প কোন saropa_lints সংস্করণ ব্যবহার করতে পারে তা যাচাই করা হচ্ছে...",
       "notDetected": "নিয়ন্ত্রিত না হয়েছে",
       "dart": "Dart SDK",
       "flutter": "Flutter SDK",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "প্লাগইন ভার্সন সিঙ্ক করে নাই",
     "driftRowDescription": "analysis_options.yaml বলে {configured}, pubspec.lock পিন {pinned}। সিঙ্ক করতে ক্লিক করুন।",
     "driftSynced": "analysis_options.yaml প্লাগইন ভার্সন আপডেট করা হয়েছে {pinned}।"
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints বিনামূল্যে ও ওপেন সোর্স। একটি দ্রুত রেটিং বা রিভিউ অন্য ডেভেলপারদের এটি খুঁজে পেতে সাহায্য করে — আর GitHub-এ আপনার মতামত ও বাগ রিপোর্ট এটিকে ক্রমাগত আরও ভালো করে তোলে।",
+      "marketplace": "Marketplace-এ রেট করুন",
+      "openVsx": "Open VSX-এ রেট করুন",
+      "never": "আর জিজ্ঞাসা করবেন না"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "VS Code Marketplace-এ রেট করুন",
+        "description": "অন্য ডেভেলপাররা যাতে Saropa Lints খুঁজে পান, সে জন্য রেটিং দিন"
+      },
+      "openVsx": {
+        "label": "Open VSX-এ রেট করুন",
+        "description": "ওপেন রেজিস্ট্রিতে রেটিং দিন"
+      }
+    },
+    "welcome": {
+      "header": "বিনামূল্যে, ওপেন সোর্স এবং কমিউনিটির জন্য তৈরি",
+      "body": "Saropa Lints ওপেন সোর্স এবং সব সময় থাকবে। একটি দ্রুত রেটিং অন্য ডেভেলপারদের এটি খুঁজে পেতে সাহায্য করে। বাগ পেয়েছেন বা নতুন ফিচারের ধারণা আছে? একটি ইস্যু খুলুন — প্রতিটি রিপোর্ট টুলটিকে সবার জন্য আরও ভালো করে।",
+      "marketplace": "VS Code Marketplace-এ রেট করুন",
+      "openVsx": "Open VSX-এ রেট করুন",
+      "issues": "GitHub-এ সমস্যা জানান"
+    }
   }
 }

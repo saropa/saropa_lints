@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Was ist neu"
+      "title": "Neuigkeiten"
     },
     "hero": {
       "subtitle": "Diese Version ändert die Standard-Diagnose-Engine. Lesen Sie dies, bevor Sie weiterarbeiten – es beeinflusst, was Sie im Problems-Panel sehen werden."
@@ -80,7 +80,7 @@
       "subtitle": "{count}-Ergebnisse · {timestamp}",
       "baselineSubtitle": "Im Vergleich zur Baseline von {date}",
       "searchPlaceholder": "Nach Regeln, Dateien oder Nachrichten filtern…",
-      "filterTier": "Tier 1 ist ein Tier-Tier.",
+      "filterTier": "Stufe",
       "filterSeverity": "Schwere der Erkrankung",
       "filterImpact": "Auswirkungen",
       "filterBaselineStatus": "Grundlinie",
@@ -93,7 +93,7 @@
       "colLine": "Linie",
       "colRule": "Artikel Regel Regeln",
       "colSeverity": "Schwere der Erkrankung",
-      "colTier": "Tier 1 ist ein Tier-Tier.",
+      "colTier": "Stufe",
       "colMessage": "Die Botschaft ist eine Nachricht.",
       "empty": "Keine Ergebnisse — das Projekt ist sauber.",
       "filteredEmpty": "Keine Ergebnisse passen zu den aktuellen Filtern.",
@@ -281,7 +281,7 @@
       "enableTitle": "Diese Regel wieder aktivieren — entfernt die Überschreibung in analysis_options_custom.yaml und startet die Analyse erneut"
     },
     "tab": {
-      "tier": "Tier 1 ist ein Tier-Tier.",
+      "tier": "Stufe",
       "packs": "Regelpakete sind regelpacks.",
       "overrides": "Überschreitet die Overrides.",
       "sdk": "SDK-Release",
@@ -413,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "Stufe: {tier} · Spur: {lane}",
-      "descriptionNoLane": "Tier: {tier}"
+      "descriptionNoLane": "Stufe: {tier}"
     },
     "controls": {
       "laneLight": "Light — ~200 Regeln in-editor, rest bei Speichern",
@@ -692,7 +692,7 @@
       },
       "project": {
         "version": "Version",
-        "tier": "Tier 1 ist ein Tier-Tier.",
+        "tier": "Stufe",
         "vibrancy": "Vibranz",
         "packages": "Pakete gescannt",
         "packagesSuppressed": "{count} ({suppressed} unterdrückt)",
@@ -707,7 +707,7 @@
         "allErrors": "{count} Findings (alle Fehler)",
         "allErrorsOne": "1 Finding (ein Fehler)",
         "mixed": "{errors} Fehler · {warnings} Warnungen",
-        "noErrors": "{total} findings"
+        "noErrors": "{total} Befunde"
       },
       "problem": {
         "openCompat": "Version kompatibilitätskarte öffnen",
@@ -838,7 +838,7 @@
     "hazardScan": {
       "warning": "Große Datei(n) {count} gefunden innerhalb des geöffneten Ordners „{folder}“ (Pfade sind relativ zu diesem Ordner): {files}. VS Code überwacht jede Datei im Ordner auf Änderungen, und große Dateien können es verlangsamen oder abstürzen lassen.",
       "andMore": "und {count} mehr",
-      "unnamedFolder": "(unnamed folder)",
+      "unnamedFolder": "(unbenannter Ordner)",
       "addExclusions": "Von Watcher ausschließen",
       "dismiss": "Entlassen Sie.",
       "added": "{count}-Watcher-Ausklammerungsmuster(h) zur Arbeitsbereichseinstellungen hinzugefügt."
@@ -999,7 +999,7 @@
       "owasp": "OWASP",
       "ruleType": "Regel-Typ Art der Regel.",
       "ruleStatus": "Der Status der Regel ist:",
-      "tier": "Tier 1 ist ein Tier-Tier.",
+      "tier": "Stufe",
       "pack": "Packungen (S)"
     },
     "seg": {
@@ -2483,7 +2483,8 @@
       "progressPubGet": "pub get ausführen… ({elapsed}s)",
       "progressConfigWrite": "Konfiguration schreiben… ({elapsed}s)",
       "progressAnalysis": "Analyse läuft… ({elapsed}s)",
-      "progressBaseline": "Baseline-Scan läuft… ({elapsed}s)"
+      "progressBaseline": "Baseline-Scan läuft… ({elapsed}s)",
+      "analysisScanning": "Arbeitsbereich wird gescannt… {percent} % ({count} Probleme bisher)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Analyse der Analyse-Spur",
@@ -2860,7 +2861,7 @@
   "blastRadius": {
     "label": {
       "upgrade": "Upgrade",
-      "breaks": "Verursacht Fehler",
+      "breaks": "Inkompatibilitäten",
       "breaksLower": "bricht",
       "upgradeNotRecommended": "⚠️ Upgrade nicht empfohlen"
     },
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Plug-in-Version nicht synchronisiert",
     "driftRowDescription": "analysis_options.yaml sagt {configured}, pubspec.lock Pins {pinned}. Klicken Sie zum Synchronisieren.",
     "driftSynced": "analysis_options.yaml Plugin-Version wurde auf {pinned} aktualisiert."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints ist kostenlos und Open Source. Eine kurze Bewertung hilft anderen Entwicklern, es zu entdecken – und Feedback sowie Fehlerberichte auf GitHub machen es immer besser.",
+      "marketplace": "Im Marketplace bewerten",
+      "openVsx": "Auf Open VSX bewerten",
+      "never": "Nicht mehr fragen"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Im VS Code Marketplace bewerten",
+        "description": "Gib eine Bewertung ab, damit andere Entwickler Saropa Lints finden"
+      },
+      "openVsx": {
+        "label": "Auf Open VSX bewerten",
+        "description": "Bewerte uns in der offenen Registry"
+      }
+    },
+    "welcome": {
+      "header": "Kostenlos, Open Source und für die Community gebaut",
+      "body": "Saropa Lints ist Open Source und bleibt es auch. Eine kurze Bewertung hilft anderen Entwicklern, es zu entdecken. Fehler gefunden oder eine Idee für ein Feature? Eröffne ein Issue – jeder Bericht macht das Tool für alle besser.",
+      "marketplace": "Im VS Code Marketplace bewerten",
+      "openVsx": "Auf Open VSX bewerten",
+      "issues": "Problem auf GitHub melden"
+    }
   }
 }

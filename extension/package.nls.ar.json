@@ -113,6 +113,8 @@
   "command.showWelcome.title": "Saropa Lints: ما الجديد",
   "command.openHelpHub.title": "Saropa Lints: المساعدة مساعدة",
   "command.openPubDevSaropaLints.title": "Saropa Lints: فتح الحزمة على pub.dev.",
+  "command.rateOnMarketplace.title": "Saropa Lints: Rate on VS Code Marketplace",
+  "command.rateOnOpenVsx.title": "Saropa Lints: Rate on Open VSX",
   "command.createSaropaInstructions.title": "إنشاء Saropa Lints تعليمات لعملاء الذكاء الاصطناعي.",
   "command.packageVibrancy.scan.title": "حزم مسح الملفات",
   "command.packageVibrancy.rescan.title": "حزم إعادة المسح (الجديدة)",

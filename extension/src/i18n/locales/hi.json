@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "क्या नया है"
+      "title": "नया क्या है"
     },
     "hero": {
       "subtitle": "इस रिलीज़ ने डिफ़ॉल्ट डायनोस्टिक इंजन को बदल दिया है। आप जारी काम करने से पहले इसे पढ़ें — यह आपके प्रॉब्लम पैनल में दिखने वाली चीज़ को प्रभावित करेगा।"
@@ -677,7 +677,7 @@
         "on": "विश्लेषण चल रहा है: सेटिंग और एनालाइजर प्लगइन दोनों सक्रिय हैं।",
         "off": "एनालिसिस बंद है: सेटिंग और एनालाइजर प्लगइन दोनों बंद हैं।",
         "partialSetting": "अंशतः बंद: सरोपा लिंट्स.एनएबल्ड सेटिंग बंद है जबकि एनालाइजर प्लगइन सक्रिय है।",
-        "partialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on.",
+        "partialPlugin": "आंशिक रूप से बंद: सेटिंग चालू है जबकि analysis_options.yaml में analyzer प्लगइन बंद है।",
         "notSetUp": "saropa_lints इस प्रोजेक्ट में सेट नहीं है: यह pubspec.yaml में एक डिपेंडेंसी नहीं है और analysis_options.yaml में कोई प्लगइन प्रविष्टि नहीं है।"
       },
       "fix": {
@@ -2215,7 +2215,7 @@
       "lspDisabledPrompt": "LSP सर्वर सेटिंग में अक्षम कर दिया गया है (saropaLints.lspServer.enabled)। इसे सक्षम करें और शुरू करें?",
       "lspEnableButton": "सक्षम करें सक्षम करें",
       "lspStopped": "एलएसपी सर्वर: रोक दिया गया।",
-      "lspStartFailed": "LSP Server: failed to start (see the error message and the Saropa Lints LSP output channel).",
+      "lspStartFailed": "LSP सर्वर: शुरू नहीं हो सका (त्रुटि संदेश और Saropa Lints LSP आउटपुट चैनल देखें)।",
       "analyzerToggleOn": "एनालाइजर प्लगइन: सक्रिय करना...",
       "analyzerToggleOff": "एनालाइजर प्लगइन: अक्षम करना...",
       "daemonToggleOn": "स्कैन Daemon: वापस आ रहा है...",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "पब गेट चल रहा है... ({elapsed}s)",
       "progressConfigWrite": "लिखना विन्यासन... ({elapsed}s)",
       "progressAnalysis": "एनालिसिस चल रहा है... ({elapsed}s)",
-      "progressBaseline": "आधार खोज चल रही है... ({elapsed}s)"
+      "progressBaseline": "आधार खोज चल रही है... ({elapsed}s)",
+      "analysisScanning": "कार्यक्षेत्र स्कैन हो रहा है… {percent}% (अब तक {count} समस्याएँ)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: एनालिसिस लेन",
@@ -2938,7 +2939,7 @@
       "localSource": "saropa_lints: लोकल स्रोत",
       "dartTooOld": "saropa_lints: एक्सटेंशन नई Dart की आवश्यकता है",
       "tipPubspec": "इस प्रोजेक्ट में pubspec रूट का उपयोग किया जाता है: saropa_lints एक निर्भरता है pubspec.yaml में। आपको संपादक निदान और कमांड लाइन कमांड (dart run saropa_lints:init, scan, baseline) मिलते हैं।",
-      "tipPlugin": "This project uses the plugin route: saropa_lints is set as a plugin in analysis_options.yaml. You get editor diagnostics only. The command line commands (dart run saropa_lints:init, scan, baseline) need saropa_lints in pubspec.yaml.",
+      "tipPlugin": "यह प्रोजेक्ट प्लगइन रूट का उपयोग करता है: saropa_lints को analysis_options.yaml में प्लगइन के रूप में सेट किया गया है। आपको केवल एडिटर डायग्नोस्टिक्स मिलते हैं। कमांड-लाइन कमांड (dart run saropa_lints:init, scan, baseline) के लिए pubspec.yaml में saropa_lints होना ज़रूरी है।",
       "tipBoth": "इस प्रोजेक्ट में दोनों रूट्स का उपयोग किया जाता है और वे सहमत हैं। आपको एडिटर डायनोस्टिक्स और कमांड लाइन कमांड मिलते हैं।",
       "tipDisagree": "pubspec.yaml और analysis_options.yaml नाम अलग वर्जन बताते हैं saropa_lints। संपादक एक एडिटर वर्जन ({plugin}) का उपयोग करता है; कमांड लाइन कमांड वर्जन (pubspec.yaml) का उपयोग करते हैं ({pubspec})।",
       "tipNeither": "saropa_lints इस प्रोजेक्ट में सेट नहीं है: यह न तो pubspec.yaml में एक डिपेंडेंसी है और न ही analysis_options.yaml में एक प्लगइन है।",
@@ -2981,7 +2982,7 @@
       "notDetected": "अनुसंधान नहीं किया गया",
       "dart": "Dart SDK",
       "flutter": "Flutter SDK",
-      "lockedSaropa": "Locked saropa_lints",
+      "lockedSaropa": "लॉक किया गया saropa_lints",
       "lockedAnalyzer": "लॉक कर दिया एनालाइजर",
       "plugin": "प्लगइन संस्करण (analysis_options.yaml)",
       "blockers": "नई संस्करण के ब्लॉक करने वाला क्या है",
@@ -3018,7 +3019,7 @@
     "tooltipOn": "Saropa Lints (सेटिंग एवं एनालाइजर प्लगइन) पर है। अक्षय करने के लिए क्लिक करें।",
     "tooltipOff": "Saropa Lints बंद है (सेटिंग और एनालाइजर प्लगइन)। इसे चालू करने के लिए क्लिक करें।",
     "tooltipPartialSetting": "अंशतः बंद: सरोपा लिंट्स.एनेबल्ड सेटिंग बंद है जबकि एनालाइजर प्लगइन चालू है। फिक्स करने के लिए क्लिक करें (दोनों चालू करता है)",
-    "tooltipPartialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on. Click to fix (turns both on).",
+    "tooltipPartialPlugin": "आंशिक रूप से बंद: सेटिंग चालू है जबकि analysis_options.yaml में analyzer प्लगइन बंद है। ठीक करने के लिए क्लिक करें (दोनों चालू हो जाएँगे)।",
     "dashboardOff": "लिंट्स बंद हैं।",
     "dashboardPartialSetting": "लिंट्स आंशिक रूप से बंद हैं: सरोपा लिंट्स.एनएबल्ड सेटिंग बंद है।",
     "dashboardPartialPlugin": "लिंट्स आंशिक रूप से बंद हैं: एनालाइजर प्लगइन आपके analysis_options.yaml में बंद है।",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "प्लगइन संस्करण असंगत",
     "driftRowDescription": "analysis_options.yaml कहता है {configured}, pubspec.lock पिन्स {pinned}। सिंक करने के लिए क्लिक करें।",
     "driftSynced": "analysis_options.yaml प्लगइन संस्करण अपडेट किया गया है {pinned}।"
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints मुफ़्त और ओपन सोर्स है। एक त्वरित रेटिंग या समीक्षा अन्य डेवलपर को इसे खोजने में मदद करती है — और GitHub पर प्रतिक्रिया व बग रिपोर्ट इसे लगातार बेहतर बनाती हैं।",
+      "marketplace": "Marketplace पर रेट करें",
+      "openVsx": "Open VSX पर रेट करें",
+      "never": "दोबारा न पूछें"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "VS Code Marketplace पर रेट करें",
+        "description": "रेटिंग दें ताकि अन्य डेवलपर Saropa Lints ढूँढ सकें"
+      },
+      "openVsx": {
+        "label": "Open VSX पर रेट करें",
+        "description": "ओपन रजिस्ट्री पर रेटिंग दें"
+      }
+    },
+    "welcome": {
+      "header": "मुफ़्त, ओपन सोर्स और समुदाय के लिए बनाया गया",
+      "body": "Saropa Lints ओपन सोर्स है और हमेशा रहेगा। एक त्वरित रेटिंग अन्य डेवलपर को इसे खोजने में मदद करती है। कोई बग मिला या फ़ीचर का विचार है? एक issue खोलें — हर रिपोर्ट टूल को सबके लिए बेहतर बनाती है।",
+      "marketplace": "VS Code Marketplace पर रेट करें",
+      "openVsx": "Open VSX पर रेट करें",
+      "issues": "GitHub पर समस्या दर्ज करें"
+    }
   }
 }

@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Apa yang Baru"
+      "title": "Yang Baru"
     },
     "hero": {
       "subtitle": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks ini mungkin mengandung token placeholder: token placeholder. Salin setiap satu ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat."
@@ -80,7 +80,7 @@
       "subtitle": "Temuan {count} · {timestamp}",
       "baselineSubtitle": "Dibandingkan dengan baseline dari {date}",
       "searchPlaceholder": "Filter berdasarkan aturan, file, atau pesan…",
-      "filterTier": "Tier",
+      "filterTier": "Tingkat",
       "filterSeverity": "Tingkat keparahan",
       "filterImpact": "Dampak dampak dampak dampak",
       "filterBaselineStatus": "Dasar",
@@ -93,7 +93,7 @@
       "colLine": "Garis garis garis garis",
       "colRule": "Aturan",
       "colSeverity": "Tingkat keparahan",
-      "colTier": "Tier",
+      "colTier": "Tingkat",
       "colMessage": "Pesan pesan pesan pesan.",
       "empty": "Tidak ada temuan — proyek ini bersih.",
       "filteredEmpty": "Tidak ada temuan yang sesuai dengan filter saat ini.",
@@ -281,7 +281,7 @@
       "enableTitle": "Aktifkan kembali aturan ini — menghapus override di analysis_options_custom.yaml dan menjalankan ulang analisis"
     },
     "tab": {
-      "tier": "Tier",
+      "tier": "Tingkat",
       "packs": "Paket aturan paket.",
       "overrides": "Overrides mengabaikan.",
       "sdk": "Peluncuran SDK",
@@ -413,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "Tingkat: {tier} · Jalur: {lane}",
-      "descriptionNoLane": "Tier: Tingkat yang lebih rendah. {tier} adalah"
+      "descriptionNoLane": "Tingkat: {tier}"
     },
     "controls": {
       "laneLight": "Light — ~200 aturan dalam editor, sisanya saat menyimpan",
@@ -692,7 +692,7 @@
       },
       "project": {
         "version": "Versi versi versi versi",
-        "tier": "Tier",
+        "tier": "Tingkat",
         "vibrancy": "Vibrasi",
         "packages": "Paket yang di-scan",
         "packagesSuppressed": "{count} ({suppressed} ditindas)",
@@ -999,7 +999,7 @@
       "owasp": "OWASP",
       "ruleType": "Jenis aturan jenis peraturan.",
       "ruleStatus": "Status Rule adalah status aturan.",
-      "tier": "Tier",
+      "tier": "Tingkat",
       "pack": "Paket (s)"
     },
     "seg": {
@@ -1301,7 +1301,7 @@
       "body": "Aturan ini belum pernah memicu di mana pun di workspace Anda, jadi tidak ada masalah spesifik atau perbaikan yang bisa ditampilkan. Jalankan analisis untuk melihatnya dalam konteks, atau periksa paket aturan di bawah ini untuk mengetahui apa yang dicari aturan tersebut.",
       "bodyDisabled": "Aturan ini saat ini dinonaktifkan, sehingga tidak akan muncul dalam hasil analisis. Aktifkan kembali di atas dan jalankan analisis untuk melihat apa yang tertangkap.",
       "tierLine": "Termasuk dari tier: {tier}",
-      "packsLine": "Rule pack: {packs}",
+      "packsLine": "Paket aturan: {packs}",
       "packsOverflow": "Rule pack: {packs} (+{count} lebih)"
     }
   },
@@ -2199,7 +2199,7 @@
     },
     "action": {
       "killAll": "Matikan Semua {name}",
-      "restartAll": "Restart Semua",
+      "restartAll": "Mulai ulang {name}",
       "killAllDescription": "Hentikan hanya LSP Server. Analyzer Plugin dan Scan Daemon tidak dapat dihentikan secara mandiri saat ini — gunakan tombol ON/OFF masing-masing engine sebagai gantinya.",
       "restartAllDescription": "Berhenti dan mengulang peluncuran server LSP (atau memulainya jika belum berjalan). Plugin Analyzer dan Scan Daemon tidak terpengaruh — gunakan tombol ON/OFF masing-masing engine secara langsung."
     },
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Menggunakan pub get… ({elapsed}s)",
       "progressConfigWrite": "Menulis konfigurasi… ({elapsed}s)",
       "progressAnalysis": "Analisis sedang berjalan… ({elapsed}s)",
-      "progressBaseline": "Melakukan pemindaian dasar… ({elapsed}s)"
+      "progressBaseline": "Melakukan pemindaian dasar… ({elapsed}s)",
+      "analysisScanning": "Memindai workspace… {percent}% ({count} masalah sejauh ini)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Analisis Jalur Set",
@@ -2861,7 +2862,7 @@
     "label": {
       "upgrade": "Perbarui",
       "breaks": "Pecah",
-      "breaksLower": "merusak",
+      "breaksLower": "perubahan yang merusak",
       "upgradeNotRecommended": "⚠️ Upgrade tidak disarankan"
     },
     "notRecommended": "Upgrade tidak dianjurkan",
@@ -2900,7 +2901,7 @@
     "pickTitle": "Pindah aturan yang diubah nama",
     "pickPlaceholder": "Pilih file yang akan diperbarui",
     "fileHits": "{hits} perubahan",
-    "diffTitle": "Rule rename: {file}",
+    "diffTitle": "Penggantian nama aturan: {file}",
     "confirm": "Terapkan perubahan nama rule ke file(s) {count}? Perbedaan sudah terbuka untuk tinjauan.",
     "apply": "Terapkan",
     "progress": "Migrasi aturan yang diubah nama",
@@ -2938,7 +2939,7 @@
       "localSource": "saropa_lints: sumber lokal",
       "dartTooOld": "saropa_lints: plugin membutuhkan versi Dart yang lebih baru",
       "tipPubspec": "Proyek ini menggunakan pubspec route: saropa_lints adalah dependensi dalam pubspec.yaml. Anda mendapatkan diagnosa editor dan perintah baris perintah (dart run saropa_lints:init, scan, baseline).",
-      "tipPlugin": "This project uses the plugin route: saropa_lints is set as a plugin in analysis_options.yaml. You get editor diagnostics only. The command line commands (dart run saropa_lints:init, scan, baseline) need saropa_lints in pubspec.yaml.",
+      "tipPlugin": "Proyek ini memakai jalur plugin: saropa_lints diatur sebagai plugin di analysis_options.yaml. Anda hanya mendapat diagnostik editor. Perintah baris perintah (dart run saropa_lints:init, scan, baseline) membutuhkan saropa_lints di pubspec.yaml.",
       "tipBoth": "Proyek ini menggunakan kedua rute dan mereka setuju. Anda mendapatkan diagnosa editor dan perintah baris perintah.",
       "tipDisagree": "pubspec.yaml dan analysis_options.yaml nama berbeda saropa_lints versi. Editor menggunakan versi plugin ({plugin}); perintah baris perintah menggunakan versi pubspec.yaml ({pubspec}).",
       "tipNeither": "saropa_lints tidak dikonfigurasikan dalam proyek ini: ia bukan dependensi dalam pubspec.yaml dan bukan plugin dalam analysis_options.yaml.",
@@ -2948,7 +2949,7 @@
     "recommend": {
       "latestOk": "saropa_lints {version} adalah rilis terbaru dan bekerja dengan proyek ini. Gunakan ^{version}.",
       "alreadyCorrect": "Proyek ini sudah menggunakan konfigurasi saropa_lints yang direkomendasikan. Tidak ada tindakan yang perlu dilakukan.",
-      "needsNewerDart": "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "needsNewerDart": "saropa_lints {newest} membutuhkan Dart SDK yang lebih baru daripada yang dimiliki proyek ini ({dart}). Pertahankan ^{chosen}, atau tingkatkan Flutter untuk memakai {newest}.",
       "metaExcludesPin": "saropa_lints {newest} memerlukan meta package yang lebih baru daripada Flutter SDK pins ({pin}). Pertahankan ^{chosen}, atau upgrade Flutter untuk menggunakan {newest}.",
       "packageHoldsAnalyzer": "Paket {package} menghambat analis, sehingga saropa_lints {newest} tidak dapat diinstal. Gunakan ^{chosen}, atau perbarui {package} untuk menggunakan {newest}.",
       "noVersionResolves": "Tidak dapat menginstal versi saropa_lints sebagai dependensi karena {package} memerlukan analyzer yang lebih lama. Plugin route masih berfungsi.",
@@ -2981,7 +2982,7 @@
       "notDetected": "tidak terdeteksi",
       "dart": "Dart SDK",
       "flutter": "Flutter SDK",
-      "lockedSaropa": "Locked saropa_lints",
+      "lockedSaropa": "saropa_lints terkunci",
       "lockedAnalyzer": "Analisis terkunci",
       "plugin": "Versi Plugin (analysis_options.yaml)",
       "blockers": "Apa yang menghalangi versi yang lebih baru",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Versi plugin tidak selaras",
     "driftRowDescription": "analysis_options.yaml mengatakan {configured}, pubspec.lock pin {pinned}. Klik untuk sinkron.",
     "driftSynced": "analysis_options.yaml plugin versi diperbarui ke {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints gratis dan open source. Peringkat atau ulasan singkat membantu developer lain menemukannya — dan masukan serta laporan bug di GitHub membuatnya terus lebih baik.",
+      "marketplace": "Beri peringkat di Marketplace",
+      "openVsx": "Beri peringkat di Open VSX",
+      "never": "Jangan tanya lagi"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Beri peringkat di VS Code Marketplace",
+        "description": "Beri peringkat agar developer lain dapat menemukan Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Beri peringkat di Open VSX",
+        "description": "Beri peringkat di registri terbuka"
+      }
+    },
+    "welcome": {
+      "header": "Gratis, open source, dan dibuat untuk komunitas",
+      "body": "Saropa Lints open source dan akan selalu begitu. Peringkat singkat membantu developer lain menemukannya. Menemukan bug atau punya ide fitur? Buka issue — setiap laporan membuat alat ini lebih baik untuk semua orang.",
+      "marketplace": "Beri peringkat di VS Code Marketplace",
+      "openVsx": "Beri peringkat di Open VSX",
+      "issues": "Laporkan masalah di GitHub"
+    }
   }
 }

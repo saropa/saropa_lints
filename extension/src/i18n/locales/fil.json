@@ -80,7 +80,7 @@
       "subtitle": "{count} results · {timestamp}",
       "baselineSubtitle": "Kumpara sa baseline mula sa {date}",
       "searchPlaceholder": "Filtra ayon sa rule, file, o mensahe…",
-      "filterTier": "Tier",
+      "filterTier": "Antas",
       "filterSeverity": "Kalubhaan",
       "filterImpact": "Epekto",
       "filterBaselineStatus": "Batayan",
@@ -93,7 +93,7 @@
       "colLine": "Linya",
       "colRule": "Panuntunan",
       "colSeverity": "Kalubhaan",
-      "colTier": "Tier",
+      "colTier": "Antas",
       "colMessage": "Mensahe",
       "empty": "Walang mga resulta — ang proyekto ay malinis.",
       "filteredEmpty": "Walang mga resulta ang sumasangguni sa kasalukuyang mga filter.",
@@ -281,7 +281,7 @@
       "enableTitle": "Ibalik ang pagsusunod sa rule — nagpapalit ng override sa analysis_options_custom.yaml at nagrere-run muli ang analysis"
     },
     "tab": {
-      "tier": "Tier",
+      "tier": "Antas",
       "packs": "Mga pakete ng patakaran ay may mga pakete.",
       "overrides": "Nag-iwan ng pansin ang mga overrides.",
       "sdk": "Paglulunsad ng SDK",
@@ -397,7 +397,7 @@
       "hint": "Mga file at folder na dapat i-ignored ng file watcher ng VS Code. Ang bilang ay nanggaling sa scan ng workspace hazard; gamitin ang List upang makita ang mga path, pagkatapos ay i-exclude ang mga ito mula sa warning na ipapakita ng scan.",
       "scanning": "Nag-scan ng workspace...",
       "affected": "{count} naapektuhan",
-      "list": "List",
+      "list": "Ilista",
       "recommended": "Rekomendadong mga eksklusyon na hindi pa nakalista sa watcherExclude"
     },
     "extension": {
@@ -413,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "Tier: {tier} · Lane: {lane}",
-      "descriptionNoLane": "Tier: Ang antas ng pag-aari. {tier} ang kanyang mga"
+      "descriptionNoLane": "Antas: {tier}"
     },
     "controls": {
       "laneLight": "Light — ~200 na mga rule sa loob ng editor, ang iba ay nagsisimula sa pag-save",
@@ -670,7 +670,7 @@
         "status": "Katayuan",
         "project": "Proyekto",
         "problems": "Mga Problema",
-        "memory": "Memory",
+        "memory": "Memorya",
         "actions": "Mga Aktibidad mga Aksyon"
       },
       "cause": {
@@ -692,7 +692,7 @@
       },
       "project": {
         "version": "Bersyon",
-        "tier": "Tier",
+        "tier": "Antas",
         "vibrancy": "Vibrancy",
         "packages": "Packages na in-scan",
         "packagesSuppressed": "{count} ({suppressed} sinuppresyon)",
@@ -701,7 +701,7 @@
         "findings": "Mga Natuklasan sa Paghahanap",
         "updates": "Nagagawa ang mga update",
         "actionItems": "Mga aksyon na ginagawa",
-        "route": "Route"
+        "route": "Ruta"
       },
       "findings": {
         "allErrors": "{count} mga finding (lahat ng mga error)",
@@ -719,14 +719,14 @@
         "processes": "{count} proseso(s) · {size} RSS",
         "daemons": "Flutter daemon",
         "daemonsValue": "{total} ({orphaned} na walang magulang)",
-        "scanDaemons": "Orphaned scan daemons",
+        "scanDaemons": "Mga naulilang scan daemon",
         "scanDaemonsValue": "{count}, gamitin ang Clean Up upang i-kill",
         "other": "Iba pang Dart",
         "extHost": "Extension host",
         "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
         "ram": "Mga Machine RAM",
         "ramValue": "{free} libre mula sa {total}",
-        "trend": "RSS trend (last ~30 min)"
+        "trend": "Trend ng RSS (huling ~30 min)"
       },
       "action": {
         "turnOff": "I-off ang Lints",
@@ -747,7 +747,7 @@
       "locationGlobal": "iyong mga setting ng user",
       "locationWorkspace": "ang mga setting ng workspace na ito",
       "locationWorkspaceFolder": "ang mga setting ng folder na workspace",
-      "apply": "I-apply ang {gb}",
+      "apply": "Ilapat ang {gb}",
       "notNow": "Hindi ngayon",
       "dontAskAgain": "Huwag na manguha uli"
     },
@@ -999,7 +999,7 @@
       "owasp": "OWASP",
       "ruleType": "Uri ng panuntunan uri ng patakaran",
       "ruleStatus": "Rule status ng katayuan sa pag-uutos.",
-      "tier": "Tier",
+      "tier": "Antas",
       "pack": "Pack (mga) pakete ng mga produkto"
     },
     "seg": {
@@ -1302,7 +1302,7 @@
       "bodyDisabled": "Ang rule na ito ay kasalukuyang di nakakaapekto, kaya wala itong makikita sa mga resulta ng analysis. I-enable ito sa ibaba at i-run ang analysis upang makita ang mga bagay na ito nakakatagpo.",
       "tierLine": "Nakuha mula sa tier: {tier}",
       "packsLine": "Rule pack: {packs}",
-      "packsOverflow": "Rule pack: {packs} (+{count} more)"
+      "packsOverflow": "Rule pack: {packs} (+{count} pa)"
     }
   },
   "triageDash": {
@@ -2199,13 +2199,13 @@
     },
     "action": {
       "killAll": "Iwanan Ang Lahat Ng {name}",
-      "restartAll": "Ibalik Lahat",
+      "restartAll": "I-restart ang {name}",
       "killAllDescription": "Magtatag ng direktang pagbubukas ng LSP Server lamang. Ang Analyzer Plugin at Scan Daemon ay hindi pa maaaring i-kill nang walang pagkakakilanlan — gamitin ang sariling switch ng ON/OFF ng bawat engine.",
       "restartAllDescription": "Nag-ugat at nagsisimula muli ang LSP Server (o nagsisimula ito kung hindi pa ito nagtatrabaho). Ang Analyzer Plugin at Scan Daemon ay hindi napekin — gamitin ang sariling ON/OFF toggle ng bawat engine."
     },
     "log": {
       "empty": "Walang mga entry sa log pa.",
-      "masterToggleOn": "Master switch: enabling…",
+      "masterToggleOn": "Master switch: ino-on…",
       "masterToggleOff": "Master switch: di-nagagawa...",
       "killAll": "Iwanan Lahat: nagsilbi na ang lahat ng mga engine na maaaring kontrolin.",
       "restartAll": "Restart All: restarted lahat ng kontrolable nga engines.",
@@ -2469,7 +2469,7 @@
       "configUpdated": "Saropa Lints config na-update (tier: ang antas ng pag-config ay hindi dapat i-upgrade) {tier}). sa pamamagitan ng .",
       "configWriteFailed": "Ang Config write ay nabigo. {details}",
       "scaffoldGateTitle": "Composite analyzer plugin scaffolding ng mga gusali.",
-      "scaffoldGateDetail": "Ito ay magsulat ng isang bagong Dart package sa ilalim ng iyong workspace (pubspec.yaml, lib/main.dart, README): isang custom_lint plugin na nagrehistro ng Saropa at iniiwan ang mga ganto para sa iyong sariling mga patakaran.\n\nGamitin lamang ito kapag nagpadala ka ng mga pasadyang patakaran sa analyzer kasama ang Saropa. Normal na Saropa-only projects ay maaaring i-skip ito  ⁇ ang analyzer ay nagpapahintulot sa isang solong plugin entry bawat konteksto.\n\nSusunod: Ang Pag-ibig ng mga Tao pumili ng isang folder na may kaugnayan sa workspace. Kung ang folder na iyon ay umiiral na, ikaw ay tinanong bago pa man ma-overwrite.",
+      "scaffoldGateDetail": "Magsusulat ito ng bagong Dart package sa ilalim ng workspace mo (pubspec.yaml, lib/main.dart, README): isang custom_lint plugin na nagrerehistro sa Saropa at nag-iiwan ng mga hook para sa sarili mong mga rule.\n\nGamitin lang ito kung nagpapadala ka ng mga custom analyzer rule kasama ng Saropa. Puwedeng laktawan ito ng mga karaniwang proyektong Saropa lang—isang plugin entry lang bawat context ang pinapayagan ng analyzer.\n\nSusunod: pumili ng folder na relatibo sa workspace. Kung umiiral na ang folder, tatanungin ka bago may ma-overwrite.",
       "actionContinue": "Patuloy na patuloy na patuloy na.",
       "actionOpenGuide": "Buksan ang gabay sa paggabay ng bukás.",
       "scaffoldPathOutsideWorkspace": "Ang landas ng scaffold ay dapat na nasa loob ng folder ng workspace.",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Pumuproseso ang pub get… ({elapsed}s)",
       "progressConfigWrite": "Paghahatag ng config... ({elapsed}s)",
       "progressAnalysis": "Pagsusuri... ({elapsed}s)",
-      "progressBaseline": "Pagsusimula ng baseline scan… ({elapsed}s)"
+      "progressBaseline": "Pagsusimula ng baseline scan… ({elapsed}s)",
+      "analysisScanning": "Sina-scan ang workspace… {percent}% ({count} isyu sa ngayon)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Itakda ang Analysis Lane",
@@ -2897,10 +2898,10 @@
   "ruleMigration": {
     "none": "Walang mga binagong rule na kailangan i-migrate.",
     "noWorkspace": "Ibukod ang folder ng Dart project upang i-migrate ang pangalan ng rule.",
-    "pickTitle": "Migrate renamed rules",
+    "pickTitle": "Ilipat ang mga pinalitang-pangalang rule",
     "pickPlaceholder": "Piliin ang mga file na i-update",
     "fileHits": "{hits} pagbabago(s)",
-    "diffTitle": "Rule rename: {file}",
+    "diffTitle": "Pagpapalit ng pangalan ng rule: {file}",
     "confirm": "Mag-aplay ng mga pagbabago sa pangalan ng rule para sa mga file {count}? Ang mga pagbabago ay nasa estado ng pagsusuri.",
     "apply": "Pangkatin",
     "progress": "Pangangalakal ng mga binago ng mga rule",
@@ -2926,7 +2927,7 @@
       "offerNoDartRenames": "saropa_lints: ginagamit mo ang {route} sa {installed}. Ang {offered} ay magagamit. Ibinago ang mga {count} na rule mula sa {installed}. Magmigrate?",
       "offerRenamesUnknown": "saropa_lints: ginagamit mo ang {route} sa {installed}. Ang {offered} ay magagamit at gumagana sa iyong Dart {dart}. Ang mga binagong pangalan ng mga rule ay i-check pagkatapos ng upgrade. Magmigrate?",
       "offerNoDartRenamesUnknown": "saropa_lints: ginagamit mo ang {route} sa {installed}. Ang {offered} ay magagamit. Ii-check ang mga binagong pangalan ng mga rule pagkatapos ng upgrade. Magmigrate?",
-      "actionMigrate": "Migrate"
+      "actionMigrate": "Ilipat"
     },
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
@@ -2988,7 +2989,7 @@
       "fixes": "Paano mafix",
       "apply": "Pangkatin",
       "applying": "Pangangalap...",
-      "preview": "Preview diff",
+      "preview": "I-preview ang diff",
       "refresh": "Pangalawa ang pagsusuring uli",
       "diffTitle": "{file}: proporsiyon na bersyon ng pagbabago",
       "staleReloaded": "Ang proyekto ay nagbago habang naghahati ka sa kard, kaya walang anumang aplikasyon. Tumutulungan ka sa mga nai-update na payo at i-click muli ang Apply.",
@@ -3013,7 +3014,7 @@
   },
   "lintsSwitch": {
     "statusOn": "Saropa Lints: Sa",
-    "statusOff": "Saropa Lints: Off",
+    "statusOff": "Saropa Lints: Naka-off",
     "statusPartial": "Saropa Lints: Nakakatapos na bahagi",
     "tooltipOn": "Saropa Lints ay naka-set (setting at analyzer plugin). I-click para i-off.",
     "tooltipOff": "Saropa Lints ay naka-off (setting at plugin ng analyzer). I-click para i-on ito.",
@@ -3024,8 +3025,33 @@
     "dashboardPartialPlugin": "Ang mga lint ay bahagi na off: ang plugin ng analyzer ay off sa analysis_options.yaml.",
     "dashboardTurnOn": "Iluvian",
     "dashboardFix": "Ibahin",
-    "driftRowLabel": "Plugin version out of sync",
+    "driftRowLabel": "Hindi tugma ang bersyon ng plugin",
     "driftRowDescription": "analysis_options.yaml nagsabi ng {configured}, pubspec.lock pins {pinned}. I-click para i-sync.",
     "driftSynced": "Nag-update ang plugin ng analysis_options.yaml version sa {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Libre at open source ang Saropa Lints. Nakakatulong ang mabilis na rating o review para madiskubre ito ng ibang developer — at pinapabuti pa ito ng feedback at bug report sa GitHub.",
+      "marketplace": "I-rate sa Marketplace",
+      "openVsx": "I-rate sa Open VSX",
+      "never": "Huwag nang magtanong muli"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "I-rate sa VS Code Marketplace",
+        "description": "Mag-iwan ng rating para matulungan ang ibang developer na mahanap ang Saropa Lints"
+      },
+      "openVsx": {
+        "label": "I-rate sa Open VSX",
+        "description": "Mag-iwan ng rating sa open registry"
+      }
+    },
+    "welcome": {
+      "header": "Libre, open source, at ginawa para sa komunidad",
+      "body": "Open source ang Saropa Lints at mananatili itong ganoon. Nakakatulong ang mabilis na rating para madiskubre ito ng ibang developer. May nakitang bug o may ideya para sa feature? Magbukas ng issue — bawat ulat ay nagpapabuti sa tool para sa lahat.",
+      "marketplace": "I-rate sa VS Code Marketplace",
+      "openVsx": "I-rate sa Open VSX",
+      "issues": "Mag-ulat ng isyu sa GitHub"
+    }
   }
 }

@@ -97,7 +97,7 @@
       "colMessage": "رسالة الرسالة الرسالية",
       "empty": "لا توجد نتائج — المشروع نظيف.",
       "filteredEmpty": "لا توجد نتائج تطابق bộ lọc الحالي.",
-      "loadMore": "покажи больше",
+      "loadMore": "عرض المزيد",
       "keyboardHint": "مفاتيح السهم للتنقل · إدخال لفتح الملف · إس كيو تي لمسح البحث",
       "copiedJson": "مراجعة JSON تم نسخها إلى الحافظة.",
       "exportJson": "تصدير JSON",
@@ -2251,7 +2251,7 @@
         "created": "طلب سحب مفتوح لـ {branch}.",
         "openPr": "فتح طلب تعديل",
         "notARepository": "تم كتابة {path} ولكن هذا المجلد ليس مستودع git، إذن لا يوجد شيء لنشره.",
-        "pubspecHasOtherEdits": "pubspec.yaml already had uncommitted edits of yours. A commit takes whole files, so publishing from here would push those edits too. Commit or stash them, then run the commands above yourself."
+        "pubspecHasOtherEdits": "يحتوي pubspec.yaml أصلًا على تعديلاتك غير المودَعة. يشمل الإيداع الملفات كاملة، لذا فإن النشر من هنا سيدفع تلك التعديلات أيضًا. أودِعها أو احفظها مؤقتًا (stash) ثم شغّل الأوامر أعلاه بنفسك."
       }
     }
   },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "تم إعادة تمكين مُساعِد Saropa Lints داخل العملية. إعادة تشغيل خادم تحليل Dart لتحميله مرة أخرى.",
       "reenableNothingToRestore": "Saropa Lints: لا شيء لاستعادة. لا يُعتبر المُتوَقِّف في العملية حاليًا مُعطَّلًا من خلال التوسِيع.",
       "noOpenDartFiles": "Saropa Lints: هيئة إدارة المعلومات لم يتم العثور على أي ملفات مفتوحة Dart. أعد فتح ملف Dart أو قم بإيقاف تشغيل إعداد \"فتح المحررين فقط\".",
+      "analysisScanning": "جارٍ فحص مساحة العمل… {percent}% ({count} مشكلة حتى الآن)",
       "configUpdated": "Saropa Lints config تم تحديثها (الدرجة: {tier}).) ، وذلك بسبب أنّه",
       "configWriteFailed": "فشل كتابة التكوين. {details}",
       "scaffoldGateTitle": "المكونات المحلل إضافة هيكل الهيكل الإسكاني.",
@@ -2948,7 +2949,7 @@
     "recommend": {
       "latestOk": "saropa_lints {version} هو الإصدار الأحدث ويعمل مع هذا المشروع. استخدم ^{version}.",
       "alreadyCorrect": "هذا المشروع يستخدم بالفعل التكوين المقترح saropa_lints. لا يوجد إجراء مطلوب.",
-      "needsNewerDart": "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "needsNewerDart": "يحتاج saropa_lints {newest} إلى Dart SDK أحدث مما يملكه هذا المشروع ({dart}). أبقِ على ^{chosen}، أو حدّث Flutter لاستخدام {newest}.",
       "metaExcludesPin": "saropa_lints {newest} يحتاج إلى حزمة ميتا أحدث من إصدار Flutter SDK الخاص بك ({pin}). احتفظ بـ ^{chosen}، أو قم بتحديث Flutter لاستخدام {newest}.",
       "packageHoldsAnalyzer": "الحزمة {package} تمنع تحليل المُحلِّل، لذا لا يمكن تثبيت saropa_lints {newest}. استخدم ^{chosen}، أو تحديث {package} لاستخدام {newest}.",
       "noVersionResolves": "لا يمكن تثبيت أي نسخة من saropa_lints كاعتماد لأن {package} يتطلب مُحلِّلًا أقدم. لا يزال маршрут الإضافة يعمل.",
@@ -3027,5 +3028,31 @@
     "driftRowLabel": "نسخة الإضافة غير متزامنة",
     "driftRowDescription": "analysis_options.yaml يقول {configured}، pubspec.lock أكوام {pinned}. انقر ل Đồng bộ.",
     "driftSynced": "تحديث إصدار وحدة analysis_options.yaml إلى {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints مجاني ومفتوح المصدر. تقييم أو مراجعة سريعة تساعد المطورين الآخرين على اكتشافه، وملاحظاتكم وتقارير الأخطاء على GitHub تجعله أفضل باستمرار.",
+      "marketplace": "قيّم على Marketplace",
+      "openVsx": "قيّم على Open VSX",
+      "dismiss": "الآن لا",
+      "never": "لا تسأل مرة أخرى"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "قيّم على VS Code Marketplace",
+        "description": "قيّم الإضافة لمساعدة المطورين الآخرين على العثور على Saropa Lints"
+      },
+      "openVsx": {
+        "label": "قيّم على Open VSX",
+        "description": "قيّم الإضافة في السجل المفتوح"
+      }
+    },
+    "welcome": {
+      "header": "مجاني ومفتوح المصدر ومبني للمجتمع",
+      "body": "Saropa Lints مفتوح المصدر وسيبقى كذلك دائمًا. تقييم سريع يساعد المطورين الآخرين على اكتشافه. وجدت خطأً أو لديك فكرة لميزة؟ افتح بلاغًا — كل بلاغ يجعل الأداة أفضل للجميع.",
+      "marketplace": "قيّم على VS Code Marketplace",
+      "openVsx": "قيّم على Open VSX",
+      "issues": "أبلغ عن مشكلة على GitHub"
+    }
   }
 }

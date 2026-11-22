@@ -768,9 +768,25 @@ class ScanRunner {
       try {
         fileContext = collection.contextFor(absFiles[i]);
       } on StateError {
-        _err('  Skipping (outside analysis roots): ${absFiles[i]}');
-        _skippedFileCount++;
-        continue;
+        // The project's own `analyzer: exclude:` (e.g. `example/**`) removes
+        // a file from the shared collection. When the caller explicitly
+        // disabled exclusions for the file list
+        // ([applyExclusionsToFileList] false) it still asked for that file to
+        // be scanned, so honoring the exclude here made the resolved scan
+        // silently return nothing while the syntactic run() scanned it —
+        // violating the resolved-superset-of-syntactic invariant. Give such
+        // a file its own single-file collection (explicitly included paths
+        // are not subject to the exclude globs). Cost is one extra context,
+        // paid only for explicitly requested excluded files.
+        final rescued = applyExclusionsToFileList
+            ? null
+            : _contextForExcludedFile(absFiles[i]);
+        if (rescued == null) {
+          _err('  Skipping (outside analysis roots): ${absFiles[i]}');
+          _skippedFileCount++;
+          continue;
+        }
+        fileContext = rescued;
       }
       _showProgress(i, absFiles.length, diagnostics.length, absFiles[i], sw);
       await _scanSingleFileResolved(
@@ -806,11 +822,41 @@ class ScanRunner {
       }
     }
 
+    // Release per-file collections created for excluded files (see above).
+    for (final rescuedCollection in _rescuedCollections) {
+      await rescuedCollection.dispose();
+    }
+    _rescuedCollections.clear();
+
     // Clear progress line when using stderr
     if (messageSink == null) {
       io.stderr.write('\r${' ' * 79}\r');
     }
     return diagnostics;
+  }
+
+  /// Single-file collections built by [_contextForExcludedFile]; disposed when
+  /// the resolved scan finishes so many excluded files do not keep one full
+  /// analyzer context alive each.
+  final List<AnalysisContextCollection> _rescuedCollections =
+      <AnalysisContextCollection>[];
+
+  /// Builds a context rooted at the single [absFile], or null when the
+  /// analyzer still refuses it. Used only for files the project's analyzer
+  /// excludes that the caller explicitly asked to scan.
+  AnalysisContext? _contextForExcludedFile(String absFile) {
+    try {
+      final collection = AnalysisContextCollection(
+        includedPaths: [absFile],
+        resourceProvider: PhysicalResourceProvider.INSTANCE,
+      );
+      // Tracked so the scan can dispose it once finished.
+      _rescuedCollections.add(collection);
+      return collection.contextFor(absFile);
+    } on StateError {
+      // Still unreachable: caller reports it as skipped.
+      return null;
+    }
   }
 
   Future<void> _scanSingleFileResolved(
@@ -939,7 +985,11 @@ class ScanRunner {
     CompilationUnit? unit,
   }) {
     final provider = PhysicalResourceProvider.INSTANCE;
-    final file = provider.getFile(filePath);
+    // PhysicalResourceProvider asserts on non-normalized paths. Callers can
+    // hand in a mixed-separator path on Windows (e.g. `C:\tmp\x/packages`
+    // from string-concatenated targets), which threw "Path must be
+    // normalized". Normalizing here fixes it for every call site at once.
+    final file = provider.getFile(p.normalize(filePath));
     final listener = RecordingDiagnosticListener();
     final reporter = DiagnosticReporter(listener, FileSource(file));
     return RuleContextUnit(

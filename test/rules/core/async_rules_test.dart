@@ -326,6 +326,24 @@ void main() {
     });
   });
 
+  group('PreferStreamDistinctRule', () {
+    // Regression: listeners that ignore the event value are refresh signals;
+    // .distinct() would break them, so the rule must skip them.
+    test('fixture documents ignored-parameter signal listener as GOOD', () {
+      final source = File(
+        'example/lib/async/prefer_stream_distinct_fixture.dart',
+      ).readAsStringSync();
+      expect(source, contains('prefChanged.stream.listen((_)'));
+    });
+
+    test('rule source skips listeners that ignore their parameter', () {
+      final source = File(
+        'lib/src/rules/core/async_rules.dart',
+      ).readAsStringSync();
+      expect(source, contains('_ignoresEventParameter(callback)'));
+    });
+  });
+
   // Stub-only behavior tests were removed from this file. Keep rule metadata,
   // fixture verification, and targeted metadata checks while migrating to
   // analyzer-backed behavior tests.

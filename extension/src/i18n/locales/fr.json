@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Quoi de neuf"
+      "title": "Nouveautés"
     },
     "hero": {
       "subtitle": "Cette version modifie le moteur de diagnostic par défaut. Lisez ceci avant de continuer votre travail — cela affecte ce que vous verrez dans le panneau Problèmes."
@@ -707,7 +707,7 @@
         "allErrors": "{count} findings (tous les erreurs)",
         "allErrorsOne": "1 finding (une erreur)",
         "mixed": "Erreurs {errors} · Avertissements {warnings}",
-        "noErrors": "{total} findings"
+        "noErrors": "{total} résultats"
       },
       "problem": {
         "openCompat": "Carte de compatibilité de la version ouverte",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Exécution de pub get… ({elapsed}s)",
       "progressConfigWrite": "Écriture de la configuration… ({elapsed}s)",
       "progressAnalysis": "Analyse en cours… ({elapsed}s)",
-      "progressBaseline": "Scan de base en cours… ({elapsed}s)"
+      "progressBaseline": "Scan de base en cours… ({elapsed}s)",
+      "analysisScanning": "Analyse de l’espace de travail… {percent} % ({count} problèmes jusqu’ici)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints : Analyse de la voie",
@@ -2861,7 +2862,7 @@
     "label": {
       "upgrade": "Mise à niveau de mise à jour.",
       "breaks": "Interromps",
-      "breaksLower": "casse",
+      "breaksLower": "ruptures",
       "upgradeNotRecommended": "⚠️ Mise à niveau non recommandée"
     },
     "notRecommended": "Mise à niveau non recommandée",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Version du plugin hors synchronisation",
     "driftRowDescription": "analysis_options.yaml dit {configured}, pubspec.lock broches {pinned}. Cliquez pour synchroniser.",
     "driftSynced": "Mise à jour de la version du plugin analysis_options.yaml vers {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints est gratuit et open source. Une note ou un avis rapide aide d’autres développeurs à le découvrir, et les retours et rapports de bogues sur GitHub l’améliorent sans cesse.",
+      "marketplace": "Noter sur le Marketplace",
+      "openVsx": "Noter sur Open VSX",
+      "never": "Ne plus demander"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Noter sur le VS Code Marketplace",
+        "description": "Laissez une note pour aider d’autres développeurs à trouver Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Noter sur Open VSX",
+        "description": "Laissez une note sur le registre ouvert"
+      }
+    },
+    "welcome": {
+      "header": "Gratuit, open source et conçu pour la communauté",
+      "body": "Saropa Lints est open source et le restera toujours. Une note rapide aide d’autres développeurs à le découvrir. Un bogue ou une idée de fonctionnalité ? Ouvrez un ticket : chaque rapport améliore l’outil pour tout le monde.",
+      "marketplace": "Noter sur le VS Code Marketplace",
+      "openVsx": "Noter sur Open VSX",
+      "issues": "Signaler un problème sur GitHub"
+    }
   }
 }

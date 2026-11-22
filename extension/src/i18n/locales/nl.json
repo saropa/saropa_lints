@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Wat is er nieuw in v16"
+      "title": "Wat is er nieuw"
     },
     "hero": {
       "subtitle": "Deze release wijzigt het standaard diagnostische engine. Lees dit voor je verder werkt — het beïnvloedt wat je zult zien in het Problems-venster."
@@ -80,7 +80,7 @@
       "subtitle": "{count} bevindingen · {timestamp}",
       "baselineSubtitle": "Geverdere met baseline van {date}",
       "searchPlaceholder": "Filter op regel, bestand of bericht…",
-      "filterTier": "Tier",
+      "filterTier": "Niveau",
       "filterSeverity": "De ernst van de situatie",
       "filterImpact": "Invloed",
       "filterBaselineStatus": "Basislijn",
@@ -93,7 +93,7 @@
       "colLine": "Lijn Lijnlijn Lijn",
       "colRule": "Regel",
       "colSeverity": "De ernst van de situatie",
-      "colTier": "Tier",
+      "colTier": "Niveau",
       "colMessage": "Bericht",
       "empty": "Geen resultaten — het project is schoon.",
       "filteredEmpty": "Geen resultaten matchen de huidige filters.",
@@ -281,7 +281,7 @@
       "enableTitle": "Deze regel opnieuw activeren — verwijdert de override in analysis_options_custom.yaml en voert de analyse opnieuw uit"
     },
     "tab": {
-      "tier": "Tier",
+      "tier": "Niveau",
       "packs": "Regelpakketten zijn regelpakketjes.",
       "overrides": "Overschrijden overrides.",
       "sdk": "SDK-uitrol",
@@ -413,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "Niveau: {tier} · Baan: {lane}",
-      "descriptionNoLane": "Tier: de hoogste niveau. {tier} is een PH0__."
+      "descriptionNoLane": "Niveau: {tier}"
     },
     "controls": {
       "laneLight": "Light — ~200 regels in-editor, rest op slaan",
@@ -477,7 +477,7 @@
       "readmeImages": "README IMAGES Lees de afbeeldingen."
     },
     "header": {
-      "logoAlt": "{name} logo is het logo van de _PH0_.",
+      "logoAlt": "Logo van {name}",
       "grade": "Graad {grade}",
       "licenseTitle": "Licentie licenties licentie.",
       "published": "Gepubliceerd {date}"
@@ -545,7 +545,7 @@
       "footprintTooltip": "Eigen {own} + unieke transitives {unique} + gedeelde transitiven {shared}. Het verwijderen van deze dep bespaart {saved} (gedeelde deps blijven door anderen ingehaald).",
       "trueFootprint": "True Footprint is een echte voetafdruk.",
       "packagesCount": "{count} pakketten",
-      "dependents": "Afhankelijken"
+      "dependents": "Afhankelijke pakketten"
     },
     "fileUsages": {
       "commentedOut": "Verwijzingen zonder commentaar:",
@@ -566,7 +566,7 @@
       "archived": "ARCHIVEERD — repository is read-only",
       "knownIssue": "Bekende probleem: {reason}",
       "unused": "Ongebruikt — geen imports gedetecteerd",
-      "fix": "⁇  fix: {version}"
+      "fix": "— oplossing: {version}"
     },
     "versionGap": {
       "versionTitle": "Gap versie gap versie",
@@ -692,11 +692,11 @@
       },
       "project": {
         "version": "Versie versie versia",
-        "tier": "Tier",
+        "tier": "Niveau",
         "vibrancy": "Vibrantie",
         "packages": "Packages gescand",
         "packagesSuppressed": "{count} ({suppressed} onderdrukt)",
-        "score": "Lint score",
+        "score": "Lintscore",
         "scorePending": "volledige analyse uitvoeren (gedeelde scan)",
         "findings": "Bevindingen bevindingen.",
         "updates": "Updates beschikbaar",
@@ -711,7 +711,7 @@
       },
       "problem": {
         "openCompat": "Open versie compatibiliteit kaart",
-        "reviewReadiness": "Review workspace issues"
+        "reviewReadiness": "Problemen in werkruimte bekijken"
       },
       "memory": {
         "saropa": "Saropa Lints",
@@ -724,7 +724,7 @@
         "other": "Andere Dart",
         "extHost": "Extensiehost",
         "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
-        "ram": "Machine RAM",
+        "ram": "Machinegeheugen (RAM)",
         "ramValue": "{free} vrij van {total}",
         "trend": "RSS trend (laatste ~30 min)"
       },
@@ -999,7 +999,7 @@
       "owasp": "OWASP",
       "ruleType": "Regel type Regeltypes",
       "ruleStatus": "Rule status: de regelstatus van een artikel.",
-      "tier": "Tier",
+      "tier": "Niveau",
       "pack": "Pack (en) van de pakketten"
     },
     "seg": {
@@ -2198,7 +2198,7 @@
       "off": "AF"
     },
     "action": {
-      "killAll": "Dood allemaal",
+      "killAll": "Alle {name} beëindigen",
       "restartAll": "Herstart {name}",
       "killAllDescription": "Alleen de LSP Server stoppen. De Analyzer Plugin en Scan Daemon kunnen op dit moment niet afzonderlijk worden beëindigd — gebruik in plaats daarvan de eigen ON/OFF schakelaar van elk engine.",
       "restartAllDescription": "Stopt en herstart de LSP Server (of start deze indien deze niet draait). De Analyzer Plugin en Scan Daemon zijn onbeïnvloed — gebruik de eigen ON/OFF schakelaars van elk engine."
@@ -2325,7 +2325,7 @@
       "issues": "Issues issues zijn kwesties.",
       "reportIssue": "Rapport Uitgave Verslag Issue"
     },
-    "logoAlt": "{packageName} logo is het logo van de _PH0_.",
+    "logoAlt": "Logo van {packageName}",
     "readMore": "Meer meer meer meer.",
     "readmeImageAlt": "README afbeelding van de Readme-afbeelding."
   },
@@ -2483,7 +2483,8 @@
       "progressPubGet": "pub get uitvoeren… ({elapsed}s)",
       "progressConfigWrite": "Config schrijven… ({elapsed}s)",
       "progressAnalysis": "Analyseren... ({elapsed}s)",
-      "progressBaseline": "Baseline-scan uitvoeren… ({elapsed}s)"
+      "progressBaseline": "Baseline-scan uitvoeren… ({elapsed}s)",
+      "analysisScanning": "Werkruimte scannen… {percent}% ({count} problemen tot nu toe)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Analyseer Regel",
@@ -2517,7 +2518,7 @@
       "crossFileHtmlReportGenerated": "Cross-file HTML rapport gegenereerd.",
       "actionOpenInBrowser": "Open in de browser.",
       "actionOpenFile": "Open File Open File openen",
-      "crossFileSnapshotFailed": "Cross-file snapshot mislukt: {message} is een PH0__.",
+      "crossFileSnapshotFailed": "Snapshot over meerdere bestanden mislukt: {message}",
       "crossFileSnapshotNoJson": "Cross-file snapshot voltooid maar JSON bestand niet gevonden.",
       "crossFileSnapshotWritten": "Cross-file snapshot geschreven naar rapporten/.saropa_lints/cross_file_snapshot.json",
       "crossFileNoWorkspace": "Saropa Lints: Het is een generieke vorm van _ph1__. geen Dart/Flutter werkruimte gevonden. Open eerst een project met pubspec.yaml.",
@@ -2647,7 +2648,7 @@
       "actionRescan": "Opnieuw scannen",
       "bulkUpdateNoUpdates": "Geen updates beschikbaar.",
       "bulkUpdateNoUpdatesFiltered": "Geen {filter} updates beschikbaar.",
-      "bulkUpdateFailed": "Bulk update mislukt: {error} is een PH0__.",
+      "bulkUpdateFailed": "Bulkupdate mislukt: {error}",
       "bulkUpdateUpdatedOne": "Bijgewerkt {count} pakket.",
       "bulkUpdateUpdatedOther": "Bijgewerkte {count} pakketten.",
       "detailViewConstraintNotFound": "Kon geen versiebeperking vinden voor {package}.",
@@ -2860,8 +2861,8 @@
   "blastRadius": {
     "label": {
       "upgrade": "Upgrade upgraden is een upgrade.",
-      "breaks": "Breekt",
-      "breaksLower": "breekt",
+      "breaks": "Breuken",
+      "breaksLower": "breuken",
       "upgradeNotRecommended": "⚠️ Upgrade niet aanbevolen"
     },
     "notRecommended": "Upgrade niet aanbevolen",
@@ -2993,7 +2994,7 @@
       "diffTitle": "{file}: voorgestelde versie wijziging",
       "staleReloaded": "Het project is veranderd terwijl u deze kaart bekeek, dus niets is toegepast. Beleid opnieuw en klik op Toepassen.",
       "loadFailed": "Kon versiecompatibiliteit niet controleren: {detail}",
-      "routeLabel": "Install route",
+      "routeLabel": "Installatieroute",
       "routes": {
         "dependency": "Afhankelijkheid in pubspec.yaml",
         "plugin": "Plug-in in analysis_options.yaml alleen",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Plug-in versie niet in sync",
     "driftRowDescription": "analysis_options.yaml zegt {configured}, pubspec.lock pinnen {pinned}. Klik om te synchroniseren.",
     "driftSynced": "analysis_options.yaml plug-in versie bijgewerkt naar {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints is gratis en open source. Een korte beoordeling of review helpt andere ontwikkelaars het te ontdekken, en feedback en bugmeldingen op GitHub maken het steeds beter.",
+      "marketplace": "Beoordelen op Marketplace",
+      "openVsx": "Beoordelen op Open VSX",
+      "never": "Niet meer vragen"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Beoordelen op VS Code Marketplace",
+        "description": "Laat een beoordeling achter zodat andere ontwikkelaars Saropa Lints kunnen vinden"
+      },
+      "openVsx": {
+        "label": "Beoordelen op Open VSX",
+        "description": "Laat een beoordeling achter in het open register"
+      }
+    },
+    "welcome": {
+      "header": "Gratis, open source en gebouwd voor de community",
+      "body": "Saropa Lints is open source en blijft dat. Een korte beoordeling helpt andere ontwikkelaars het te ontdekken. Een bug gevonden of een idee voor een functie? Open een issue: elke melding maakt de tool beter voor iedereen.",
+      "marketplace": "Beoordelen op VS Code Marketplace",
+      "openVsx": "Beoordelen op Open VSX",
+      "issues": "Een probleem melden op GitHub"
+    }
   }
 }

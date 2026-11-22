@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Что нового в v16"
+      "title": "Что нового"
     },
     "hero": {
       "subtitle": "Этот выпуск изменяет стандартный диагностический движок. Прочтите это перед тем, как продолжить работу — это влияет на то, что вы увидите в панели Проблем."
@@ -2291,7 +2291,7 @@
     },
     "community": {
       "issues": "{count} проблем",
-      "prs": "{count} PRs - это пиар-сервисы.",
+      "prs": "{count} PR",
       "activity90d": "90d: закрыты выпуски {closed}, объединены PRs {merged}.",
       "lastCommit": "Последний комментарий: {time}",
       "archived": "Репозиторий архивируется.",
@@ -2483,7 +2483,8 @@
       "progressPubGet": "Выполнение pub get… ({elapsed}s)",
       "progressConfigWrite": "Запись конфига… ({elapsed}s)",
       "progressAnalysis": "Анализ выполняется… ({elapsed}s)",
-      "progressBaseline": "Сканирование базовой линии… ({elapsed}s)"
+      "progressBaseline": "Сканирование базовой линии… ({elapsed}s)",
+      "analysisScanning": "Сканирование рабочей области… {percent}% (проблем пока: {count})"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Установите Анализ Полосы",
@@ -2935,7 +2936,7 @@
       "both": "saropa_lints: pubspec + plugin {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (разногласие)",
       "neither": "saropa_lints: не настроен",
-      "localSource": "saropa_lints: local source",
+      "localSource": "saropa_lints: локальный источник",
       "dartTooOld": "saropa_lints: плагин требует более новой Dart",
       "tipPubspec": "Этот проект использует pubspec маршрут: saropa_lints является зависимостью в pubspec.yaml. Вы получаете диагностику редактора и команды командной строки (dart run saropa_lints:init, scan, baseline)",
       "tipPlugin": "Этот проект использует плагин route: saropa_lints задан как плагин в analysis_options.yaml. Вы получаете диагностику редактора только. Команды командной строки (dart run saropa_lints:init, scan, baseline) требуют saropa_lints в pubspec.yaml.",
@@ -3027,5 +3028,30 @@
     "driftRowLabel": "Версия плагина вне синхронизации",
     "driftRowDescription": "analysis_options.yaml говорит {configured}, pubspec.lock пины {pinned}. Нажмите, чтобы синхронизировать.",
     "driftSynced": "analysis_options.yaml плагин версии обновлен до {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints бесплатен и имеет открытый исходный код. Быстрая оценка или отзыв помогает другим разработчикам найти его, а отзывы и сообщения об ошибках на GitHub делают его лучше.",
+      "marketplace": "Оценить в Marketplace",
+      "openVsx": "Оценить в Open VSX",
+      "never": "Больше не спрашивать"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Оценить в VS Code Marketplace",
+        "description": "Оставьте оценку, чтобы другие разработчики нашли Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Оценить в Open VSX",
+        "description": "Оставьте оценку в открытом реестре"
+      }
+    },
+    "welcome": {
+      "header": "Бесплатно, с открытым исходным кодом и для сообщества",
+      "body": "Saropa Lints имеет открытый исходный код и всегда будет таким. Быстрая оценка помогает другим разработчикам найти его. Нашли ошибку или есть идея функции? Создайте issue — каждое сообщение делает инструмент лучше для всех.",
+      "marketplace": "Оценить в VS Code Marketplace",
+      "openVsx": "Оценить в Open VSX",
+      "issues": "Сообщить о проблеме на GitHub"
+    }
   }
 }

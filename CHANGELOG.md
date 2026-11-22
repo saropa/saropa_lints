@@ -66,6 +66,36 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.6.0] — Unreleased
+
+The extension's rating prompts, welcome panel, scan progress message and several other strings now read natively in all 24 supported languages instead of falling back to English. Eleven false positives are also fixed. [log](https://github.com/saropa/saropa_lints/blob/v17.6.0/CHANGELOG.md)
+
+### Fixed
+
+- `avoid_context_after_navigation` no longer reports the awaited navigator call itself (e.g. `await Navigator.maybePop(context)`). The `context` argument is evaluated before the await, so only uses after the await are checked.
+- `avoid_gesture_only_interactions` no longer flags a GestureDetector when an ancestor `Semantics` supplies `onTap`/`onLongPress`, or when it is an opaque `SizedBox`/`ColoredBox` hit region with nothing to focus.
+- `avoid_variable_shadowing` no longer reports Dart 3 wildcard `_` locals, loop variables or parameters.
+- `require_ios_accessibility_large_text` no longer flags a literal `TextStyle(fontSize:)` consumed by `Text`/`RichText` (ambient `TextScaler`) or a `TextPainter` with a `textScaler:`. It still reports bare styles and consumers that pin scaling off (`TextScaler.noScaling`, `textScaleFactor: 1`).
+- `invalid_field_name` no longer reports contextual keywords (e.g. `when`) used as record field names; only reserved words are flagged.
+- `prefer_static_method` no longer flags a state-free method that other code in the library calls through an instance receiver (`widget.button.buildTile()`). Making it static would break those callers.
+- `avoid_motion_without_reduce` no longer reports animated widgets whose duration (or enclosing class) is gated through a project reduce-motion helper such as `isMotionReduced`, or that use `Duration.zero`.
+- `avoid_public_members_in_states` no longer flags `@override` members that implement a user-defined mixin or base-class contract.
+- `prefer_stream_distinct` no longer fires when the `listen` callback ignores its event parameter (`(_) => ...` or an unused parameter).
+- `require_permission_manifest_android` now reads the project's AndroidManifest.xml. It no longer reports `permission_handler` imports when the manifest already declares permissions or when there is no manifest to check.
+- `avoid_implicitly_nullable_extension_types` now reports only extension types with a nullable or bare-type-parameter representation. Non-nullable representations (`int`, `List<T>`) are no longer flagged.
+
+### Changed
+
+- Added hand-written translations for the rate-and-feedback prompts, "What's New" panel, workspace scan progress and roughly 100 smaller strings across the translated locales. They have not had native-speaker review.
+
+### Internal
+
+- Scan tests (`git_changed_files_test`, `scan_analyzer_exclude_test`) now compare separator-neutral paths on Windows; the anti-pattern `.contains()` guard is satisfied by the iOS large-text rule.
+- Fixed `ScanRunner.runResolved` silently skipping explicitly requested files that the project's `analyzer: exclude:` removes, which broke the resolved-superset-of-syntactic invariant. Also normalized the path in `_createContextUnit` so mixed-separator targets no longer throw "Path must be normalized" on Windows, and made the git-changed-files and analyzer-exclude tests separator-neutral.
+- i18n dictionaries: technical labels (pubspec/plugin-route version sources, RSS/heap readout, `WASM`, `GitHub Actions CI`, `N/A`, `UPDATE`) are now passthroughs in every locale, and `dev` is a cognate in the nine locales that kept it. Hand translations live in `extension/scripts/i18n/manual_translations.py` and `manual_translations_gaps.py`.
+
+---
+
 ## [17.5.0]
 
 Polish translations in the extension are refreshed, and the release tooling no longer stalls on a stale version number. [log](https://github.com/saropa/saropa_lints/blob/v17.5.0/CHANGELOG.md)

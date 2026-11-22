@@ -87,6 +87,28 @@ class W extends State {
       expect(codes, isNot(contains(ruleName)));
     });
 
+    // FP repro (bug report): the awaited navigator call itself takes `context`
+    // as an argument, evaluated before suspension, after a mounted guard. The
+    // call itself must not be reported.
+    test('FP: context arg of the awaited call itself is not flagged', () async {
+      const code = '''
+class State {}
+class Nav {
+  static Future<bool> maybePop(Object? c) async => true;
+}
+class W extends State {
+  bool mounted = true;
+  Future<void> go() async {
+    if (!mounted) return;
+    await Nav.maybePop(context);
+  }
+  Object? get context => null;
+}
+''';
+      final codes = await reportedRuleCodes(rule, code);
+      expect(codes, isNot(contains(ruleName)));
+    });
+
     // BAD: unguarded context use after awaited navigation fires.
     test('BAD: unguarded context after await fires', () async {
       const code = '''

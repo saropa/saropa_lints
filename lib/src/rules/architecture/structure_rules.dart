@@ -2153,10 +2153,31 @@ class PreferStaticMethodRule extends SaropaLintRule {
       // Check if method body uses 'this' or instance members
       final bool usesThis = _usesThisOrInstanceMembers(node);
 
-      if (!usesThis) {
+      // FP fix: a method with no instance-state access is still an instance
+      // API when other code calls it through an instance receiver
+      // (`widget.button.buildTile()`); making it static would break those
+      // call sites, so it must not be reported.
+      if (!usesThis && !_isCalledThroughInstance(node)) {
         reporter.atToken(node.name, code);
       }
     });
+  }
+
+  /// True when any invocation in the same library resolves to [node] and has
+  /// an explicit receiver that is an instance expression (not a type name).
+  /// Why: `Type.method()` is a static-style call and would survive the
+  /// change; `instance.method()` would not.
+  static bool _isCalledThroughInstance(MethodDeclaration node) {
+    final Element? declared = node.declaredFragment?.element.baseElement;
+    final AstNode? root = node.root;
+    if (declared == null || root == null) return false;
+    bool found = false;
+    root.accept(
+      _InstanceCallFinder(declared, () {
+        found = true;
+      }),
+    );
+    return found;
   }
 
   bool _hasOverrideAnnotation(MethodDeclaration node) {
@@ -2210,6 +2231,55 @@ class PreferStaticMethodRule extends SaropaLintRule {
       }),
     );
     return usesThis;
+  }
+}
+
+/// Finds invocations of a specific method made through an instance receiver.
+/// Used by [PreferStaticMethodRule] to avoid flagging methods whose callers
+/// would break if the method became static.
+class _InstanceCallFinder extends RecursiveAstVisitor<void> {
+  _InstanceCallFinder(this.target, this.onFound);
+  final Element target;
+  final void Function() onFound;
+
+  /// A receiver that names a type (`Foo.m`) is a static-style access and
+  /// would survive the method becoming static; anything else is an instance.
+  static bool _isTypeReceiver(Expression receiver) =>
+      receiver is SimpleIdentifier && receiver.element is InterfaceElement;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // realTarget (not target) so cascades (`obj..m()`) are seen: their
+    // `target` is null but the receiver is the cascade target. An explicit
+    // `this.m()` counts too: it needs an instance, and the rule's body scan
+    // only covers calls made from inside the candidate method itself.
+    final Expression? receiver = node.realTarget;
+    if (receiver != null &&
+        node.methodName.element?.baseElement == target &&
+        !_isTypeReceiver(receiver)) {
+      onFound();
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  // Tear-offs (`list.map(obj.m)`) are not invocations but break the same way
+  // when `m` becomes static, so they are instance uses too.
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (node.identifier.element?.baseElement == target &&
+        !_isTypeReceiver(node.prefix)) {
+      onFound();
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (node.propertyName.element?.baseElement == target &&
+        !_isTypeReceiver(node.realTarget)) {
+      onFound();
+    }
+    super.visitPropertyAccess(node);
   }
 }
 
