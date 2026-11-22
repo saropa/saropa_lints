@@ -68,6 +68,10 @@ class ScanCliArgs {
     this.noExclude = false,
     this.strictFiles = false,
     this.jobs,
+    this.maxMemoryMb,
+    this.chunkTimeoutSeconds,
+    this.progress,
+    this.slowFileMs,
   });
 
   final String path;
@@ -234,6 +238,21 @@ class ScanCliArgs {
   /// count), N >= 1 = that many workers. Applies to the default syntactic scan
   /// only; `--resolve`, `--profile` and `--debug-rule` always run serially.
   final int? jobs;
+
+  /// `--max-memory-mb`: RSS budget for the whole scan process. When exceeded
+  /// the scan sheds workers, and stops early with partial results if a single
+  /// worker still exceeds it. Null = derived from worker count and free RAM.
+  final int? maxMemoryMb;
+
+  /// `--chunk-timeout <seconds>`: wall-clock limit for one chunk of files
+  /// before its worker is restarted and the chunk retried file by file.
+  final int? chunkTimeoutSeconds;
+
+  /// `--progress auto|bar|plain|json|none`; null = auto.
+  final String? progress;
+
+  /// `--slow-file-ms <n>`: report files that take longer than this.
+  final int? slowFileMs;
 }
 
 /// Parses [args] for the scan command.
@@ -282,6 +301,10 @@ ScanParseResult parseScanArgs(
   bool noExclude = false;
   bool strictFiles = false;
   int? jobs;
+  int? maxMemoryMb;
+  int? chunkTimeoutSeconds;
+  String? progress;
+  int? slowFileMs;
 
   var i = 0;
   while (i < args.length) {
@@ -424,6 +447,57 @@ ScanParseResult parseScanArgs(
           '--jobs requires a value (a positive integer or auto).',
         );
       }
+      continue;
+    }
+    // Memory budget for the whole scan process (MB).
+    if (arg == '--max-memory-mb') {
+      i++;
+      final parsed = i < args.length ? int.tryParse(args[i]) : null;
+      if (parsed == null || parsed < 128) {
+        return ScanParseInvalid(
+          '--max-memory-mb requires an integer of at least 128 (MB).',
+        );
+      }
+      maxMemoryMb = parsed;
+      i++;
+      continue;
+    }
+    // Per-chunk hang protection.
+    if (arg == '--chunk-timeout') {
+      i++;
+      final parsed = i < args.length ? int.tryParse(args[i]) : null;
+      if (parsed == null || parsed < 5) {
+        return ScanParseInvalid(
+          '--chunk-timeout requires a number of seconds (at least 5).',
+        );
+      }
+      chunkTimeoutSeconds = parsed;
+      i++;
+      continue;
+    }
+    // Progress style: bar (TTY), plain (CI logs), json (extension), none.
+    if (arg == '--progress') {
+      i++;
+      final v = i < args.length ? args[i].toLowerCase() : '';
+      if (!const {'auto', 'bar', 'plain', 'json', 'none'}.contains(v)) {
+        return ScanParseInvalid(
+          '--progress must be one of: auto, bar, plain, json, none.',
+        );
+      }
+      progress = v;
+      i++;
+      continue;
+    }
+    if (arg == '--slow-file-ms') {
+      i++;
+      final parsed = i < args.length ? int.tryParse(args[i]) : null;
+      if (parsed == null || parsed < 100) {
+        return ScanParseInvalid(
+          '--slow-file-ms requires a number of milliseconds (at least 100).',
+        );
+      }
+      slowFileMs = parsed;
+      i++;
       continue;
     }
     if (arg == '--tier') {
@@ -686,6 +760,10 @@ ScanParseResult parseScanArgs(
       noExclude: noExclude,
       strictFiles: strictFiles,
       jobs: jobs,
+      maxMemoryMb: maxMemoryMb,
+      chunkTimeoutSeconds: chunkTimeoutSeconds,
+      progress: progress,
+      slowFileMs: slowFileMs,
     ),
   );
 }

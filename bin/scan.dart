@@ -121,7 +121,7 @@ Future<void> main(List<String> args) async {
     // (defaults to light for the plugin, but ScanRunner defaults to full).
     lane: parseRuleLane(parsed.lane ?? 'full'),
     laneStats: parsed.laneStats,
-    messageSink: parsed.quiet ? (_) {} : null,
+    messageSink: parsed.quiet && parsed.progress != 'json' ? (_) {} : null,
     // Keep the IDE issue cap — scan output may feed the Problems tab.
     // disableIssueCap: false (default),
     excludeGlobs: excludeGlobs,
@@ -138,29 +138,59 @@ Future<void> main(List<String> args) async {
   // InstanceCreationExpression and type-based rules actually fire; the default
   // path stays the fast syntactic parse.
   final List<ScanDiagnostic>? diagnostics;
-  if (parsed.resolve) {
-    diagnostics = await runner.runResolved();
-  } else {
-    // Parallel syntactic scan. Worker count comes from --jobs (N | auto),
-    // capped by CPU/memory; unset stays serial and prints a recommendation
-    // on large projects. Features with process-local state stay serial.
+  {
+    // Worker count and memory budget. Resolution order: --jobs, then the
+    // SAROPA_LINTS_JOBS env var, then the default (auto for the cheap
+    // syntactic scan; serial for --resolve, which opts in explicitly).
+    final env = Platform.environment;
+    final envJobs = env['SAROPA_LINTS_JOBS'];
+    final requested =
+        parsed.jobs ?? (envJobs == null ? null : parseJobsValue(envJobs));
+    final envMem = int.tryParse(env['SAROPA_LINTS_MAX_MEMORY_MB'] ?? '');
+    final machine = detectMachine();
     final jobsDecision = resolveJobs(
-      requested: parsed.jobs,
+      requested: requested,
       fileCount: runner.countFilesToScan(),
-      cores: Platform.numberOfProcessors,
-      availableMemoryMb: readAvailableMemoryMb(),
+      machine: machine,
+      resolved: parsed.resolve,
       incompatibleReason: parsed.profile
           ? '--profile records timings per process'
           : parsed.debugRule != null
           ? '--debug-rule traces in one process'
           : null,
     );
-    if (!quiet) {
+    final progressStyle = switch (parsed.progress) {
+      'bar' => ProgressStyle.bar,
+      'plain' => ProgressStyle.plain,
+      'json' => ProgressStyle.json,
+      'none' => ProgressStyle.none,
+      _ => ProgressStyle.auto,
+    };
+    if (!quiet || progressStyle == ProgressStyle.json) {
       for (final note in jobsDecision.notes) {
         stderr.writeln(note);
       }
     }
-    diagnostics = await runner.runParallel(jobsDecision.jobs);
+    diagnostics = await runner.runParallel(
+      jobsDecision.jobs,
+      resolve: parsed.resolve,
+      config: ScanParallelConfig(
+        maxMemoryMb: parsed.maxMemoryMb ?? envMem,
+        availableMemoryMb: machine.availableMemoryMb,
+        totalMemoryMb: machine.totalMemoryMb,
+        chunkTimeout: Duration(seconds: parsed.chunkTimeoutSeconds ?? 120),
+        slowFileMs: parsed.slowFileMs ?? 3000,
+        progress: progressStyle,
+        hasTerminal: stdout.hasTerminal && stderr.hasTerminal,
+        // An explicit memory budget must be enforced even with one worker,
+        // and the in-process serial path has no watchdog.
+        forceEngine:
+            (parsed.maxMemoryMb ?? envMem) != null &&
+            jobsDecision.jobs <= 1 &&
+            !parsed.profile &&
+            parsed.debugRule == null,
+      ),
+    );
   }
 
   // Flush the timing profile even when diagnostics is null (config error):
@@ -333,6 +363,14 @@ Future<void> main(List<String> args) async {
   );
   if (skipped > 0 && dartFiles.isNotEmpty && exitCode == 0) {
     exitCode = 1;
+  }
+  // A scan that stopped early to protect the machine (memory pressure) has
+  // only partial results: never let a gate pass on that. Exit 3 means
+  // "incomplete" and is distinct from 1 (findings) and 2 (config error);
+  // findings, if any, still win with exit 1.
+  final parallelReport = runner.lastParallelReport;
+  if (parallelReport != null && parallelReport.aborted && exitCode == 0) {
+    exitCode = 3;
   }
 
   // Build --fail-on metadata for JSON output so consumers understand why
@@ -836,18 +874,55 @@ void _printUsage() {
     '  --files <path>...    Scan only these Dart files (paths relative to path).',
   );
   print('  --files-from-stdin  Read one file path per line from stdin.');
+  print('');
   print(
-    '  --jobs, -j <n|auto> Scan with parallel workers (syntactic scan only).',
+    'Performance and memory (the scan slows itself down if memory runs low):',
+  );
+  print('  --jobs, -j <n|auto|off>');
+  print(
+    '                      Parallel workers. Default: auto for the fast scan',
   );
   print(
-    '                      auto = recommended count from CPUs and free memory.',
+    '                      (CPUs minus one — all CPUs in CI — bounded by free',
   );
   print(
-    '                      Default: serial, with a hint on large projects.',
+    '                      memory and container limits); serial for --resolve',
   );
   print(
-    '                      Ignored with --resolve, --profile, --debug-rule.',
+    '                      unless set. 1 or off = serial. Also SAROPA_LINTS_JOBS.',
   );
+  print('                      Ignored with --profile and --debug-rule.');
+  print(
+    '  --max-memory-mb <n> Memory budget for the whole scan (default: from worker',
+  );
+  print(
+    '                      count and free memory). The scan sheds workers near',
+  );
+  print(
+    '                      it and stops early (exit 3, partial results) if a',
+  );
+  print(
+    '                      single worker still exceeds it. SAROPA_LINTS_MAX_MEMORY_MB.',
+  );
+  print(
+    '  --chunk-timeout <s> Restart a worker stuck on one chunk for this long and',
+  );
+  print(
+    '                      retry it file by file; a file that hangs again is',
+  );
+  print('                      skipped and reported (default 120).');
+  print(
+    '  --progress <style>  auto | bar | plain | json | none. plain prints a line',
+  );
+  print(
+    '                      every 15s (CI logs); json emits machine-readable',
+  );
+  print('                      SAROPA_SCAN_EVENT lines on stderr.');
+  print('  --slow-file-ms <n>  Report files slower than this (default 3000).');
+  print(
+    '  Exit codes: 0 clean, 1 findings, 2 error, 3 incomplete (stopped early).',
+  );
+  print('');
   print('  --exclude-globs <p> Exclude files matching these glob patterns.');
   print(
     '                      Patterns are matched relative to the scanned folder.',

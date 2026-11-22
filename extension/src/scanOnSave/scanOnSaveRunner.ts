@@ -15,6 +15,8 @@ import { spawn } from 'node:child_process';
 import * as vscode from 'vscode';
 import { resolveCliCwd, killProcessTree } from '../views/devCliRoot';
 import { l10n } from '../i18n/runtime';
+import { applyWindowsPriority, lowPrioritySpec } from '../scanResources/lowPriority';
+import { readScanResourceSettings } from '../scanResources/scanResourceConfig';
 
 // See projectVibrancyCliRunner.ts SPAWN_USE_SHELL for the CVE-2024-27980 /
 // PATHEXT rationale — identical reasoning applies to every dart spawn here.
@@ -286,10 +288,15 @@ export function runScanOnSave(
     }
     const args = buildScanOnSaveArgs(projectRoot, filePaths, tier, resolve);
     const cliCwd = resolveCliCwd(projectRoot);
-    const child = spawn('dart', ['run', 'saropa_lints:scan', ...args], {
+    // Reduced CPU priority (setting `saropaLints.scan.lowPriority`, default
+    // on) keeps the editor responsive while the scan runs.
+    const lowPriority = readScanResourceSettings().lowPriority;
+    const spec = lowPrioritySpec('dart', ['run', 'saropa_lints:scan', ...args], lowPriority);
+    const child = spawn(spec.command, [...spec.args], {
       cwd: cliCwd,
       shell: SPAWN_USE_SHELL,
     });
+    applyWindowsPriority(child.pid, lowPriority);
     let stdout = '';
     let stderr = '';
     // Watchdog + settle-once bookkeeping. A `dart` child that never exits would

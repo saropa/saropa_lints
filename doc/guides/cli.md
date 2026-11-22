@@ -74,6 +74,11 @@ dart run saropa_lints scan /path/to/project
 | `--fail-on-count <n>` | Used with `--fail-on`: exit 1 only when the count of matching diagnostics exceeds _n_. Lets CI tolerate a known baseline of warnings. |
 | `--fail-on-impact-count <n>` | Used with `--fail-on-impact`: exit 1 only when the count of matching impact-level diagnostics exceeds _n_. Lets CI tolerate a known baseline during migration. |
 | `--fail-on-tier <name>` | Exit 1 only when any diagnostic comes from a rule in this tier or below. Lets CI see all diagnostics at a high tier but only fail on essential-tier findings during incremental adoption. Values: `essential`, `recommended`, `professional`, `comprehensive`, `pedantic`. |
+| `--jobs <n\|auto\|off>` / `-j` | Parallel workers for the scan. **Default: auto** for the fast scan — CPUs minus one (all CPUs in CI), bounded by free memory and container (cgroup) CPU/memory limits. `1`/`off` forces serial. With `--resolve` the default stays serial because each resolved worker is a full analyzer (~2 GB); opt in with `--jobs N`. Also `SAROPA_LINTS_JOBS`. |
+| `--max-memory-mb <n>` | Memory budget for the whole scan process. The scan sheds workers as it nears the budget and ramps back up when memory frees; if a single worker still exceeds it the scan stops early with partial results and exit code `3`. Default: derived from the worker count and free memory. Also `SAROPA_LINTS_MAX_MEMORY_MB`. |
+| `--chunk-timeout <seconds>` | Restart a worker that is stuck on one chunk of files for this long and retry the chunk file by file; a file that hangs again is skipped and reported. Default `120`. |
+| `--progress <style>` | `auto` (default), `bar`, `plain`, `json`, `none`. `plain` prints one status line every 15 s — readable in CI logs. `json` emits `SAROPA_SCAN_EVENT {…}` lines on stderr for tooling (this is what the VS Code extension reads). |
+| `--slow-file-ms <n>` | Report files that take longer than this to scan (default `3000`). Useful for finding what makes a scan slow. |
 | `--quiet` / `-q` | Suppress all stderr progress and status messages. The caller gets only the exit code and stdout output (report or JSON). |
 | `--profile` | Record per-rule execution timing and write to `reports/.saropa_lints/rule_timings.json` (slowest first, with call counts and averages). |
 | `--fix-ignores` | Bulk-convert bare `// ignore: rule_name` comments to `// ignore: saropa_lints/rule_name` for all known saropa_lints rules. |
@@ -383,6 +388,19 @@ Scan-only inputs: `tier`, `resolve`, `max-severity`, `fail-on`, `fail-on-impact`
 Other inputs: `working-directory`, `min-severity`, `min-impact`, `exclude-globs`, `include-globs`, `sarif-file`, `upload-sarif`, `install-sdk`, `sdk-version`, `pub-get`. Outputs: `exit-code`, `findings`, `sarif-file`.
 
 For Flutter projects, set up `subosito/flutter-action@v2` before this step and leave `install-sdk` at its default `auto` — it detects the SDK already on PATH and skips installing a second one.
+
+#### Speed, memory and not overloading the runner
+
+The scan splits files into chunks and feeds them to parallel workers, so a large project scans in a fraction of the serial time. Output is identical for any worker count (the same diagnostics in the same order).
+
+It is built to never take a machine down:
+
+- **Sized for the machine.** Workers default to the CPUs you actually have — a container's CPU quota is honored, not the host's core count — and never more than free memory can hold (~300 MB each for the fast scan, ~2 GB each for `--resolve`).
+- **Self-throttling.** Every half second the scan checks its own memory and the machine's free memory. Past 80% of the budget it sheds a worker; below the free-memory reserve (10% of RAM, 512 MB–2 GB) it drops to one worker at once. It ramps back up after sustained calm.
+- **Fails safe.** If one worker still exceeds the budget the scan stops early and exits **3** ("incomplete") instead of letting the runner be OOM-killed, so a gate can never pass on a partial scan. Exit codes: `0` clean, `1` findings, `2` error, `3` incomplete.
+- **Hang protection.** A worker stuck on a pathological file is restarted; the culprit is isolated, skipped and named in the summary, and the rest of the scan continues.
+
+On GitHub Actions the `jobs` and `max-memory-mb` inputs map to these flags. Leave them empty for the CI-aware default (all CPUs the job gets, memory-bounded). To shrink a scan on a small runner: `jobs: 2`. To see what dominates a slow scan, read the "Slowest files" line in the log.
 
 #### Doing it by hand
 

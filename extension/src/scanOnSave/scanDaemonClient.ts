@@ -17,6 +17,8 @@
 import { spawn, type ChildProcess } from 'node:child_process';
 import { resolveCliCwd, killProcessTree } from '../views/devCliRoot';
 import { l10n } from '../i18n/runtime';
+import { applyWindowsPriority, lowPrioritySpec } from '../scanResources/lowPriority';
+import { readScanResourceSettings } from '../scanResources/scanResourceConfig';
 import type { ScanOnSavePayload, ScanOnSaveResult } from './scanOnSaveRunner';
 
 // See projectVibrancyCliRunner.ts SPAWN_USE_SHELL for the CVE-2024-27980 /
@@ -129,11 +131,17 @@ export class ScanDaemonClient {
   }
 
   start(): void {
-    const child = spawn(
-      'dart',
-      ['run', 'saropa_lints:scan_daemon', this._projectRoot, '--tier', this._tier],
-      { cwd: resolveCliCwd(this._projectRoot), shell: SPAWN_USE_SHELL },
-    );
+    const settings = readScanResourceSettings();
+    const args = ['run', 'saropa_lints:scan_daemon', this._projectRoot, '--tier', this._tier];
+    // An explicit memory setting also bounds the daemon: it recycles itself
+    // (clean exit, respawn) once its RSS passes this ceiling.
+    if (settings.maxMemoryMb > 0) args.push('--max-rss-mb', String(settings.maxMemoryMb));
+    const spec = lowPrioritySpec('dart', args, settings.lowPriority);
+    const child = spawn(spec.command, [...spec.args], {
+      cwd: resolveCliCwd(this._projectRoot),
+      shell: SPAWN_USE_SHELL,
+    });
+    applyWindowsPriority(child.pid, settings.lowPriority);
     this._child = child;
     this._alive = true;
     child.stdout?.on('data', (chunk: Buffer | string) => this._onStdout(chunk.toString()));

@@ -254,6 +254,12 @@ class ProgressTracker {
   // Track slow files (> 2 seconds) for summary
   static final Map<String, int> _slowFiles = {}; // file -> seconds
 
+  /// Runtime switch that silences the progress line and summary. The
+  /// compile-time `SAROPA_LINTS_PROGRESS` define cannot be changed after the
+  /// fact, so scan worker isolates (whose output would interleave with the
+  /// parent's single progress line) set this instead.
+  static bool suppressProgressOutput = false;
+
   // Issue limit tracking
   static int _maxIssues = 500; // Default limit (0 = unlimited)
   static bool _isLimitReached = false;
@@ -487,7 +493,7 @@ class ProgressTracker {
 
   /// Record that a file is being analyzed and potentially report progress.
   static void recordFile(String path) {
-    if (!_progressEnabled) return;
+    if (!_progressEnabled || suppressProgressOutput) return;
 
     // Initialize start time on first file
     _startTime ??= DateTime.now();
@@ -728,7 +734,9 @@ class ProgressTracker {
   /// Report final summary when analysis completes.
   static void reportSummary() {
     final startTime = _startTime;
-    if (!_progressEnabled || startTime == null) return;
+    if (!_progressEnabled || suppressProgressOutput || startTime == null) {
+      return;
+    }
 
     final elapsed = DateTime.now().difference(startTime);
     final fileCount = _seenFiles.length;

@@ -436,7 +436,8 @@
     "walkthrough.step.walkthrough.triage.title",
     "welcome.card.sidebar.actionWalkthrough",
     "welcome.discover.findings.label",
-    "welcome.discover.packages.label"
+    "welcome.discover.packages.label",
+    "scanResources.*"
   ],
   "reviewed_ok": {
     "ar": [

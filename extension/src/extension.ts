@@ -155,6 +155,7 @@ import { logReport, logSection, flushReport, findLatestAnalysisReport } from './
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
 import { ScanOnSaveController } from './scanOnSave/scanOnSaveController';
+import { showScanPerformancePicker } from './scanResources/scanResourcePicker';
 import {
   runActivation as runVibrancyActivation,
   stopFreshnessWatcher,
@@ -651,7 +652,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // analyzer plugin (which Lane 2 makes opt-in).
   const scanOnSaveDiagCollection = vscode.languages.createDiagnosticCollection('saropa_lints');
   context.subscriptions.push(scanOnSaveDiagCollection);
-  scanOnSaveController = new ScanOnSaveController(scanOnSaveDiagCollection, getProjectRoot, getSharedOutputChannel());
+  scanOnSaveController = new ScanOnSaveController(
+    scanOnSaveDiagCollection,
+    getProjectRoot,
+    getSharedOutputChannel(),
+    context.globalState,
+  );
   context.subscriptions.push(scanOnSaveController);
   setScanSuspendedProvider(() => scanOnSaveController.isDaemonSuspended);
 
@@ -2467,6 +2473,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // never reaches.
     vscode.commands.registerCommand('saropaLints.scanOnSave.runBaselineScan', async () => {
       await scanOnSaveController.runBaselineScanCommand();
+    }),
+    // Shows this machine's capacity, what each performance profile would do on
+    // it, and which one is recommended — then applies the choice.
+    vscode.commands.registerCommand('saropaLints.scan.configurePerformance', async () => {
+      const files = await vscode.workspace.findFiles(
+        '**/*.dart',
+        '**/{.dart_tool,build,node_modules,.git}/**',
+        20000,
+      );
+      await showScanPerformancePicker(files.length);
     }),
     // Create a baseline (saropa_baseline.json) that suppresses existing
     // violations so only new code is flagged. Backs the "Create baseline"

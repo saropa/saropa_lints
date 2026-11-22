@@ -13,7 +13,7 @@
 library;
 
 import 'dart:io' as io;
-import 'dart:isolate' show Isolate;
+import 'dart:async' show unawaited;
 
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/dart/analysis/analysis_context.dart';
@@ -31,7 +31,10 @@ import '../config/runtime_tier_cap.dart';
 import '../init/cli_args.dart' show tierOrder;
 import '../../saropa_lints.dart';
 import 'capturing_registry.dart';
+import 'parallel_scan_engine.dart';
 import 'scan_config.dart';
+import 'scan_jobs.dart' show defaultMaxMemoryMb, readAvailableMemoryMb;
+import 'scan_pressure.dart' show PressureLimits;
 import 'scan_diagnostic.dart';
 import 'scan_rule_context.dart';
 import 'scan_rule_tracer.dart';
@@ -248,44 +251,152 @@ class ScanRunner {
   /// CLI size the worker pool before [runParallel] starts.
   int countFilesToScan() => _resolveDartFiles().length;
 
-  /// Like [run], but shards the file list across [jobs] worker isolates.
+  /// Report from the most recent [runParallel] (null before one ran).
+  ParallelScanReport? lastParallelReport;
+
+  /// Opens a reusable [ChunkScanner]: loads and registers the rules (and, when
+  /// [resolved], builds the analyzer context collection) ONCE, then scans any
+  /// number of file chunks against them. Used by worker isolates and by the
+  /// in-process fallback of [runParallel]. Returns null when there is nothing
+  /// to run (no rules enabled / unusable config).
+  Future<ChunkScanner?> openChunkScanner({
+    required bool resolved,
+    int slowFileMs = 3000,
+    bool rescueExcluded = false,
+  }) async {
+    final plan = _prepare();
+    if (plan == null || plan.rules.isEmpty) return null;
+
+    if (!resolved) {
+      final registrations = _registerRules(
+        plan.rules,
+        () => ScanRuleContext(definingUnit: _dummyContextUnit()),
+      );
+      final visitorRule = _visitorRuleMap(registrations);
+      return (files) async {
+        final diagnostics = <ScanDiagnostic>[];
+        final slow = <SlowFile>[];
+        var stopped = false;
+        for (final f in files) {
+          if (_stopSentinelHit(0, 0, diagnostics.length)) {
+            stopped = true;
+            break;
+          }
+          final t = Stopwatch()..start();
+          _scanSingleFile(f, registrations, visitorRule, diagnostics);
+          if (t.elapsedMilliseconds >= slowFileMs) {
+            slow.add(SlowFile(f, t.elapsedMilliseconds));
+          }
+        }
+        return ChunkOutcome(
+          diagnostics: diagnostics,
+          stopped: stopped,
+          slowFiles: slow,
+        );
+      };
+    }
+
+    // Resolved: one collection per scanner (per worker), built once.
+    final collection = buildProjectCollection(targetPath);
+    final registrations = _registerRules(
+      plan.rules,
+      () => ResolvedScanRuleContext(definingUnit: _dummyContextUnit()),
+    );
+    final visitorRule = _visitorRuleMap(registrations);
+    return (files) async {
+      final diagnostics = <ScanDiagnostic>[];
+      final slow = <SlowFile>[];
+      var stopped = false;
+      var outsideRoots = 0;
+      for (final raw in files) {
+        if (_stopSentinelHit(0, 0, diagnostics.length)) {
+          stopped = true;
+          break;
+        }
+        final f = p.normalize(p.absolute(raw));
+        AnalysisContext ctx;
+        try {
+          ctx = collection.contextFor(f);
+        } on StateError {
+          // The project's `analyzer: exclude:` removed this file. Mirror the
+          // serial path: a file the caller explicitly asked for gets its own
+          // single-file context; otherwise it is skipped (and counted).
+          final rescued = rescueExcluded ? _contextForExcludedFile(f) : null;
+          if (rescued == null) {
+            outsideRoots++;
+            continue;
+          }
+          ctx = rescued;
+        }
+        final t = Stopwatch()..start();
+        await _scanSingleFileResolved(
+          ctx,
+          f,
+          registrations,
+          visitorRule,
+          diagnostics,
+        );
+        if (t.elapsedMilliseconds >= slowFileMs) {
+          slow.add(SlowFile(f, t.elapsedMilliseconds));
+        }
+      }
+      return ChunkOutcome(
+        diagnostics: diagnostics,
+        stopped: stopped,
+        slowFiles: slow,
+        outsideRoots: outsideRoots,
+      );
+    };
+  }
+
+  /// Scans with [jobs] worker isolates (see `parallel_scan_engine.dart`):
+  /// a chunk work queue with a memory/pressure watchdog, per-chunk timeouts
+  /// and progress reporting. Output is identical for any worker count.
   ///
-  /// The syntactic scan has no cross-file state, so each worker builds its
-  /// own rule set and scans an interleaved slice of the files; results are
-  /// merged back into the same order a serial [run] produces (file order,
-  /// then emission order within a file). Falls back to [run] when [jobs] is
-  /// 1 or there are too few files to split.
+  /// [jobs] should come from `resolveJobs` (scan_jobs.dart). With [jobs] <= 1
+  /// and no explicit engine request this is the plain in-process [run] /
+  /// [runResolved]. Per-rule profiling and `--debug-rule` tracing keep
+  /// process-local state: callers must use [run] for those.
   ///
-  /// [jobs] should come from `resolveJobs` (scan_jobs.dart), which caps it by
-  /// CPU count and available memory. Per-rule profiling and `--debug-rule`
-  /// tracing keep process-local state and are not supported here: callers
-  /// must use [run] for those.
-  Future<List<ScanDiagnostic>?> runParallel(int jobs) async {
-    if (jobs <= 1) return run();
+  /// Read [lastParallelReport] afterwards for throttling, slow files and
+  /// skipped files.
+  Future<List<ScanDiagnostic>?> runParallel(
+    int jobs, {
+    bool resolve = false,
+    ScanParallelConfig config = const ScanParallelConfig(),
+  }) async {
+    lastParallelReport = null;
+    if (jobs <= 1 && !config.forceEngine) {
+      return resolve ? runResolved() : run();
+    }
     _skippedFileCount = 0;
     final plan = _prepare();
     if (plan == null) return null;
     if (plan.files.isEmpty) return const [];
 
-    // Capture the cap before any worker-side changes; workers run in their
-    // own isolates (separate statics) but be explicit about the source.
+    // Capture the cap in the parent: workers run with it disabled (their
+    // per-process counters would drop diagnostics that belong in the global
+    // first N); it is applied once after the ordered merge.
     final parentIssueCap = ProgressTracker.maxIssues;
-    final workers = jobs < plan.files.length ? jobs : plan.files.length;
-    if (workers <= 1) {
-      final registrations = _registerRules(
-        plan.rules,
-        () => ScanRuleContext(definingUnit: _dummyContextUnit()),
-      );
-      return _scanFiles(plan.files, registrations);
-    }
-
-    // Interleave (round-robin) so slow regions of the tree spread across
-    // workers instead of landing on one shard.
-    final shards = List.generate(workers, (_) => <int>[]);
-    for (var i = 0; i < plan.files.length; i++) {
-      shards[i % workers].add(i);
-    }
-    _err('Scanning ${plan.files.length} files with $workers workers...');
+    final workerCount = jobs < 1 ? 1 : jobs;
+    final limits = PressureLimits(
+      maxMemoryMb:
+          config.maxMemoryMb ??
+          defaultMaxMemoryMb(
+            jobs: workerCount,
+            resolved: resolve,
+            availableMemoryMb: config.availableMemoryMb,
+          ),
+      reserveMb:
+          config.reserveMb ??
+          PressureLimits.defaultReserveMb(config.totalMemoryMb),
+    );
+    _err(
+      'Scanning ${plan.files.length} files with $workerCount '
+      'worker${workerCount == 1 ? '' : 's'} '
+      '(memory budget ${limits.maxMemoryMb} MB, keeping ${limits.reserveMb} MB '
+      'free)...',
+    );
 
     final spec = _WorkerSpec(
       targetPath: targetPath,
@@ -297,14 +408,47 @@ class ScanRunner {
       excludeLightLane: excludeLightLane,
       bypassTierCap: bypassTierCap,
       laneIsLight: lane == RuleLane.light,
+      resolved: resolve,
+      slowFileMs: config.slowFileMs,
+      rescueExcluded: !applyExclusionsToFileList,
     );
-    final results = await Future.wait([
-      for (final shard in shards)
-        _runShard(spec, [for (final idx in shard) plan.files[idx]]),
-    ]);
 
-    // The parent owns sentinel cleanup in parallel mode (see
-    // [leaveStopSentinel]).
+    // The parent's own scanner, used only if workers cannot start.
+    ChunkScanner? inline;
+    Future<ChunkOutcome> inlineScan(List<String> files) async {
+      inline ??= await openChunkScanner(
+        resolved: resolve,
+        slowFileMs: config.slowFileMs,
+        rescueExcluded: !applyExclusionsToFileList,
+      );
+      final s = inline;
+      if (s == null) return const ChunkOutcome(diagnostics: []);
+      return s(files);
+    }
+
+    final result = await runChunkedScan(
+      files: plan.files,
+      options: ParallelScanOptions(
+        jobs: workerCount,
+        limits: limits,
+        chunkTimeout: config.chunkTimeout,
+        slowFileMs: config.slowFileMs,
+        progress: config.progress,
+        hasTerminal: config.hasTerminal,
+        onMessage: _progressOrErr,
+        chunkSize: config.chunkSize,
+      ),
+      spec: spec,
+      workerEntry: _scanWorkerMain,
+      inlineScan: inlineScan,
+      readRssMb: _currentRssMb,
+      readAvailableMb: readAvailableMemoryMb,
+    );
+    lastParallelReport = result.report;
+    _skippedFileCount = result.report.outsideRoots;
+    _reportParallelSummary(result.report);
+
+    // The parent owns sentinel cleanup in parallel mode (workers leave it).
     final sentinel = io.File(p.join(p.absolute(targetPath), '.saropa_stop'));
     try {
       if (sentinel.existsSync()) sentinel.deleteSync();
@@ -312,50 +456,77 @@ class ScanRunner {
       // Best effort; the scan itself already honored the stop.
     }
 
-    // Workers re-resolve paths to absolute form; map each back to the exact
-    // string a serial run reports so output (and downstream relativization)
-    // is identical. Also gives each file its serial position for ordering.
-    final root = p.absolute(targetPath);
-    String abs(String f) =>
-        p.isAbsolute(f) ? p.normalize(f) : p.normalize(p.join(root, f));
-    final indexOf = <String, int>{
-      for (var i = 0; i < plan.files.length; i++) abs(plan.files[i]): i,
-    };
-    final merged = <(int, int, ScanDiagnostic)>[];
-    for (final shardResult in results) {
-      if (shardResult == null) return null;
-      for (var seq = 0; seq < shardResult.length; seq++) {
-        final d = shardResult[seq];
-        final idx = indexOf[abs(d.filePath)];
-        merged.add((
-          idx ?? plan.files.length,
-          seq,
-          idx == null ? d : d.withFilePath(plan.files[idx]),
-        ));
-      }
-    }
-    merged.sort((a, b) {
-      final byFile = a.$1.compareTo(b.$1);
-      return byFile != 0 ? byFile : a.$2.compareTo(b.$2);
-    });
-
     // A serial run caps non-ERROR diagnostics (Problems-tab safeguard, see
-    // ProgressTracker). Each worker applied that cap to its own shard; apply
-    // it once more across the merged, serially-ordered list so the result
-    // matches serial. Every diagnostic in the global first N+1 is also in its
-    // own shard's first N+1, so nothing is lost by the per-shard caps.
-    final cap = parentIssueCap;
+    // ProgressTracker). Apply it once over the ordered merge so the result is
+    // the same for every worker count.
     final out = <ScanDiagnostic>[];
     var nonError = 0;
-    for (final m in merged) {
-      final d = m.$3;
-      if (cap > 0 && d.severity.toUpperCase() != 'ERROR') {
+    for (final d in result.diagnostics) {
+      if (parentIssueCap > 0 && d.severity.toUpperCase() != 'ERROR') {
         nonError++;
-        if (nonError > cap + 1) continue;
+        if (nonError > parentIssueCap + 1) continue;
       }
       out.add(d);
     }
     return out;
+  }
+
+  /// Progress and event lines: raw (no newline) to the sink or stderr.
+  void _progressOrErr(String message) {
+    if (message.startsWith('\r')) {
+      _progress(message);
+    } else {
+      _err(message);
+    }
+  }
+
+  int _currentRssMb() {
+    try {
+      return io.ProcessInfo.currentRss ~/ (1024 * 1024);
+    } on Object {
+      return 0;
+    }
+  }
+
+  /// One-paragraph outcome for humans: what ran, what was throttled, what was
+  /// slow or skipped.
+  void _reportParallelSummary(ParallelScanReport r) {
+    final secs = (r.elapsedMs / 1000).toStringAsFixed(1);
+    _err(
+      'Scanned ${r.filesScanned}/${r.filesTotal} files in ${secs}s '
+      '(peak ${r.peakRssMb} MB'
+      '${r.minAvailableMb != null ? ', lowest free ${r.minAvailableMb} MB' : ''}'
+      '${r.usedFallback ? ', ran in-process' : ''}).',
+    );
+    if (r.throttleEvents.any((e) => e.to < e.from)) {
+      _err(
+        'The scan slowed itself down ${r.throttleEvents.where((e) => e.to < e.from).length} '
+        'time(s) to protect your machine (lowest: ${r.minAllowedWorkers} '
+        'worker(s)). Reduce --jobs or raise --max-memory-mb to change this.',
+      );
+    }
+    if (r.slowFiles.isNotEmpty) {
+      final top = r.slowFiles
+          .take(3)
+          .map((s) => '${s.path} (${(s.ms / 1000).toStringAsFixed(1)}s)')
+          .join(', ');
+      _err('Slowest files: $top.');
+    }
+    if (r.skippedFiles.isNotEmpty) {
+      _err(
+        '${r.skippedFiles.length} file(s) were NOT scanned because they hung '
+        'or crashed a worker: ${r.skippedFiles.take(5).join(', ')}.',
+      );
+    }
+    if (r.outsideRoots > 0) {
+      _err(
+        '${r.outsideRoots} file(s) were skipped (outside the analysis roots '
+        'or excluded by the project config).',
+      );
+    }
+    if (r.aborted) {
+      _err('Scan stopped early: ${r.abortReason}. Results are partial.');
+    }
   }
 
   /// Runs the scan with full type/element resolution and returns all
@@ -1362,12 +1533,6 @@ class _RuleRegistration {
   final MutableRuleContext context;
 }
 
-/// Starts one worker isolate. A top-level function so the closure captures
-/// only [spec] and [files] — never the parent runner or its rule objects,
-/// which cannot be sent across isolates.
-Future<List<ScanDiagnostic>?> _runShard(_WorkerSpec spec, List<String> files) =>
-    Isolate.run(() => _scanShardInWorker(spec, files));
-
 /// Sendable description of a [ScanRunner] for a worker isolate (only plain
 /// values: strings, bools, sets of strings).
 class _WorkerSpec {
@@ -1381,6 +1546,9 @@ class _WorkerSpec {
     required this.excludeLightLane,
     required this.bypassTierCap,
     required this.laneIsLight,
+    required this.resolved,
+    required this.slowFileMs,
+    required this.rescueExcluded,
   });
 
   final String targetPath;
@@ -1392,29 +1560,87 @@ class _WorkerSpec {
   final bool excludeLightLane;
   final bool bypassTierCap;
   final bool laneIsLight;
+  final bool resolved;
+  final int slowFileMs;
+  final bool rescueExcluded;
 }
 
-/// Worker-isolate entry: runs a quiet, serial syntactic scan of [files]
-/// (already filtered by the parent, so exclusions are not re-applied).
-List<ScanDiagnostic>? _scanShardInWorker(_WorkerSpec spec, List<String> files) {
-  // The Problems-tab cap counts per process, so a per-shard cap would drop
-  // diagnostics that belong in the global first N. Workers report everything;
-  // the parent applies the cap once after merging (see runParallel).
-  ProgressTracker.setMaxIssues(0);
-  final runner = ScanRunner(
-    targetPath: spec.targetPath,
-    preResolvedFiles: files,
-    tier: spec.tier,
-    enabledRuleNames: spec.enabledRuleNames,
-    messageSink: (_) {},
-    applyExclusionsToFileList: false,
-    excludeLightLane: spec.excludeLightLane,
-    bypassTierCap: spec.bypassTierCap,
-    lane: spec.laneIsLight ? RuleLane.light : RuleLane.full,
-    noExclude: spec.noExclude,
-    excludeGlobs: spec.excludeGlobs,
-    includeGlobs: spec.includeGlobs,
-    leaveStopSentinel: true,
+/// Worker isolate entry point (top level so it can be spawned).
+void _scanWorkerMain(WorkerBootstrap boot) {
+  unawaited(
+    runWorkerLoop(boot, (Object raw) async {
+      final spec = raw as _WorkerSpec;
+      // The Problems-tab cap counts per process, so a per-worker cap would
+      // drop diagnostics that belong in the global first N. Workers report
+      // everything; the parent applies the cap once after merging.
+      ProgressTracker.setMaxIssues(0);
+      ProgressTracker.suppressProgressOutput = true;
+      final runner = ScanRunner(
+        targetPath: spec.targetPath,
+        // Chunks arrive over the port; discovery is the parent's job.
+        preResolvedFiles: const [],
+        tier: spec.tier,
+        enabledRuleNames: spec.enabledRuleNames,
+        // Worker output is silent by default (the parent owns the terminal);
+        // set SAROPA_LINTS_WORKER_DEBUG=1 to see what workers report.
+        messageSink: io.Platform.environment['SAROPA_LINTS_WORKER_DEBUG'] == '1'
+            ? (m) => io.stderr.writeln('[worker] $m')
+            : (_) {},
+        applyExclusionsToFileList: false,
+        excludeLightLane: spec.excludeLightLane,
+        bypassTierCap: spec.bypassTierCap,
+        lane: spec.laneIsLight ? RuleLane.light : RuleLane.full,
+        noExclude: spec.noExclude,
+        excludeGlobs: spec.excludeGlobs,
+        includeGlobs: spec.includeGlobs,
+        leaveStopSentinel: true,
+      );
+      return runner.openChunkScanner(
+        resolved: spec.resolved,
+        slowFileMs: spec.slowFileMs,
+        rescueExcluded: spec.rescueExcluded,
+      );
+    }),
   );
-  return runner.run();
+}
+
+/// Tunables for [ScanRunner.runParallel] beyond the worker count.
+class ScanParallelConfig {
+  const ScanParallelConfig({
+    this.maxMemoryMb,
+    this.reserveMb,
+    this.availableMemoryMb,
+    this.totalMemoryMb,
+    this.chunkTimeout = const Duration(seconds: 120),
+    this.slowFileMs = 3000,
+    this.progress = ProgressStyle.auto,
+    this.hasTerminal = false,
+    this.chunkSize,
+    this.forceEngine = false,
+  });
+
+  /// RSS budget for the whole scan process; null = derived from worker count
+  /// and available memory.
+  final int? maxMemoryMb;
+
+  /// Free system memory to leave untouched; null = 10% of RAM (512–2048 MB).
+  final int? reserveMb;
+
+  /// Machine figures used to derive defaults.
+  final int? availableMemoryMb;
+  final int? totalMemoryMb;
+
+  /// Per-chunk wall-clock limit before a worker is restarted.
+  final Duration chunkTimeout;
+
+  /// Files slower than this are reported.
+  final int slowFileMs;
+
+  final ProgressStyle progress;
+  final bool hasTerminal;
+  final int? chunkSize;
+
+  /// Run through the engine even for one worker (gains timeouts, slow-file
+  /// and memory watchdog; costs one worker-startup).
+  final bool forceEngine;
 }

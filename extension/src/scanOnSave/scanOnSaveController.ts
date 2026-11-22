@@ -19,6 +19,24 @@ import { runBaselineScan } from './baselineScanRunner';
 import { readTierFromAnalysisOptionsYaml } from '../config/tierConfig';
 import { getEnabledSeverities, affectsSeveritySettings } from '../config/severityConfig';
 import { l10n } from '../i18n/runtime';
+import {
+  classifyMachinePressure,
+  defaultReserveMb,
+  readMachineSnapshot,
+} from '../scanResources/machineResources';
+import { runFastBaselineScan } from '../scanResources/fastBaselineRunner';
+import { waitForRecovery } from '../scanResources/scanResourceGuard';
+import {
+  abortedNotice,
+  daemonLowMemoryNotice,
+  deepPausedNotice,
+  deepPreflightNotice,
+  fastDoneNotice,
+  throttledNotice,
+} from '../scanResources/scanResourceNotices';
+import { readScanResourceSettings } from '../scanResources/scanResourceConfig';
+import { resolveScanResources } from '../scanResources/scanResourceSettings';
+import { ScanResourceUi } from '../scanResources/scanResourceUi';
 
 /**
  * Resolves the tier to scan with — `analysis_options.yaml` is the source of
@@ -333,6 +351,18 @@ export class ScanOnSaveController implements vscode.Disposable {
   private _lastDiagnosticsByFile = new Map<string, ScanOnSaveDiagnostic[]>();
   /** True when the daemon has been suspended due to heavy memory pressure. */
   private _daemonSuspended = false;
+  /** Renders pressure/preflight notices and applies their one-click fixes. */
+  private readonly _resourceUi: ScanResourceUi | undefined;
+  /** Set once the low-memory daemon notice was shown this session (no nagging). */
+  private _daemonLowMemoryNotified = false;
+  /** One-shot override from the notice's "Start anyway" action. */
+  private _forceDaemonOnce = false;
+  /**
+   * Files whose diagnostics came from a type-aware (resolved) scan. The fast
+   * syntactic baseline must not overwrite them: it cannot reproduce the
+   * type-based findings, so replacing them would silently lose results.
+   */
+  private readonly _deepScannedFiles = new Set<string>();
   /**
    * Files dropped by the over-cap backstop that the user has not been told about yet.
    *
@@ -410,6 +440,17 @@ export class ScanOnSaveController implements vscode.Disposable {
     ch.appendLine(`  tier:             ${cfg.get<string>('tier', 'recommended')}`);
     ch.appendLine(`  resolveTypes:     ${cfg.get<boolean>('scanOnSave.resolveTypes', true)}`);
     ch.appendLine(`  baseline running: ${this._baselineScanInFlight}`);
+    const res = readScanResourceSettings();
+    const machine = readMachineSnapshot();
+    const pressure = classifyMachinePressure(machine);
+    ch.appendLine(
+      `  scan resources:   profile=${res.profile}, maxWorkers=${res.maxWorkers || 'auto'}, ` +
+        `maxMemoryMb=${res.maxMemoryMb || 'auto'}, lowPriority=${res.lowPriority}, baselineMode=${res.baselineMode}`,
+    );
+    ch.appendLine(
+      `  machine:          ${machine.cores} cores, ${machine.freeMb} MB free of ${machine.totalMb} MB ` +
+        `(pressure: ${pressure.level}, reserve ${pressure.reserveMb} MB)`,
+    );
     ch.appendLine('=======================================');
     ch.show(true);
   }
@@ -431,7 +472,9 @@ export class ScanOnSaveController implements vscode.Disposable {
     private readonly _collection: vscode.DiagnosticCollection,
     private readonly _getProjectRoot: () => string | undefined,
     private readonly _outputChannel?: vscode.OutputChannel,
+    state?: vscode.Memento,
   ) {
+    this._resourceUi = state ? new ScanResourceUi(state) : undefined;
     this._statusBarItem = vscode.window.createStatusBarItem(
       'saropaLints.scanOnSave',
       vscode.StatusBarAlignment.Right,
@@ -929,7 +972,19 @@ export class ScanOnSaveController implements vscode.Disposable {
       // When the daemon is suspended due to memory pressure, fall back to
       // the lightweight syntactic scan — better partial coverage than a
       // multi-GB daemon holding memory while most rules are shed anyway.
-      const useDaemon = resolveTypes && !this._daemonSuspended;
+      let useDaemon = resolveTypes && !this._daemonSuspended;
+      // Starting the daemon costs several GB. If the machine cannot host it
+      // right now, scan this batch syntactically instead and say why, with
+      // one-click fixes — never start a multi-GB process on a machine that
+      // is already struggling.
+      if (useDaemon && !this._daemonManager.isAlive) {
+        if (this._forceDaemonOnce) {
+          this._forceDaemonOnce = false;
+        } else if (this._daemonLacksMemory()) {
+          useDaemon = false;
+          this._notifyDaemonLowMemory();
+        }
+      }
       this._log(`tier=${tier}, resolveTypes=${resolveTypes}, useDaemon=${useDaemon}, daemonSuspended=${this._daemonSuspended}`);
       const result = useDaemon
         ? await this._scanViaDaemon(root, files, tier)
@@ -944,6 +999,9 @@ export class ScanOnSaveController implements vscode.Disposable {
         // be the same permanent-death bug as a hung child).
         this._reportScanFailure(result);
         return;
+      }
+      if (useDaemon) {
+        for (const f of files) this._deepScannedFiles.add(f);
       }
       this._reportScanSuccess(files, result.payload?.diagnostics ?? [], start);
     } finally {
@@ -1026,16 +1084,56 @@ export class ScanOnSaveController implements vscode.Disposable {
     );
   }
 
+  /** True when the machine cannot host the multi-GB daemon right now. */
+  private _daemonLacksMemory(): boolean {
+    const machine = readMachineSnapshot();
+    const reserve = defaultReserveMb(machine.totalMb);
+    return deepPreflightNotice(machine, reserve, 0) !== null;
+  }
+
+  /** Shows the low-memory notice once per session and applies the choice. */
+  private _notifyDaemonLowMemory(): void {
+    this._log('daemon start skipped: not enough free memory — scanning syntactically');
+    if (this._daemonLowMemoryNotified) return;
+    this._daemonLowMemoryNotified = true;
+    const ui = this._resourceUi;
+    if (!ui || !readScanResourceSettings().notifyOnPressure) return;
+    const machine = readMachineSnapshot();
+    void ui
+      .show(daemonLowMemoryNotice(machine, defaultReserveMb(machine.totalMb)))
+      .then((action) => {
+        if (action === 'startAnyway') this._forceDaemonOnce = true;
+      });
+  }
+
   /**
-   * Lane 3 (plans/PLAN_scan_only_diagnostics.md): on-demand whole-project
-   * scan so files never saved this session still show up in the Problems
-   * panel. Deliberately command-triggered, never called on activation — a
-   * measured full pass on `contacts` (4,478 files) ran ~25 minutes, past
-   * the plan's own "tens of minutes -> on-demand only" threshold.
+   * Counts Dart files cheaply for sizing/estimates (capped so a huge
+   * monorepo cannot stall the UI). Approximate by design.
+   */
+  private async _estimateDartFileCount(): Promise<number> {
+    try {
+      const found = await vscode.workspace.findFiles(
+        '**/*.dart',
+        '**/{.dart_tool,build,node_modules,.git}/**',
+        20000,
+      );
+      return found.length;
+    } catch {
+      return 0;
+    }
+  }
+
+  /**
+   * Whole-project scan. Two modes (setting `saropaLints.scanOnSave.baselineMode`):
    *
-   * Runs as a cancelable notification progress; each chunk's diagnostics
-   * are applied to the collection as it completes, so a cancel or crash
-   * partway through still leaves earlier chunks' findings visible.
+   *  - **fast** (default): one parallel syntactic scan — about a minute on a
+   *    project the deep scan needs ~25 minutes for. Afterwards the user is
+   *    offered the deep scan with a time/memory estimate.
+   *  - **deep**: the type-aware daemon scan, chunked, with a memory guard that
+   *    holds the scan while the machine is critically low on memory.
+   *
+   * Both check the machine first and offer the lighter alternative instead of
+   * pushing a struggling computer over the edge.
    */
   async runBaselineScanCommand(): Promise<void> {
     if (!this._isEnabled()) {
@@ -1051,50 +1149,232 @@ export class ScanOnSaveController implements vscode.Disposable {
     this._baselineScanInFlight = true;
     const tier = resolveEffectiveTier(root);
     try {
-      await vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: l10n('scanOnSave.baseline.progressTitle'),
-          cancellable: true,
-        },
-        async (progress, token) => {
-          const result = await runBaselineScan(this._daemonManager, root, tier, {
-            isCanceled: () => token.isCancellationRequested,
-            onProgress: (p) => {
-              progress.report({
-                message: l10n('scanOnSave.baseline.progressMessage', {
-                  scanned: String(p.filesScanned),
-                  total: String(p.totalFiles),
-                  issues: String(p.issuesFound),
-                }),
-              });
-            },
-            onChunk: (chunkFiles, diagnostics) => this._applyDiagnostics(chunkFiles, diagnostics),
-          });
-          if (result.canceled) {
-            void vscode.window.showInformationMessage(
-              l10n('notify.commands.scanOnSaveBaselineCanceled', {
-                scanned: String(result.filesScanned),
-                total: String(result.totalFiles),
-              }),
-            );
-          } else if (result.errorMessage) {
-            void vscode.window.showWarningMessage(
-              l10n('notify.commands.scanOnSaveBaselineFailed', { details: result.errorMessage }),
-            );
-          } else {
-            void vscode.window.showInformationMessage(
-              l10n('notify.commands.scanOnSaveBaselineDone', {
-                total: String(result.totalFiles),
-                issues: String(result.diagnostics.length),
-              }),
-            );
-          }
-        },
-      );
+      const settings = readScanResourceSettings();
+      let mode = settings.baselineMode;
+      if (mode === 'deep') {
+        // Preflight: is there room for the deep scan right now?
+        const machine = readMachineSnapshot();
+        const notice = deepPreflightNotice(
+          machine,
+          defaultReserveMb(machine.totalMb),
+          await this._estimateDartFileCount(),
+        );
+        if (notice && this._resourceUi) {
+          const choice = await this._resourceUi.show(notice);
+          if (choice === 'runFast') mode = 'fast';
+          else if (choice !== 'runDeepAnyway') return; // dismissed → do nothing
+        }
+      }
+      if (mode === 'fast') {
+        await this._runFastBaseline(root, tier);
+      } else {
+        await this._runDeepBaseline(root, tier);
+      }
     } finally {
       this._baselineScanInFlight = false;
     }
+  }
+
+  /** Fast mode: one parallel syntactic scan process with live progress. */
+  private async _runFastBaseline(root: string, tier: string): Promise<void> {
+    const settings = readScanResourceSettings();
+    const machine = readMachineSnapshot();
+    const fileEstimate = await this._estimateDartFileCount();
+    const resources = resolveScanResources(settings, machine, fileEstimate);
+    this._log(
+      `fast baseline: jobs=${resources.jobs} (${resources.limitedBy}), maxMemoryMb=${resources.maxMemoryMb}, ` +
+        `profile=${settings.profile}, ~${fileEstimate} files`,
+    );
+    let throttleNoticeShown = false;
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: l10n('scanOnSave.baseline.progressTitle'),
+        cancellable: true,
+      },
+      async (progress, token) => {
+        let lastPct = 0;
+        const result = await runFastBaselineScan(root, tier, {
+          resources,
+          lowPriority: settings.lowPriority,
+          isCanceled: () => token.isCancellationRequested,
+          onProgress: (p) => {
+            const pct = p.total > 0 ? Math.floor((p.done * 100) / p.total) : 0;
+            progress.report({
+              increment: Math.max(0, pct - lastPct),
+              message: l10n('scanOnSave.baseline.progressMessage', {
+                scanned: String(p.done),
+                total: String(p.total),
+                issues: '…',
+              }),
+            });
+            lastPct = pct;
+          },
+          onThrottle: (ev) => {
+            this._log(`fast baseline throttled ${ev.from} → ${ev.to}: ${ev.reason}`);
+            // One notice per scan, and only when it actually slowed down.
+            if (throttleNoticeShown || ev.to >= ev.from) return;
+            if (!settings.notifyOnPressure || !this._resourceUi) return;
+            throttleNoticeShown = true;
+            void this._resourceUi.show(throttledNotice(ev, settings.profile));
+          },
+        });
+        if (result.canceled) {
+          void vscode.window.showInformationMessage(
+            l10n('notify.commands.scanOnSaveBaselineCanceled', {
+              scanned: String(result.summary?.filesScanned ?? 0),
+              total: String(result.summary?.filesTotal ?? fileEstimate),
+            }),
+          );
+          return;
+        }
+        if (result.errorMessage || !result.payload) {
+          void vscode.window.showWarningMessage(
+            l10n('notify.commands.scanOnSaveBaselineFailed', {
+              details: result.errorMessage ?? l10n('notify.commands.scanOnSaveFailed'),
+            }),
+          );
+          return;
+        }
+        const summary = result.summary;
+        if (summary) {
+          this._log(
+            `fast baseline done: ${summary.filesScanned}/${summary.filesTotal} files in ` +
+              `${(summary.elapsedMs / 1000).toFixed(1)}s, peak ${summary.peakRssMb} MB, ` +
+              `min workers ${summary.minAllowedWorkers}, slow=${summary.slowFiles.length}, ` +
+              `skipped=${summary.skippedFiles.length}`,
+          );
+          for (const slow of summary.slowFiles) this._log(`  slow file: ${slow.file} (${slow.ms} ms)`);
+          for (const skipped of summary.skippedFiles) this._log(`  skipped file: ${skipped}`);
+        }
+        this._applyFastBaseline(result.payload.diagnostics, summary?.aborted !== true);
+
+        const afterMachine = readMachineSnapshot();
+        const reserve = defaultReserveMb(afterMachine.totalMb);
+        if (summary?.aborted && this._resourceUi) {
+          void this._resourceUi.show(abortedNotice(summary.abortReason ?? '', settings.profile));
+          return;
+        }
+        const filesScanned = summary?.filesScanned ?? fileEstimate;
+        const offerDeep = !(this._resourceUi?.neverOfferDeep ?? true);
+        const notice = fastDoneNotice(
+          { filesScanned, elapsedMs: summary?.elapsedMs ?? 0 },
+          result.payload.diagnostics.length,
+          afterMachine,
+          reserve,
+          offerDeep,
+        );
+        if (!this._resourceUi) return;
+        // Don't hold the progress notification open while the follow-up
+        // prompt waits for a click.
+        void this._resourceUi.show(notice).then(async (action) => {
+          if (action === 'runDeep') {
+            this._baselineScanInFlight = true;
+            try {
+              await this._runDeepBaseline(root, tier);
+            } finally {
+              this._baselineScanInFlight = false;
+            }
+          }
+        });
+      },
+    );
+  }
+
+  /**
+   * Applies a fast-baseline result without destroying better data: files
+   * already scanned type-aware keep their diagnostics, and (on a complete
+   * run) files that previously had findings but now scan clean are cleared.
+   */
+  private _applyFastBaseline(
+    diagnostics: readonly ScanOnSaveDiagnostic[],
+    complete: boolean,
+  ): void {
+    const byFile = new Map<string, ScanOnSaveDiagnostic[]>();
+    for (const d of diagnostics) {
+      if (this._deepScannedFiles.has(d.filePath)) continue;
+      const list = byFile.get(d.filePath) ?? [];
+      list.push(d);
+      byFile.set(d.filePath, list);
+    }
+    const files = new Set(byFile.keys());
+    if (complete) {
+      for (const f of this._lastDiagnosticsByFile.keys()) {
+        if (!this._deepScannedFiles.has(f)) files.add(f);
+      }
+    }
+    const flat = [...byFile.values()].flat();
+    this._applyDiagnostics([...files], flat);
+  }
+
+  /** Deep mode: chunked type-aware daemon scan with a memory guard. */
+  private async _runDeepBaseline(root: string, tier: string): Promise<void> {
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: l10n('scanOnSave.baseline.progressTitle'),
+        cancellable: true,
+      },
+      async (progress, token) => {
+        const settings = readScanResourceSettings();
+        const result = await runBaselineScan(this._daemonManager, root, tier, {
+          isCanceled: () => token.isCancellationRequested,
+          onProgress: (p) => {
+            progress.report({
+              message: l10n('scanOnSave.baseline.progressMessage', {
+                scanned: String(p.filesScanned),
+                total: String(p.totalFiles),
+                issues: String(p.issuesFound),
+              }),
+            });
+          },
+          onChunk: (chunkFiles, diagnostics) => {
+            for (const f of chunkFiles) this._deepScannedFiles.add(f);
+            this._applyDiagnostics(chunkFiles, diagnostics);
+          },
+          // Between chunks: if free memory has fallen below the reserve, hold
+          // the scan (and tell the user how to fix it) rather than push the
+          // machine into swap.
+          beforeChunk: async () => {
+            const pressure = classifyMachinePressure(readMachineSnapshot());
+            if (pressure.level !== 'critical') return 'continue';
+            this._log(`deep baseline paused: free ${pressure.freeMb} MB < reserve ${pressure.reserveMb} MB`);
+            const recovery = waitForRecovery({ isCanceled: () => token.isCancellationRequested });
+            if (settings.notifyOnPressure && this._resourceUi) {
+              const choice = await Promise.race([
+                this._resourceUi.show(deepPausedNotice(pressure)).then((a) => ({ a })),
+                recovery.then((r) => ({ r })),
+              ]);
+              if ('a' in choice) {
+                if (choice.a === 'cancelScan') return 'cancel';
+                if (choice.a === 'resume') return 'continue';
+              }
+            }
+            const outcome = await recovery;
+            return outcome === 'canceled' ? 'cancel' : 'continue';
+          },
+        });
+        if (result.canceled) {
+          void vscode.window.showInformationMessage(
+            l10n('notify.commands.scanOnSaveBaselineCanceled', {
+              scanned: String(result.filesScanned),
+              total: String(result.totalFiles),
+            }),
+          );
+        } else if (result.errorMessage) {
+          void vscode.window.showWarningMessage(
+            l10n('notify.commands.scanOnSaveBaselineFailed', { details: result.errorMessage }),
+          );
+        } else {
+          void vscode.window.showInformationMessage(
+            l10n('notify.commands.scanOnSaveBaselineDone', {
+              total: String(result.totalFiles),
+              issues: String(result.diagnostics.length),
+            }),
+          );
+        }
+      },
+    );
   }
 
   dispose(): void {

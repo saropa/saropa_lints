@@ -68,11 +68,26 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [17.6.1] — Unreleased
 
-The scan command can now use several CPU cores instead of one, which makes large projects scan substantially faster. It stays serial unless asked, and it recommends a safe worker count based on your CPUs and free memory. [log](https://github.com/saropa/saropa_lints/blob/v17.6.1/CHANGELOG.md)
+Scanning now uses your computer's cores while staying careful with its memory: large projects scan several times faster, the VS Code whole-project scan finishes in about a minute instead of tens of minutes, and a scan that would strain your machine slows itself down — and tells you how to fix it — instead of freezing it. [log](https://github.com/saropa/saropa_lints/blob/v17.6.1/CHANGELOG.md)
 
 ### Added
 
-- `scan --jobs <n|auto>` (or `-j`) scans files with parallel workers, with `auto` picking a count that respects CPU count and available memory — omit it and large scans print the recommended value; `--resolve`, `--profile` and `--debug-rule` still run serially, and no action is required.
+- `scan` runs in parallel by default (`--jobs <n|auto|off>`), sized from your CPUs, free memory and container limits, so large scans finish sooner on CI and desktops alike — use `--jobs 1` for the old serial behaviour.
+- `scan` watches its own memory (`--max-memory-mb`), sheds workers under pressure, and stops early with exit code 3 rather than risk the machine — a gate can no longer pass on a partial scan.
+- `scan` recovers from a file that hangs a worker (`--chunk-timeout`), skips and names it, and reports slow files (`--slow-file-ms`) so you can see what makes a scan slow.
+- `scan --progress plain` prints a status line every 15 seconds, which is readable in CI logs; the GitHub Action gained `jobs` and `max-memory-mb` inputs.
+- VS Code: **Scan Whole Project for Issues** now defaults to a fast parallel scan (`saropaLints.scanOnSave.baselineMode`) and offers the type-aware deep scan afterwards with a time and memory estimate; no action required.
+- VS Code: **Saropa Lints: Scan Performance and Memory Settings…** shows what each profile (`gentle`, `balanced`, `fast`) would do on your machine and recommends one; fine-tune with `saropaLints.scan.maxWorkers` and `saropaLints.scan.maxMemoryMb`.
+- VS Code: when free memory is low, the multi-GB type-aware scan is skipped or paused with a notification offering one-click fixes (use the fast scan, turn off type resolution, resume, or open settings) instead of starting on a struggling computer.
+
+### Changed
+
+- VS Code scan processes now run at reduced CPU priority (`saropaLints.scan.lowPriority`, on by default) so typing stays smooth during a scan; no action required.
+- A fast whole-project scan no longer overwrites findings from files that were already scanned with type resolution; no action required.
+
+### Internal
+
+- New locale strings (`scanResources.*`) ship in English in every locale until the translation pipeline is run; they are allowlisted in `english_allowed.json`.
 
 ---
 

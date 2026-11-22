@@ -3053,5 +3053,45 @@
       "openVsx": "امتیاز در Open VSX",
       "issues": "گزارش مشکل در GitHub"
     }
+  },
+  "scanResources": {
+    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
+    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
+    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
+    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
+    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
+    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
+    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
+    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "action": {
+      "gentleProfile": "Use Gentle Profile",
+      "openSettings": "Open Settings",
+      "runFast": "Run Fast Scan",
+      "runDeep": "Run Deep Scan",
+      "runDeepAnyway": "Run Deep Scan Anyway",
+      "resume": "Resume Now",
+      "cancelScan": "Cancel Scan",
+      "turnOffTypeResolution": "Turn Off Type Resolution",
+      "startAnyway": "Start Anyway",
+      "notNow": "Not Now",
+      "neverAskDeep": "Don't Ask Again"
+    },
+    "picker": {
+      "title": "Scan Performance",
+      "machine": "{cores} CPU cores · {free} free of {total}",
+      "recommended": "recommended for this computer",
+      "resources": "{jobs} worker(s) · {memory} memory budget",
+      "openSettings": "Open all scan settings",
+      "profile": {
+        "gentle": "Gentle",
+        "balanced": "Balanced",
+        "fast": "Fast"
+      },
+      "profileDetail": {
+        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
+        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
+        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+      }
+    }
   }
 }

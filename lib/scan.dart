@@ -37,7 +37,17 @@ export 'src/scan/scan_config.dart'
         loadAnalyzerExcludes,
         isScanIntegrationDisabled;
 export 'src/scan/scan_diagnostic.dart' show ScanDiagnostic;
-export 'src/scan/scan_runner.dart' show ScanMessageSink, ScanRunner;
+export 'src/scan/scan_runner.dart'
+    show ScanMessageSink, ScanParallelConfig, ScanRunner;
+export 'src/scan/parallel_scan_engine.dart'
+    show ParallelScanReport, ProgressStyle, SlowFile, ThrottleEvent;
+export 'src/scan/scan_jobs.dart'
+    show
+        JobsDecision,
+        MachineInfo,
+        detectMachine,
+        recommendJobs,
+        resolveJobs;
 export 'src/scan/scan_json.dart'
     show scanDiagnosticsToJson, scanDiagnosticsToJsonString;
 export 'src/scan/git_changed_files.dart' show gitChangedDartFiles;

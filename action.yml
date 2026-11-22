@@ -94,6 +94,25 @@ inputs:
     required: false
     default: ''
 
+  jobs:
+    description: >-
+      scan only. Parallel worker count: a number, `auto`, or `1` for serial.
+      Empty (default) means auto — every CPU the runner (or container quota)
+      gives the job, bounded by free memory, and the scan slows itself down
+      if memory runs low. Ignored with `resolve: true` unless set explicitly,
+      because each resolved worker is a full analyzer (~2 GB).
+    required: false
+    default: ''
+
+  max-memory-mb:
+    description: >-
+      scan only. Memory budget in MB for the whole scan. Empty (default)
+      derives it from the worker count and free memory. The scan sheds
+      workers as it nears the budget and stops early with partial results
+      (exit code 3) rather than let the runner be OOM-killed.
+    required: false
+    default: ''
+
   since:
     description: >-
       audit only. Only audit files changed since this git ref (e.g. origin/main). Empty
@@ -193,6 +212,8 @@ runs:
         FAIL_ON_COUNT: ${{ inputs.fail-on-count }}
         FAIL_ON_IMPACT_COUNT: ${{ inputs.fail-on-impact-count }}
         FAIL_ON_TIER: ${{ inputs.fail-on-tier }}
+        JOBS: ${{ inputs.jobs }}
+        MAX_MEMORY_MB: ${{ inputs.max-memory-mb }}
         SINCE: ${{ inputs.since }}
         BASELINE: ${{ inputs.baseline }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
@@ -245,6 +266,8 @@ runs:
         [ -n "$FAIL_ON_COUNT" ] && scan_only="$scan_only fail-on-count"
         [ -n "$FAIL_ON_IMPACT_COUNT" ] && scan_only="$scan_only fail-on-impact-count"
         [ -n "$FAIL_ON_TIER" ] && scan_only="$scan_only fail-on-tier"
+        [ -n "$JOBS" ] && scan_only="$scan_only jobs"
+        [ -n "$MAX_MEMORY_MB" ] && scan_only="$scan_only max-memory-mb"
         if [ "$resolved" = audit ] && [ -n "$scan_only" ]; then
           fail "these inputs only apply to command 'scan':$scan_only (resolved command: audit)."
         fi
@@ -281,6 +304,19 @@ runs:
           case "$FAIL_ON_TIER" in
             essential|recommended|professional|comprehensive|pedantic) ;;
             *) fail "fail-on-tier must be essential, recommended, professional, comprehensive or pedantic (got '$FAIL_ON_TIER')." ;;
+          esac
+        fi
+
+        if [ -n "$JOBS" ]; then
+          case "$JOBS" in
+            auto|off|serial) ;;
+            *[!0-9]*|0) fail "jobs must be a positive integer, 'auto' or 'off' (got '$JOBS')." ;;
+          esac
+        fi
+        if [ -n "$MAX_MEMORY_MB" ]; then
+          case "$MAX_MEMORY_MB" in
+            *[!0-9]*) fail "max-memory-mb must be a whole number of megabytes (got '$MAX_MEMORY_MB')." ;;
+            *) [ "$MAX_MEMORY_MB" -ge 128 ] || fail "max-memory-mb must be at least 128 (got '$MAX_MEMORY_MB')." ;;
           esac
         fi
 
@@ -467,6 +503,8 @@ runs:
         FAIL_ON_COUNT: ${{ inputs.fail-on-count }}
         FAIL_ON_IMPACT_COUNT: ${{ inputs.fail-on-impact-count }}
         FAIL_ON_TIER: ${{ inputs.fail-on-tier }}
+        JOBS: ${{ inputs.jobs }}
+        MAX_MEMORY_MB: ${{ inputs.max-memory-mb }}
         EXCLUDE_GLOBS: ${{ inputs.exclude-globs }}
         INCLUDE_GLOBS: ${{ inputs.include-globs }}
         BASELINE: ${{ inputs.baseline }}
@@ -582,6 +620,10 @@ runs:
           [ -n "$FAIL_ON_COUNT" ] && args+=(--fail-on-count "$FAIL_ON_COUNT")
           [ -n "$FAIL_ON_IMPACT_COUNT" ] && args+=(--fail-on-impact-count "$FAIL_ON_IMPACT_COUNT")
           [ -n "$FAIL_ON_TIER" ] && args+=(--fail-on-tier "$FAIL_ON_TIER")
+          # Parallelism and memory: unset means the CLI's own default (auto,
+          # CI-aware: all CPUs the job is allowed, memory-bounded).
+          [ -n "$JOBS" ] && args+=(--jobs "$JOBS")
+          [ -n "$MAX_MEMORY_MB" ] && args+=(--max-memory-mb "$MAX_MEMORY_MB")
         fi
 
         echo "Running: dart run saropa_lints ${args[*]}"

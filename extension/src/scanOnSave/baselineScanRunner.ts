@@ -75,6 +75,12 @@ export async function runBaselineScan(
     onChunk?: (chunkFiles: readonly string[], diagnostics: readonly ScanOnSaveDiagnostic[]) => void;
     /** Overrides {@link BASELINE_SCAN_CHUNK_SIZE} — test-only knob. */
     chunkSize?: number;
+    /**
+     * Awaited before each chunk. Lets the caller hold the scan while the
+     * machine is under memory pressure; returning `'cancel'` ends the pass
+     * the same way a user cancellation does.
+     */
+    beforeChunk?: () => Promise<'continue' | 'cancel'>;
   },
 ): Promise<BaselineScanResult> {
   const files = await daemonManager.listFiles(root, tier);
@@ -96,6 +102,9 @@ export async function runBaselineScan(
 
   for (const chunk of chunks) {
     if (options.isCanceled()) {
+      return { completed: false, canceled: true, filesScanned, totalFiles, diagnostics };
+    }
+    if (options.beforeChunk && (await options.beforeChunk()) === 'cancel') {
       return { completed: false, canceled: true, filesScanned, totalFiles, diagnostics };
     }
     const result = await daemonManager.scan(root, chunk, tier);
