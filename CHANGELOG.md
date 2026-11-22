@@ -72,7 +72,7 @@ Scanning now uses your computer's cores while staying careful with its memory: l
 
 ### Added
 
-- `scan` runs in parallel by default (`--jobs <n|auto|off>`), sized from your CPUs, free memory and container limits, so large scans finish sooner on CI and desktops alike — use `--jobs 1` for the old serial behaviour.
+- `scan` runs in parallel by default (`--jobs <n|auto|off>`), sized from your CPUs, free memory and container limits, so large scans finish sooner on CI and desktops alike — use `--jobs 1` for the old serial behavior.
 - `scan` watches its own memory (`--max-memory-mb`), sheds workers under pressure, and stops early with exit code 3 rather than risk the machine — a gate can no longer pass on a partial scan.
 - `scan` recovers from a file that hangs a worker (`--chunk-timeout`), skips and names it, and reports slow files (`--slow-file-ms`) so you can see what makes a scan slow.
 - `scan --progress plain` prints a status line every 15 seconds, which is readable in CI logs; the GitHub Action gained `jobs` and `max-memory-mb` inputs.

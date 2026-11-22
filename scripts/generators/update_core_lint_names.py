@@ -113,10 +113,8 @@ def update_file(names: list[str], *, check_only: bool) -> bool:
         + content[match.end() :]
     )
     _TIER_INTEGRITY.write_text(new_content, encoding="utf-8")
-    print(
-        f"Updated CORE_DART_LINT_NAMES: {len(names)} rules "
-        f"(was {len(re.findall(chr(34) + r'(\w+)' + chr(34), old_body))}).",
-    )
+    old_count = len(re.findall(r'"(\w+)"', old_body))
+    print(f"Updated CORE_DART_LINT_NAMES: {len(names)} rules (was {old_count}).")
     return True
 
 

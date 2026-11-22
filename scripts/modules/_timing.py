@@ -67,7 +67,8 @@ def _print_timing_row(
     bar = ""
     if duration >= 0.5 and max_duration > 0:
         bar_len = max(1, int(duration / max_duration * 15))
-        bar = f"  {d}{'\u2588' * bar_len}{x}"
+        block = "\u2588" * bar_len
+        bar = f"  {d}{block}{x}"
 
     # Status icon as plain text for the log file
     plain_icon = "+" if success else "x"
@@ -140,7 +141,8 @@ class StepTimer:
 
         x = Color.RESET.value
         d = Color.DIM.value
-        print(f"  {d}{'\u2500' * 49}{x}")
+        rule = "\u2500" * 49
+        print(f"  {d}{rule}{x}")
         print(f"    {'Total':<28}{format_duration(total):>8}")
         log_write(f"  {'-' * 49}")
         log_write(f"    {'Total':<28}{format_duration(total):>8}")
