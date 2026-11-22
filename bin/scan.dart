@@ -22,6 +22,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart' show RuleTimingTracker;
 import 'package:saropa_lints/src/cli/sdk_compat_checker.dart';
 import 'package:saropa_lints/src/config/rule_lane.dart' show parseRuleLane;
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';
+import 'package:saropa_lints/src/scan/scan_jobs.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 import 'package:saropa_lints/src/tiers.dart';
 
@@ -136,9 +137,31 @@ Future<void> main(List<String> args) async {
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default
   // path stays the fast syntactic parse.
-  final diagnostics = parsed.resolve
-      ? await runner.runResolved()
-      : runner.run();
+  final List<ScanDiagnostic>? diagnostics;
+  if (parsed.resolve) {
+    diagnostics = await runner.runResolved();
+  } else {
+    // Parallel syntactic scan. Worker count comes from --jobs (N | auto),
+    // capped by CPU/memory; unset stays serial and prints a recommendation
+    // on large projects. Features with process-local state stay serial.
+    final jobsDecision = resolveJobs(
+      requested: parsed.jobs,
+      fileCount: runner.countFilesToScan(),
+      cores: Platform.numberOfProcessors,
+      availableMemoryMb: readAvailableMemoryMb(),
+      incompatibleReason: parsed.profile
+          ? '--profile records timings per process'
+          : parsed.debugRule != null
+          ? '--debug-rule traces in one process'
+          : null,
+    );
+    if (!quiet) {
+      for (final note in jobsDecision.notes) {
+        stderr.writeln(note);
+      }
+    }
+    diagnostics = await runner.runParallel(jobsDecision.jobs);
+  }
 
   // Flush the timing profile even when diagnostics is null (config error):
   // by that point rules may already have run, and a partial profile beats a
@@ -813,6 +836,18 @@ void _printUsage() {
     '  --files <path>...    Scan only these Dart files (paths relative to path).',
   );
   print('  --files-from-stdin  Read one file path per line from stdin.');
+  print(
+    '  --jobs, -j <n|auto> Scan with parallel workers (syntactic scan only).',
+  );
+  print(
+    '                      auto = recommended count from CPUs and free memory.',
+  );
+  print(
+    '                      Default: serial, with a hint on large projects.',
+  );
+  print(
+    '                      Ignored with --resolve, --profile, --debug-rule.',
+  );
   print('  --exclude-globs <p> Exclude files matching these glob patterns.');
   print(
     '                      Patterns are matched relative to the scanned folder.',

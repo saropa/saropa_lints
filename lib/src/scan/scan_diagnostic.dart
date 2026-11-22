@@ -42,6 +42,22 @@ class ScanDiagnostic {
   /// analyzer severity. Null for non-saropa diagnostics that have no impact.
   final String? impact;
 
+  /// Copy of this diagnostic reported against [path] instead of [filePath].
+  ScanDiagnostic withFilePath(String path) => ScanDiagnostic(
+    ruleName: ruleName,
+    filePath: path,
+    line: line,
+    column: column,
+    offset: offset,
+    length: length,
+    endLine: endLine,
+    endColumn: endColumn,
+    severity: severity,
+    problemMessage: problemMessage,
+    correctionMessage: correctionMessage,
+    impact: impact,
+  );
+
   @override
   // Default nullable problemMessage to an empty string so the output never
   // prints the literal 'null' (avoid_nullable_interpolation).

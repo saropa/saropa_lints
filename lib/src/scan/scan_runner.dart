@@ -13,6 +13,7 @@
 library;
 
 import 'dart:io' as io;
+import 'dart:isolate' show Isolate;
 
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/dart/analysis/analysis_context.dart';
@@ -64,8 +65,29 @@ class ScanRunner {
     this.noExclude = false,
     List<String> excludeGlobs = const [],
     List<String> includeGlobs = const [],
-  }) : _excludePatterns = excludeGlobs.map(_globToRegex).toList(),
+    this.leaveStopSentinel = false,
+    List<String>? preResolvedFiles,
+  }) : _preResolvedFiles = preResolvedFiles,
+       _rawExcludeGlobs = List.unmodifiable(excludeGlobs),
+       _rawIncludeGlobs = List.unmodifiable(includeGlobs),
+       _excludePatterns = excludeGlobs.map(_globToRegex).toList(),
        _includePatterns = includeGlobs.map(_globToRegex).toList();
+
+  /// Raw glob strings kept so [runParallel] can rebuild an equivalent runner
+  /// inside each worker isolate (compiled [RegExp]s are not worth sending).
+  final List<String> _rawExcludeGlobs;
+  final List<String> _rawIncludeGlobs;
+
+  /// When true, a `.saropa_stop` sentinel is honored but NOT deleted. Worker
+  /// isolates use this so every shard sees the stop request; the parent
+  /// deletes the file once all workers have finished.
+  final bool leaveStopSentinel;
+
+  /// Exact file strings to scan, bypassing discovery, normalization and
+  /// exclusion. Worker isolates get the parent's already-resolved list so the
+  /// paths rules see are byte-identical to a serial run (some rules branch on
+  /// path shape, so re-absolutizing would change results).
+  final List<String>? _preResolvedFiles;
 
   /// Project root: config is loaded from here and relative [dartFiles] are resolved against it.
   final String targetPath;
@@ -220,6 +242,120 @@ class ScanRunner {
       () => ScanRuleContext(definingUnit: _dummyContextUnit()),
     );
     return _scanFiles(plan.files, registrations);
+  }
+
+  /// Number of files a scan would visit, without loading any rules. Lets the
+  /// CLI size the worker pool before [runParallel] starts.
+  int countFilesToScan() => _resolveDartFiles().length;
+
+  /// Like [run], but shards the file list across [jobs] worker isolates.
+  ///
+  /// The syntactic scan has no cross-file state, so each worker builds its
+  /// own rule set and scans an interleaved slice of the files; results are
+  /// merged back into the same order a serial [run] produces (file order,
+  /// then emission order within a file). Falls back to [run] when [jobs] is
+  /// 1 or there are too few files to split.
+  ///
+  /// [jobs] should come from `resolveJobs` (scan_jobs.dart), which caps it by
+  /// CPU count and available memory. Per-rule profiling and `--debug-rule`
+  /// tracing keep process-local state and are not supported here: callers
+  /// must use [run] for those.
+  Future<List<ScanDiagnostic>?> runParallel(int jobs) async {
+    if (jobs <= 1) return run();
+    _skippedFileCount = 0;
+    final plan = _prepare();
+    if (plan == null) return null;
+    if (plan.files.isEmpty) return const [];
+
+    // Capture the cap before any worker-side changes; workers run in their
+    // own isolates (separate statics) but be explicit about the source.
+    final parentIssueCap = ProgressTracker.maxIssues;
+    final workers = jobs < plan.files.length ? jobs : plan.files.length;
+    if (workers <= 1) {
+      final registrations = _registerRules(
+        plan.rules,
+        () => ScanRuleContext(definingUnit: _dummyContextUnit()),
+      );
+      return _scanFiles(plan.files, registrations);
+    }
+
+    // Interleave (round-robin) so slow regions of the tree spread across
+    // workers instead of landing on one shard.
+    final shards = List.generate(workers, (_) => <int>[]);
+    for (var i = 0; i < plan.files.length; i++) {
+      shards[i % workers].add(i);
+    }
+    _err('Scanning ${plan.files.length} files with $workers workers...');
+
+    final spec = _WorkerSpec(
+      targetPath: targetPath,
+      tier: tier,
+      enabledRuleNames: enabledRuleNames,
+      excludeGlobs: _rawExcludeGlobs,
+      includeGlobs: _rawIncludeGlobs,
+      noExclude: noExclude,
+      excludeLightLane: excludeLightLane,
+      bypassTierCap: bypassTierCap,
+      laneIsLight: lane == RuleLane.light,
+    );
+    final results = await Future.wait([
+      for (final shard in shards)
+        _runShard(spec, [for (final idx in shard) plan.files[idx]]),
+    ]);
+
+    // The parent owns sentinel cleanup in parallel mode (see
+    // [leaveStopSentinel]).
+    final sentinel = io.File(p.join(p.absolute(targetPath), '.saropa_stop'));
+    try {
+      if (sentinel.existsSync()) sentinel.deleteSync();
+    } on io.IOException {
+      // Best effort; the scan itself already honored the stop.
+    }
+
+    // Workers re-resolve paths to absolute form; map each back to the exact
+    // string a serial run reports so output (and downstream relativization)
+    // is identical. Also gives each file its serial position for ordering.
+    final root = p.absolute(targetPath);
+    String abs(String f) =>
+        p.isAbsolute(f) ? p.normalize(f) : p.normalize(p.join(root, f));
+    final indexOf = <String, int>{
+      for (var i = 0; i < plan.files.length; i++) abs(plan.files[i]): i,
+    };
+    final merged = <(int, int, ScanDiagnostic)>[];
+    for (final shardResult in results) {
+      if (shardResult == null) return null;
+      for (var seq = 0; seq < shardResult.length; seq++) {
+        final d = shardResult[seq];
+        final idx = indexOf[abs(d.filePath)];
+        merged.add((
+          idx ?? plan.files.length,
+          seq,
+          idx == null ? d : d.withFilePath(plan.files[idx]),
+        ));
+      }
+    }
+    merged.sort((a, b) {
+      final byFile = a.$1.compareTo(b.$1);
+      return byFile != 0 ? byFile : a.$2.compareTo(b.$2);
+    });
+
+    // A serial run caps non-ERROR diagnostics (Problems-tab safeguard, see
+    // ProgressTracker). Each worker applied that cap to its own shard; apply
+    // it once more across the merged, serially-ordered list so the result
+    // matches serial. Every diagnostic in the global first N+1 is also in its
+    // own shard's first N+1, so nothing is lost by the per-shard caps.
+    final cap = parentIssueCap;
+    final out = <ScanDiagnostic>[];
+    var nonError = 0;
+    for (final m in merged) {
+      final d = m.$3;
+      if (cap > 0 && d.severity.toUpperCase() != 'ERROR') {
+        nonError++;
+        if (nonError > cap + 1) continue;
+      }
+      out.add(d);
+    }
+    return out;
   }
 
   /// Runs the scan with full type/element resolution and returns all
@@ -504,6 +640,8 @@ class ScanRunner {
   /// otherwise discovers under [targetPath]. User-supplied `--exclude-globs`
   /// patterns are applied in both paths.
   List<String> _resolveDartFiles() {
+    final pre = _preResolvedFiles;
+    if (pre != null) return pre;
     final raw = dartFiles;
     if (raw == null || raw.isEmpty) {
       // Pass noExclude so --no-exclude skips hardcoded path exclusions
@@ -639,7 +777,7 @@ class ScanRunner {
       return false;
     }
     try {
-      sentinel.deleteSync();
+      if (!leaveStopSentinel) sentinel.deleteSync();
     } on io.IOException {
       // Leave the stale sentinel; the abort itself still proceeds.
     }
@@ -1222,4 +1360,61 @@ class _RuleRegistration {
   /// scan, [ResolvedScanRuleContext] for `--resolve`; both are
   /// [MutableRuleContext] so the runner can update [currentUnit] per file.
   final MutableRuleContext context;
+}
+
+/// Starts one worker isolate. A top-level function so the closure captures
+/// only [spec] and [files] — never the parent runner or its rule objects,
+/// which cannot be sent across isolates.
+Future<List<ScanDiagnostic>?> _runShard(_WorkerSpec spec, List<String> files) =>
+    Isolate.run(() => _scanShardInWorker(spec, files));
+
+/// Sendable description of a [ScanRunner] for a worker isolate (only plain
+/// values: strings, bools, sets of strings).
+class _WorkerSpec {
+  const _WorkerSpec({
+    required this.targetPath,
+    required this.tier,
+    required this.enabledRuleNames,
+    required this.excludeGlobs,
+    required this.includeGlobs,
+    required this.noExclude,
+    required this.excludeLightLane,
+    required this.bypassTierCap,
+    required this.laneIsLight,
+  });
+
+  final String targetPath;
+  final String? tier;
+  final Set<String>? enabledRuleNames;
+  final List<String> excludeGlobs;
+  final List<String> includeGlobs;
+  final bool noExclude;
+  final bool excludeLightLane;
+  final bool bypassTierCap;
+  final bool laneIsLight;
+}
+
+/// Worker-isolate entry: runs a quiet, serial syntactic scan of [files]
+/// (already filtered by the parent, so exclusions are not re-applied).
+List<ScanDiagnostic>? _scanShardInWorker(_WorkerSpec spec, List<String> files) {
+  // The Problems-tab cap counts per process, so a per-shard cap would drop
+  // diagnostics that belong in the global first N. Workers report everything;
+  // the parent applies the cap once after merging (see runParallel).
+  ProgressTracker.setMaxIssues(0);
+  final runner = ScanRunner(
+    targetPath: spec.targetPath,
+    preResolvedFiles: files,
+    tier: spec.tier,
+    enabledRuleNames: spec.enabledRuleNames,
+    messageSink: (_) {},
+    applyExclusionsToFileList: false,
+    excludeLightLane: spec.excludeLightLane,
+    bypassTierCap: spec.bypassTierCap,
+    lane: spec.laneIsLight ? RuleLane.light : RuleLane.full,
+    noExclude: spec.noExclude,
+    excludeGlobs: spec.excludeGlobs,
+    includeGlobs: spec.includeGlobs,
+    leaveStopSentinel: true,
+  );
+  return runner.run();
 }

@@ -19,6 +19,8 @@
 /// against the set {info, warning, error} (case-insensitive).
 library;
 
+import 'scan_jobs.dart' show parseJobsValue;
+
 /// Result of parsing scan CLI arguments.
 sealed class ScanParseResult {}
 
@@ -65,6 +67,7 @@ class ScanCliArgs {
     this.includeGlobs = const [],
     this.noExclude = false,
     this.strictFiles = false,
+    this.jobs,
   });
 
   final String path;
@@ -225,6 +228,12 @@ class ScanCliArgs {
   /// must guarantee every named file was analyzed. Only meaningful with
   /// `--files` or `--files-from-stdin`.
   final bool strictFiles;
+
+  /// Requested worker count from `--jobs`: null = flag not given (serial, with
+  /// a recommendation hint on large scans), 0 = `auto` (use the recommended
+  /// count), N >= 1 = that many workers. Applies to the default syntactic scan
+  /// only; `--resolve`, `--profile` and `--debug-rule` always run serially.
+  final int? jobs;
 }
 
 /// Parses [args] for the scan command.
@@ -272,6 +281,7 @@ ScanParseResult parseScanArgs(
   bool quiet = false;
   bool noExclude = false;
   bool strictFiles = false;
+  int? jobs;
 
   var i = 0;
   while (i < args.length) {
@@ -394,6 +404,26 @@ ScanParseResult parseScanArgs(
     if (arg == '--strict-files') {
       strictFiles = true;
       i++;
+      continue;
+    }
+    // Parallel workers for the syntactic scan: `--jobs N` or `--jobs auto`.
+    // `auto` picks a CPU- and memory-safe count (see scan_jobs.dart).
+    if (arg == '--jobs' || arg == '-j') {
+      i++;
+      if (i < args.length && !args[i].startsWith('--')) {
+        final parsed = parseJobsValue(args[i]);
+        if (parsed == null) {
+          return ScanParseInvalid(
+            '--jobs must be a positive integer or "auto", got "${args[i]}".',
+          );
+        }
+        jobs = parsed;
+        i++;
+      } else {
+        return ScanParseInvalid(
+          '--jobs requires a value (a positive integer or auto).',
+        );
+      }
       continue;
     }
     if (arg == '--tier') {
@@ -655,6 +685,7 @@ ScanParseResult parseScanArgs(
       includeGlobs: includeGlobs,
       noExclude: noExclude,
       strictFiles: strictFiles,
+      jobs: jobs,
     ),
   );
 }

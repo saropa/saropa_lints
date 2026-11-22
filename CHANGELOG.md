@@ -66,6 +66,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.6.1] — Unreleased
+
+The scan command can now use several CPU cores instead of one, which makes large projects scan substantially faster. It stays serial unless asked, and it recommends a safe worker count based on your CPUs and free memory. [log](https://github.com/saropa/saropa_lints/blob/v17.6.1/CHANGELOG.md)
+
+### Added
+
+- `scan --jobs <n|auto>` (or `-j`) scans files with parallel workers, with `auto` picking a count that respects CPU count and available memory — omit it and large scans print the recommended value; `--resolve`, `--profile` and `--debug-rule` still run serially, and no action is required.
+
+---
+
 ## [17.6.0]
 
 The extension's rating prompts, welcome panel, scan progress message and several other strings now read natively in all 24 supported languages instead of falling back to English. Eleven false positives are also fixed. [log](https://github.com/saropa/saropa_lints/blob/v17.6.0/CHANGELOG.md)
