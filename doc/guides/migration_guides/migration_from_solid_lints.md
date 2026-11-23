@@ -7,7 +7,7 @@ This guide helps you migrate from [`solid_lints`](https://pub.dev/packages/solid
 
 | Feature | solid_lints | saropa_lints |
 |---------|-------------|--------------|
-| **Rule count** | 33 rules | 2300+ custom rules |
+| **Rule count** | 33 rules | 2350+ custom rules |
 | **Focus** | SOLID principles, ISO/IEC & NIST-inspired code quality | Security, accessibility, performance, Flutter-specific patterns, plus general code quality |
 | **Configuration** | Per-rule YAML options | 5 progressive tiers + rule packs |
 | **Architecture** | Native `analysis_server_plugin` | Native `analysis_server_plugin` |

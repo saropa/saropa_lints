@@ -7,7 +7,7 @@ This guide helps you migrate from [`many_lints`](https://pub.dev/packages/many_l
 
 | Feature | many_lints | saropa_lints |
 |---------|-----------|--------------|
-| **Rule count** | 261 rules + 106 quick fixes | 2300+ custom rules, 221+ quick fixes |
+| **Rule count** | 261 rules + 106 quick fixes | 2350+ custom rules, 221+ quick fixes |
 | **Focus** | General Dart/Flutter code quality, Bloc/Riverpod, fpdart | Security, accessibility, performance, and library-specific analysis at much greater breadth |
 | **Architecture** | `analysis_server_plugin` (native, no `custom_lint`) | `custom_lint` plugin |
 | **Configuration** | Presets (`none`/`core`/`recommended`/`opinionated`/`pedantic`), per-rule `include`/`exclude`/`message`/options | 5 progressive tiers |

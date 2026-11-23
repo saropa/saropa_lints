@@ -6,8 +6,8 @@ This guide helps you migrate from [`subpackage_lint`](https://pub.dev/packages/s
 
 | Feature | subpackage_lint | saropa_lints |
 |---------|------------------|--------------|
-| **Rule count** | 3 rules | 2300+ custom rules |
-| **Focus** | Monorepo/subpackage import boundaries only | Security, accessibility, performance, and 2300+ Flutter-specific patterns, plus general import hygiene |
+| **Rule count** | 3 rules | 2350+ custom rules |
+| **Focus** | Monorepo/subpackage import boundaries only | Security, accessibility, performance, and 2350+ Flutter-specific patterns, plus general import hygiene |
 | **Configuration** | Single-purpose plugin | 5 progressive tiers |
 | **Scope** | `/src/` boundary enforcement for monorepo subpackages | Broad, general-purpose lint coverage |
 

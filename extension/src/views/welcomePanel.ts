@@ -101,7 +101,7 @@ export class WelcomePanel implements vscode.Disposable {
       vscode.ViewColumn.One,
       { enableScripts: true, retainContextWhenHidden: false },
     );
-    // Fast-path render with the static "2,300+" fallback immediately, then swap in
+    // Fast-path render with the static "2,350+" fallback immediately, then swap in
     // the live count once the CLI resolves — same rationale as showAboutPanel: a
     // cold `dart run` can take a second or two, and the panel should never block on
     // a supplementary figure. See welcomePanelStats.ts.

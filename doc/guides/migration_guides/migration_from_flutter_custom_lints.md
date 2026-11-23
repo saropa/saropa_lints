@@ -7,7 +7,7 @@ This guide helps you migrate from [`flutter_custom_lints`](https://pub.dev/packa
 
 | Feature | flutter_custom_lints | saropa_lints |
 |---------|------------------------|--------------|
-| **Rule count** | 5 rules | 2300+ custom rules |
+| **Rule count** | 5 rules | 2350+ custom rules |
 | **Focus** | General-purpose disposal, type-safety, and null-safety checks | Comprehensive security, accessibility, performance, and Flutter-specific analysis |
 | **Configuration** | Flat rule set | 5 progressive tiers + rule packs |
 

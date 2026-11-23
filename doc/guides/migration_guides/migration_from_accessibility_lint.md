@@ -13,7 +13,7 @@ This guide helps you migrate from [`accessibility_lint`](https://pub.dev/package
 
 | Feature | accessibility_lint | saropa_lints |
 |---------|---------------------|--------------|
-| **Rule count** | 5 rules | 2300+ custom rules |
+| **Rule count** | 5 rules | 2350+ custom rules |
 | **Focus** | Immediate accessibility checks: tooltips, semantic labels, touch targets | Full accessibility suite plus security, performance, and Flutter-specific patterns |
 | **Maintenance** | **Archived — no longer maintained** | Actively maintained |
 | **Configuration** | Flat rule set | 5 progressive tiers + rule packs |

@@ -6,8 +6,8 @@ This guide helps you migrate from [`awesome_lints`](https://pub.dev/packages/awe
 
 | Feature | awesome_lints | saropa_lints |
 |---------|-----------------|--------------|
-| **Rule count** | 123 rules (65 Common Dart, 32 Flutter, 22 Bloc, 8 Provider, 1 FakeAsync) | 2300+ custom rules |
-| **Focus** | Broad Dart/Flutter lint collection, largely DCM-compatible naming | Security, accessibility, performance, and 2300+ Flutter-specific patterns |
+| **Rule count** | 123 rules (65 Common Dart, 32 Flutter, 22 Bloc, 8 Provider, 1 FakeAsync) | 2350+ custom rules |
+| **Focus** | Broad Dart/Flutter lint collection, largely DCM-compatible naming | Security, accessibility, performance, and 2350+ Flutter-specific patterns |
 | **Configuration** | Flat rule list | 5 progressive tiers |
 | **Maintenance** | Community package | Actively maintained |
 

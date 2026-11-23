@@ -6,7 +6,7 @@ This guide helps you migrate from `import_order_lint` to `saropa_lints`.
 
 | Feature | import_order_lint | saropa_lints |
 |---------|--------------------|--------------|
-| **Rule count** | 1 check (import ordering) | 2300+ rules across security, a11y, performance, and 15+ libraries |
+| **Rule count** | 1 check (import ordering) | 2350+ rules across security, a11y, performance, and 15+ libraries |
 | **Architecture** | Standalone CLI tool (not a `custom_lint` plugin) | `custom_lint` plugin, real-time IDE feedback |
 | **Import ordering** | `dart:` → `flutter/` → external packages → project → relative, alphabetized, blank-line-separated groups | Same grouping/ordering enforced as IDE diagnostics |
 | **Auto-fix** | `import_order_lint:import_order` rewrites files in place | Quick fixes per-violation, no standalone rewrite command |

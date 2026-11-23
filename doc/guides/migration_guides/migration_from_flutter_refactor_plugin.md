@@ -16,7 +16,7 @@ only — it is unverified and should be treated as low-confidence.
 
 | Feature | flutter_refactor_plugin | saropa_lints |
 |---------|--------------------------|--------------|
-| **Rule count** | 1 rule (unverified) | 2300+ custom rules |
+| **Rule count** | 1 rule (unverified) | 2350+ custom rules |
 | **Focus** | Automatic widget-extraction refactor for deep widget nesting | Full-spectrum security, accessibility, performance, and library-specific analysis |
 | **Quick fixes** | Content-based automatic widget extraction | 221+ quick fixes across the whole rule set |
 

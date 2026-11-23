@@ -6,7 +6,7 @@ This guide helps you migrate from `logd_linters` to `saropa_lints`.
 
 | Feature | logd_linters | saropa_lints |
 |---------|--------------|--------------|
-| **Rule count** | 13 rules | 2300+ custom rules |
+| **Rule count** | 13 rules | 2350+ custom rules |
 | **Focus** | `logd` logging library API contracts, arena lifecycle, formatter purity | Flutter-specific analysis, broad coverage |
 | **Configuration** | Single config | 5 progressive tiers |
 | **Scope** | The `logd` package's pooled `LogDocument`/`LogEngine`/`Logger`/`LogTag`/`Handler` API only | Security, accessibility, performance, state management, and more |

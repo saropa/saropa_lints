@@ -6,7 +6,7 @@ This guide helps you migrate from `dart_code_linter` (Bancolombia's actively-mai
 
 | Feature | dart_code_linter | saropa_lints |
 |---------|-------------------|--------------|
-| **Rule count** | 82 rules + continuous metrics | 2300+ custom rules |
+| **Rule count** | 82 rules + continuous metrics | 2350+ custom rules |
 | **Focus** | DCM-lineage code metrics & anti-patterns | Flutter-specific analysis across security, accessibility, performance, and every major state-management library |
 | **Reporting** | HTML/console maintainability-index report | Discrete threshold lint rules (no continuous report) |
 | **Configuration** | YAML rule/metric config | 5 progressive tiers |

@@ -6,7 +6,7 @@ This guide helps you migrate from `architecture_linter` (Iteo) to `saropa_lints`
 
 | Feature | architecture_linter | saropa_lints |
 |---------|---------------------|--------------|
-| **Rule count** | 1 functional rule (banned-layer-import) + 3 self-diagnostics | 2300+ custom rules |
+| **Rule count** | 1 functional rule (banned-layer-import) + 3 self-diagnostics | 2350+ custom rules |
 | **Focus** | Configurable N-layer banned-import graph | Fixed UI/domain/data layering + full-codebase quality, security, accessibility |
 | **Configuration** | YAML-defined layers and banned import pairs | 5 progressive tiers |
 | **Maintenance** | Small, single-purpose package | Actively maintained |
@@ -59,7 +59,7 @@ The three `TODO` rows are meta-diagnostics for `architecture_linter`'s own confi
 
 ## What You Gain
 
-saropa_lints has no per-project layer-graph configuration, but it ships fixed architecture rules that need zero setup: `avoid_ui_in_domain_layer`, `avoid_direct_data_access_in_ui`, `avoid_business_logic_in_ui`, `avoid_cross_feature_dependencies`, `avoid_circular_dependencies`, `avoid_circular_imports` — plus 2300+ rules covering security, accessibility, performance, and library-specific patterns (GetX, Riverpod, Bloc, Provider, Firebase, Isar, Hive) that `architecture_linter` doesn't attempt.
+saropa_lints has no per-project layer-graph configuration, but it ships fixed architecture rules that need zero setup: `avoid_ui_in_domain_layer`, `avoid_direct_data_access_in_ui`, `avoid_business_logic_in_ui`, `avoid_cross_feature_dependencies`, `avoid_circular_dependencies`, `avoid_circular_imports` — plus 2350+ rules covering security, accessibility, performance, and library-specific patterns (GetX, Riverpod, Bloc, Provider, Firebase, Isar, Hive) that `architecture_linter` doesn't attempt.
 
 ## What You Lose
 

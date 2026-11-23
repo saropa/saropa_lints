@@ -6,7 +6,7 @@ This guide helps you migrate from `df_safer_dart_lints` to `saropa_lints`.
 
 | Feature | df_safer_dart_lints | saropa_lints |
 |---------|----------------------|--------------|
-| **Rule count** | 9 rule classes / 18 lint codes (WARNING + ERROR variant of each) | 2300+ custom rules |
+| **Rule count** | 9 rule classes / 18 lint codes (WARNING + ERROR variant of each) | 2350+ custom rules |
 | **Focus** | Annotation-gated safety markers (`@mustAwaitAllFutures`, `@sendable`, `@unsafe`, `Outcome` monad) | General-purpose Flutter-specific analysis without annotation gating |
 | **Configuration** | Opt in per-declaration via the package's own annotations | 5 progressive tiers |
 | **Maintenance** | Small, single-purpose package | Actively maintained |
@@ -64,7 +64,7 @@ All 6 `TODO` rows are gated on `df_safer_dart_lints`' own annotation markers (`@
 
 ## What You Gain
 
-saropa_lints' `avoid_ignoring_return_values` and `avoid_unawaited_future` fire everywhere without requiring per-declaration annotations, plus 2300+ rules across security, accessibility, performance, and library-specific patterns (GetX, Riverpod, Bloc, Provider, Firebase, Isar, Hive) that `df_safer_dart_lints` doesn't attempt.
+saropa_lints' `avoid_ignoring_return_values` and `avoid_unawaited_future` fire everywhere without requiring per-declaration annotations, plus 2350+ rules across security, accessibility, performance, and library-specific patterns (GetX, Riverpod, Bloc, Provider, Firebase, Isar, Hive) that `df_safer_dart_lints` doesn't attempt.
 
 ## What You Lose
 

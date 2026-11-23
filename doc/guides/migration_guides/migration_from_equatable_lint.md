@@ -6,8 +6,8 @@ This guide helps you migrate from `equatable_lint` (bamlab) to `saropa_lints`.
 
 | Feature | equatable_lint | saropa_lints |
 |---------|-----------------|--------------|
-| **Rule count** | 2 rules | 2300+ custom rules |
-| **Focus** | `Equatable` correctness only (missing props, missing `super.props` call) | `Equatable` correctness plus 2300+ rules across security, accessibility, performance, and library-specific patterns |
+| **Rule count** | 2 rules | 2350+ custom rules |
+| **Focus** | `Equatable` correctness only (missing props, missing `super.props` call) | `Equatable` correctness plus 2350+ rules across security, accessibility, performance, and library-specific patterns |
 | **Configuration** | Enable/disable per rule | 5 progressive tiers |
 | **Maintenance** | Small, single-purpose package | Actively maintained |
 | **Cost** | Free & open source | Free & open source |
@@ -53,7 +53,7 @@ Coverage: 2 rules — 1 HAVE (50%), 1 TODO (50%)
 
 ## What You Gain
 
-Beyond `Equatable` field coverage, saropa_lints ships additional Equatable correctness rules — `require_equatable_props_override`, `avoid_mutable_field_in_equatable`, `require_extend_equatable` — plus 2300+ rules across security, accessibility, performance, and library-specific patterns (GetX, Riverpod, Bloc, Provider, Firebase, Isar, Hive) that `equatable_lint` doesn't attempt.
+Beyond `Equatable` field coverage, saropa_lints ships additional Equatable correctness rules — `require_equatable_props_override`, `avoid_mutable_field_in_equatable`, `require_extend_equatable` — plus 2350+ rules across security, accessibility, performance, and library-specific patterns (GetX, Riverpod, Bloc, Provider, Firebase, Isar, Hive) that `equatable_lint` doesn't attempt.
 
 ## What You Lose
 

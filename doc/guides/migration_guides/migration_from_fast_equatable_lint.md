@@ -6,7 +6,7 @@ This guide helps you migrate from `fast_equatable_lint` to `saropa_lints`.
 
 | Feature | fast_equatable_lint | saropa_lints |
 |---------|----------------------|--------------|
-| **Rule count** | 2 rules (`fast_equatable` package only) | 2300+ rules across security, a11y, performance, and 15+ libraries |
+| **Rule count** | 2 rules (`fast_equatable` package only) | 2350+ rules across security, a11y, performance, and 15+ libraries |
 | **Scope** | `FastEquatable`/`hashParameters` correctness only | Whole-project static analysis |
 | **Architecture** | Dart analyzer plugin (`analysis_server_plugin`) | `custom_lint` plugin |
 | **Configuration** | Two rules, on by default | 5 progressive tiers |

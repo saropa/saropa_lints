@@ -8,7 +8,7 @@ in the `extra_lints` repo) to `saropa_lints`.
 
 | Feature | flutter_sane_lints | saropa_lints |
 |---------|---------------------|--------------|
-| **Rule count** | 2 rules | 2300+ custom rules |
+| **Rule count** | 2 rules | 2350+ custom rules |
 | **Focus** | Ad-hoc string literals in widgets; `if` used instead of exhaustive `switch` on enums | Full-spectrum security, accessibility, performance, and library-specific analysis |
 | **Configuration** | On/off via `custom_lint` | 5 progressive tiers |
 
@@ -79,7 +79,7 @@ Coverage: 2 rules — 2 HAVE (100%)
 
 saropa_lints' i18n rule family covers translation-key validation, unused-locale-key detection, and
 pluralization, well beyond the single literal-detection rule `flutter_sane_lints` offers, plus
-2300+ rules covering security, accessibility, and Flutter-specific patterns entirely outside
+2350+ rules covering security, accessibility, and Flutter-specific patterns entirely outside
 `flutter_sane_lints`'s scope.
 
 ## Getting Help

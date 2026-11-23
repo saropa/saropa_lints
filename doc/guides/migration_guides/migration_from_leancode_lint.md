@@ -6,7 +6,7 @@ This guide helps you migrate from `leancode_lint` to `saropa_lints`.
 
 | Feature | leancode_lint | saropa_lints |
 |---------|----------------|--------------|
-| **Rule count** | 23 rules | 2300+ custom rules |
+| **Rule count** | 23 rules | 2350+ custom rules |
 | **Focus** | Bloc/Cubit conventions, hooks, design-system enforcement | Flutter-specific analysis across security, accessibility, performance, and every major state-management library |
 | **Architecture** | `analysis_server_plugin` (v27.0.0+) | custom_lint plugin |
 | **Configuration** | Programmatic `LeanCodeLintConfig` (custom plugin package) | 5 progressive tiers, `analysis_options.yaml` |

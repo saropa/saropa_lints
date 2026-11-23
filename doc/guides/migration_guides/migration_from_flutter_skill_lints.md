@@ -6,7 +6,7 @@ This guide helps you migrate from `flutter_skill_lints` to `saropa_lints`.
 
 | Feature | flutter_skill_lints | saropa_lints |
 |---------|---------------------|--------------|
-| **Rule count** | 279 rules | 2300+ custom rules |
+| **Rule count** | 279 rules | 2350+ custom rules |
 | **Focus** | Flutter/Riverpod/Freezed-heavy general-purpose set | Broader coverage: security, accessibility, performance, GetX/Bloc/Provider/Firebase/Isar/Hive, plus the same Riverpod/Freezed ground |
 | **Configuration** | Enable individually via `plugins.flutter_skill_lints` | 5 progressive tiers |
 | **Overlap with saropa** | High — 83% of its rules have a direct saropa equivalent | — |

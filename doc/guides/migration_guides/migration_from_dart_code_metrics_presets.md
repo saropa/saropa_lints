@@ -6,7 +6,7 @@ This guide helps you migrate from [`dart_code_metrics_presets`](https://pub.dev/
 
 | Feature | dart_code_metrics_presets | saropa_lints |
 |---------|----------------------------|--------------|
-| **Rule count** | 15 package-specific preset YAMLs, ~85 rule references | 2300+ custom rules, incl. deep Bloc/Riverpod/Provider/GetX/Equatable coverage |
+| **Rule count** | 15 package-specific preset YAMLs, ~85 rule references | 2350+ custom rules, incl. deep Bloc/Riverpod/Provider/GetX/Equatable coverage |
 | **Focus** | Curated DCM rule subsets per third-party package (bloc, riverpod, flame, intl, mocktail, ...) | Broad Dart/Flutter analysis, package-specific rules built in |
 | **Configuration** | Import one preset YAML per package you use | 5 progressive tiers, all package rules included automatically |
 | **Maintenance** | Companion presets to DCM | Actively maintained, standalone |
@@ -204,7 +204,7 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 
 ## What You Gain
 
-saropa_lints applies its package-specific rules (Bloc, Riverpod, Provider, GetX, Equatable, Flutter Hooks) automatically at every tier — there's no separate preset YAML to `include:` per package. You also get 2300+ rules covering areas none of these presets touch: security, general accessibility, performance, and Dart language-level code quality.
+saropa_lints applies its package-specific rules (Bloc, Riverpod, Provider, GetX, Equatable, Flutter Hooks) automatically at every tier — there's no separate preset YAML to `include:` per package. You also get 2350+ rules covering areas none of these presets touch: security, general accessibility, performance, and Dart language-level code quality.
 
 ## What You Lose
 

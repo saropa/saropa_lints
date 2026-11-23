@@ -6,7 +6,7 @@ This guide helps you migrate from `all_observer_lint` to `saropa_lints`.
 
 | Feature | all_observer_lint | saropa_lints |
 |---------|--------------------|--------------|
-| **Rule count** | 20 rules (`all_observer` reactive-state library only) | 2300+ rules across security, a11y, performance, and 15+ libraries |
+| **Rule count** | 20 rules (`all_observer` reactive-state library only) | 2350+ rules across security, a11y, performance, and 15+ libraries |
 | **Scope** | The niche `all_observer` package | Whole-project static analysis |
 | **Configuration** | `include: package:all_observer_lint/recommended.yaml` | 5 progressive tiers |
 

@@ -6,7 +6,7 @@ This guide helps you migrate from [`mvvm_linter`](https://pub.dev/packages/mvvm_
 
 | Feature | mvvm_linter | saropa_lints |
 |---------|-------------|--------------|
-| **Rule count** | 1 rule | 2300+ custom rules |
+| **Rule count** | 1 rule | 2350+ custom rules |
 | **Focus** | MVVM member-ordering enforcement | Broad Dart/Flutter analysis, incl. general member ordering |
 | **Configuration** | Single opinionated rule, no options | 5 progressive tiers |
 | **Maintenance** | Small, single-purpose package | Actively maintained, broad scope |
@@ -65,7 +65,7 @@ Coverage: 1 rules — 1 PARTIAL
 
 ## What You Gain
 
-saropa_lints' general-purpose member-ordering rule (`prefer_member_ordering`) applies to every class in your codebase, not just MVVM view-models — plus 2300+ other rules covering lifecycle, security, accessibility, and performance patterns MVVM-specific tooling doesn't touch.
+saropa_lints' general-purpose member-ordering rule (`prefer_member_ordering`) applies to every class in your codebase, not just MVVM view-models — plus 2350+ other rules covering lifecycle, security, accessibility, and performance patterns MVVM-specific tooling doesn't touch.
 
 ## What You Lose
 

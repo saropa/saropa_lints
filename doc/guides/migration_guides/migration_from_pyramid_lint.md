@@ -6,7 +6,7 @@ This guide helps you migrate from `pyramid_lint` to `saropa_lints`.
 
 | Feature | pyramid_lint | saropa_lints |
 |---------|--------------|--------------|
-| **Rule count** | 36 rules | 2300+ custom rules |
+| **Rule count** | 36 rules | 2350+ custom rules |
 | **Focus** | Curated Dart + Flutter correctness/style set | Full-spectrum security, accessibility, performance, and library-specific analysis |
 | **Configuration** | Enable individually | 5 progressive tiers |
 | **Implementation quality** | High — real quick-fixes, precise `TypeChecker`-based type checking | High — quick-fixes on 221+ rules, mix of type-checking and AST pattern matching |

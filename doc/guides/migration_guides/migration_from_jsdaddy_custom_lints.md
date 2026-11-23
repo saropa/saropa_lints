@@ -6,7 +6,7 @@ This guide helps you migrate from `jsdaddy_custom_lints` to `saropa_lints`.
 
 | Feature | jsdaddy_custom_lints | saropa_lints |
 |---------|------------------------|--------------|
-| **Rule count** | 1 rule (file naming) | 2300+ rules across security, a11y, performance, and 15+ libraries |
+| **Rule count** | 1 rule (file naming) | 2350+ rules across security, a11y, performance, and 15+ libraries |
 | **Scope** | Kebab-case file naming only | Whole-project static analysis |
 | **Distribution** | Git dependency (not published on pub.dev) | Published on pub.dev |
 | **Configuration** | Single opt-in rule | 5 progressive tiers |

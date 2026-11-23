@@ -7,7 +7,7 @@ This guide helps you migrate from [`flutter_doctor_ai`](https://pub.dev/packages
 
 | Feature | flutter_doctor_ai | saropa_lints |
 |---------|--------------------|--------------|
-| **Rule count** | 5 static rules (plus an AI-powered CLI mode using Groq/Gemini/OpenAI) | 2300+ custom rules |
+| **Rule count** | 5 static rules (plus an AI-powered CLI mode using Groq/Gemini/OpenAI) | 2350+ custom rules |
 | **Architecture** | Standalone CLI, LLM calls for context-aware fixes | `custom_lint`/`analysis_server_plugin`, real-time IDE feedback |
 | **Focus** | A handful of common Flutter bug patterns | Comprehensive security, accessibility, performance, and Flutter-specific analysis |
 | **Cost** | AI mode requires an LLM API key | Free & open source, no external calls |

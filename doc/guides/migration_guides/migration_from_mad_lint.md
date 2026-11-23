@@ -6,7 +6,7 @@ This guide helps you migrate from `mad_lint` (MadBrains' `analysis_server_plugin
 
 | Feature | mad_lint | saropa_lints |
 |---------|----------|--------------|
-| **Rule count** | 13 rules | 2300+ custom rules |
+| **Rule count** | 13 rules | 2350+ custom rules |
 | **Focus** | Internal MadBrains conventions (mappedFields, copyWith completeness) | Full-spectrum Flutter/Dart analysis |
 | **Configuration** | Flat `diagnostics` map | 5 progressive tiers |
 | **Scope** | Single-team house style | General-purpose, OSS |

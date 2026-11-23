@@ -12,7 +12,7 @@ This guide helps you migrate from `design_system_lints` (Sidecar framework) to `
 
 | Feature | design_system_lints | saropa_lints |
 |---------|----------------------|--------------|
-| **Rule count** | 7 active rules | 2300+ custom rules |
+| **Rule count** | 7 active rules | 2350+ custom rules |
 | **Focus** | Flags hardcoded design values (color, edge insets, box shadow, radius, text style, theme data, box constraints) against a project's `@designSystem`-annotated source | Flags hardcoded design values against Flutter's own `Theme.of(context)` |
 | **Architecture** | **Sidecar framework (defunct since 2022)** | custom_lint plugin (actively maintained) |
 | **Configuration** | Per-project `@designSystem` annotation on a source class | 5 progressive tiers |
@@ -67,7 +67,7 @@ All 6 `TODO` rows depend on a generic `@designSystem`-annotated source class mec
 
 ## What You Gain
 
-An actively maintained plugin architecture (Sidecar is defunct), plus 2300+ rules covering security, accessibility, performance, and library-specific patterns (GetX, Riverpod, Bloc, Provider, Firebase, Isar, Hive) that `design_system_lints` never attempted even at its peak.
+An actively maintained plugin architecture (Sidecar is defunct), plus 2350+ rules covering security, accessibility, performance, and library-specific patterns (GetX, Riverpod, Bloc, Provider, Firebase, Isar, Hive) that `design_system_lints` never attempted even at its peak.
 
 ## What You Lose
 

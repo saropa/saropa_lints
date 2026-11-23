@@ -6,8 +6,8 @@ This guide helps you migrate from [`ripplearc_linter`](https://pub.dev/packages/
 
 | Feature | ripplearc_linter | saropa_lints |
 |---------|-------------------|--------------|
-| **Rule count** | 24 rules | 2300+ custom rules |
-| **Focus** | One company's internal code-quality and strict-testing conventions, open-sourced as-is | Security, accessibility, performance, and 2300+ Flutter-specific patterns |
+| **Rule count** | 24 rules | 2350+ custom rules |
+| **Focus** | One company's internal code-quality and strict-testing conventions, open-sourced as-is | Security, accessibility, performance, and 2350+ Flutter-specific patterns |
 | **Configuration** | Flat rule list | 5 progressive tiers |
 | **Applicability** | Many rules encode one team's specific conventions (a DI framework's API, a doc-comment policy, an issue-tracker URL pattern) | Broadly applicable across projects |
 

@@ -6,7 +6,7 @@ This guide helps you migrate from [`team_guard`](https://github.com/HazemHamdy7/
 
 | Feature | team_guard | saropa_lints |
 |---------|-----------|--------------|
-| **Rule count** | 1 configurable mechanism | 2300+ custom rules |
+| **Rule count** | 1 configurable mechanism | 2350+ custom rules |
 | **Focus** | Project-configurable widget/class ban-and-replace | Full-spectrum security, accessibility, performance, and library-specific analysis |
 | **Configuration** | `team_guard.yaml` widget/class replacement map | 5 progressive tiers |
 | **Scaffolding** | Generates replacement stub files in `lib/core` | N/A — saropa_lints does not scaffold code |

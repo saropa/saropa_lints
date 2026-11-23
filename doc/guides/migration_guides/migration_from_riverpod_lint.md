@@ -6,7 +6,7 @@ This guide helps you migrate from `riverpod_lint` (the official Riverpod package
 
 | Feature | riverpod_lint | saropa_lints |
 |---------|----------------|--------------|
-| **Rule count** | ~15 rules, Riverpod-only | 2300+ custom rules |
+| **Rule count** | ~15 rules, Riverpod-only | 2350+ custom rules |
 | **Focus** | Riverpod codegen correctness | Flutter-specific analysis across security, accessibility, performance, and every major state-management library |
 | **Configuration** | None (fixed rule set) | 5 progressive tiers |
 | **Maintenance** | Official (rrousselGit/riverpod monorepo) | Actively maintained |

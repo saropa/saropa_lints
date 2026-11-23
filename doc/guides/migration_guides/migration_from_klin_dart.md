@@ -6,13 +6,13 @@ This guide helps you migrate from `klin_dart` to `saropa_lints`.
 
 | Feature | klin_dart | saropa_lints |
 |---------|-----------|--------------|
-| **Rule count** | 6 rules | 2300+ custom rules |
+| **Rule count** | 6 rules | 2350+ custom rules |
 | **Focus** | Complexity metrics & hardcoded strings | Flutter-specific analysis across security, accessibility, performance, and state management |
 | **Configuration** | Per-rule thresholds (class/function/file length) | 5 progressive tiers |
 | **Maintenance** | Small community package | Actively maintained |
 | **Cost** | Free & open source | Free & open source |
 
-**Note**: klin_dart is a small, focused package (6 rules) built around code-length and complexity metrics plus two string-literal checks. saropa_lints covers the same ground with configurable-threshold equivalents, plus 2300+ rules beyond klin_dart's scope.
+**Note**: klin_dart is a small, focused package (6 rules) built around code-length and complexity metrics plus two string-literal checks. saropa_lints covers the same ground with configurable-threshold equivalents, plus 2350+ rules beyond klin_dart's scope.
 
 ## Quick Migration
 

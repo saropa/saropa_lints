@@ -6,7 +6,7 @@ This guide helps you migrate from `bloc_lint` (the official [bloc](https://blocl
 
 | Feature | bloc_lint | saropa_lints |
 |---------|-----------|--------------|
-| **Rule count** | 9 rules | 2300+ custom rules (20+ Bloc-specific) |
+| **Rule count** | 9 rules | 2350+ custom rules (20+ Bloc-specific) |
 | **Focus** | Bloc/Cubit API correctness and style | Flutter-specific analysis, broad coverage |
 | **Configuration** | `package:bloc_lint/recommended.yaml`, or the `bloc` CLI | 5 progressive tiers |
 | **CLI** | Standalone `bloc lint` binary (via `bloc_tools`) | `custom_lint` plugin (IDE + CLI) |

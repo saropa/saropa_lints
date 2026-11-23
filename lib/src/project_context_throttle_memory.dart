@@ -1823,7 +1823,7 @@ class MemoryPressureHandler {
   /// and severity registries. Notifies the extension callback if set.
   static void _updateShedLevel(int newLevel, int rss) {
     // Skip rebuild when the level hasn't changed — _rebuildShedRuleNames
-    // iterates all 2300+ rules and checks essential membership for each.
+    // iterates all 2350+ rules and checks essential membership for each.
     if (newLevel == _shedLevel) return;
     final oldLevel = _shedLevel;
     _shedLevel = newLevel;

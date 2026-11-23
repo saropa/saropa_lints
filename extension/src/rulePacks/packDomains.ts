@@ -34,7 +34,7 @@ export function isStylisticRule(rule: string): boolean {
  * Used by the rule-explain panel to give a rule that has never fired in the current
  * workspace something concrete to show besides its bare name — the extension ships
  * no per-rule description catalog, but pack membership and tier ({@link isStylisticRule}'s
- * sibling `RULE_TIER_BY_CODE`) are already generated data with full 2300+-rule coverage.
+ * sibling `RULE_TIER_BY_CODE`) are already generated data with full 2350+-rule coverage.
  */
 export function packsForRule(rule: string): string[] {
   const labels: string[] = [];

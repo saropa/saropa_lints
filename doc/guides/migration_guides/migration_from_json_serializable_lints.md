@@ -7,7 +7,7 @@ This guide helps you migrate from [`json_serializable_lints`](https://pub.dev/pa
 
 | Feature | json_serializable_lints | saropa_lints |
 |---------|--------------------------|--------------|
-| **Rule count** | 3 rules, all `json_serializable`-codegen-contract focused | 2300+ custom rules |
+| **Rule count** | 3 rules, all `json_serializable`-codegen-contract focused | 2350+ custom rules |
 | **Focus** | `@JsonSerializable()` `fromJson`/`toJson` presence checks | Comprehensive security, accessibility, performance, and Flutter-specific analysis |
 | **Configuration** | Flat rule set | 5 progressive tiers + rule packs |
 

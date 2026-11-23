@@ -7,7 +7,7 @@ This guide helps you migrate from [`json_parser_linter`](https://pub.dev/package
 
 | Feature | json_parser_linter | saropa_lints |
 |---------|---------------------|--------------|
-| **Rule count** | 1 combined rule (2 independent sub-checks) | 2300+ custom rules |
+| **Rule count** | 1 combined rule (2 independent sub-checks) | 2350+ custom rules |
 | **Focus** | `@GenerateJsonParser`-annotated class contract validation for the `json_coder` codegen suite | Comprehensive security, accessibility, performance, and Flutter-specific analysis |
 | **Configuration** | Single opt-in rule | 5 progressive tiers + rule packs |
 

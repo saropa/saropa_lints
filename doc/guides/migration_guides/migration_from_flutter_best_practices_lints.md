@@ -6,7 +6,7 @@ This guide helps you migrate from `flutter_best_practices_lints` to `saropa_lint
 
 | Feature | flutter_best_practices_lints | saropa_lints |
 |---------|-------------------------------|--------------|
-| **Rule count** | 5 rules | 2300+ custom rules |
+| **Rule count** | 5 rules | 2350+ custom rules |
 | **Focus** | File structure and class-naming conventions | Flutter-specific analysis, broad coverage |
 | **Configuration** | Single config | 5 progressive tiers |
 | **Cost** | Free & open source | Free & open source |

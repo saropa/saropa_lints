@@ -6,7 +6,7 @@ This guide helps you migrate from `clean_architecture_kit` (part of the `clean_a
 
 | Feature | clean_architecture_kit | saropa_lints |
 |---------|--------------------------|--------------|
-| **Rule count** | 16 rules, all architecture-focused | 2300+ custom rules |
+| **Rule count** | 16 rules, all architecture-focused | 2350+ custom rules |
 | **Focus** | Configurable clean-architecture layer boundary enforcement | Broad Flutter analysis — architecture is one of many categories |
 | **Configuration** | Per-project layer/folder configuration (domain/data/presentation) | 5 progressive tiers |
 | **Maintenance** | Small, focused package | Actively maintained |

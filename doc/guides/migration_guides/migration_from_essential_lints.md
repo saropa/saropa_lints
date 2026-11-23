@@ -6,8 +6,8 @@ This guide helps you migrate from [`essential_lints`](https://pub.dev/packages/e
 
 | Feature | essential_lints | saropa_lints |
 |---------|-------------------|--------------|
-| **Rule count** | 31 rules (27 in `rules/`, 4 in `warnings/`) | 2300+ custom rules |
-| **Focus** | Logical safety and function/member-ordering design, with quick fixes and code assists | Security, accessibility, performance, and 2300+ Flutter-specific patterns |
+| **Rule count** | 31 rules (27 in `rules/`, 4 in `warnings/`) | 2350+ custom rules |
+| **Focus** | Logical safety and function/member-ordering design, with quick fixes and code assists | Security, accessibility, performance, and 2350+ Flutter-specific patterns |
 | **Architecture** | Native `analysis_rule` API | `custom_lint` plugin |
 | **Configuration** | Flat rule list | 5 progressive tiers |
 

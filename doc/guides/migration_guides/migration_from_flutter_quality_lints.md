@@ -6,8 +6,8 @@ This guide helps you migrate from [`flutter_quality_lints`](https://pub.dev/pack
 
 | Feature | flutter_quality_lints | saropa_lints |
 |---------|------------------------|--------------|
-| **Rule count** | 18 rules | 2300+ custom rules |
-| **Focus** | Code-health checks (methods, magic numbers, nesting) plus HTML/JSON/Markdown trend reports | Security, accessibility, performance, and 2300+ Flutter-specific patterns |
+| **Rule count** | 18 rules | 2350+ custom rules |
+| **Focus** | Code-health checks (methods, magic numbers, nesting) plus HTML/JSON/Markdown trend reports | Security, accessibility, performance, and 2350+ Flutter-specific patterns |
 | **Configuration** | Flat rule list | 5 progressive tiers |
 | **Reliability** | Several shipped rules are non-functional stubs (see below) | Actively maintained, verified against fixtures |
 

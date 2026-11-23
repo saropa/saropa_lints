@@ -6,7 +6,7 @@ This guide helps you migrate from [`flutter_a11y_lints`](https://pub.dev/package
 
 | Feature | flutter_a11y_lints | saropa_lints |
 |---------|---------------------|--------------|
-| **Rule count** | 12 shipped rules (27 documented, 15 unimplemented) | 2300+ custom rules, dozens accessibility-focused |
+| **Rule count** | 12 shipped rules (27 documented, 15 unimplemented) | 2350+ custom rules, dozens accessibility-focused |
 | **Focus** | Accessibility only, via a `SemanticNode` IR tree | Broad Dart/Flutter analysis incl. deep accessibility coverage |
 | **Configuration** | `custom_lint` plugin | 5 progressive tiers |
 | **Maintenance** | Small, single-purpose package | Actively maintained, broad scope |

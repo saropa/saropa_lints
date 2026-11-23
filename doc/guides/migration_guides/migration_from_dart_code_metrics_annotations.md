@@ -6,7 +6,7 @@ This guide helps you migrate from [`dart_code_metrics_annotations`](https://pub.
 
 | Feature | dart_code_metrics_annotations | saropa_lints |
 |---------|-------------------------------|--------------|
-| **Rule count** | 3 annotation-driven rule groups | 2300+ custom rules |
+| **Rule count** | 3 annotation-driven rule groups | 2350+ custom rules |
 | **Focus** | Annotations consumed by DCM's rule engine | Broad Dart/Flutter analysis, unconditional (no opt-in annotations required) |
 | **Configuration** | Requires `@Throws`/`@AcceptedTypes`/`@mutated` annotations in your code | 5 progressive tiers, works on unmodified code |
 | **Maintenance** | Companion package to DCM | Actively maintained, standalone |

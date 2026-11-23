@@ -6,7 +6,7 @@ This guide helps you migrate from [`import_lint`](https://pub.dev/packages/impor
 
 | Feature | import_lint | saropa_lints |
 |---------|-------------|--------------|
-| **Rule count** | 1 configurable rule-engine | 2300+ custom rules |
+| **Rule count** | 1 configurable rule-engine | 2350+ custom rules |
 | **Focus** | Generic import-boundary DSL | Broad Dart/Flutter analysis, incl. fixed-layer import rules |
 | **Configuration** | `target`/`from`/`except` glob rules in YAML | 5 progressive tiers, minimal setup |
 | **Maintenance** | Actively maintained, narrow scope | Actively maintained, broad scope |

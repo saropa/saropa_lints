@@ -6,7 +6,7 @@ This guide helps you migrate from `architecture_lints` (part of the `architectur
 
 | Feature | architecture_lints | saropa_lints |
 |---------|---------------------|--------------|
-| **Rule count** | 23 rules | 2300+ custom rules |
+| **Rule count** | 23 rules | 2350+ custom rules |
 | **Focus** | Config-driven architecture-component-graph engine (dependency, type, member, annotation, naming, exception, and parameter/return "safety" rules) | Fixed architecture rules + full-codebase quality, security, accessibility, library-specific patterns |
 | **Configuration** | Per-project component/type/member graph definitions in YAML | 5 progressive tiers |
 | **Maintenance** | Small workspace package | Actively maintained |
@@ -81,7 +81,7 @@ All 19 `TODO` rows depend on a generic, config-driven component-graph engine (de
 
 ## What You Gain
 
-Beyond fixed layer/DI architecture rules (`avoid_ui_in_domain_layer`, `avoid_business_logic_in_ui`, `avoid_circular_dependencies`, `avoid_circular_imports`, `avoid_singleton_pattern`, `require_typed_di_registration`, `prefer_constructor_injection`), saropa_lints covers security, accessibility, performance, and 2300+ rules across GetX, Riverpod, Bloc, Provider, Firebase, Isar, and Hive that `architecture_lints` does not attempt.
+Beyond fixed layer/DI architecture rules (`avoid_ui_in_domain_layer`, `avoid_business_logic_in_ui`, `avoid_circular_dependencies`, `avoid_circular_imports`, `avoid_singleton_pattern`, `require_typed_di_registration`, `prefer_constructor_injection`), saropa_lints covers security, accessibility, performance, and 2350+ rules across GetX, Riverpod, Bloc, Provider, Firebase, Isar, and Hive that `architecture_lints` does not attempt.
 
 ## What You Lose
 

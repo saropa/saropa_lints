@@ -6,7 +6,7 @@ This guide helps you migrate from `context_plus_lint` to `saropa_lints`.
 
 | Feature | context_plus_lint | saropa_lints |
 |---------|--------------------|--------------|
-| **Rule count** | 4 rules | 2300+ custom rules |
+| **Rule count** | 4 rules | 2350+ custom rules |
 | **Focus** | `context_plus` package API correctness | Flutter-specific analysis, broad coverage |
 | **Configuration** | Single config | 5 progressive tiers |
 | **Scope** | `context.use()` / `Ref` lifecycle only | Security, accessibility, performance, state management, and more |

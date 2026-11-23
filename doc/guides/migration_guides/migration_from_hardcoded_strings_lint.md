@@ -7,7 +7,7 @@ This guide helps you migrate from
 
 | Feature | hardcoded_strings_lint | saropa_lints |
 |---------|------------------------|--------------|
-| **Rule count** | 1 rule | 2300+ custom rules |
+| **Rule count** | 1 rule | 2350+ custom rules |
 | **Focus** | Hardcoded strings in Flutter widget constructors | Full-spectrum security, accessibility, performance, and library-specific analysis |
 | **Architecture** | `analysis_server_plugin` (native, no `custom_lint`) | `custom_lint` plugin |
 | **Quick fixes** | Ignore comment, ignore-for-file, disable in config, extract-to-variable | 221+ quick fixes across the whole rule set |
@@ -89,7 +89,7 @@ depends on precise allowlist parity, verify behavior on your codebase before dro
 ## What You Gain
 
 `saropa_lints` includes the rest of its i18n rule family beyond hardcoded-string detection —
-translation-key validation, unused-locale-key detection, and pluralization checks — plus 2300+
+translation-key validation, unused-locale-key detection, and pluralization checks — plus 2350+
 rules covering security, accessibility, and Flutter-specific patterns entirely outside
 `hardcoded_strings_lint`'s scope.
 

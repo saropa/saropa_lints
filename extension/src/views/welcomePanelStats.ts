@@ -20,7 +20,7 @@ export interface WelcomeStat {
  * inventing new ones.
  */
 export function buildWelcomeStats(ruleCounts: RuleCountSummary | null): WelcomeStat[] {
-  const totalRules = ruleCounts ? ruleCounts.total.toLocaleString() : '2,300+';
+  const totalRules = ruleCounts ? ruleCounts.total.toLocaleString() : '2,350+';
   return [
     { value: totalRules, label: 'lint rules', tone: 'brand' },
     { value: '250+', label: 'quick fixes', tone: 'status-good' },

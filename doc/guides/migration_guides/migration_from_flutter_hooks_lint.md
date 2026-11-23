@@ -6,7 +6,7 @@ This guide helps you migrate from `flutter_hooks_lint` to `saropa_lints`.
 
 | Feature | flutter_hooks_lint | saropa_lints |
 |---------|---------------------|--------------|
-| **Rule count** | 7 rules | 2300+ custom rules (5+ Flutter Hooks-specific) |
+| **Rule count** | 7 rules | 2350+ custom rules (5+ Flutter Hooks-specific) |
 | **Focus** | `flutter_hooks` API correctness | Flutter-specific analysis, broad coverage |
 | **Configuration** | Single config | 5 progressive tiers |
 | **Quick fixes** | 5 of 7 rules | Yes, per-rule (see mapping below) |

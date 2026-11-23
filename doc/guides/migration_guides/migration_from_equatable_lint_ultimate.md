@@ -7,7 +7,7 @@ This guide helps you migrate from `equatable_lint_ultimate` (a maintained fork o
 
 | Feature | equatable_lint_ultimate | saropa_lints |
 |---------|--------------------------|--------------|
-| **Rule count** | 2 rules + 1 assist (Equatable only) | 2300+ rules across security, a11y, performance, and 15+ libraries |
+| **Rule count** | 2 rules + 1 assist (Equatable only) | 2350+ rules across security, a11y, performance, and 15+ libraries |
 | **Scope** | `equatable` package correctness only | Whole-project static analysis, including Equatable |
 | **Configuration** | Single flat rule list | 5 progressive tiers |
 | **Maintenance** | Community fork of an unmaintained original | Actively maintained |

@@ -1771,6 +1771,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Curated passthrough: bullet glyph plus a single placeholder (dependency name) has no translatable words.
         "• {dep}": "• {dep}",
         "#": "#",
+        # KPI sub-label under a package count ("3 / in comparison"); "đang so sánh" = "being compared". The prior MT output "so sánh trong khi so sánh." ("compare while comparing") was nonsensical.
+        "in comparison": "đang so sánh",
         "Deps": "Phụ thuộc",
         "OWASP": "OWASP",
         "Saropa": "Saropa",
