@@ -24,7 +24,7 @@ Made by Saropa. All rights reserved.
 Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ```
 
-2300+ custom lint rules with 250+ quick fixes for Flutter and Dart — static analysis for security, accessibility, performance, and library-specific patterns. Includes a VS Code extension with Package Vibrancy scoring.
+2350+ custom lint rules with 250+ quick fixes for Flutter and Dart — static analysis for security, accessibility, performance, and library-specific patterns. Includes a VS Code extension with Package Vibrancy scoring.
 
 **Package** — [pub.dev/packages/saropa_lints](https://pub.dev/packages/saropa_lints)
 
@@ -63,6 +63,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
    **CI** — [actions](https://github.com/saropa/saropa_lints/actions). **Score** — [pub.dev score](https://pub.dev/packages/saropa_lints/score).
 
 -->
+
+---
+
+## [17.7.1] — Unreleased
+
+Published rule counts are now consistent across the README, extension, migration guides and in-product text, and the Vietnamese comparison label reads correctly. [log](https://github.com/saropa/saropa_lints/blob/v17.7.1/CHANGELOG.md)
+
+### Changed
+
+- Rule-count claims in the README, extension README, extension manifest strings, translated catalogs, welcome panel fallback, About pages, Professional Services page and every migration guide now say "2350+" instead of a mix of 1400+, 1500+, 2100+ and 2300+; no action required.
+
+### Fixed
+
+- The Vietnamese label under the package count in the comparison view no longer reads "so sánh trong khi so sánh." and now reads "đang so sánh"; no action required.
 
 ---
 
