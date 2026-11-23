@@ -36,7 +36,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 <!-- MAINTENANCE NOTES -- IMPORTANT --
 
-   Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versioning: [SemVer](https://semver.org/spec/v2.0.0.html). Omit dates from headers, because [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays them.
+   Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/spec/v2.0.0.html). Omit dates from headers, because [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays them.
 
    **Overview** — Every release (and [Unreleased]) opens with a 2–4 sentence user-facing summary that doesn't restate the bullets. Banned: file paths, line numbers, regex snippets, internal flag names, project-specific counts or percentages, and AST or visitor terminology. End with `[log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md)` (no preceding line break), substituting the version.
 
