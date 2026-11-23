@@ -2957,7 +2957,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 // =============================================================================
 // Built once on first access. Creates temporary instances to get rule names,
 // then discards them. Only the factory references are kept in memory.
-// This allows tier filtering without keeping all 2300+ rules in memory.
+// This allows tier filtering without keeping all 2350+ rules in memory.
 
 /// Lazy name→factory map, built once on first access.
 final Map<String, SaropaLintRule Function()> _ruleFactories =
@@ -3039,7 +3039,7 @@ void ensureRuleRegistryBuilt() {
 ///
 /// Only instantiates rules that are in the provided set.
 /// This is the key optimization - for essential tier (331 rules),
-/// only 331 rules are created instead of all 2300+.
+/// only 331 rules are created instead of all 2350+.
 /// Builds rule instances only for the given [ruleNames] (e.g. tier set).
 /// Used by the native plugin so only enabled-tier rules are instantiated.
 List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
@@ -3227,7 +3227,7 @@ void _logUnknownRuleReferences(
 // =============================================================================
 //
 // Caches the filtered rule list per tier+config combination to avoid
-// re-filtering 1400+ rules on every file analysis. The filter operation
+// re-filtering 2350+ rules on every file analysis. The filter operation
 // itself is O(n) and was being called for EVERY file in the project.
 //
 // Cache invalidation: The cache is keyed by tier name. If the user changes

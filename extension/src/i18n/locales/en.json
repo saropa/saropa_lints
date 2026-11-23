@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Rules & Tiers",
-        "description": "Configure which of the 2,300+ rules run and at what severity."
+        "description": "Configure which of the 2,350+ rules run and at what severity."
       },
       "catalog": {
         "label": "Command Catalog",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable",
       "actionEnable": "Enable",
       "bulkRuleToggleConfirm": "{verb} {count} rules? This updates analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2300+ lint rules.",
+      "setupPrompt": "Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2350+ lint rules.",
       "actionSetUpProject": "Set Up Project",
       "actionNotNow": "Not Now"
     },

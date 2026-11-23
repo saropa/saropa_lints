@@ -8,7 +8,7 @@
 
 Static analysis tools are essential, but they are passive. They find issues, but they don't fix architecture, ensure security compliance, or reduce technical debt.
 
-**Saropa Services** bridges the gap between **finding bugs** and **shipping secure, stable software**. We leverage our proprietary analysis engine (1,500+ rules mapped to OWASP standards) to provide high-impact remediation and compliance services for professional Flutter teams.
+**Saropa Services** bridges the gap between **finding bugs** and **shipping secure, stable software**. We leverage our proprietary analysis engine (2,350+ rules mapped to OWASP standards) to provide high-impact remediation and compliance services for professional Flutter teams.
 
 ### OWASP Compliance Ready
 
@@ -102,7 +102,7 @@ If you are moving from **Dart Code Metrics (DCM)**, **Very Good Analysis**, or *
 
 | Feature | The Value |
 |---------|-----------|
-| **We Build The Engine** | We maintain the open source package. We know the 1,500+ rules better than anyone. |
+| **We Build The Engine** | We maintain the open source package. We know the 2,350+ rules better than anyone. |
 | **OWASP Mapped** | Security rules mapped to OWASP Mobile Top 10 and Web Top 10. Reports auditors understand. |
 | **No "Tool Fatigue"** | We don't just sell you a license and a dashboard. We provide the expertise to fix the issues the tool finds. |
 | **Brownfield Specialists** | We specialize in legacy code. We know how to modernize apps without rewriting them. |

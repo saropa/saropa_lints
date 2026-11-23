@@ -135,7 +135,7 @@ Folder-level defaults were applied with [scripts/generators/bulk_rule_metadata.p
 
 ### 3. Set performance optimizations (optional but recommended)
 
-With 1400+ rules, performance matters. Two getters help the framework optimize rule execution:
+With 2350+ rules, performance matters. Two getters help the framework optimize rule execution:
 
 #### Rule Cost Classification
 

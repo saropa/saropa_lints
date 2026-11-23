@@ -1,6 +1,6 @@
 ![Saropa Lints - Advanced Static Analysis for Flutter & Dart](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner_v2.png)
 
-**The most comprehensive static analysis suite for Flutter and Dart.** 2,300+ lint rules that catch memory leaks, security vulnerabilities, accessibility violations, and runtime crashes — the bugs that compile fine but crash in production.
+**The most comprehensive static analysis suite for Flutter and Dart.** 2,350+ lint rules that catch memory leaks, security vulnerabilities, accessibility violations, and runtime crashes — the bugs that compile fine but crash in production.
 
 Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter better.
 
@@ -71,7 +71,7 @@ Widget build(context) {
 }
 ```
 
-Saropa Lints detects these patterns and 2,300+ more across four domains:
+Saropa Lints detects these patterns and 2,350+ more across four domains:
 
 - **Security** — Hardcoded credentials, sensitive data in logs, unsafe deserialization, OWASP-mapped
 - **Accessibility** — Missing semantics, inadequate touch targets, screen reader issues, EAA compliance
