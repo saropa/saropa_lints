@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "ルールと階層",
-        "description": "2,300以上のルールのうちどれを実行し、どの深刻度で実行するかを設定します。"
+        "description": "2,350以上のルールのうちどれを実行し、どの深刻度で実行するかを設定します。"
       },
       "catalog": {
         "label": "コマンドカタログ コマンドカタログ",
@@ -2441,7 +2441,7 @@
       "actionDisable": "禁断する Disable",
       "actionEnable": "Enable 設定を有効にします.",
       "bulkRuleToggleConfirm": "{verb} {count} ルール? これは analysis_options_custom.yaml.を更新しています.",
-      "setupPrompt": "Saropa Lints により saropa_lints が設定されていない Dart プロジェクトが検出されました。2300 以上の lint ルールの設定を今すぐ行います。",
+      "setupPrompt": "Saropa Lints により saropa_lints が設定されていない Dart プロジェクトが検出されました。2350 以上の lint ルールの設定を今すぐ行います。",
       "actionSetUpProject": "プロジェクトを設定する プロジェクトのセットアップ",
       "actionNotNow": "今,今ではない."
     },

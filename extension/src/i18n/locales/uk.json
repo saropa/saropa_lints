@@ -2441,7 +2441,7 @@
       "actionDisable": "Виключити відключати",
       "actionEnable": "Включити ввімкнути включити",
       "bulkRuleToggleConfirm": "{verb} {count} правила? Це оновлює analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints виявив проект Dart без налаштування saropa_lints. Встановіть тепер для 2300+ правил лінта.",
+      "setupPrompt": "Saropa Lints виявив проект Dart без налаштування saropa_lints. Встановіть тепер для 2350+ правил лінта.",
       "actionSetUpProject": "Налагодити проект, створити проект.",
       "actionNotNow": "Не зараз, не тепер."
     },

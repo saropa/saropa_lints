@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "กฎและระดับ",
-        "description": "กำหนดให้กฎที่มีมากกว่า 2,300 กฎทำงานและระดับความรุนแรงที่จะใช้"
+        "description": "กำหนดให้กฎที่มีมากกว่า 2,350 กฎทำงานและระดับความรุนแรงที่จะใช้"
       },
       "catalog": {
         "label": "คาตอล็อกบัญชาการ Command Catalogue การกํากับและการใช้",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable ปิดการใช้งาน",
       "actionEnable": "Enable enable เปิดให้ใช้ได้",
       "bulkRuleToggleConfirm": "{verb} {count} กฎกติกา? การอัพเดท analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints พบโปรเจกต์ Dart ที่ไม่มี saropa_lints ตั้งค่า ตั้งค่าทันทีเพื่อกฎการตรวจสอบ 2300+ ข้อ",
+      "setupPrompt": "Saropa Lints พบโปรเจกต์ Dart ที่ไม่มี saropa_lints ตั้งค่า ตั้งค่าทันทีเพื่อกฎการตรวจสอบ 2350+ ข้อ",
       "actionSetUpProject": "ตั้งโครงการ Set Up Project จัดทําโครต",
       "actionNotNow": "ไม่ตอนนี้ ไม่ใช่ ตอนนี้"
     },

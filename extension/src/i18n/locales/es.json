@@ -2441,7 +2441,7 @@
       "actionDisable": "Desactivar deshabilitar el servicio.",
       "actionEnable": "Habilitar habilitar para permitir.",
       "bulkRuleToggleConfirm": "¿Reglas {verb} {count}? Esto actualiza analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints detectó un proyecto Dart sin saropa_lints configurado. Configure ahora para 2300+ reglas de lint.",
+      "setupPrompt": "Saropa Lints detectó un proyecto Dart sin saropa_lints configurado. Configure ahora para 2350+ reglas de lint.",
       "actionSetUpProject": "Establecer el proyecto Configurar el proyecto",
       "actionNotNow": "Ahora no, ahora no."
     },

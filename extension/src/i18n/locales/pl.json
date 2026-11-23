@@ -2441,7 +2441,7 @@
       "actionDisable": "Wyłączanie wyłączyć",
       "actionEnable": "Włącz Enable włączyć",
       "bulkRuleToggleConfirm": "{verb} {count} zasady? To aktualizacja analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints wykrył projekt Dart bez skonfigurowanego saropa_lints. Skonfiguruj teraz aby zastosować 2300+ reguł lint.",
+      "setupPrompt": "Saropa Lints wykrył projekt Dart bez skonfigurowanego saropa_lints. Skonfiguruj teraz aby zastosować 2350+ reguł lint.",
       "actionSetUpProject": "Ustaw projekt, skonfiguruj projekt.",
       "actionNotNow": "Nie teraz, nie teraz."
     },

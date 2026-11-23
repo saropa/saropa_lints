@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable vô hiệu hóa",
       "actionEnable": "Enable enable enable cho phép",
       "bulkRuleToggleConfirm": "{verb} {count} quy tắc? Điều này cập nhật analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints phát hiện một dự án Dart không có saropa_lints được cấu hình. Thiết lập ngay để có 2300+ quy tắc lint.",
+      "setupPrompt": "Saropa Lints phát hiện một dự án Dart không có saropa_lints được cấu hình. Thiết lập ngay để có 2350+ quy tắc lint.",
       "actionSetUpProject": "Thiết lập dự án thiết lập dự kiến",
       "actionNotNow": "Không Bây Giờ"
     },

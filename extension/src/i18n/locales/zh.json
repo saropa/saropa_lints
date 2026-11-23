@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "规则与层级",
-        "description": "配置运行的 2300 多条规则以及其严重程度。"
+        "description": "配置运行的 2350 多条规则以及其严重程度。"
       },
       "catalog": {
         "label": "命令目录指令目录",
@@ -2441,7 +2441,7 @@
       "actionDisable": "禁用 禁止 使用",
       "actionEnable": "启用 启动 在此处.",
       "bulkRuleToggleConfirm": "规则是什么? {verb} {count} 的规则? 这更新了 analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints 检测到未配置 saropa_lints 的 Dart 项目。立即设置 2300 多个 lint 规则。",
+      "setupPrompt": "Saropa Lints 检测到未配置 saropa_lints 的 Dart 项目。立即设置 2350 多个 lint 规则。",
       "actionSetUpProject": "设置项目,建立一个项目.",
       "actionNotNow": "现在不是,不应该是."
     },

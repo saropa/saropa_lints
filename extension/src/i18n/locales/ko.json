@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "규칙 및 등급",
-        "description": "2,300개 이상의 규칙 중 어떤 규칙이 실행되며, 어떤 중대도에서 실행되는지 설정합니다."
+        "description": "2,350개 이상의 규칙 중 어떤 규칙이 실행되며, 어떤 중대도에서 실행되는지 설정합니다."
       },
       "catalog": {
         "label": "명령 카탈로그",
@@ -2441,7 +2441,7 @@
       "actionDisable": "비활성화 해제",
       "actionEnable": "Enable Enable를 활성화하십시오.",
       "bulkRuleToggleConfirm": "{verb} {count} 규칙? analysis_options_custom.yaml.ly를 업데이트합니다",
-      "setupPrompt": "Saropa Lints는 saropa_lints가 설정되지 않은 Dart 프로젝트를 감지했습니다. 2300개 이상의 린트 규칙을 설정하려면 지금 설정하세요.",
+      "setupPrompt": "Saropa Lints는 saropa_lints가 설정되지 않은 Dart 프로젝트를 감지했습니다. 2350개 이상의 린트 규칙을 설정하려면 지금 설정하세요.",
       "actionSetUpProject": "프로젝트 설정 프로젝트를 구성하십시오.",
       "actionNotNow": "지금은 지금, 지금은 아니다."
     },

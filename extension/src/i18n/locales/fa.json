@@ -2441,7 +2441,7 @@
       "actionDisable": "غیرفعال کردن Disable",
       "actionEnable": "فعال کردن",
       "bulkRuleToggleConfirm": "{verb} {count} قوانین؟ این analysis_options_custom.yaml را به روز می کند",
-      "setupPrompt": "Saropa Lints یک پروژه Dart بدون پیکربندی saropa_lints تشخیص داد. اکنون پیکربندی کنید تا 2300 + قاعده لینت را فعال کنید.",
+      "setupPrompt": "Saropa Lints یک پروژه Dart بدون پیکربندی saropa_lints تشخیص داد. اکنون پیکربندی کنید تا 2350 + قاعده لینت را فعال کنید.",
       "actionSetUpProject": "راه اندازی پروژه تنظیم پروژه",
       "actionNotNow": "حالا نه، الان نه"
     },

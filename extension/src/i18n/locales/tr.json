@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable Deaktive Etme İşlemleri",
       "actionEnable": "Olanak vermek",
       "bulkRuleToggleConfirm": "{verb} {count} kuralları? Bu, analysis_options_custom.yaml'i güncelliyor.",
-      "setupPrompt": "Saropa Lints, saropa_lints yapılandırılmadığı bir Dart projesi tespit etti. 2300+ linter kuralı için şimdi ayarlayın.",
+      "setupPrompt": "Saropa Lints, saropa_lints yapılandırılmadığı bir Dart projesi tespit etti. 2350+ linter kuralı için şimdi ayarlayın.",
       "actionSetUpProject": "Projeyi Kurmak Projesi Yapılandırma",
       "actionNotNow": "Şimdi değil şimdi, şimdi değil."
     },

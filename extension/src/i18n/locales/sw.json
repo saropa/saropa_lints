@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Moto ya Kifundisho na Mwaka wa Kifundisho",
-        "description": "Tambua kwa nani ya 2,300+ kati ya nizawa ya kuzalisha na kwa kati ya kifedha."
+        "description": "Tambua kwa nani ya 2,350+ kati ya nizawa ya kuzalisha na kwa kati ya kifedha."
       },
       "catalog": {
         "label": "Katalogi ya amri ya amri Catalog.",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable Disable Kulemaza",
       "actionEnable": "Enable Kuwezesha kuwezesha",
       "bulkRuleToggleConfirm": "{verb} {count} sheria? Hii inasasisha analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints amesha kujaribu project ya Dart bila kujaribu saropa_lints. Tafakari kwa 2300+ rules ya lint.",
+      "setupPrompt": "Saropa Lints amesha kujaribu project ya Dart bila kujaribu saropa_lints. Tafakari kwa 2350+ rules ya lint.",
       "actionSetUpProject": "Kuanzisha Mradi wa kuanzisha mradi.",
       "actionNotNow": "Sio sasa, sio sasa."
     },

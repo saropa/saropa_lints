@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "قواعد و درجات",
-        "description": "2,300+ قواعد میں سے کون سا قاعدہ چلے اور کس سطح کی سنجیدگی پر چلے اس کی ترتیب دیں۔"
+        "description": "2,350+ قواعد میں سے کون سا قاعدہ چلے اور کس سطح کی سنجیدگی پر چلے اس کی ترتیب دیں۔"
       },
       "catalog": {
         "label": "کمانڈ کیٹلاگ کا حکم دیں",
@@ -2441,7 +2441,7 @@
       "actionDisable": "غیر فعال کریں Disable",
       "actionEnable": "Enable فعال کریں چالو کریں۔",
       "bulkRuleToggleConfirm": "{verb} {count} قواعد کیا ہیں؟ اس سے analysis_options_custom.yaml کو اپ ڈیٹ کیا گیا ہے۔",
-      "setupPrompt": "Saropa Lints میں Dart پروجیکٹ کا پتہ چلا لیا گیا ہے جس میں saropa_lints کی ترتیب نہیں ہے۔ 2300+ لینٹ قواعد کے لیے اب تیار کریں۔",
+      "setupPrompt": "Saropa Lints میں Dart پروجیکٹ کا پتہ چلا لیا گیا ہے جس میں saropa_lints کی ترتیب نہیں ہے۔ 2350+ لینٹ قواعد کے لیے اب تیار کریں۔",
       "actionSetUpProject": "پروجیکٹ سیٹ اپ کریں منصوبے کی ترتیب دیں",
       "actionNotNow": "اب نہیں، ابھی نہیں۔"
     },

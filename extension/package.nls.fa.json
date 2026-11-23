@@ -7,7 +7,7 @@
   "views.actions.name": "اقدامات اقداماتی که انجام می شود",
   "views.status.name": "وضعیت Status موقعیت وضعیت",
   "command.auditFolder.title": "Saropa: پوشه ا审计...",
-  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart و Flutter قواعد لینت برای امنیت، دسترسی پذیری و عملکرد.\n\nنیاز به یک پروژه Dart یا Flutter دارد.\n\nپوشه ای که شامل یک `pubspec.yaml` باشد را باز کنید تا شروع کنید.\n\n[بیشتر بدانید](https://pub.dev/packages/saropa_lints)\n[دیدن تمام دستورات](command:saropaLints.showCommandCatalog)\n[درباره Saropa Lints](command:saropaLints.showAbout)\n[شروع کردن](command:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2350+ Dart و Flutter قواعد لینت برای امنیت، دسترسی پذیری و عملکرد.\n\nنیاز به یک پروژه Dart یا Flutter دارد.\n\nپوشه ای که شامل یک `pubspec.yaml` باشد را باز کنید تا شروع کنید.\n\n[بیشتر بدانید](https://pub.dev/packages/saropa_lints)\n[دیدن تمام دستورات](command:saropaLints.showCommandCatalog)\n[درباره Saropa Lints](command:saropaLints.showAbout)\n[شروع کردن](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: تنظیم پروژه (pubspec + config)",
   "command.disable.title": "Saropa Lints: خاموش کردن ادغام Lint",
   "command.reenablePlugin.title": "Saropa Lints: فعال سازی مجدد پلاگین در فرآیند میزبان",

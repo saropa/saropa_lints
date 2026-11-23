@@ -2441,7 +2441,7 @@
       "actionDisable": "অক্ষম করুন নিষ্ক্রিয় করুন",
       "actionEnable": "Enable সক্ষম করুন সক্রিয় করুন",
       "bulkRuleToggleConfirm": "{verb} {count} নিয়ম? এই আপডেট analysis_options_custom.yaml.am এর সাথে মিলিত হয়েছে।",
-      "setupPrompt": "Saropa Lints একটি Dart প্রকল্প বিনা saropa_lints এর সাথে প্রক্ষেতা করেছে। 2300+ লিন্ট নিয়ম সেট আপ করুন।",
+      "setupPrompt": "Saropa Lints একটি Dart প্রকল্প বিনা saropa_lints এর সাথে প্রক্ষেতা করেছে। 2350+ লিন্ট নিয়ম সেট আপ করুন।",
       "actionSetUpProject": "প্রকল্প সেট আপ করুন প্রজেক্ট সেটআপ করুন",
       "actionNotNow": "এখন না, এখন নয়।"
     },

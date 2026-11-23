@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "חוקי שיווי משקל / גובה שיווי משקל",
-        "description": "הגדר אילו מהחוקים של 2,300+ יוצאים בפעולה ובמה רמת האזהרה."
+        "description": "הגדר אילו מהחוקים של 2,350+ יוצאים בפעולה ובמה רמת האזהרה."
       },
       "catalog": {
         "label": "קטלוג פיקוד קאטלוג",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable disable - כבלי את היכולת",
       "actionEnable": "Enable enable אפשר את הפעלת",
       "bulkRuleToggleConfirm": "{verb} {count} כללים? זה מעדכן את analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints נתן זיהוי פרויקט Dart ללא saropa_lints מוגדר. תצטרכו להכין עכשיו עבור 2300+ правила לינט.",
+      "setupPrompt": "Saropa Lints נתן זיהוי פרויקט Dart ללא saropa_lints מוגדר. תצטרכו להכין עכשיו עבור 2350+ правила לינט.",
       "actionSetUpProject": "הקמת פרויקט, הגדרת פרוייקט.",
       "actionNotNow": "לא עכשיו, לא עכשיו."
     },

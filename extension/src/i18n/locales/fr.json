@@ -2441,7 +2441,7 @@
       "actionDisable": "Désactiver désactiver.",
       "actionEnable": "L'option Activer est activée.",
       "bulkRuleToggleConfirm": "Les règles de {verb} {count} ? Cela met à jour analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints a détecté un projet Dart sans saropa_lints configuré. Configurez maintenant pour plus de 2300 règles de linter.",
+      "setupPrompt": "Saropa Lints a détecté un projet Dart sans saropa_lints configuré. Configurez maintenant pour plus de 2350 règles de linter.",
       "actionSetUpProject": "Mettre en place le projet de mise en place du projet.",
       "actionNotNow": "Pas maintenant, pas tout de suite."
     },

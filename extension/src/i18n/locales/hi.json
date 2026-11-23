@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "नियम एवं स्तर",
-        "description": "2,300+ नियमों में से कौन से नियम चलाए जाएं और किस गंभीरता पर."
+        "description": "2,350+ नियमों में से कौन से नियम चलाए जाएं और किस गंभीरता पर."
       },
       "catalog": {
         "label": "कमांड कैटलॉग कमांड सूची",
@@ -2441,7 +2441,7 @@
       "actionDisable": "अक्षम करें अक्षम करना",
       "actionEnable": "सक्षम करें सक्षम करें",
       "bulkRuleToggleConfirm": "{verb} {count} नियम? यह analysis_options_custom.yaml.l को अपडेट करता है।",
-      "setupPrompt": "Saropa Lints द्वारा एक Dart प्रोजेक्ट का पता लगाया गया है जिसमें saropa_lints नहीं निर्धारित किया गया है। 2300+ लिंट नियमों के लिए अब सेट अप करें।",
+      "setupPrompt": "Saropa Lints द्वारा एक Dart प्रोजेक्ट का पता लगाया गया है जिसमें saropa_lints नहीं निर्धारित किया गया है। 2350+ लिंट नियमों के लिए अब सेट अप करें।",
       "actionSetUpProject": "परियोजना की स्थापना करें",
       "actionNotNow": "अब नहीं, अभी नहीं।"
     },

@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable Disabled Menonaktifkan",
       "actionEnable": "Enable mengaktifkan.",
       "bulkRuleToggleConfirm": "{verb} {count} aturan? Ini memperbarui analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints mendeteksi proyek Dart tanpa saropa_lints dikonfigurasi. Susun sekarang untuk 2300+ aturan lint.",
+      "setupPrompt": "Saropa Lints mendeteksi proyek Dart tanpa saropa_lints dikonfigurasi. Susun sekarang untuk 2350+ aturan lint.",
       "actionSetUpProject": "Membuat Set Up Project Proyek",
       "actionNotNow": "Tidak sekarang, tidak sekarang."
     },

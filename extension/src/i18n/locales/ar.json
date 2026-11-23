@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "قواعد ومستويات",
-        "description": "حدد أي من القواعد التي تزيد عن 2300 قاعدة تعمل وأيها تُنفذ بمستوى خطورة معين."
+        "description": "حدد أي من القواعد التي تزيد عن 2350 قاعدة تعمل وأيها تُنفذ بمستوى خطورة معين."
       },
       "catalog": {
         "label": "قائمة القيادة كتالوج الأوامر",
@@ -2441,7 +2441,7 @@
       "actionDisable": "تعطيل تعطيّل",
       "actionEnable": "تمكين Enable تمكين",
       "bulkRuleToggleConfirm": "{verb} {count} قاعدة؟ هذا تحديث analysis_options_custom.yaml",
-      "setupPrompt": "اكتشف Saropa Lints مشروع Dart دون تكوين saropa_lints. قم بالإعداد الآن لأكثر من 2300+ من قواعد الوبر.",
+      "setupPrompt": "اكتشف Saropa Lints مشروع Dart دون تكوين saropa_lints. قم بالإعداد الآن لأكثر من 2350+ من قواعد الوبر.",
       "actionSetUpProject": "إعداد المشروع إنشاء مشروع.",
       "actionNotNow": "ليس الآن وليس الآن"
     },

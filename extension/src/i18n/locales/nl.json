@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable Disable Ontschakelen",
       "actionEnable": "Inschakelen",
       "bulkRuleToggleConfirm": "{verb} {count} regels? Dit is een update van analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints heeft een Dart project gedetecteerd zonder saropa_lints geconfigureerd. Stel nu in voor 2300+ lint regels.",
+      "setupPrompt": "Saropa Lints heeft een Dart project gedetecteerd zonder saropa_lints geconfigureerd. Stel nu in voor 2350+ lint regels.",
       "actionSetUpProject": "Project opzetten project instellen",
       "actionNotNow": "Nu niet, nu niet."
     },

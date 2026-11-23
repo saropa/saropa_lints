@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Mga Tala at Mga Antas",
-        "description": "I-configure kung alin sa 2,300+ na mga rule ang mag-run at sa anong antas ng kahalagahan."
+        "description": "I-configure kung alin sa 2,350+ na mga rule ang mag-run at sa anong antas ng kahalagahan."
       },
       "catalog": {
         "label": "Command Catalogue Katalogo ng Pag-uutos",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Huwag paganahin",
       "actionEnable": "Paganahin",
       "bulkRuleToggleConfirm": "{verb} {count} mga patakaran? Ito ay nag-update ng analysis_options_custom.yaml.",
-      "setupPrompt": "Nakadetekta ang Saropa Lints ng isang Dart project nang walang saropa_lints na nakakonfigure. Mag-set up ngayon para sa 2300+ lint rules.",
+      "setupPrompt": "Nakadetekta ang Saropa Lints ng isang Dart project nang walang saropa_lints na nakakonfigure. Mag-set up ngayon para sa 2350+ lint rules.",
       "actionSetUpProject": "I-set up ang proyekto, i-setup ang proyekto.",
       "actionNotNow": "Hindi ngayon, hindi pa."
     },
