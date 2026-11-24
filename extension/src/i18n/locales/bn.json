@@ -3116,7 +3116,7 @@
     "sdkTooOld": "সবচেয়ে নতুন Saropa Lints ইঞ্জিন জন্য Dart {required} বা নতুন প্রয়োজন, কিন্তু এখানে ব্যবহৃত Dart হল {found}। একটি নতুন Dart SDK ইনস্টল করুন এবং \"saropaLints.externalEngine.dartSdkPath\" এর মান এর ফোল্ডার হিসাবে সেট করুন।",
     "sdkUnknown": "অজানা",
     "install": {
-      "prompt": "This installs the latest Saropa Lints engine globally (dart pub global activate saropa_lints) using a newer Dart SDK, then scans this project with it. This project's pubspec.yaml and SDK pin are not changed.",
+      "prompt": "এটি একটি নতুন Dart SDK ব্যবহার করে সবচেয়ে নতুন Saropa Lints ইঞ্জিন গ্লোবালি ইনস্টল করে (dart pub global activate saropa_lints), তারপর এটি দিয়ে এই প্রজেক্ট স্ক্যান করে। এই প্রজেক্টের pubspec.yaml এবং SDK পিন পরিবর্তন করা হয় না।",
       "confirm": "ইনস্টল করুন এবং স্ক্যান করুন"
     },
     "progress": "Saropa Lints: সর্বশেষ ইঞ্জিন দিয়ে স্ক্যান করা হচ্ছে…",

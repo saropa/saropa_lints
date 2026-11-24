@@ -3113,7 +3113,7 @@
   },
   "externalEngine": {
     "noProject": "Buka dulu folder proyek Dart.",
-    "sdkTooOld": "The latest Saropa Lints engine needs Dart {required} or newer, but the Dart used here is {found}. Install a newer Dart SDK and set \"saropaLints.externalEngine.dartSdkPath\" to its folder.",
+    "sdkTooOld": "Mesin Saropa Lints terbaru membutuhkan Dart {required} atau lebih baru, tetapi Dart yang digunakan di sini adalah {found}. Instal Dart SDK yang lebih baru dan atur \"saropaLints.externalEngine.dartSdkPath\" ke foldernya.",
     "sdkUnknown": "tidak diketahui",
     "install": {
       "prompt": "Ini menginstal engine Saropa Lints terbaru secara global (dart pub global activate saropa_lints) menggunakan SDK Dart yang lebih baru, lalu memindai proyek ini dengan engine tersebut. pubspec.yaml dan pin SDK proyek ini tidak berubah.",

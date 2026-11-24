@@ -2441,7 +2441,7 @@
       "actionDisable": "تعطيل تعطيّل",
       "actionEnable": "تمكين Enable تمكين",
       "bulkRuleToggleConfirm": "{verb} {count} قاعدة؟ هذا تحديث analysis_options_custom.yaml",
-      "setupPrompt": "اكتشف Saropa Lints مشروع Dart دون تكوين saropa_lints. قم بالإعداد الآن لأكثر من 2350+ من قواعد الوبر.",
+      "setupPrompt": "اكتشف Saropa Lints مشروع Dart بدون إعداد saropa_lints. قم بالإعداد الآن للحصول على أكثر من 2350 قاعدة lint.",
       "actionSetUpProject": "إعداد المشروع إنشاء مشروع.",
       "actionNotNow": "ليس الآن وليس الآن"
     },
@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "تشغيل تحليل التحليل.",
       "runAnalysisDescription": "إعادة تشغيل المدقق",
+      "latestEngineLabel": "مسح باستخدام المحرك الأحدث",
+      "latestEngineDescription": "هذا المشروع يحتوي على SDK Dart قديم جداً لا يمكن تحليله في الوقت الحقيقي",
       "updateConfigLabel": "تحديث التكوين",
       "updateConfigDescription": "-initialize أو refresh خيارات التحليل"
     },
@@ -3108,5 +3110,18 @@
       "applied": "تم الحفظ: تحليل مباشر محدود إلى حوالي {limit}. إعادة تشغيل خادم التحليل لتطبيقه.",
       "writeFailed": "لم يتم تحديث analysis_options_custom.yaml. تحقق من أن الملف قابل للكتابة."
     }
+  },
+  "externalEngine": {
+    "noProject": "افتح أولاً مجلد مشروع Dart.",
+    "sdkTooOld": "تحتاج المحرك الأحدث Saropa Lints إلى Dart {required} أو أحدث، ولكن المحرك Dart المستخدم هنا هو {found}. تثبيت إصدار أحدث من SDK Dart وتعيين \"saropaLints.externalEngine.dartSdkPath\" إلى مجلد هذا الإصدار.",
+    "sdkUnknown": "غير معروف",
+    "install": {
+      "prompt": "يقوم هذا بتثبيت المحرك الأحدث Saropa Lints عالميًا (dart pub global activate saropa_lints) باستخدام SDK أحدث Dart، ثم يفحص هذا المشروع به. لا يتم تغيير pubspec.yaml لهذا المشروع وピン SDK.",
+      "confirm": "تثبيت وفحص"
+    },
+    "progress": "Saropa Lints: تحليل باستخدام المحرك الأحدث...",
+    "installFailed": "لم يتم تثبيت المحرك Saropa Lints: {detail}",
+    "scanFailed": "المسح باستخدام أحدث محرك فشل: {detail}",
+    "done": "Saropa Lints: تم العثور على {count} مشكلة(ات) بواسطة آخر محرك (Dart {version})."
   }
 }

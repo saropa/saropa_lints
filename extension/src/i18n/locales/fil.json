@@ -3114,7 +3114,7 @@
   "externalEngine": {
     "noProject": "Ipagbaba muna ang folder ng proyekto Dart.",
     "sdkTooOld": "Ang pinakabagong Saropa Lints engine ay nangangailangan ng Dart {required} o mas bagyo, ngunit ang Dart na ginamit dito ay {found}. I-install ang mas bagyo na Dart SDK at itakda ang \"saropaLints.externalEngine.dartSdkPath\" sa kanyang folder.",
-    "sdkUnknown": "unknown",
+    "sdkUnknown": "hindi alam",
     "install": {
       "prompt": "Ito ay nag-install ng pinakabagong Saropa Lints engine sa global (dart pub global activate saropa_lints) gamit ang mas bagong Dart SDK, pagkatapos ay nagscan ng proyekto na ito gamit ang SDK na ito. Ang pubspec.yaml at SDK pin ng proyekto ay hindi binago.",
       "confirm": "I-install at i-scan"

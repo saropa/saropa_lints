@@ -3113,10 +3113,10 @@
   },
   "externalEngine": {
     "noProject": "פתח תחילה תיקיית פרויקט Dart.",
-    "sdkTooOld": "ה엔진 האחרון Saropa Lints דורש Dart {required} או עדכני, אך ה-Dart שנעשה בו שימוש הוא {found}. התקין את ה-Dart SDK העדכני וה설ך \"saropaLints.externalEngine.dartSdkPath\" לדרור שלו.",
+    "sdkTooOld": "מנוע Saropa Lints העדכני ביותר דורש Dart {required} ומעלה, אך גרסת ה-Dart שבשימוש כאן היא {found}. התקן Dart SDK חדש יותר והגדר את \"saropaLints.externalEngine.dartSdkPath\" לתיקייה שלו.",
     "sdkUnknown": "לא ידוע",
     "install": {
-      "prompt": "This installs the latest Saropa Lints engine globally (dart pub global activate saropa_lints) using a newer Dart SDK, then scans this project with it. This project's pubspec.yaml and SDK pin are not changed.",
+      "prompt": "פעולה זו מתקינה את מנוע Saropa Lints העדכני ביותר באופן גלובלי (dart pub global activate saropa_lints) באמצעות Dart SDK חדש יותר, ואז סורקת איתו את הפרויקט הזה. קובץ pubspec.yaml והצמדת ה-SDK של הפרויקט אינם משתנים.",
       "confirm": "התקן וסרוק"
     },
     "progress": "Saropa Lints: סנכרון עם מנוע עדכני…",

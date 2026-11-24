@@ -894,6 +894,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "zh": {
+        # Manual: setup notification prompt (mirrors locales/zh.json setupPrompt).
+        "Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2350+ lint rules.": "Saropa Lints 检测到未配置 saropa_lints 的 Dart 项目。立即设置，启用 2350 多条 lint 规则。",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -947,6 +949,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ar": {
+        # Manual: setup notification prompt (mirrors locales/ar.json setupPrompt).
+        "Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2350+ lint rules.": "اكتشف Saropa Lints مشروع Dart بدون إعداد saropa_lints. قم بالإعداد الآن للحصول على أكثر من 2350 قاعدة lint.",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1062,6 +1066,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "bn": {
+        # Manual: MT left the consent prompt in English.
+        "This installs the latest Saropa Lints engine globally (dart pub global activate saropa_lints) using a newer Dart SDK, then scans this project with it. This project's pubspec.yaml and SDK pin are not changed.": "এটি একটি নতুন Dart SDK ব্যবহার করে সবচেয়ে নতুন Saropa Lints ইঞ্জিন গ্লোবালি ইনস্টল করে (dart pub global activate saropa_lints), তারপর এটি দিয়ে এই প্রজেক্ট স্ক্যান করে। এই প্রজেক্টের pubspec.yaml এবং SDK পিন পরিবর্তন করা হয় না।",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1197,6 +1203,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "fil": {
+        # Manual: SDK-version fallback label; MT returned the English unchanged.
+        "unknown": "hindi alam",
         "{jobs} worker(s) · {memory} memory budget": "{jobs} worker · {memory} badyet sa memorya",
         # Manual: MT returned the English unchanged for this drift label.
         "Cross-project drift": "Drift sa iba't ibang proyekto",
@@ -1366,6 +1374,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Translation Engine (Ollama)": "Makina ng Pagsasalin (Ollama)",
     },
     "he": {
+        # Manual: MT left the consent prompt in English.
+        "This installs the latest Saropa Lints engine globally (dart pub global activate saropa_lints) using a newer Dart SDK, then scans this project with it. This project's pubspec.yaml and SDK pin are not changed.": "פעולה זו מתקינה את מנוע Saropa Lints העדכני ביותר באופן גלובלי (dart pub global activate saropa_lints) באמצעות Dart SDK חדש יותר, ואז סורקת איתו את הפרויקט הזה. קובץ pubspec.yaml והצמדת ה-SDK של הפרויקט אינם משתנים.",
+        # Manual: the MT output for this message was corrupted with stray Korean characters.
+        "The latest Saropa Lints engine needs Dart {required} or newer, but the Dart used here is {found}. Install a newer Dart SDK and set \"saropaLints.externalEngine.dartSdkPath\" to its folder.": "מנוע Saropa Lints העדכני ביותר דורש Dart {required} ומעלה, אך גרסת ה-Dart שבשימוש כאן היא {found}. התקן Dart SDK חדש יותר והגדר את \"saropaLints.externalEngine.dartSdkPath\" לתיקייה שלו.",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1421,6 +1433,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "id": {
+        # Manual: MT left this external-engine message in English.
+        "The latest Saropa Lints engine needs Dart {required} or newer, but the Dart used here is {found}. Install a newer Dart SDK and set \"saropaLints.externalEngine.dartSdkPath\" to its folder.": "Mesin Saropa Lints terbaru membutuhkan Dart {required} atau lebih baru, tetapi Dart yang digunakan di sini adalah {found}. Instal Dart SDK yang lebih baru dan atur \"saropaLints.externalEngine.dartSdkPath\" ke foldernya.",
         # Manual: "info" severity label; MT left the English short form unchanged, so use the full Indonesian word.
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
@@ -1535,6 +1549,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Manual: "Trend" is a Polish loanword; "RSS" stays as the technical abbreviation.
     },
     "sw": {
+        # Manual: these four strings had no curated entry; MT output was garbled or unrelated.
+        "Directory name shown in the diagnostic message as where an open document should be moved instead.": "Jina la saraka linaloonyeshwa kwenye ujumbe wa uchunguzi kama mahali ambapo hati iliyo wazi inapaswa kuhamishiwa badala yake.",
+        "Disable platforms this project does not target so platform-specific rules for them stay off.": "Zima majukwaa ambayo mradi huu hauyalengi ili kanuni mahususi za majukwaa hayo zibaki zimezimwa.",
+        "Size bar in KB. The workspace hazard scan flags any file above it that files.watcherExclude does not cover and offers to exclude it (default 5120 = 5 MB).": "Kikomo cha ukubwa kwa KB. Uchanganuzi wa hatari wa nafasi ya kazi huashiria faili yoyote iliyo juu yake ambayo files.watcherExclude haifunika na hutoa kuitenga (chaguomsingi 5120 = MB 5).",
+        "Suggest excluding folders that need no analysis (platform folders, build output, docs, worktrees) from dart.analysisExcludedFolders, and flag exclusions that exist only in analysis_options.yaml. Large analyzed file counts slow quick fixes and raise analysis-server memory.": "Pendekeza kutenga folda zisizohitaji uchanganuzi (folda za majukwaa, matokeo ya ujenzi, hati, worktrees) kutoka dart.analysisExcludedFolders, na uashirie vizuizi vilivyopo tu katika analysis_options.yaml. Idadi kubwa ya faili zinazochanganuzwa hupunguza kasi ya marekebisho ya haraka na huongeza kumbukumbu ya seva ya uchanganuzi.",
         "Balanced": "Sawazishwa",
         "Gentle": "Laini",
         "Could not update analysis_options_custom.yaml. Check that the file is writable.": "Imeshindwa kusasisha analysis_options_custom.yaml. Hakikisha faili linaweza kuandikwa.",
@@ -1724,6 +1743,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Scanned {ago}": "{ago} önce tarandı",
     },
     "uk": {
+        # Manual: setup notification prompt (mirrors locales/uk.json setupPrompt).
+        "Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2350+ lint rules.": "Saropa Lints виявив проєкт Dart без налаштованого saropa_lints. Налаштуйте зараз, щоб отримати понад 2350 правил lint.",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
