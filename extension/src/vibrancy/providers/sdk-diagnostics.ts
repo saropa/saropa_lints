@@ -11,6 +11,7 @@ import {
     parseEnvironmentConstraints, findEnvironmentRange,
 } from '../services/pubspec-parser';
 import { PACKAGE_VIBRANCY_DOC_URL } from '../sdk-vibrancy-table';
+import { isSuppressed } from '../../pubspec-validation';
 
 interface SemverParts {
     readonly major: number;
@@ -158,6 +159,12 @@ function buildConstraintDiagnostics(
 
     const range = findEnvironmentRange(content, key);
     if (!range) { return []; }
+
+    // Honor `# saropa_lints:ignore sdk-constraint` on the same or preceding
+    // line, so projects that deliberately pin an old SDK (e.g. for old
+    // Android API levels) can silence the warning. Reuses the parser from
+    // pubspec-validation so both diagnostic families share one syntax.
+    if (isSuppressed(content.split(/\r?\n/), range.line, CODE)) { return []; }
 
     const vscodeRange = new vscode.Range(
         range.line, range.startChar,

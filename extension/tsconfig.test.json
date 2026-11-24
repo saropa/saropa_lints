@@ -80,6 +80,8 @@
     "src/test/vibrancy/views/known-issues-html.test.ts",
     "src/test/vibrancy/providers/tree-items.test.ts",
     "src/test/vibrancy/providers/hover-provider.test.ts",
+    "src/test/vibrancy/providers/sdk-diagnostics.test.ts",
+    "src/test/vibrancy/providers/sdk-suppress-action.test.ts",
     "src/rulePacks/rulePackDefinitions.ts",
     "src/rulePacks/rulePackYaml.ts",
     "src/rulePacks/versionGroups.ts",

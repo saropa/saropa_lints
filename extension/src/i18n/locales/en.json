@@ -2858,6 +2858,11 @@
     "noServerFound": "No Drift Advisor server found. Start your app with the server running, then click Refresh.",
     "integrationOff": "Drift Advisor integration is off. Enable it in settings (saropaLints.driftAdvisor.integration), then click Refresh."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Suppress (intentional old SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Upgrade",

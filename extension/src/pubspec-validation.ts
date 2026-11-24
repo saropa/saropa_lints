@@ -198,15 +198,49 @@ export function parseSuppressedRules(commentLine: string): Set<string> {
 }
 
 /**
+ * True when the file carries `# saropa_lints:ignore-file` (silences every
+ * code) or `# saropa_lints:ignore-file a, b` (silences only the listed codes).
+ * Lets a project that deliberately pins old tooling opt out of a diagnostic
+ * family once instead of annotating each line.
+ */
+export function isFileSuppressed(
+    lines: readonly string[],
+    code: string,
+): boolean {
+    for (const line of lines) {
+        const m = line.match(/#\s*saropa_lints:ignore-file(?:\s+(.+))?\s*$/);
+        if (!m) { continue; }
+        // Bare directive = all codes; otherwise only the listed ones.
+        if (!m[1]) { return true; }
+        const codes = m[1].split(',').map(c => c.trim()).filter(Boolean);
+        if (codes.includes(code)) { return true; }
+    }
+    return false;
+}
+
+/**
+ * True when [line] ends in a `# saropa_lints:ignore` directive that is a pure
+ * comma-separated code list (so another code can be appended safely). Prose
+ * after the codes makes this false. Shared with the quick-fix so the editing
+ * grammar cannot drift from the parsing grammar above.
+ */
+export function endsWithIgnoreCodeList(line: string): boolean {
+    return /#\s*saropa_lints:ignore\s+[\w-]+(\s*,\s*[\w-]+)*\s*$/.test(line);
+}
+
+/**
  * Check whether a diagnostic on a given line is suppressed by an
  * inline `# saropa_lints:ignore <code>` comment — either on the
  * same line or on the line immediately above.
  */
-function isSuppressed(
+export function isSuppressed(
     lines: readonly string[],
     diagLine: number,
     code: string,
 ): boolean {
+    // File-wide directive wins before any per-line lookup.
+    if (isFileSuppressed(lines, code)) { return true; }
+
     // Check inline comment on the diagnostic's own line
     const sameLine = lines[diagLine] ?? '';
     if (parseSuppressedRules(sameLine).has(code)) { return true; }

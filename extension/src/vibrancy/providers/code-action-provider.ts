@@ -8,6 +8,8 @@ import * as vscode from 'vscode';
 import { VibrancyResult, AlternativeSuggestion } from '../types';
 import { findKnownIssue, isReplacementPackageName } from '../scoring/known-issues';
 import { findOverrideRange } from '../services/override-parser';
+import { l10n } from '../../i18n/runtime';
+import { endsWithIgnoreCodeList } from '../../pubspec-validation';
 
 /** Normalizes [vscode.Diagnostic.code] whether it is a string, number, or `{ value }` object. */
 function getDiagnosticCode(diag: vscode.Diagnostic): string | number | undefined {
@@ -114,7 +116,10 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
         diag: vscode.Diagnostic,
     ): vscode.CodeAction[] {
         const lineText = document.getText(document.lineAt(diag.range.start).range);
-        if (!lineText.includes('sdk:')) { return []; }
+        // Suppress applies to both the sdk: and flutter: lines.
+        const suppress = this._createSdkSuppressAction(document, diag);
+        // The ">=3.11.0" raise only makes sense for the Dart sdk: line.
+        if (!lineText.includes('sdk:')) { return [suppress]; }
         const current = document.getText(diag.range);
         const upperMatch = current.match(/<\s*(\d+\.\d+\.\d+)/);
         const upper = upperMatch ? ` <${upperMatch[1]}` : '';
@@ -133,7 +138,48 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
             if (preferred) { action.isPreferred = true; }
             actions.push(action);
         }
+        actions.push(suppress);
         return actions;
+    }
+
+    /**
+     * "Suppress (intentional old SDK)": appends `# saropa_lints:ignore sdk-constraint`
+     * to the constraint line, extending an existing directive if one is present
+     * (a second directive on the same line would not be parsed).
+     */
+    private _createSdkSuppressAction(
+        document: vscode.TextDocument,
+        diag: vscode.Diagnostic,
+    ): vscode.CodeAction {
+        const action = new vscode.CodeAction(
+            l10n('vibrancy.sdkConstraint.suppressOldSdk'),
+            vscode.CodeActionKind.QuickFix,
+        );
+        action.diagnostics = [diag];
+        action.edit = new vscode.WorkspaceEdit();
+        const line = document.lineAt(diag.range.start.line);
+        const text = line.text.trimEnd();
+        const end = new vscode.Position(line.lineNumber, text.length);
+        // Shared grammar with the parser: pure comma-separated code list only.
+        if (endsWithIgnoreCodeList(text)) {
+            // Existing directive that ends in a pure code list: extend it.
+            action.edit.insert(document.uri, end, ', sdk-constraint');
+        } else if (text.includes('saropa_lints:ignore')) {
+            // Directive followed by free text: appending would put the code
+            // after the prose where the parser reads it as part of a code
+            // name, so use a standalone comment on the line above instead.
+            const indent = text.match(/^\s*/)?.[0] ?? '';
+            action.edit.insert(
+                document.uri,
+                new vscode.Position(line.lineNumber, 0),
+                `${indent}# saropa_lints:ignore sdk-constraint\n`,
+            );
+        } else {
+            action.edit.insert(
+                document.uri, end, '  # saropa_lints:ignore sdk-constraint',
+            );
+        }
+        return action;
     }
 
     private _createRemoveOverrideAction(
