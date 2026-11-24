@@ -175,3 +175,16 @@ class Good415EqualsOnly {
 abstract class Good415Contract {
   Map<String, Object?> toJson();
 }
+
+// GOOD: prefixed generator annotation is still recognized
+@m.MappableClass()
+class Good415Prefixed {
+  final String name = 'x';
+  Map<String, Object?> toJson() => {'a': name, 'b': name};
+}
+
+// GOOD: trivial delegating toJson has no key mapping to generate
+class Good415Delegating {
+  final Good415Point inner = Bad415Point(1, 2);
+  Map<String, Object?> toJson() => inner as Map<String, Object?>;
+}

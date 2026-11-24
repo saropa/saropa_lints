@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -43,8 +44,10 @@ const Set<String> _generatorAnnotations = <String>{
 /// the boilerplate by hand even when the project mandates a generator.
 ///
 /// A class is reported when it declares at least one instance field AND has a
-/// concrete `toJson`, `fromJson` (constructor or static method) or `copyWith`,
-/// or both `operator ==` and `hashCode`. `toString` alone and `==` alone are
+/// concrete `copyWith`, or both `operator ==` and `hashCode`, or a concrete
+/// `toJson` / `fromJson` (constructor or static method) that uses at least two
+/// distinct string-literal keys. The key threshold keeps trivial delegating
+/// `toJson() => _inner.toJson()` wrappers out of the results. `toString` alone and `==` alone are
 /// NOT enough: they are common in non-data classes and would be noisy.
 ///
 /// Not reported: classes annotated `@MappableClass`, `@freezed`, `@Freezed`,
@@ -155,7 +158,8 @@ class PreferGeneratedDataClassesRule extends SaropaLintRule {
   /// toJson/fromJson/copyWith, or both `==` and `hashCode`.
   static bool _hasHandWrittenBoilerplate(ClassDeclaration node) {
     bool hasInstanceField = false;
-    bool hasSerializationOrCopy = false;
+    bool hasCopyWith = false;
+    final _StringKeyCollector keys = _StringKeyCollector();
     bool hasEquals = false;
     bool hasHashCode = false;
 
@@ -164,13 +168,14 @@ class PreferGeneratedDataClassesRule extends SaropaLintRule {
         hasInstanceField = true;
       } else if (member is ConstructorDeclaration) {
         // `Foo.fromJson(...)` and `factory Foo.fromJson(...)`.
-        if (member.name?.lexeme == 'fromJson') hasSerializationOrCopy = true;
+        if (member.name?.lexeme == 'fromJson') member.body.accept(keys);
       } else if (member is MethodDeclaration && !member.isAbstract) {
         final String name = member.name.lexeme;
-        if (name == 'toJson' || name == 'copyWith') {
-          hasSerializationOrCopy = true;
-        } else if (name == 'fromJson' && member.isStatic) {
-          hasSerializationOrCopy = true;
+        if (name == 'copyWith') {
+          hasCopyWith = true;
+        } else if (name == 'toJson' ||
+            (name == 'fromJson' && member.isStatic)) {
+          member.body.accept(keys);
         } else if (name == '==') {
           hasEquals = true;
         } else if (name == 'hashCode' && member.isGetter) {
@@ -180,6 +185,26 @@ class PreferGeneratedDataClassesRule extends SaropaLintRule {
     }
 
     return hasInstanceField &&
-        (hasSerializationOrCopy || (hasEquals && hasHashCode));
+        (hasCopyWith ||
+            (hasEquals && hasHashCode) ||
+            keys.distinctCount >= _minSerializationKeys);
+  }
+}
+
+/// Minimum distinct string keys in toJson/fromJson before the class counts as
+/// hand-written serialization (see class doc).
+const int _minSerializationKeys = 2;
+
+/// Collects distinct simple string literals under an AST subtree; used to
+/// measure how much key-based JSON mapping a method hand-writes.
+class _StringKeyCollector extends RecursiveAstVisitor<void> {
+  final Set<String> _keys = <String>{};
+
+  int get distinctCount => _keys.length;
+
+  @override
+  void visitSimpleStringLiteral(SimpleStringLiteral node) {
+    _keys.add(node.value);
+    super.visitSimpleStringLiteral(node);
   }
 }
