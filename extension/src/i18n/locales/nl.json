@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Analyse uitvoeren",
       "runAnalysisDescription": "Analyseer opnieuw",
+      "latestEngineLabel": "Scan met nieuwste engine",
+      "latestEngineDescription": "Deze project's Dart SDK is te oud voor live analyse",
       "updateConfigLabel": "Config bijwerken",
       "updateConfigDescription": "Initialiseer of vernieuw analyseopties"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Bewaard: live analyse is beperkt tot ongeveer {limit}. Start de analyse-server op om het toe te passen.",
       "writeFailed": "Kon analysis_options_custom.yaml niet bijwerken. Controleer of het bestand schrijfbaar is."
     }
+  },
+  "externalEngine": {
+    "noProject": "Open een Dart projectmap eerst.",
+    "sdkTooOld": "De nieuwste Saropa Lints engine vereist Dart {required} of nieuwer, maar het hier gebruikte Dart is {found}. Installeer een nieuwere Dart SDK en stel \"saropaLints.externalEngine.dartSdkPath\" in op de map van deze SDK.",
+    "sdkUnknown": "onbekend",
+    "install": {
+      "prompt": "Dit installeert de nieuwste Saropa Lints engine wereldwijd (dart pub global activate saropa_lints) met een nieuwere Dart SDK, en scant daarna dit project met deze. De pubspec.yaml en SDK pin van dit project blijven onveranderd.",
+      "confirm": "Installeer en scan"
+    },
+    "progress": "Saropa Lints: scannen met de nieuwste engine…",
+    "installFailed": "Kon de Saropa Lints engine niet installeren: {detail}",
+    "scanFailed": "De laatste engine-scan is mislukt: {detail}",
+    "done": "Saropa Lints: {count} fout(en) gevonden door de nieuwste engine (Dart {version})."
   }
 }

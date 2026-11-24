@@ -1311,6 +1311,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'prefer_function_over_static_method': 'architecture',
   'prefer_future_void_function_over_async_callback': 'core',
   'prefer_future_wait': 'core',
+  'prefer_generated_data_classes': 'codegen',
   'prefer_generic_exception': 'stylistic',
   'prefer_geocoding_cache': 'packages',
   'prefer_geolocation_coarse_location': 'packages',

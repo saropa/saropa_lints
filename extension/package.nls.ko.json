@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "시작 시 스캔할 디렉토리(프로젝트 루트에 상대적으로). Workspace Scan이 활성화될 때만 사용됩니다. 프로젝트 구조에 맞게 조정하세요 — 예를 들어, 테스트 파일이 중요하지 않다면 'test'를 제거하거나 'src'를 추가하세요.",
   "command.toggleLints.title": "Saropa Lints: 켜기 / 끄기",
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock로 플러그인 버전 동기화",
-  "command.showStatusBarMenu.title": "Saropa Lints: 상태 메뉴"
+  "command.showStatusBarMenu.title": "Saropa Lints: 상태 메뉴",
+  "command.scanWithLatestEngine.title": "Saropa Lints: 최신 엔진으로 스캔 (구형 Dart 프로젝트)",
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK 폴더( bin/dart 포함)는 \"최신 엔진으로 스캔\" 기능에서 사용됩니다. Dart 3.11 이상이어야 합니다. PATH에 있는 dart를 사용하려면 빈칸으로 두세요."
 }

@@ -2400,6 +2400,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Package-specific rules (package_specific_rules.dart),
   PreferTypedPrefsWrapperRule.new,
   PreferFreezedForDataClassesRule.new,
+  PreferGeneratedDataClassesRule.new,
   // Previously unregistered rules (restored),
   AlwaysRemoveGetxListenerRule.new,
   AvoidBlocEmitAfterCloseRule.new,

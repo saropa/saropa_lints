@@ -1,13 +1,13 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2350+ Dart/Flutter قواعد لائٹنگ مع ہم نظریہ تحلیل، پکیج وبرنسیٹی کے ساتھ پیکیج سلامتی اسکورنگ، خطرات کی تحلیل، اور اپ گریڈ کرنے کے منصوبہ بندی۔",
+  "extension.description": "2350+ Dart/Flutter قواعد لینٹ سے جوڑ کر ایک نظریہ اینالیزس، پکیج وبرنسی ڈپندنسی ہیلتھ سکورنگ، کمزوری چیکنگ، اور اپ گریڈ پلاننگ کے ساتھ۔",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "ڈیش بورڈز",
   "views.actions.name": "ايڪشنز",
   "views.status.name": "اسٽيٽس",
   "command.auditFolder.title": "Saropa: ایڈیٹ فولڈر...",
-  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2350+ Dart اور Flutter لائٹ رولز سیکورٹی، اکسیسیبلیٹی، اور پرفارمنس کے لیے۔\n\nDart یا Flutter پروجیکٹ کی ضرورت ہے۔\n\nایک فولڈر کھولیں جس میں `pubspec.yaml` موجود ہو۔\n\n[آن لائن سیکھیں](https://pub.dev/packages/saropa_lints)\n[سی ڈی ای کمانڈز دیکھیں](command:saropaLints.showCommandCatalog)\n[Saropa Lints بارے میں](command:saropaLints.showAbout)\n[شروع کریں](command:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2350+ Dart اور Flutter لائنز کے قواعد سیکورٹی، اکسیسیبلیٹی، اور پرفارمنس کے لیے۔\n\nDart یا Flutter پروجیکٹ کی ضرورت ہے۔\n\nایک فولڈر کھولیں جس میں `pubspec.yaml` موجود ہو۔\n\n[آن لائن سیکھیں](https://pub.dev/packages/saropa_lints)\n[سیم کمانڈز دیکھیں](command:saropaLints.showCommandCatalog)\n[Saropa Lints بارے مزید جانیں](command:saropaLints.showAbout)\n[شروع کریں](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: پروجيڪٽ سيٽ اپ ڪريو (pubspec + config)",
   "command.disable.title": "Saropa Lints: Lint انٽيگريشن بند ڪريو",
   "command.reenablePlugin.title": "Saropa Lints: انسائیڈ پروسس پلاگن کو دوبارہ سے سرکاری کریں",
@@ -201,7 +201,7 @@
   "config.property.issuesPageSize.description": "گروپ شدہ نتائج میں فی فائل دکھائی جانے والی خلاف ورزیوں کی زیادہ سے زیادہ تعداد (فائنڈنگ ڈیش بورڈ / اندرونی فہرست) ۔ باقی کے طور پر دکھایا جاتا ہے \"اور N مزید ...\".",
   "config.property.violationsGroupBy.description": "ٹنڈ نتائج کے لئے ڈیفالٹ گروپنگ (نتائج ڈیش بورڈ / گروہ بندی کی فہرست). \"اثر\" فہرستوں میں سب سے پہلے اہم اور اعلی درجے کی ہے۔ عارضی طور پر تبدیل کرنے کے لئے ڈیش بورڈ ٹول بار کا استعمال کریں۔",
   "config.property.checkForUpdates.description": "وقتا فوقتا saropa_lints پیکیج کے نئے ورژن کی جانچ کریں اور اپ گریڈ کرنے کی پیش کش کریں۔",
-  "config.property.pubspecValidation.preferPinnedVersions.markdownDescription": "جب **آن** ہو، pubspec تصدیق اکسACT version pins (1.2.3) کو ترجیح دیتی ہے اور caret ranges (^1.2.3) کو نشان دیتی ہے۔ جب **اُف** ہو (ڈیفالٹ)، تو اسے caret سینٹکس کو ترجیح دیتی ہے اور bare versions کو نشان دیتی ہے — dart pub add کی سلوک کے مطابق۔ ایک ہی مڈ کا نشان ہوتا ہے۔",
+  "config.property.pubspecValidation.preferPinnedVersions.markdownDescription": "جب **آن** ہو، pubspec تصدیق اکسACT version pins (1.2.3) کو ترجیح دیتی ہے اور caret ranges (^1.2.3) کو نشان دیتی ہے۔ جب **آف** ہو (پیش فریض)، اس کی ترجیح caret سینٹکس اور bare versions کو نشان دیتی ہے — dart pub add کی سلوک کے مطابق۔ ایک ہی مڈ کا نشان ہر وقت ہوتا ہے۔",
   "config.section.Severity.Filters.title": "گریویٹی فیلٹر",
   "config.property.severity.error.markdownDescription": "**error**-سطح تجزیہ کو مسائل پنل اور تلاش درخت میں دکھائیں۔ **off** کرکے دکھائی گئی تمام غلطیوں کو چھپا دیجیے Saropa Lints سے (Dart SDK تجزیہ کو متاثر نہیں کرتا)۔ `init --tier` دوبارہ چالن کے باوجود بھی برقرار رہتا ہے۔",
   "config.property.severity.warning.markdownDescription": "**تحذیر**-سطح تشخیصات کو مسائل پنل اور تلاش درخت میں دکھائیں۔ **اُتار** کر تمام تحذیرات Saropa Lints سے چھپائی جائیں۔",
@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "سٹارٹ اپ پر اسکین کرنے والی ڈائریکٹریز (پروجیکٹ روٹ سے متعلق)۔ صرف اس وقت استعمال کیا جاتا ہے جب ورک اسپیس اسکین فعال ہو۔ اپنے پروجیکٹ کے ڈھانچے سے ملنے کے لیے اسے ایڈجسٹ کریں — جیسے اگر ٹیسٹ فائلیں متعلقہ نہیں ہیں تو 'src' شامل کریں یا 'ٹیسٹ' کو ہٹا دیں۔",
   "command.toggleLints.title": "Saropa Lints: ٹرین ڈن / اف /نومٹھنک",
   "command.syncPluginVersion.title": "Saropa Lints: سینکس پلاگن ورژن کو pubspec.lock تک سинک کریں",
-  "command.showStatusBarMenu.title": "Saropa Lints: ایکسٹنشن کی حالت منو"
+  "command.showStatusBarMenu.title": "Saropa Lints: ایکسٹنشن کی حالت منو",
+  "command.scanWithLatestEngine.title": "Saropa Lints: آخری انجن سے اسکن کریں (قدیم Dart پروجیکٹس)",
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK فولڈر (bin/dart کو شامل کرتا ہے) \"Latest Engine سکن کریں\" کے ذریعے استعمال ہوتا ہے۔ Dart 3.11 یا نئی ترکیب کا استعمال کرنا ضروری ہے۔ PATH پر dart استعمال کرنے کے لیے خالی رکھیں۔"
 }

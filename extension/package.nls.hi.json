@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "शुरूआत पर स्कैन करने के लिए डायरेक्टरी (प्रोजेक्ट रूट के संबंध में)। केवल जब वर्कस्पेस स्कैन सक्षम हो। अपने प्रोजेक्ट संरचना के साथ मेल खाने के लिए इसे समायोजित करें — उदाहरण के लिए 'src' जोड़ें या 'test' हटाएं यदि टेस्ट फ़ाइलें महत्वपूर्ण नहीं हैं।",
   "command.toggleLints.title": "Saropa Lints: स्विच ऑन / ऑफ",
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock में सिंक प्लगइन संस्करण",
-  "command.showStatusBarMenu.title": "Saropa Lints: स्टेटस मेनू"
+  "command.showStatusBarMenu.title": "Saropa Lints: स्टेटस मेनू",
+  "command.scanWithLatestEngine.title": "Saropa Lints: सबसे नया इंजन स्कैन करें (पुराने Dart प्रोजेक्ट)",
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK फोल्डर (bin/dart को समावेश करता है) \"Scan with Latest Engine\" द्वारा उपयोग किया जाता है। Dart 3.11 या नई वर्जन के साथ उपलब्ध होना आवश्यक है। PATH पर dart का उपयोग करने के लिए खाली छोड़ दें।"
 }

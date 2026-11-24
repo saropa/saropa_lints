@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "Directorios para escanear al iniciar (relativos a la raíz del proyecto). Solo se utiliza cuando está habilitado el escaneo del espacio de trabajo. Ajuste este valor para que coincida con la estructura de su proyecto — p. ej. agregue 'src' o elimine 'test' si los archivos de prueba no son relevantes.",
   "command.toggleLints.title": "Saropa Lints: Encender / Apagar",
   "command.syncPluginVersion.title": "Saropa Lints: Sincronizar Versión del Plugin con pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: Menú de Estado"
+  "command.showStatusBarMenu.title": "Saropa Lints: Menú de Estado",
+  "command.scanWithLatestEngine.title": "Saropa Lints: Escaneo con Motor Más Reciente (Proyectos Dart Antiguos)",
+  "config.property.externalEngine.dartSdkPath.description": "Carpeta del SDK Dart (contiene bin/dart) usada por \"Scan with Latest Engine\". Debe ser Dart 3.11 o más reciente. Dejar en blanco para usar el dart en PATH."
 }

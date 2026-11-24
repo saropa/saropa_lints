@@ -1781,6 +1781,8 @@ const Set<String> recommendedOnlyRules = <String>{
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
 /// Includes stricter naming conventions for API parameters.
 const Set<String> professionalOnlyRules = <String>{
+  // Hand-written toJson/fromJson/copyWith/==+hashCode where a generator is a dependency
+  'prefer_generated_data_classes',
   // Call-site safety: flags 2+ consecutive positional args of confusable type
   'always_specify_parameter_names',
   'mutable_tearoff',

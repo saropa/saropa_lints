@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "Başlangıçta taranacak dizinler (proje köküne göre). Yalnızca Çalışma Alanı Taraması etkinleştirildiğinde kullanılır. Bunu proje yapınıza uyacak şekilde ayarlayın - ör. Test dosyaları alakalı değilse 'src' ekleyin veya 'test'i kaldırın.",
   "command.toggleLints.title": "Saropa Lints: Aç / Kapat",
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock ile Plugin Versiyonunu Synchronize Et",
-  "command.showStatusBarMenu.title": "Saropa Lints: Durum Menüsü"
+  "command.showStatusBarMenu.title": "Saropa Lints: Durum Menüsü",
+  "command.scanWithLatestEngine.title": "Saropa Lints: En Yeni Motorla Tarayın (Eski Dart Projeleri)",
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK klasörü (\"Scan with Latest Engine\" tarafından kullanılır) (bin/dart içerir). Dart 3.11 veya daha yeni olmalıdır. Yol boş bırakılarak PATH'teki dart kullanılır."
 }

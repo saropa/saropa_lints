@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "Katalogi do skanowania przy starcie (względem korzenia projektu). Używane tylko wtedy, gdy włączona jest opcja Skanuj Przestrzeń Pracy. Zmieniaj to, aby pasowało do struktury Twojego projektu — np. dodaj „src” lub usuń „test”, jeśli pliki testowe nie są istotne.",
   "command.toggleLints.title": "Saropa Lints: Włącz / Wyłącz",
   "command.syncPluginVersion.title": "Saropa Lints: Synchronizacja Wersji Pluginu z pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: Menu Statusu"
+  "command.showStatusBarMenu.title": "Saropa Lints: Menu Statusu",
+  "command.scanWithLatestEngine.title": "Saropa Lints: Skanuj z najnowszym silnikiem (starsze projekty Dart)",
+  "config.property.externalEngine.dartSdkPath.description": "Katalog Dart SDK (zawiera bin/dart) używany przez \"Scan with Latest Engine\". Musi być Dart 3.11 lub nowszy. Opuszczenie pola pustego spowoduje użycie dart z PATH."
 }

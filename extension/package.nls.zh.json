@@ -325,7 +325,7 @@
   "walkthrough.step.walkthrough.healthScore.title": "卫生分数的健康评分",
   "walkthrough.step.walkthrough.healthScore.description": "您的项目质量一目了然：状态栏和概览视图中的 **0–100 分数**。\n\n绿色（80+）、黄色（50–79）、红色（<50）。错误会严重扣分。\n\n[运行分析](command:saropaLints.runAnalysis) · [设置项目](command:saropaLints.enable)",
   "walkthrough.step.walkthrough.issues.title": "违规行为和内联注释",
-  "walkthrough.step.walkthrough.issues.description": "**查找面板**编辑标签页中的查找结果，按严重程度和文件分组。**错误镜头风格**的注释会在每行末尾显示警告。按文本、严重程度、影响或规则进行筛选。右键以静音警告。",
+  "walkthrough.step.walkthrough.issues.description": "**查找面板**编辑标签页中的发现，按严重程度和文件分组。**错误镜头风格**的注释会在每行末尾显示警告。按文本、严重程度、影响或规则进行筛选。右键以静音警告。",
   "walkthrough.step.walkthrough.security.title": "安全姿势安全姿态",
   "walkthrough.step.walkthrough.security.description": "**OWASP 顶级 10** 覆盖矩阵 — 移动端和网页。每个类别显示违规和规则数量。点击以筛选违规。\n\n为审计导出合规性报告。\n\n[导出 OWASP 报告](command:saropaLints.exportOwaspReport)",
   "walkthrough.step.walkthrough.triage.title": "分诊",
@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "启动时扫描的目录（相对于项目根目录）。仅在启用工作区扫描时使用。调整它以匹配您的项目结构 - 例如如果测试文件不相关，则添加“src”或删除“test”。",
   "command.toggleLints.title": "Saropa Lints: 开启 / 关闭",
   "command.syncPluginVersion.title": "Saropa Lints：同步插件版本到 pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: 状态菜单"
+  "command.showStatusBarMenu.title": "Saropa Lints: 状态菜单",
+  "command.scanWithLatestEngine.title": "Saropa Lints：使用最新引擎扫描（旧版 Dart 项目）",
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK文件夹（包含bin/dart）用于“使用最新引擎扫描”。必须为Dart 3.11或更新版本。留空则使用PATH中的dart。"
 }

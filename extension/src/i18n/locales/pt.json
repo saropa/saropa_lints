@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Execute a análise de execução.",
       "runAnalysisDescription": "Reexecutar analisador",
+      "latestEngineLabel": "Varredura com o último motor",
+      "latestEngineDescription": "Esse projeto usa uma versão muito antiga do SDK Dart para análise em tempo real",
       "updateConfigLabel": "Atualizar config",
       "updateConfigDescription": "Inicializar ou atualizar opções de análise"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Salvo: análise em tempo real é limitada a cerca de {limit}. Reinicie o servidor de análise para aplicá-la.",
       "writeFailed": "Não foi possível atualizar analysis_options_custom.yaml. Verifique se o arquivo é gravável."
     }
+  },
+  "externalEngine": {
+    "noProject": "Abra primeiro a pasta do projeto Dart.",
+    "sdkTooOld": "As últimas versões do motor Saropa Lints exigem Dart {required} ou mais recentes, mas o Dart usado aqui é {found}. Instale um SDK Dart mais recente e defina \"saropaLints.externalEngine.dartSdkPath\" para sua pasta.",
+    "sdkUnknown": "desconhecido",
+    "install": {
+      "prompt": "Isso instala a versão mais recente do engine Saropa Lints globalmente (dart pub global activate saropa_lints) usando um novo SDK Dart, em seguida, escaneia esse projeto com ele. Os pubspec.yaml e a versão fixa do SDK desse projeto não são alterados.",
+      "confirm": "Instale e escaneie"
+    },
+    "progress": "Saropa Lints: escaneando com o último motor…",
+    "installFailed": "Não foi possível instalar o engine Saropa Lints: {detail}",
+    "scanFailed": "A verificação do último motor falhou: {detail}",
+    "done": "Saropa Lints: {count} problema(s) encontrado(s) pelo último motor (Dart {version})."
   }
 }

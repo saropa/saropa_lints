@@ -258,7 +258,7 @@
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX e librerie di stato e iniezione delle dipendenze correlate.",
       "networking-apis": "Clienti HTTP, GraphQL, Firebase, Supabase e connettività.",
-      "storage-persistence": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Database locali e store chiave-valore — Drift, Hive, Isar, sqflite, shared_preferences.",
+      "storage-persistence": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotto.",
       "navigation-deep-links": "Regole rigorose:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo di una frase.\n\nTesto: Routing e gestione dei deep-link — auto_route, go_router, app_links, url_launcher e webview.",
       "media-graphics": "Immagini, SVG, animazione, audio, mappe, pickers e il motore Flame.",
       "device-platform": "Sensori, posizione, autorizzazioni, biometria, notifiche e lavoro in background.",
@@ -2185,7 +2185,7 @@
         "ci": "Legge e scrive .github/workflows/saropa-lints.yml nel tuo albero di lavoro per abilitare o disabilitare il workflow bundled GitHub Actions. Questo riflette il file sulla tua ramo corrente — la copia del ramo di default è ciò che effettivamente gate le richieste di pull, e i due possono divergere. L'abilitazione/non abilitazione non esegue mai né elimina il workflow; tu stesso ancora revisioni e commit il cambiamento."
       },
       "recommended": {
-        "analyzerPlugin": "Regole Rigide:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzione, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare la corretta sistema di scrittura per la lingua di destinazione; non passare a un'altra lingua a metà frase.\n\nTesto: Consigliato: OFF mentre il Server LSP è acceso. Accendi (con LSP disattivato) se una regola smette di attivarsi con LSP.",
+        "analyzerPlugin": "Regole Rigide:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzione, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare la corretta sistema di scrittura per la lingua di destinazione; non passare a un'altra lingua durante la frase.\n\nTesto: Consigliato: OFF mentre il Server LSP è acceso. Accendi (con LSP disattivato) se una regola smette di attivarsi con LSP.",
         "scanDaemon": "Raccomandato: ACCESO.",
         "lspServer": "Raccomandato: ON (predefinito, beta). Copre la diagnostica in tempo reale.",
         "ci": "Consigliato: ACCESO solo se desideri che le richieste di pull siano soggette a verifica."
@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Eseguire l'analisi esegui l' analisi.",
       "runAnalysisDescription": "Riavvia l'analizzatore",
+      "latestEngineLabel": "Scansiona con l'ultimo motore",
+      "latestEngineDescription": "Questo progetto utilizza una versione troppo vecchia dell'SDK Dart per l'analisi in tempo reale",
       "updateConfigLabel": "Aggiorna configurazione",
       "updateConfigDescription": "Inizializza o rinnova le opzioni di analisi"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Salvato: l'analisi in tempo reale è limitata a circa {limit}. Riavvia il server di analisi per applicarla.",
       "writeFailed": "Non è stato possibile aggiornare analysis_options_custom.yaml. Verifica che il file sia scrivibile."
     }
+  },
+  "externalEngine": {
+    "noProject": "Apri prima una cartella del progetto Dart.",
+    "sdkTooOld": "Le ultime engine Saropa Lints richiedono Dart {required} o versioni successive, ma qui viene utilizzato un Dart obsoleto, {found}. Installa un nuovo SDK Dart e imposta \"saropaLints.externalEngine.dartSdkPath\" nella sua cartella.",
+    "sdkUnknown": "sconosciuto",
+    "install": {
+      "prompt": "Questo installa l'ultimo engine Saropa Lints a livello globale (dart pub global activate saropa_lints) utilizzando un nuovo SDK Dart, quindi scansiona questo progetto con esso. I pin pubspec.yaml del progetto e dello SDK non vengono modificati.",
+      "confirm": "Installa e scansiona"
+    },
+    "progress": "Saropa Lints: scansione con l'ultimo motore...",
+    "installFailed": "Non è possibile installare l'engine Saropa Lints: {detail}",
+    "scanFailed": "Lo scan del latest-engine è fallito: {detail}",
+    "done": "Saropa Lints: {count} problema(i) trovato(i) dall'ultimo motore (Dart {version})."
   }
 }

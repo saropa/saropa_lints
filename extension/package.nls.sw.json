@@ -325,16 +325,16 @@
   "walkthrough.step.walkthrough.healthScore.title": "Health Score (Kiwango cha Afya)",
   "walkthrough.step.walkthrough.healthScore.description": "Ubora wa mradi wako kwa muhtasari: alama **0–100** katika upau wa hali na mwonekano wa Muhtasari.\n\nKijani (80+), njano (50–79), nyekundu (<50). Makosa huadhibu sana.\n\n[Endesha uchambuzi](command:saropaLints.runAnalysis) · [Sanidi mradi](command:saropaLints.enable)",
   "walkthrough.step.walkthrough.issues.title": "Ukiukaji & Inline Annotations",
-  "walkthrough.step.walkthrough.issues.description": "Matokeo katika kipengele ya **Dashboard ya Matokeo** ya editor, iko kwa kibaki na faili. **Matokeo ya kipengele ya Error Lens-style** yana kushirikisha matokeo kwenye wakati wa kila mline.\n\nFiltrate kwa kisanduku, kibaki, kifedha, au kipango. Kikumbukumbu kushirikisha kushinda kifedha.",
+  "walkthrough.step.walkthrough.issues.description": "Matokeo katika kipengele ya **Dashboard ya Matokeo** ya editor, iko kwa kibaki na faili. **Matokeo ya kipengele ya Error Lens** kushughulisha matokeo kwenye wakati wa kila mline.\n\nKufiliza kwa maelezo, kibaki, kipasio, au kipengele. Kuchapisha kwa kuzingatia matokeo.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
   "walkthrough.step.walkthrough.security.title": "Msimamo wa Usalama Posture Security",
   "walkthrough.step.walkthrough.security.description": "**OWASP Top 10** matrix ya kudhibiti - Mobile na Web. Kila kategoria ina onyesha idadi ya vifungu na idadi ya kutoa. Click kufiltra Vifungu.\n\nEksport raporti ya kudhibiti kwa audits.\n\n[Export OWASP Report](command:saropaLints.exportOwaspReport)",
   "walkthrough.step.walkthrough.triage.title": "Uainishaji",
   "walkthrough.step.walkthrough.triage.description": "Sifa zinazozungumzwa kwa uwezo — makosa, kipindi ya kipindi, na mazungumzaji. Kila kipengele ina **moto ya kipengele** ya kipengele.\n\nKutumia **Manage Rule Packs** kutaktwa au kutumika kwa kipengele na kipengele ya kipengele; mabadiliko yana kushiriki kwa YAML na kushiriki kwa analisisi.\n\n[Open Manage Rule Packs](command:saropaLints.openConfigDashboard)",
   "walkthrough.step.walkthrough.trends.title": "Hatari ya Faili na Mwelekeo wa Mtazamo",
-  "walkthrough.step.walkthrough.trends.description": "**File Risk** inakarisha faili kwa kuzunguka kwa kipindi - kipindi kikubwa kwa kipindi kikubwa kwa kipindi kikubwa.",
+  "walkthrough.step.walkthrough.trends.description": "**File Risk** inakarisha faili kwa kuzunguka kwa kipindi ya kipindi — kipindi ya kipindi kwa kipindi.",
   "walkthrough.step.walkthrough.packageVibrancy.title": "Kifurushi cha Afya ya Package Health",
   "walkthrough.step.walkthrough.packageVibrancy.description": "Tafuta mpira ya kujifunza kwa kuzunguka kwa kipindi, kujifunza kwa kipindi, na kipindi ya kipindi. Ona **CycloneDX SBOM** kwa kujifunza kwa kipindi ya kipindi.\n\nNafasi ya matokeo inaonekana kama CodeLens badges na kwenye kipindi ya **Package Dashboard** ya kipindi.\n\n[Scan Package Vibrancy](command:saropaLints.packageVibrancy.scan)",
-  "walkthrough.step.walkthrough.todosAndHacks.description": "Tazama kila `TODO`, `HACK`, na `FIXME` comment kwenye workspace. Jumle kwa kundi ya tag au folder, na klikua kujua jumla ya wakati.",
+  "walkthrough.step.walkthrough.todosAndHacks.description": "Tazama kila `TODO`, `HACK`, na `FIXME` comment kote katika workspace. Jumle kwa kifungu au folder, na klikua kujua jumla ya mizigo.",
   "walkthrough.step.walkthrough.crossFile.title": "Cross-File Analysis Uchambuzi wa faili.",
   "walkthrough.step.walkthrough.crossFile.description": "Tekeleza ukaguzi wa mradi mzima ambao uchanganuzi wa faili moja hauwezi kufanya: faili ambazo hazijatumika, utegemezi wa mduara, takwimu za kuagiza, vitegemezi vya vipengele, uagizaji uliokufa, alama ambazo hazijatumika, vitufe vya l10n ambavyo havijatumika, vizuizi rudufu, muhtasari wa JSON, usafirishaji wa grafu na ripoti ya HTML.\n\n[Tafuta Faili Zisizotumika](command:saropaLints.crossFile.unusedFiles) · [Tengeneza Ripoti ya HTML Mtambuka](command:saropaLints.crossFile.report)",
   "walkthrough.step.walkthrough.commandCatalog.title": "Browse All Commands Tafuta amri zote",
@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "Makutano ya kusimama kwenye muda wa kuanza (kulingana na mbingu wa project). Iliyotumika kwa kipato kwenye Workspace Scan. Tafuta kujaribu kujua mbingu wako — tafsiri kujadili 'src' au kushinda 'test' kama faili ya test hufaniki.",
   "command.toggleLints.title": "Saropa Lints: Tumia / Ondoa",
   "command.syncPluginVersion.title": "Saropa Lints: Tafuta Versi ya Plugin kwa pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: Menu ya Uhusiano"
+  "command.showStatusBarMenu.title": "Saropa Lints: Menu ya Uhusiano",
+  "command.scanWithLatestEngine.title": "Saropa Lints: Tafuta na Engine Mpya (Projekto ya Dart ya Mwaka Mwa Kili)",
+  "config.property.externalEngine.dartSdkPath.description": "Jumla ya Dart SDK (inakaribisha bin/dart) inayozalishwa na \"Scan na Engine Mwaka Mwa Kati\". Must be Dart 3.11 au mwingi. Pungua kuu kwa kuzalishwa dart katika PATH."
 }

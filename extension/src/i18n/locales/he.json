@@ -2208,7 +2208,7 @@
       "masterToggleOn": "מצב מנהל: הפעלה...",
       "masterToggleOff": "מצב מנהל: כיבוי...",
       "killAll": "הכבה הכל: עצמה כל מנועים שוטפים.",
-      "restartAll": "إعادة تشغيل كل: تم إعادة تشغيل جميع المحركات القابلة للتحكم.",
+      "restartAll": "إعادة تشغيل جميع: تم إعادة تشغيل جميع المحركات القابلة للتحكم.",
       "lspToggleOn": "שרת LSP: הפעלה...",
       "lspToggleOff": "שרת LSP: אכיפה...",
       "lspStarted": "שרת LSP: התחיל.",
@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "רץ ניתוח ריצה",
       "runAnalysisDescription": "הפעלה מחדש של המפענח",
+      "latestEngineLabel": "סרוק עם מנוע עדכני ביותר",
+      "latestEngineDescription": "הפרויקט הזה משתמש בSDK Dart שמאוד ישן לניתוח בזמן אמת",
       "updateConfigLabel": "עדכון קובץ Yapılandırma",
       "updateConfigDescription": "הפעלה או עדכון אפשרויות ניתוח"
     },
@@ -3108,5 +3110,18 @@
       "applied": "נשמר: ניתוח לוחץ הוא מוגבל לבערך {limit}. עצור את שרת האנליזה כדי להפעיל אותו.",
       "writeFailed": "לא ניתן לעדכן את analysis_options_custom.yaml. בדוק שהקובץ ניתן לכתיבה."
     }
+  },
+  "externalEngine": {
+    "noProject": "פתח תחילה תיקיית פרויקט Dart.",
+    "sdkTooOld": "ה엔진 האחרון Saropa Lints דורש Dart {required} או עדכני, אך ה-Dart שנעשה בו שימוש הוא {found}. התקין את ה-Dart SDK העדכני וה설ך \"saropaLints.externalEngine.dartSdkPath\" לדרור שלו.",
+    "sdkUnknown": "לא ידוע",
+    "install": {
+      "prompt": "This installs the latest Saropa Lints engine globally (dart pub global activate saropa_lints) using a newer Dart SDK, then scans this project with it. This project's pubspec.yaml and SDK pin are not changed.",
+      "confirm": "התקן וסרוק"
+    },
+    "progress": "Saropa Lints: סנכרון עם מנוע עדכני…",
+    "installFailed": "לא ניתן להתקין את מנוע Saropa Lints: {detail}",
+    "scanFailed": "הסריקה של הגרסה האחרונה נכשלה: {detail}",
+    "done": "Saropa Lints: {count} תקלה(ות) נמצאו על ידי המנוע האחרון (Dart {version})."
   }
 }

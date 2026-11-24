@@ -201,7 +201,7 @@
   "config.property.issuesPageSize.description": "حداکثر تعداد تخلفات نشان داده شده در هر پرونده در یافته های گروه بندی (Findings Dashboard / لیست داخلی). باقی مانده به عنوان \"و N بیشتر ...\" نشان داده شده است.",
   "config.property.violationsGroupBy.description": "گروه بندی پیش فرض برای یافته های لنت (Findings Dashboard / لیست گروهی). \"تاثیر\" لیست های مهم و بالا را در ابتدا قرار می دهد؛ برای تغییر موقت از نوار ابزار داشبورد استفاده کنید.",
   "config.property.checkForUpdates.description": "به طور دوره ای نسخه های جدیدتر بسته saropa_lints را بررسی کنید و پیشنهاد ارتقاء دهید.",
-  "config.property.pubspecValidation.preferPinnedVersions.markdownDescription": "وقتی **on** است، اعتبارسنجی pubspec از نسخه‌های دقیق (1.2.3) ترجیح می‌دهد و علامت‌های caret ( ^1.2.3) را نمی‌پذیرد. وقتی **off** (پیش‌فرض) است، از سینتکس caret و علامت‌های نسخه‌های خالی ترجیح می‌دهد - این رفتار با عملکرد دستور dart pub add یکسان است. فقط یک حالت در هر زمان فعال است.",
+  "config.property.pubspecValidation.preferPinnedVersions.markdownDescription": "وقتی **فعال** است، اعتبارسنجی pubspec از نسخه‌های دقیق (1.2.3) ترجیح می‌دهد و نمادهای کارتن را ( ^1.2.3 ) نمی‌پذیرد. وقتی **غیر فعال** است (پیش‌فرض)، از نماد کارتن و نسخه‌های خالی ترجیح می‌دهد - که با رفتار دستور dart pub add هم‌اکنگی دارد. فقط یک حالت در هر زمان فعال است.",
   "config.section.Severity.Filters.title": "فیلترهای جدیت",
   "config.property.severity.error.markdownDescription": "در بخش مشکلات و درخت یافته‌ها، نمایش **خطا** در سطح تشخیصات ارور را نمایش دهید و **خاموش** کنید تا همه اخطارها از Saropa Lints مخفی شوند (بر روی Dart SDK analyzer تأثیر نمی‌گذارد). در برابر مجدد اجرا `init --tier` مقاوم است.",
   "config.property.severity.warning.markdownDescription": "هشدارهای **warning** را در پنل مشکلات و درخت یافته‌ها نمایش دهید. **off** را فعال کنید تا همه هشدارها از Saropa Lints مخفی شوند.",
@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "دایرکتوری‌هایی که در زمان راه‌اندازی اسکن می‌شوند (نسبت به ریشه پروژه). فقط در صورت فعال بودن اسکن فضای کاری استفاده می‌شود. این تنظیم را تنظیم کنید تا با ساختار پروژه شما هم خوانا باشد — مثال: اگر فایل‌های تست مرتبط نیستند، 'test' را اضافه یا حذف کنید.",
   "command.toggleLints.title": "Saropa Lints: روشن / خاموش",
   "command.syncPluginVersion.title": "Saropa Lints: نسخه افزونه هم ارزی را به pubspec.lock تنظیم کنید",
-  "command.showStatusBarMenu.title": "Saropa Lints: منو وضعیت"
+  "command.showStatusBarMenu.title": "Saropa Lints: منو وضعیت",
+  "command.scanWithLatestEngine.title": "Saropa Lints: اسکن با انجن آخرین (پروژه های قدیمی Dart)",
+  "config.property.externalEngine.dartSdkPath.description": "پوشه Dart SDK (که bin/dart را شامل می‌کند) که توسط \"Scan with Latest Engine\" استفاده می‌شود. باید Dart 3.11 یا جدیدتر باشد. اگر خالی باشد، dart موجود در PATH استفاده می‌شود."
 }

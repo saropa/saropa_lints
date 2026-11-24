@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "תיקיות לסריקה בעת הפעלה (לפי יחס ל根本 הפרויקט). משמשות רק כאשר פעולת סריקה של סביבת העבודה מופעלת. ערוך את זה כדי להתאים למבנה הפרויקט שלך — לדוגמה, הוסף 'src' או הסר 'test' אם קבציทดสอบ אינם רלוונטיים.",
   "command.toggleLints.title": "Saropa Lints: פנה פעלה / כבוי",
   "command.syncPluginVersion.title": "Saropa Lints: סינכון גרסה של.Plugin ל-pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: תפריט סטטוס"
+  "command.showStatusBarMenu.title": "Saropa Lints: תפריט סטטוס",
+  "command.scanWithLatestEngine.title": "Saropa Lints: ס캔 עם מנוע עדכני (פרוייקטים ישנים Dart)",
+  "config.property.externalEngine.dartSdkPath.description": "תיקיית SDK Dart (מכילה bin/dart) המשמשת \"סריקה עם מנוע עדכני\". חייב להיות Dart 3.11 או עדכני יותר. השאירו ריק כדי להשתמש בdart ב-PATH."
 }

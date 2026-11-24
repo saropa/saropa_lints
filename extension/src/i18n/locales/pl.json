@@ -259,7 +259,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX i powiązane biblioteki stanu i wstrzykiwania zależności.",
       "networking-apis": "Klienci HTTP, GraphQL, Firebase, Supabase i łączność.",
       "storage-persistence": "Bazy danych lokalne i magazyny klucz-wartość — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Zasady ścisłe:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zamiennikowe: tokeny zamiennikowe. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumacza, usuwaj ani zmienia format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Routing i obsługa głębokiego linkowania — auto_route, go_router, app_links, url_launcher, oraz webview.",
+      "navigation-deep-links": "Zasady ścisłe:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia IDEWOWO tak, jak został napisany, w poprawnej gramatycznej pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Routing i obsługa głębokiego linkowania — auto_route, go_router, app_links, url_launcher, i webview.",
       "media-graphics": "Obrazy, SVG, animacje, dźwięk, mapy, zbieracze i silnik Flame.",
       "device-platform": "Czujniki, lokalizacja, uprawnienia, dane biometryczne, powiadomienia i prace w tle.",
       "identity-sharing": "Dostawcy usług logowania, udostępnianie i przegląd aplikacji.",
@@ -878,7 +878,7 @@
       "flutterDaemon": "Flutter Daemony",
       "saropa": "Saropa Lints",
       "otherDart": "Inne procesy Dart",
-      "modelHost": "Silne Reguły:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown lub cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE TAK, jak napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Silnik Tłumaczenia (Ollama)"
+      "modelHost": "Silnik Tłumaczenia (Ollama)"
     },
     "recommendation": {
       "heapCapTooHigh": "Serwer analizy ma ograniczenie pojemności stosu ({capMb} MB), co pozostawia mniej niż połowa RAM tego komputera dla wszystkiego innego. Zalecane ograniczenie: {recommendedMb} MB.",
@@ -1959,7 +1959,7 @@
       "progress": "{percent}% — {done}/{total} pliki"
     },
     "reports": {
-      "intro": "Zaawansowane reguły:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia IDEWOWO jak napisany, w poprawnej gramatycznie pozycji. Nigdy nie tłumacza, usuwaj ani zmienia format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Raport CLI w jednym kliknięciu, który wcześniej wymagał terminala. Każdy przycisk „Uruchom” przesyła w czasie rzeczywistym wyjście narzędzia poniżej jego karty i zapisuje kopię pod folderem reports/.saropa_lints/reports-tab/",
+      "intro": "Zasady ścisłe:\n1. Zwróć TŁYMOŚĆ przetłumaczonych ciągów.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie przekładasz, usuwasz ani zmieniasz format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie zmieniaj się do innego języka w środku zdania.\n\nTekst: Raport CLI w jednym kliknięciu, który wcześniej wymagał terminala. Każdy przycisk „Uruchom” przesyła w czasie rzeczywistym wyjście narzędzia poniżej jego karty i zapisuje kopię pod folderem reports/.saropa_lints/reports-tab/",
       "runButton": "Uruchom",
       "notRunYet": "Nie uruchomiono jeszcze",
       "running": "Uruchamianie…",
@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Przeprowadź analizę, przeprowadzić analizę.",
       "runAnalysisDescription": "Przeanalizuj ponownie analizator",
+      "latestEngineLabel": "Skanuj z najnowszym silnikiem",
+      "latestEngineDescription": "Ten projekt ma zbyt stary Dart SDK do analizy w czasie rzeczywistym",
       "updateConfigLabel": "Aktualizuj konfigurację",
       "updateConfigDescription": "Inicjalizuj lub odśwież opcje analizy"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Zapisano: analiza w czasie rzeczywistym ograniczona jest do około {limit}. Uruchom ponownie serwer analizy, aby ją zastosować.",
       "writeFailed": "Nie można zaktualizować analysis_options_custom.yaml. Sprawdź, czy plik jest zapisywalny."
     }
+  },
+  "externalEngine": {
+    "noProject": "Otwórz najpierw folder projektu Dart.",
+    "sdkTooOld": "Ostatnia wersja silnika Saropa Lints wymaga Dart {required} lub nowszej, ale użyty tu Dart to {found}. Zainstaluj nowszy zestaw SDK Dart i ustaw \"saropaLints.externalEngine.dartSdkPath\" na jego folder.",
+    "sdkUnknown": "nieznany",
+    "install": {
+      "prompt": "To zainstaluje najnowszy Saropa Lints engine globalnie (dart pub global activate saropa_lints) przy użyciu nowszego Dart SDK, a następnie skanuje ten projekt za pomocą niego. Zainstalowane w tym projekcie pubspec.yaml i pin SDK nie zostaną zmienione.",
+      "confirm": "Zainstaluj i skanuj"
+    },
+    "progress": "Saropa Lints: skanowanie z użyciem najnowszego silnika…",
+    "installFailed": "Nie można zainstalować silnika Saropa Lints: {detail}",
+    "scanFailed": "Ostatni skan latest-engine nie powiódł się: {detail}",
+    "done": "Saropa Lints: znaleziono {count} problem(y) przy użyciu najnowszego silnika (Dart {version})."
   }
 }

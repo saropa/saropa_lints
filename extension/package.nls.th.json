@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "ไดเร็กทอรีที่จะสแกนเมื่อเริ่มต้นระบบ (สัมพันธ์กับรูทโปรเจ็กต์) ใช้เมื่อเปิดใช้งานการสแกนพื้นที่ทำงานเท่านั้น ปรับเปลี่ยนให้ตรงกับโครงสร้างโครงการของคุณ — เช่น เพิ่ม 'src' หรือลบ 'test' หากไฟล์ทดสอบไม่เกี่ยวข้อง",
   "command.toggleLints.title": "Saropa Lints: เปิด / ปิด",
   "command.syncPluginVersion.title": "Saropa Lints: ซิงค์แพลตฟอร์มเวอร์ชันไปยัง pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: เมนูสถานะ"
+  "command.showStatusBarMenu.title": "Saropa Lints: เมนูสถานะ",
+  "command.scanWithLatestEngine.title": "Saropa Lints: ตรวจสอบด้วยเครื่องมือล่าสุด (โครงการ Dart เก่า)",
+  "config.property.externalEngine.dartSdkPath.description": "โฟลเดอร์ Dart SDK (ประกอบด้วย bin/dart) ที่ใช้โดย \"Scan with Latest Engine\" ต้องเป็น Dart 3.11 หรือใหม่กว่า ถ้าเว้นว่างจะใช้ dart ที่อยู่ใน PATH"
 }

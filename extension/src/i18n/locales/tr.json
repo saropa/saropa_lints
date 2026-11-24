@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Analiz çalıştırın.",
       "runAnalysisDescription": "Analizciyi yeniden çalıştır",
+      "latestEngineLabel": "En son motorla tara",
+      "latestEngineDescription": "Bu proje'nin Dart SDK'sı canlı analiz için çok eski",
       "updateConfigLabel": "Yükleme config",
       "updateConfigDescription": "Analiz seçeneklerini başlat veya yenile"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Kaydedildi: canlı analiz yaklaşık {limit}'a sınırlıdır. Analiz sunucusunu yeniden başlatarak uygulayın.",
       "writeFailed": "analysis_options_custom.yaml güncellenemedi. Dosyanın yazılabilir olduğundan emin olun."
     }
+  },
+  "externalEngine": {
+    "noProject": "İlk olarak bir Dart proje klasörünü açın.",
+    "sdkTooOld": "En son Saropa Lints motoru Dart {required} veya daha yeni sürümü gerektirir, ancak burada kullanılan Dart sürümü {found}'dir. Daha yeni bir Dart SDK'sı yükleyin ve \"saropaLints.externalEngine.dartSdkPath\" ayarını bu klasöre işaret edin.",
+    "sdkUnknown": "bilinmeyen",
+    "install": {
+      "prompt": "Bu, daha yeni bir Dart SDK kullanarak en son Saropa Lints motorunu küresel olarak (dart pub global activate saropa_lints) kurar ve ardından bu projeyi taramaya başlar. Bu proje'nin pubspec.yaml ve SDK pinleri değiştirilmez.",
+      "confirm": "Install ve tarama"
+    },
+    "progress": "Saropa Lints: en son motorla taranıyor…",
+    "installFailed": "Saropa Lints motorunu yükleyemedi: {detail}",
+    "scanFailed": "En son motor taraması başarısız oldu: {detail}",
+    "done": "Saropa Lints: {count} sorun(lar) en son motorla (Dart {version}) tespit edildi."
   }
 }

@@ -323,7 +323,7 @@
   "walkthrough.gettingStarted.title": "Начало с Saropa Lints",
   "walkthrough.gettingStarted.description": "Оценка здоровья, панель результатов, матрица безопасности, сортировка и тенденции — панель активности плюс полноразмерные вкладки редактора.",
   "walkthrough.step.walkthrough.healthScore.title": "Health Score - показатель здоровья.",
-  "walkthrough.step.walkthrough.healthScore.description": "Качество вашего проекта на взгляд: **0–100 балл** в строке состояния и представлении Обзор.",
+  "walkthrough.step.walkthrough.healthScore.description": "Качество вашего проекта на первый взгляд: **0–100 балл** в строке состояния и представлении Обзор.",
   "walkthrough.step.walkthrough.issues.title": "Нарушения и аннотации в строке.",
   "walkthrough.step.walkthrough.issues.description": "Найденные проблемы в редакторской вкладке **Findings Dashboard**, сгруппированные по тяжести и файлу. **Error Lens-style** аннотации показывают предупреждения в конце каждой строки.\n\nФильтруйте по тексту, тяжести, воздействию или правилу. Щелкните правой кнопкой мыши, чтобы подавить шум.\n\n[Запустить анализ](command:saropaLints.runAnalysis)",
   "walkthrough.step.walkthrough.security.title": "Позиция безопасности.",
@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "Папки для сканирования при запуске (относительно корня проекта). Используется только при включении сканирования рабочей области. Настройте это, чтобы соответствовать структуре вашего проекта — например, добавьте 'src' или удалите 'test', если файлы тестирования не важны.",
   "command.toggleLints.title": "Saropa Lints: Включить / Выключить",
   "command.syncPluginVersion.title": "Saropa Lints: Синхронизировать версию плагина с pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: Меню Статуса"
+  "command.showStatusBarMenu.title": "Saropa Lints: Меню Статуса",
+  "command.scanWithLatestEngine.title": "Saropa Lints: Сканирование с использованием последней версии движка (старые проекты Dart)",
+  "config.property.externalEngine.dartSdkPath.description": "Папка Dart SDK (содержит bin/dart), используемая \"Scan with Latest Engine\". Должна быть Dart 3.11 или новее. Оставьте пустым, чтобы использовать dart из PATH."
 }

@@ -236,7 +236,7 @@
       "boolean_naming": "Boolean harus menggunakan is/has/can/should prefix sehingga intent jelas dalam kondisional dan API.",
       "code_style_preferences": "Cara menulis return, conditionals, dan loops — return segera, for-in, getter vs method, dan shorthand serupa.",
       "function_parameter_style": "Fungsi panah ketika ringkas, semua parameter bernama, panggilan balik inline, dan tidak ada penugasan ulang parameter.",
-      "widget_style": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Pilihan widget Flutter — SizedBox.square, center over align, spacing over SizedBox, dan menghindari shrinkWrap dalam scrolls. Flutter projects only.",
+      "widget_style": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Keluaran HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Pilihan widget Flutter — SizedBox.square, center over align, spacing over SizedBox, dan menghindari shrinkWrap dalam scrolls. Flutter proyek hanya.",
       "class_record_style": "Kelas vs jenis pengembalian rekaman, awalan underscore pribadi, dan eksplisit ini di mana ia memperjelas.",
       "formatting": "Atur letak baris kosong, koma di akhir, dan gaya literal serta komentar. Bisa menghasilkan banyak peringatan — banyak file mungkin memerlukan perubahan.",
       "comments_documentation": "TODO dan FIXME format, kasus kalimat, periode setelah komentar doc, /// lebih dari //, dan tidak ada kode dikomentari-out.",
@@ -258,7 +258,7 @@
     "domainDesc": {
       "state-management": "Block, Riverpod, Provider, GetX dan state-related serta dependence injection libraries.",
       "networking-apis": "HTTP klien, GraphQL, Firebase, Supabase dan konektivitas.",
-      "storage-persistence": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Basis data lokal dan penyimpanan kunci-nilai — Drift, Hive, Isar, sqflite, shared_preferences.",
+      "storage-persistence": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Basis data lokal dan penyimpanan nilai-nilai kunci — Drift, Hive, Isar, sqflite, shared_preferences.",
       "navigation-deep-links": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Routing dan penanganan deep-link — auto_route, go_router, app_links, url_launcher, dan webview.",
       "media-graphics": "Gambar, SVG, animasi, audio, peta, pemetik dan mesin Flame.",
       "device-platform": "Sensor, lokasi, izin, biometrik, pemberitahuan dan pekerjaan latar belakang.",
@@ -1323,7 +1323,7 @@
     "hintNoPerRule": "Ekspor ini tidak memiliki per-peraturan jumlah masalah. Analisis ulang dengan plugin Saropa Lints saat ini.",
     "hintBuildFailed": "Tidak dapat membangun triage dari ekspor ini. Lakukan analisis baru.",
     "summaryVolume": "Triage aturan (volume / harus-perbaiki / stylistic)",
-    "hintSameAsTree": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Grup yang sama seperti pada pohon aktivitas Triage: filter Issues, atau nonaktif/aktif aturan di `analysis_options_custom.yaml`. Kelompok besar mungkin meminta konfirmasi."
+    "hintSameAsTree": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Grup yang sama seperti pada pohon Triage activity-bar: filter Issues, atau nonaktif/aktif aturan di `analysis_options_custom.yaml`. Kelompok besar mungkin meminta konfirmasi."
   },
   "kbdOverlay": {
     "toggleTitle": "Tampilkan pintasan keyboard (?)",
@@ -2181,11 +2181,11 @@
         "master": "Pengaturan switch global ekstensi (saropaLints.enabled workspace setting). Ketika dimatikan, Scan on Save berhenti dan panel samping melaporkan ekstensi sebagai dinonaktifkan. Live Analysis dan LSP Server memiliki toggle masing-masing.",
         "analyzerPlugin": "Berjalan di dalam server analisis Dart — garis bawah dalam editor saat Anda mengetik, tanpa perlu scan. Mengaktifkan/menonaktifkan mengubah ulang plugin: blok dalam analysis_options.yaml.",
         "scanDaemon": "Proses latar belakang yang mere-scan seluruh proyek saat disimpan dan menulis laporan/.saropa_lints/violations.json. Mengaktifkan/Nonaktifkan akan menghentikannya; penyimpanan berikutnya akan melanjutkannya.",
-        "lspServer": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Keluaran HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Pemisah server bahasa — menerbitkan diagnosis ke panel Masalah untuk berkas yang terbuka dan berkas kerja. Mengaktifkan/Nonaktifkan menulis pengaturan saropaLints.lspServer.enabled.",
+        "lspServer": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Keluaran HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Pemisah server bahasa — menerbitkan diagnosis ke panel Masalah untuk berkas yang terbuka dan berkas kerja. Mengaktifkan/Nonaktifkan menulis pengaturan saropaLints.lspServer.enabled.",
         "ci": "Membaca dan menulis .github/workflows/saropa-lints.yml di pohon kerja Anda untuk mengaktifkan atau menonaktifkan workflow GitHub Actions yang dikemas. Ini mencerminkan file pada cabang saat ini Anda — salinan dari cabang default adalah yang sebenarnya mengatur pull request, dan keduanya dapat berbeda. Mengaktifkan atau menonaktifkan tidak pernah menjalankan atau menghapus workflow; Anda tetap meninjau dan mengkomit perubahan tersebut sendiri."
       },
       "recommended": {
-        "analyzerPlugin": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TERTULIS, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Direkomendasikan: MATI saat Server LSP aktif. Nyalakan (dengan LSP MATI) jika aturan berhenti memicu di bawah LSP.",
+        "analyzerPlugin": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang telah diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Direkomendasikan: MATIK saat Server LSP menyala. Nyalakan (dengan LSP MATIK) jika aturan berhenti memicu di bawah LSP.",
         "scanDaemon": "Rekomendasi: ON.",
         "lspServer": "Rekomendasi: ON (default, beta). Menutupi diagnosa langsung.",
         "ci": "Rekomendasi: NYALAKAN hanya jika Anda ingin pull request di- gate."
@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Jalankan analisis analisa.",
       "runAnalysisDescription": "Jalankan ulang analisator",
+      "latestEngineLabel": "Scan dengan mesin terbaru",
+      "latestEngineDescription": "SDK Dart proyek ini terlalu lama untuk analisis langsung",
       "updateConfigLabel": "Perbarui konfigurasi",
       "updateConfigDescription": "Inisialisasi atau perbarui opsi analisis"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Disimpan: analisis langsung terbatas sekitar {limit}. Mulai ulang server analisis untuk menerapkannya.",
       "writeFailed": "Tidak dapat memperbarui analysis_options_custom.yaml. Periksa apakah file tersebut dapat ditulis."
     }
+  },
+  "externalEngine": {
+    "noProject": "Buka dulu folder proyek Dart.",
+    "sdkTooOld": "The latest Saropa Lints engine needs Dart {required} or newer, but the Dart used here is {found}. Install a newer Dart SDK and set \"saropaLints.externalEngine.dartSdkPath\" to its folder.",
+    "sdkUnknown": "tidak diketahui",
+    "install": {
+      "prompt": "Ini menginstal engine Saropa Lints terbaru secara global (dart pub global activate saropa_lints) menggunakan SDK Dart yang lebih baru, lalu memindai proyek ini dengan engine tersebut. pubspec.yaml dan pin SDK proyek ini tidak berubah.",
+      "confirm": "Instal dan scan"
+    },
+    "progress": "Saropa Lints: memindai dengan mesin terbaru…",
+    "installFailed": "Tidak dapat menginstal engine Saropa Lints: {detail}",
+    "scanFailed": "Pindaian latest-engine gagal: {detail}",
+    "done": "Saropa Lints: {count} masalah(d) ditemukan oleh engine terbaru (Dart {version})."
   }
 }

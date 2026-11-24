@@ -66,6 +66,7 @@ export 'flow/return_rules.dart';
 
 // Codegen
 export 'codegen/freezed_rules.dart';
+export 'codegen/generated_data_class_rules.dart';
 
 // Hardware
 export 'hardware/bluetooth_hardware_rules.dart';

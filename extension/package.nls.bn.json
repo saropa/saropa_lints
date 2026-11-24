@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "স্ট্যার্টআপ সময়ে স্ক্যান করার ফোল্ডার (প্রজেক্ট রুটের সাপেক্ষে)। কেবলমাত্র ওয়ার্কস্পেস স্ক্যান সক্রিয় হলে ব্যবহার করা হয়। আপনার প্রজেক্ট স্ট্রাকচার সাথে মেলানো জন্য এটি সাজান। উদাহরণস্বরূপ, যদি টেস্ট ফাইলগুলি অপ্রাসঙ্গিক হয় তবে 'src' যোগ করুন বা 'test' বাদ দিন।",
   "command.toggleLints.title": "Saropa Lints: টার্ন অন / অফ /নো_থিংক",
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock এ প্লাগিন ভার্সন সিঙ্ক করুন",
-  "command.showStatusBarMenu.title": "Saropa Lints: স্ট্যাটাস মেনু"
+  "command.showStatusBarMenu.title": "Saropa Lints: স্ট্যাটাস মেনু",
+  "command.scanWithLatestEngine.title": "Saropa Lints: সর্বশেষ ইঞ্জিন দিয়ে স্ক্যান করুন (পুরানো Dart প্রকল্প)",
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK ফোল্ডার (বিন/ডার্ট কনটেইন করে) \"স্ক্যান করুন সর্বশেষ ইঞ্জিন দ্বারা\" ব্যবহার করা হয়। এটি Dart 3.11 বা নতুন হতে হবে। PATH এ ডার্ট ব্যবহার করতে খালি রাখুন।"
 }

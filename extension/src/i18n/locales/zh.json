@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "运行分析,进行分析.",
       "runAnalysisDescription": "重新运行分析器",
+      "latestEngineLabel": "使用最新引擎扫描",
+      "latestEngineDescription": "此项目的 Dart SDK 太旧，无法进行实时分析",
       "updateConfigLabel": "更新配置",
       "updateConfigDescription": "初始化或刷新分析选项"
     },
@@ -3108,5 +3110,18 @@
       "applied": "已保存：实时分析受限于约 {limit}。重启分析服务器以应用它。",
       "writeFailed": "无法更新 analysis_options_custom.yaml。请检查文件是否可写。"
     }
+  },
+  "externalEngine": {
+    "noProject": "先打开一个 Dart 项目文件夹。",
+    "sdkTooOld": "最新 Saropa Lints 引擎需要 Dart {required} 或更新版本，但此处使用的 Dart 是 {found}。安装更新的 Dart SDK，并将其文件夹路径设置为 \"saropaLints.externalEngine.dartSdkPath\"。",
+    "sdkUnknown": "未知",
+    "install": {
+      "prompt": "此操作使用较新的 Dart SDK 安装最新的 Saropa Lints 引擎全局（dart pub global activate saropa_lints），然后使用该引擎扫描此项目。此项目的 pubspec.yaml 和 SDK 版本不会被更改。",
+      "confirm": "安装并扫描"
+    },
+    "progress": "Saropa Lints：使用最新引擎扫描中…",
+    "installFailed": "无法安装 Saropa Lints 引擎: {detail}",
+    "scanFailed": "最新引擎扫描失败：{detail}",
+    "done": "Saropa Lints: {count} 个问题由最新引擎（Dart {version}）发现。"
   }
 }

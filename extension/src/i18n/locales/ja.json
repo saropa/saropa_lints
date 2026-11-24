@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "分析を実行する.",
       "runAnalysisDescription": "再実行分析",
+      "latestEngineLabel": "最新エンジンでスキャン",
+      "latestEngineDescription": "このプロジェクトのDart SDKは、ライブ分析には古すぎます",
       "updateConfigLabel": "設定を更新",
       "updateConfigDescription": "分析オプションを初期化または再構成する"
     },
@@ -3108,5 +3110,18 @@
       "applied": "保存済み: ライブ分析は約{limit}に制限されています。分析サーバーを再起動して適用してください。",
       "writeFailed": "analysis_options_custom.yaml を更新できませんでした。ファイルが書き込み可能であることを確認してください。"
     }
+  },
+  "externalEngine": {
+    "noProject": "最初にDartプロジェクトフォルダを開いてください。",
+    "sdkTooOld": "最新のSaropa LintsエンジンはDart {required}または新しいバージョンが必要ですが、ここではDartの{found}が使用されています。新しいDartSDKをインストールし、\"saropaLints.externalEngine.dartSdkPath\"をそのフォルダに設定してください。",
+    "sdkUnknown": "未知",
+    "install": {
+      "prompt": "これは、新しいDart SDKを使用して、最新のSaropa Lintsエンジンをグローバルにインストール（dart pub global activate saropa_lints）し、このプロジェクトをスキャンします。このプロジェクトのpubspec.yamlおよびSDKピンは変更されません。",
+      "confirm": "インストールしてスキャン"
+    },
+    "progress": "Saropa Lints: 最新のエンジンでスキャン中…",
+    "installFailed": "Saropa Lintsエンジンのインストールに失敗しました: {detail}",
+    "scanFailed": "最新エンジンスキャンが失敗しました: {detail}",
+    "done": "Saropa Lints: {count} 件の問題が最新エンジン(Dart {version})によって検出されました。"
   }
 }

@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "Stricteste Regeln:  \n1. Geben Sie AUSSCHLIESSLICH den übersetzten Text aus.  \n2. Fügen Sie KEINE Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.  \n3. Der Text kann Platzhalter-Token enthalten: placeholder tokens. Kopieren Sie jeden davon exakt so, wie er geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.  \n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.  \n\nText: Verzeichnisse zum Scannen beim Start (relativ zum Projektroot). Nur dann verwendet, wenn Workspace Scan aktiviert ist. Passen Sie dies an, um Ihre Projektstruktur zu matchen — z. B. fügen Sie „src“ hinzu oder entfernen Sie „test“, wenn Testdateien nicht relevant sind.",
   "command.toggleLints.title": "Saropa Lints: Ein / Aus",
   "command.syncPluginVersion.title": "Saropa Lints: Plugin-Version mit pubspec.lock synchronisieren",
-  "command.showStatusBarMenu.title": "Saropa Lints: Status-Menü"
+  "command.showStatusBarMenu.title": "Saropa Lints: Status-Menü",
+  "command.scanWithLatestEngine.title": "Saropa Lints: Scan mit neuestem Engine (ältere Dart Projekte)",
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK-Ordner (enthält bin/dart), der von „Scan with Latest Engine“ verwendet wird. Muss Dart 3.11 oder neuer sein. Lassen Sie das Feld leer, um die dart aus PATH zu verwenden."
 }

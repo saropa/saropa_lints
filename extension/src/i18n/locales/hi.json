@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "विश्लेषण चलाएं।",
       "runAnalysisDescription": "पुनः एनालाइजर चलाएँ",
+      "latestEngineLabel": "सबसे नवीन इंजन से स्कैन करें",
+      "latestEngineDescription": "इस प्रोजेक्ट के Dart SDK जीवित विश्लेषण के लिए बहुत पुराना है",
       "updateConfigLabel": "अपडेट कॉन्फिग",
       "updateConfigDescription": "अनालिसिस विकल्पों को शुरू करें या ताज़ा करें"
     },
@@ -3108,5 +3110,18 @@
       "applied": "संचित: जीवित विश्लेषण केवल लगभग {limit} तक सीमित है। विश्लेषण सर्वर को फिर से शुरू करें ताकि इसे लागू किया जा सके।",
       "writeFailed": "analysis_options_custom.yaml को अपडेट नहीं किया जा सकता। जांच करें कि फ़ाइल लिखने योग्य है।"
     }
+  },
+  "externalEngine": {
+    "noProject": "पहले एक Dart प्रोजेक्ट फोल्डर खोलें।",
+    "sdkTooOld": "सबसे नवीन Saropa Lints इंजन Dart {required} या नवीनर आवश्यक है, लेकिन यहां उपयोग किया गया Dart {found} है। एक नवीनर Dart SDK इंस्टॉल करें और \"saropaLints.externalEngine.dartSdkPath\" को इसके फ़ोल्डर को सेट करें।",
+    "sdkUnknown": "अज्ञात",
+    "install": {
+      "prompt": "इसके द्वारा सभी विश्व स्तर पर (dart pub global activate saropa_lints) एक नएर Dart SDK का उपयोग करते हुए सबसे नवीनतम Saropa Lints इंजन स्थापित किया जाता है, फिर इस प्रोजेक्ट को इसके साथ स्कैन किया जाता है। इस प्रोजेक्ट के pubspec.yaml और SDK पिन बदले नहीं हैं।",
+      "confirm": "इंस्टॉल करें और स्कैन करें"
+    },
+    "progress": "Saropa Lints: अंतिम इंजन के साथ स्कैन कर रहे हैं…",
+    "installFailed": "Saropa Lints इंजन स्थापित नहीं किया जा सकता: {detail}",
+    "scanFailed": "सबसे नवीन इंजन स्कैन विफल रहा: {detail}",
+    "done": "Saropa Lints: {count} त्रुटि(एं) नवीनतम इंजन द्वारा (Dart {version}) पाए गए।"
   }
 }

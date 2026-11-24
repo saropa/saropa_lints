@@ -236,7 +236,7 @@
       "boolean_naming": "Les Booléens doivent utiliser les préfixes est/a/peut/devrait afin que l'intention soit claire dans les conditionnels et API.",
       "code_style_preferences": "Comment sont écrits les retours, les conditionnels et les boucles — retour immédiat, for-in, getter vs méthode, et autres raccourcis similaires.",
       "function_parameter_style": "Les fonctions de flèche sont concises, contiennent tous les paramètres nommés, des rappels en ligne et aucune réaffectation de paramètre.",
-      "widget_style": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : Flutter choix de widgets — SizedBox.square, center over align, spacing over SizedBox, et éviter shrinkWrap dans les scrolls. Flutter projets seulement.",
+      "widget_style": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel qu'écrit, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : Flutter choix de widgets — SizedBox.square, center over align, spacing over SizedBox, et éviter shrinkWrap dans les scrolls. Flutter projets seulement.",
       "class_record_style": "Classes vs types de retour d'enregistrement, préfixes privés sous-titres et explicite ceci là où il clarifie.",
       "formatting": "Placements des lignes vides, virgules en fin de ligne, et style des littéraux et commentaires. Peut être bruyant — beaucoup de fichiers peuvent nécessiter des modifications.",
       "comments_documentation": "Le format TODO et FIXME, cas de phrase, un point après les commentaires du document, /// plus //, et aucun code sans commentaire.",
@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Executer l'analyse",
       "runAnalysisDescription": "Re-lancer l'analyseur",
+      "latestEngineLabel": "Analyser avec le dernier moteur",
+      "latestEngineDescription": "Cet SDK Dart de ce projet est trop ancien pour l'analyse en temps réel",
       "updateConfigLabel": "Mettre à jour la configuration",
       "updateConfigDescription": "Initialiser ou actualiser les options d'analyse"
     },
@@ -2930,7 +2932,7 @@
       "offerNoDart": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. Voulez-vous migrer ?",
       "offerRenames": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. {count} règles ont été renommées depuis {installed}. Migration ?",
       "offerNoDartRenames": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. {count} règles ont été renommées depuis {installed}. Migration ?",
-      "offerRenamesUnknown": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie de la chaîne traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un d'entre eux dans la traduction EXACTEMENT tel qu'écrit, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
+      "offerRenamesUnknown": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie de la chaîne traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
       "offerNoDartRenamesUnknown": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
       "actionMigrate": "Migrer"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Enregistré : l'analyse en temps réel est limitée à environ {limit}. Redémarrez le serveur d'analyse pour l'appliquer.",
       "writeFailed": "Impossible de mettre à jour analysis_options_custom.yaml. Vérifiez que le fichier est modifiable."
     }
+  },
+  "externalEngine": {
+    "noProject": "Ouvrez d'abord un dossier de projet Dart.",
+    "sdkTooOld": "Les dernières versions de l'engine Saropa Lints nécessitent Dart {required} ou une version ultérieure, mais l'engine Dart utilisé ici est {found}. Installez une version plus récente de l'SDK Dart et définissez \"saropaLints.externalEngine.dartSdkPath\" vers son dossier.",
+    "sdkUnknown": "inconnu",
+    "install": {
+      "prompt": "Cela installe le dernier moteur Saropa Lints globalement (dart pub global activate saropa_lints) en utilisant un SDK Dart plus récent, puis scanne ce projet avec celui-ci. Les versions pubspec.yaml et SDK de ce projet ne sont pas modifiées.",
+      "confirm": "Installer et scanner"
+    },
+    "progress": "Saropa Lints : analyse avec le moteur le plus récent…",
+    "installFailed": "Impossible d'installer le moteur Saropa Lints : {detail}",
+    "scanFailed": "Le scan du dernier moteur a échoué : {detail}",
+    "done": "Saropa Lints : {count} problème(s) trouvé(s) par le dernier moteur (Dart {version})."
   }
 }

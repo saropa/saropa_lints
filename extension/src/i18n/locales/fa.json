@@ -682,7 +682,7 @@
       },
       "fix": {
         "turnOn": "javab: don't both on",
-        "setUp": "javab: inqilab va akhri",
+        "setUp": "javab: inqilab va akhlat kardan",
         "title": "نگه دارنده تنظیم saropaLints.enabled و پلاگین تحلیل کننده را به طور همزمان فعال می کند."
       },
       "pill": {
@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "تحلیل را اجرا کنید.",
       "runAnalysisDescription": "تحلیل کننده را مجدد اجرا کنید",
+      "latestEngineLabel": "اسکن با آخرین موتور",
+      "latestEngineDescription": "این پروژه Dart SDK خودش به اندازه کافی قدیمی است تحلیل زنده انجام نمی‌شود",
       "updateConfigLabel": "کنfig را به‌روزرسانی کنید",
       "updateConfigDescription": "انتخاب یا به‌روزرسانی گزینه‌های تحلیل"
     },
@@ -3108,5 +3110,18 @@
       "applied": "ذخیره شده: تحلیل زنده فقط به میزان حدود {limit} محدود است. سرور تحلیل را مجدد راه اندازی کنید تا اعمال شود.",
       "writeFailed": "نمی توانید فایل analysis_options_custom.yaml را به روز کنید. لطفاً اطمینان حاصل کنید که فایل قابل نوشتن است."
     }
+  },
+  "externalEngine": {
+    "noProject": "ابتدا پوشه‌ی Dart پروژه را باز کنید.",
+    "sdkTooOld": "آخرین موتور Saropa Lints نیاز به Dart {required} یا جدیدتر است، اما موتور Dart استفاده شده در اینجا {found} است. یک SDK جدیدتر Dart نصب کنید و \"saropaLints.externalEngine.dartSdkPath\" را به پوشه آن تنظیم کنید.",
+    "sdkUnknown": "ناشناخته",
+    "install": {
+      "prompt": "این نسخه آخرین Saropa Lints اینتل را به صورت جهانی نصب می کند (dart pub global activate saropa_lints) با استفاده از یک SDK جدیدتر Dart، سپس این پروژه را با آن اسکن می کند. نسخه pubspec.yaml و پین SDK پروژه این پروژه تغییر نمی کند.",
+      "confirm": "نصب و اسکن"
+    },
+    "progress": "Saropa Lints: اسکن کردن با موتور آخرین ...",
+    "installFailed": "می تواند موتور Saropa Lints نصب نشود: {detail}",
+    "scanFailed": "سکن آخرین موتور شکست خورد: {detail}",
+    "done": "Saropa Lints: {count} مسئله(ها) توسط آخرین موتور (Dart {version}) پیدا شد."
   }
 }

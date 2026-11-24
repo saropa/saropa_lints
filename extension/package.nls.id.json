@@ -340,7 +340,7 @@
   "walkthrough.step.walkthrough.commandCatalog.title": "Browse Semua Komando",
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ perintah yang terorganisir berdasarkan kategori dengan pencarian. Temukan perintah analisis, keamanan, kesehatan paket, dan pelaporan dalam satu tempat.\n\n[Browse All Commands](command:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Tentang _Saropa.",
-  "walkthrough.step.walkthrough.aboutSaropa.description": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Saropa Pty Limited — membangun perlindungan digital sejak 2010.\n\nDart paket, VS Code ekstensi, dan aplikasi konsumen untuk pengembang yang menghargai keandalan.\n\n[Visit saropa.com](https://saropa.com/)",
+  "walkthrough.step.walkthrough.aboutSaropa.description": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Saropa Pty Limited — membangun perlindungan digital sejak 2010.\n\nDart paket, VS Code ekstensi, dan aplikasi konsumen untuk pengembang yang menghargai keandalan.\n\n[Visit saropa.com](https://saropa.com/)",
   "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner yang dapat diputar kembali.",
   "command.killOrphanedDaemons.title": "Saropa Lints: Matikan Flutter Daemon Yang Tidak Berguna",
   "command.configureCompatibility.title": "Saropa Lints: Konfigurasikan Kompatibilitas Versi",
@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "Direktori yang akan di-scan saat startup (relatif terhadap akar proyek). Hanya digunakan ketika Workspace Scan diaktifkan. Sesuaikan ini untuk sesuai dengan struktur proyek Anda — misalnya, tambahkan 'src' atau hilangkan 'test' jika file test tidak relevan.",
   "command.toggleLints.title": "Saropa Lints: Nyalakan / Matikan",
   "command.syncPluginVersion.title": "Saropa Lints: Sinkronkan Versi Plugin ke pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: Menu Status"
+  "command.showStatusBarMenu.title": "Saropa Lints: Menu Status",
+  "command.scanWithLatestEngine.title": "Saropa Lints: Scan dengan Engine Terbaru (Proyek Dart Lama)",
+  "config.property.externalEngine.dartSdkPath.description": "Folder Dart SDK (mengandung bin/dart) yang digunakan oleh \"Scan dengan Engine Terbaru\". Harus Dart 3.11 atau lebih baru. Biarkan kosong untuk menggunakan dart pada PATH."
 }

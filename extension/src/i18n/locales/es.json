@@ -236,7 +236,7 @@
       "boolean_naming": "Los booleanos deben usar los prefijos es/tiene/puede/debe para que la intención sea clara en las condiciones y API.",
       "code_style_preferences": "Cómo se escriben los retornos, condicionales y bucles — retorno inmediato, for-in, getter vs método, y otros atajos similares.",
       "function_parameter_style": "Las funciones de flecha cuando son concisas, todos los parámetros nombrados, devoluciones en línea y no hay reasignación de parámetro.",
-      "widget_style": "Reglas estrictas:\n1. Devolver ÚNICAMENTE la salida traducida.\n2. NO incluir explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copiar cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca traducir, eliminar o reformatear un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambiar a otro idioma en medio de una oración.\n\nTexto: Flutter opciones de widget — SizedBox.square, centrar sobre alinear, espaciado sobre SizedBox, y evitar shrinkWrap en scrolls. Flutter proyectos solo.",
+      "widget_style": "Reglas estrictas:\n1. Devolver ÚNICAMENTE la salida traducida.\n2. NO incluir explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de lugar: tokens de lugar. Copiar cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca traducir, eliminar o reformatear un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambiar a otro idioma en medio de una oración.\n\nTexto: Flutter opciones de widget — SizedBox.square, centrar sobre alinear, espaciado sobre SizedBox, y evitar shrinkWrap en scrolls. Flutter proyectos solo.",
       "class_record_style": "Clase vs. tipos de devolución de registros, prefijos privados para subrayar y explícito esto donde se aclara.",
       "formatting": "Ubicación de líneas en blanco, comas al final, y estilo de literales y comentarios. Puede ser ruidoso — muchos archivos pueden necesitar ediciones.",
       "comments_documentation": "TODO y FIXME formato, caso de oración, un período después de comentarios doc, /// más //, y no comentó-fuera del código.",
@@ -259,7 +259,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX y las bibliotecas de estado e inyección de dependencias relacionadas.",
       "networking-apis": "Clientes HTTP, GraphQL, Firebase, Supabase y conectividad.",
       "storage-persistence": "Bases de datos locales y almacenes clave-valor — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Reglas estrictas:\n1. Devuelve ÚNICAMENTE la salida de la cadena traducida.\n2. NO incluyas explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de lugar: tokens de lugar. Copia cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca lo traduzcas, elimines o reformates un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambies a otro idioma en medio de una oración.\n\nTexto: Routing y manejo de deep-link — auto_route, go_router, app_links, url_launcher, y webview.",
+      "navigation-deep-links": "Reglas estrictas:\n1. Devuelve ÚNICAMENTE la salida de la cadena traducida.\n2. NO incluyas explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copia cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca lo traduzcas, elimines o reformates un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambies a otro idioma en medio de una oración.\n\nTexto: Routing y manejo de deep-link — auto_route, go_router, app_links, url_launcher, y webview.",
       "media-graphics": "Imágenes, SVG, animación, audio, mapas, recolectores y el motor Flame.",
       "device-platform": "Sensores, ubicación, permisos, biometría, notificaciones y trabajo en segundo plano.",
       "identity-sharing": "Proveedores de inicio de sesión, intercambio y revisión en la aplicación.",
@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Ejecutar el análisis de ejecución.",
       "runAnalysisDescription": "Volver a ejecutar el analizador",
+      "latestEngineLabel": "Escanea con el último motor",
+      "latestEngineDescription": "Este proyecto tiene una versión del SDK Dart demasiado antigua para el análisis en tiempo real",
       "updateConfigLabel": "Actualizar configuración",
       "updateConfigDescription": "Inicializar o refrescar opciones de análisis"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Guardado: el análisis en vivo está limitado a aproximadamente {limit}. Reinicie el servidor de análisis para aplicarlo.",
       "writeFailed": "No se pudo actualizar analysis_options_custom.yaml. Verifique que el archivo sea escribible."
     }
+  },
+  "externalEngine": {
+    "noProject": "Abra primero una carpeta del proyecto Dart.",
+    "sdkTooOld": "El último motor Saropa Lints requiere Dart {required} o más reciente, pero el Dart utilizado aquí es {found}. Instale un SDK Dart más reciente y establezca \"saropaLints.externalEngine.dartSdkPath\" en su carpeta.",
+    "sdkUnknown": "desconocido",
+    "install": {
+      "prompt": "Esto instala la última versión del motor Saropa Lints globalmente (dart pub global activate saropa_lints) usando un SDK más reciente Dart, luego escanea este proyecto con él. Los pubspec.yaml y la pin de SDK de este proyecto no se cambian.",
+      "confirm": "Instalar y escanear"
+    },
+    "progress": "Saropa Lints: escaneando con el motor más reciente…",
+    "installFailed": "No se pudo instalar el motor Saropa Lints: {detail}",
+    "scanFailed": "El escaneo del último motor falló: {detail}",
+    "done": "Saropa Lints: {count} problema(s) encontrado(s) por el último motor (Dart {version})."
   }
 }

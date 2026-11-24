@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "Các thư mục cần quét khi khởi động (liên quan đến thư mục gốc của dự án). Chỉ được sử dụng khi Quét không gian làm việc được bật. Điều chỉnh điều này để phù hợp với cấu trúc dự án của bạn - ví dụ: thêm 'src' hoặc xóa 'test' nếu tệp kiểm tra không liên quan.",
   "command.toggleLints.title": "Saropa Lints: Bật / Tắt",
   "command.syncPluginVersion.title": "Saropa Lints: Đồng bộ Bản ghi Plugin với pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: Menu Trạng Thái"
+  "command.showStatusBarMenu.title": "Saropa Lints: Menu Trạng Thái",
+  "command.scanWithLatestEngine.title": "Saropa Lints: Quét bằng Engine Mới Nhất (Các Dự Án Dart Cũ)",
+  "config.property.externalEngine.dartSdkPath.description": "Thư mục Dart SDK (chứa bin/dart) được sử dụng bởi \"Quét bằng Engine Mới Nhất\". Phải là Dart 3.11 hoặc mới hơn. Để trống để sử dụng dart trên PATH."
 }

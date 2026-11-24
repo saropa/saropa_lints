@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Chạy phân tích chạy.",
       "runAnalysisDescription": "Chạy lại phân tích",
+      "latestEngineLabel": "Quét bằng engine mới nhất",
+      "latestEngineDescription": "SDK Dart của dự án này quá cũ để phân tích trực tiếp",
       "updateConfigLabel": "Cập nhật cấu hình",
       "updateConfigDescription": "Khởi tạo hoặc cập nhật lại tùy chọn phân tích"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Đã lưu: phân tích thời gian thực bị giới hạn khoảng {limit}. Khởi động lại máy chủ phân tích để áp dụng.",
       "writeFailed": "Không thể cập nhật analysis_options_custom.yaml. Kiểm tra xem tệp có thể ghi được hay không."
     }
+  },
+  "externalEngine": {
+    "noProject": "Mở trước một thư mục dự án Dart.",
+    "sdkTooOld": "Engine Saropa Lints mới nhất cần Dart {required} hoặc mới hơn, nhưng phiên bản Dart được sử dụng ở đây là {found}. Cài đặt một phiên bản mới hơn của SDK Dart và thiết lập \"saropaLints.externalEngine.dartSdkPath\" đến thư mục của nó.",
+    "sdkUnknown": "không xác định",
+    "install": {
+      "prompt": "Đây sẽ cài đặt động cơ Saropa Lints mới nhất toàn cục (dart pub global activate saropa_lints) bằng một SDK mới hơn Dart, sau đó quét dự án này bằng động cơ đó. Các phiên bản pubspec.yaml và SDK của dự án này không được thay đổi.",
+      "confirm": "Cài đặt và quét"
+    },
+    "progress": "Saropa Lints: đang quét bằng bộ phát hiện mới nhất…",
+    "installFailed": "Không thể cài đặt engine Saropa Lints: {detail}",
+    "scanFailed": "Quét latest-engine đã thất bại: {detail}",
+    "done": "Saropa Lints: {count} lỗi được phát hiện bởi engine mới nhất (Dart {version})."
   }
 }

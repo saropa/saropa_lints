@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Запустити аналіз, провести аналіз.",
       "runAnalysisDescription": "Повторно запустити аналізатор",
+      "latestEngineLabel": "Сканувати з останнім двигуном",
+      "latestEngineDescription": "Цей проект Dart SDK занадто старий для живого аналізу",
       "updateConfigLabel": "Оновити конфігурацію",
       "updateConfigDescription": "Ініціалізувати або оновити параметри аналізу"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Збережено: живий аналіз обмежено приблизно до {limit}. Перезапустіть сервер аналізу, щоб застосувати його.",
       "writeFailed": "Не вдалося оновити analysis_options_custom.yaml. Перевірте, чи файл доступний для запису."
     }
+  },
+  "externalEngine": {
+    "noProject": "Відкрийте спочатку папку проекту Dart.",
+    "sdkTooOld": "Найновіший Saropa Lints двигун потребує Dart {required} або новіший, але використовується тут Dart, який є {found}. Встановіть новіший Dart SDK та встановіть \"saropaLints.externalEngine.dartSdkPath\" на його папку.",
+    "sdkUnknown": "невідомий",
+    "install": {
+      "prompt": "Це встановлює останню версію Saropa Lints двигуна глобально (dart pub global activate saropa_lints) за допомогою нового Dart SDK, потім сканує цей проект. Версія pubspec.yaml цього проекту та пін SDK не змінюються.",
+      "confirm": "Встановити та оцінити"
+    },
+    "progress": "Saropa Lints: сканування з останнім двигуном…",
+    "installFailed": "Не вдалося встановити двигун Saropa Lints: {detail}",
+    "scanFailed": "Останній сканер двигуна не вдалося: {detail}",
+    "done": "Saropa Lints: знайдено {count} проблем(и) за допомогою останнього двигуна (Dart {version})"
   }
 }

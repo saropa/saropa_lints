@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Regeln & Ebenen",
-        "description": "Strict Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das richtige Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Konfigurieren Sie, welche der über 2.350 Regeln laufen und mit welcher Schweregrad."
+        "description": "Strict Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebenden Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: placeholder tokens. Kopieren Sie jeden Token genau so, wie er geschrieben ist, in die grammatikalisch korrekte Position. Übersetzen, entfernen oder umbenennen Sie niemals einen Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache."
       },
       "catalog": {
         "label": "Befehlskatalog, der Katalog für die Kommandoführung.",
@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Führen Sie die Analyse durch.",
       "runAnalysisDescription": "Analyser erneut ausführen",
+      "latestEngineLabel": "Scan mit neuestem Engine",
+      "latestEngineDescription": "Dieses Projekt verwendet eine zu alte Dart SDK-Version für die Live-Analyse",
       "updateConfigLabel": "Konfiguration aktualisieren",
       "updateConfigDescription": "Analyseoptionen initialisieren oder aktualisieren"
     },
@@ -3108,5 +3110,18 @@
       "applied": "Gespeichert: Live-Analyse ist auf etwa {limit} beschränkt. Starten Sie den Analyseserver, um dies anzuwenden.",
       "writeFailed": "Kann analysis_options_custom.yaml nicht aktualisieren. Prüfen Sie, ob die Datei schreibbar ist."
     }
+  },
+  "externalEngine": {
+    "noProject": "Zuerst öffnen Sie ein Dart Projektordner.",
+    "sdkTooOld": "Die neueste Saropa Lints Engine benötigt Dart {required} oder neuer, aber die hier verwendete Dart ist {found}. Installieren Sie eine neuere Dart SDK und setzen Sie \"saropaLints.externalEngine.dartSdkPath\" auf dessen Ordner.",
+    "sdkUnknown": "unkannt",
+    "install": {
+      "prompt": "Dies installiert die neueste Saropa Lints Engine global (dart pub global activate saropa_lints) mithilfe eines neueren Dart SDKs, scannt dann dieses Projekt damit. Die pubspec.yaml und der SDK-Pin dieses Projekts bleiben unverändert.",
+      "confirm": "Installieren und scannen"
+    },
+    "progress": "Saropa Lints: Scannen mit dem neuesten Engine...",
+    "installFailed": "Konnte den Saropa Lints Engine nicht installieren: {detail}",
+    "scanFailed": "Der letzte Engine-Scan ist fehlgeschlagen: {detail}",
+    "done": "Saropa Lints: {count} Problem(e) gefunden von der neuesten Engine (Dart {version})"
   }
 }
