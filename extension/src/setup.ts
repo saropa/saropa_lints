@@ -1148,7 +1148,7 @@ export async function reconcilePluginOwnership(
 // until the server actually restarts. `dart.restartAnalysisServer` is owned
 // by the official Dart extension; guarded because that extension is not a
 // hard dependency here and the command may not exist in every host.
-async function restartDartAnalysisServer(): Promise<void> {
+export async function restartDartAnalysisServer(): Promise<void> {
   try {
     await vscode.commands.executeCommand('dart.restartAnalysisServer');
   } catch {

@@ -22,6 +22,7 @@ import {
   getSharedOutputChannel,
   openConfig,
   restorePluginsIntegration,
+  restartDartAnalysisServer,
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
   runCreateBaseline,
@@ -202,7 +203,7 @@ import type { ExtensionHostMemory } from './systemHealth/types';
 import type { DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
 import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
-import { setScanProgressProvider } from './analysisToastProgress';
+import { setScanProgressProvider, waitForScanToSettle } from './analysisToastProgress';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
 import {
   ciWorkflowPathFromProject,
@@ -2441,20 +2442,55 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         void vscode.window.showInformationMessage(l10n('notify.main.lintIntegrationOffCannotAnalyze'));
         return;
       }
-      const ok = await runAnalysisCommand(context);
-      if (ok) {
-        refreshAll();
-        updateAllStatusBars();
-        updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
-        // C7: Focus Overview after analysis to show Health Score delta.
-        await vscode.commands.executeCommand('saropaLints.editorDashboards.focus');
-        // C7: Include score in completion message when available.
-        const root = getProjectRoot();
-        const postData = root ? readViolations(root) : null;
-        const health = postData ? computeHealthScore(postData) : null;
-        const scoreMsg = health ? ` Score: ${health.score}` : '';
-        vscode.window.setStatusBarMessage(`Saropa Lints: Analysis complete.${scoreMsg}`, 4000);
-      }
+      // runAnalysisCommand returns true ONLY when the run was clean (zero
+      // violations) and false for both "violations found" and early-outs
+      // (no root, no open files). The old `if (ok)` gate therefore skipped the
+      // refresh, dashboard focus and completion message in exactly the case
+      // users run this command for — when there ARE findings — which read as
+      // "zero feedback, nothing changed". Always refresh and always signal
+      // completion; early-outs already showed their own message and refreshing
+      // on them is harmless.
+      // Progress notification so the click has an immediate, visible reaction
+      // even though the live-diagnostics read itself is near-instant.
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: 'Saropa Lints',
+          cancellable: true,
+        },
+        async (progress, token) => {
+          // "Re-run analyzer" must actually re-analyze: reading the live
+          // diagnostics alone just re-copies what the server already
+          // produced, so the Problems panel never changed. Restart the Dart
+          // analysis server (reloads plugins and re-lints every file), wait
+          // for its post-restart scan to finish, THEN snapshot the results.
+          progress.report({ message: 'Restarting analysis server…' });
+          await restartDartAnalysisServer();
+          await waitForScanToSettle(
+            () => token.isCancellationRequested,
+            (snap) => progress.report({
+              message: `Analyzing… ${snap.filesScanned.toLocaleString()} / ${snap.totalFiles.toLocaleString()} files`,
+            }),
+          );
+          // Cancel skips the snapshot: the scan is incomplete, so a count
+          // taken now would be misleading.
+          if (token.isCancellationRequested) return;
+          progress.report({ message: 'Collecting results…' });
+          await runAnalysisCommand(context);
+        },
+      );
+      refreshAll();
+      updateAllStatusBars();
+      updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
+      // C7: Focus Overview after analysis to show Health Score delta.
+      await vscode.commands.executeCommand('saropaLints.editorDashboards.focus');
+      // C7: Include score in completion message when available.
+      const root = getProjectRoot();
+      const postData = root ? readViolations(root) : null;
+      const health = postData ? computeHealthScore(postData) : null;
+      const scoreMsg = health ? ` Score: ${health.score}` : '';
+      const countMsg = postData ? ` ${postData.violations.length} issues.` : '';
+      vscode.window.setStatusBarMessage(`Saropa Lints: Analysis complete.${countMsg}${scoreMsg}`, 6000);
     }),
     // Re-run the pub.dev upgrade check on demand, bypassing the anti-thrash and
     // dismiss-memory throttles so the "Update available" notification can be

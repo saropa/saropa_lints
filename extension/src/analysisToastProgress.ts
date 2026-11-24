@@ -95,3 +95,37 @@ export function deferToastWhileScanning(
   );
   return true;
 }
+
+/** How long to wait for a freshly restarted server to START reporting a scan. */
+const SCAN_START_GRACE_MS = 20 * 1000;
+
+/**
+ * Resolve once the analysis server has finished the workspace scan that follows
+ * a restart. Used by "Run analysis": after `dart.restartAnalysisServer` the
+ * progress snapshot still holds the PREVIOUS run's `done` state, so "not in
+ * flight" alone would return immediately and the caller would read an empty
+ * Problems panel. Phase 1 therefore waits (bounded) for a scan to start;
+ * phase 2 waits for it to finish. If no scan ever reports (older server, no
+ * provider) the grace timeout releases the caller instead of hanging.
+ *
+ * @param isCancelled polled each tick so the user's Cancel stops the wait.
+ */
+export async function waitForScanToSettle(
+  isCancelled: () => boolean,
+  onTick?: (snap: ScanProgressSnapshot) => void,
+): Promise<void> {
+  const started = Date.now();
+  let sawScan = false;
+  while (Date.now() - started < MAX_WAIT_MS && !isCancelled()) {
+    const snap = progressProvider?.();
+    if (isScanInFlight(snap)) {
+      sawScan = true;
+      onTick?.(snap as ScanProgressSnapshot);
+    } else if (sawScan) {
+      return; // scan started and has now completed
+    } else if (Date.now() - started > SCAN_START_GRACE_MS) {
+      return; // no scan ever reported — do not hang
+    }
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+  }
+}
