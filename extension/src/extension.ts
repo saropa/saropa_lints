@@ -2513,7 +2513,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // never reaches.
     // Runs the newest engine under a newer Dart SDK for projects pinned below 3.11.
     vscode.commands.registerCommand('saropaLints.scanWithLatestEngine', async () => {
-      await scanWithLatestEngine(context, scanOnSaveDiagCollection);
+      await scanWithLatestEngine(context);
     }),
     vscode.commands.registerCommand('saropaLints.scanOnSave.runBaselineScan', async () => {
       await scanOnSaveController.runBaselineScanCommand();

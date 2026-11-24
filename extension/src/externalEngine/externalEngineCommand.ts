@@ -20,6 +20,21 @@ import {
   resolveEngineDart,
 } from './externalEngine';
 
+/**
+ * Own collection (not the scan-on-save one): a whole-project latest-engine scan
+ * must not clear or be overwritten by per-save results. Created lazily and
+ * disposed with the extension.
+ */
+let engineDiagnostics: vscode.DiagnosticCollection | undefined;
+
+function getEngineDiagnostics(context: vscode.ExtensionContext): vscode.DiagnosticCollection {
+  if (!engineDiagnostics) {
+    engineDiagnostics = vscode.languages.createDiagnosticCollection('saropa_lints_latest_engine');
+    context.subscriptions.push(engineDiagnostics);
+  }
+  return engineDiagnostics;
+}
+
 /** globalState flag: the user already agreed to install the engine globally. */
 const ACTIVATED_KEY = 'saropaLints.externalEngine.activated';
 
@@ -54,10 +69,7 @@ function run(command: string, args: string[], shell: boolean, cwd: string, timeo
  * Command body for `saropaLints.scanWithLatestEngine`. Every exit path shows a
  * visible message so the button never fails silently.
  */
-export async function scanWithLatestEngine(
-  context: vscode.ExtensionContext,
-  diagnostics: vscode.DiagnosticCollection,
-): Promise<void> {
+export async function scanWithLatestEngine(context: vscode.ExtensionContext): Promise<void> {
   const root = getProjectRoot();
   if (!root) {
     void vscode.window.showWarningMessage(l10n('externalEngine.noProject'));
@@ -112,6 +124,7 @@ export async function scanWithLatestEngine(
         );
         return;
       }
+      const diagnostics = getEngineDiagnostics(context);
       diagnostics.clear();
       for (const [file, list] of groupDiagnosticsByFile(payload.diagnostics)) {
         diagnostics.set(vscode.Uri.file(file), list.map(toVscodeDiagnostic));

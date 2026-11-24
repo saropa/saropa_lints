@@ -78,8 +78,13 @@ Fewer false positives: over 20 rules no longer flag code that was already correc
 
 - New `scripts/checks/check_report_attribution.py` proves a reported diagnostic is a saropa_lints rule before a bug is filed or fixed; `bugs/ISSUE_REPORT_GUIDE.md` now routes Dart SDK diagnostics upstream and asks reporters to retest on the latest release.
 
+### Added
+
+- VS Code: **Saropa Lints: Scan with Latest Engine (Older Dart Projects)** runs the newest scan engine under a newer Dart SDK (PATH `dart`, or `saropaLints.externalEngine.dartSdkPath`) against a project pinned below Dart 3.11, and lists the findings in the Problems panel. The first run asks before installing the engine globally; the project's `pubspec.yaml` and SDK pin are untouched. New guide: `doc/guides/older_dart_sdks.md`.
+
 ### Fixed
 
+- VS Code: the LSP server never started because the extension passed `--no-pub` to `dart run`, an option Dart 3.8 and 3.14 both reject. It now launches `bin/lsp_server.dart` directly against the project's `package_config.json`, which also avoids any implicit `pub get`.
 - VS Code: the LSP server no longer crash-loops five times when the project's locked `saropa_lints` is older than 15.2.10 (no `bin/lsp_server.dart`, e.g. 4.15.1); the extension skips the spawn and shows one warning naming the installed version, the minimum, the exact `pubspec.yaml` edit (or the Dart SDK upgrade needed first when the project is below Dart 3.9), and an **Open pubspec.yaml** button.
 - `avoid_skipped_tests` no longer flags a `skip:` driven by `bool.fromEnvironment` / `String.fromEnvironment` / `Platform.environment` (directly or via a variable initialized from one), since that is an opt-in gate; `skip: true` and string reasons are still reported; no action required.
 - VS Code: **Run analysis** in the sidebar now restarts the Dart analysis server, shows scan progress with a Cancel button, and refreshes the views and status bar with the issue count; previously it only re-copied existing diagnostics and showed nothing when issues were found.
