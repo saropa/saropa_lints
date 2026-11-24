@@ -3,11 +3,15 @@
  * resolution and argv shape (project root must be the first positional token).
  */
 import * as assert from 'node:assert';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import {
   buildEngineActivateArgs,
   buildEngineScanArgs,
   isDartNewEnough,
+  projectNeedsExternalEngine,
+  readProjectDartVersion,
   parseDartVersion,
   resolveEngineDart,
 } from '../../externalEngine/externalEngine';
@@ -54,5 +58,24 @@ describe('engine argv', () => {
     assert.strictEqual(a[a.indexOf('saropa_lints:scan') + 1], 'D:/p');
     assert.ok(a.includes('--format') && a.includes('json'));
     assert.ok(!a.includes('--no-pub'));
+  });
+});
+
+describe('readProjectDartVersion / projectNeedsExternalEngine', () => {
+  it('reads .dart_tool/version and flags Dart 3.8 as needing the external engine', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-engine-'));
+    try {
+      fs.mkdirSync(path.join(root, '.dart_tool'));
+      fs.writeFileSync(path.join(root, '.dart_tool', 'version'), '3.8.1');
+      const v = readProjectDartVersion(root);
+      assert.deepStrictEqual(v, [3, 8]);
+      assert.strictEqual(projectNeedsExternalEngine(v), true);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+  it('does not flag Dart 3.14 or an unknown version', () => {
+    assert.strictEqual(projectNeedsExternalEngine([3, 14]), false);
+    assert.strictEqual(projectNeedsExternalEngine(undefined), false);
   });
 });

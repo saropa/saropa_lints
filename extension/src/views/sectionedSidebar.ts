@@ -81,6 +81,7 @@ import { renderTreeItem } from './triageTree';
 import { OVERVIEW_EMBEDDED_CONFIG_KINDS } from '../overviewEmbeddedConfigKinds';
 import { loadSuppressions, isPathHidden, isRuleHidden } from '../suppressionsStore';
 import { l10n } from '../i18n/runtime';
+import { projectNeedsExternalEngine, readProjectDartVersion } from '../externalEngine/externalEngine';
 // `SecurityHotspotReviewStateService` / `countSecurityHotspotReviewStates`
 // were dropped from this import (WP5): the Hotspots row moved to the
 // Findings dashboard's status-line pill (WP4), which computes its own
@@ -668,7 +669,7 @@ function buildActionItems(): LeafItem[] {
     // config keys → dropped from the sidebar entirely (P2: a button on the
     // Lints Config › Config file tab, plus the command palette — see
     // configTree.ts, `getSettingAndActionNodes` removed).
-    return [
+    const items: LeafItem[] = [
         new LeafItem(
             l10n('sidebar.actions.runAnalysisLabel'),
             l10n('sidebar.actions.runAnalysisDescription'),
@@ -718,6 +719,22 @@ function buildActionItems(): LeafItem[] {
         // everyone else. It remains discoverable via the command palette,
         // the command catalog, the CLI flag, and the guide.
     ];
+    // Conditional 4th row: only when the project's own Dart SDK is below the
+    // engine floor (e.g. FVM-pinned Flutter 3.32 = Dart 3.8). Those projects
+    // cannot get live diagnostics from the current engine, so this is their
+    // only way to run it; on every other project the row would be noise, which
+    // keeps the standard Actions list at exactly 3 rows.
+    const root = getProjectRoot();
+    if (root && projectNeedsExternalEngine(readProjectDartVersion(root))) {
+        items.push(new LeafItem(
+            l10n('sidebar.actions.latestEngineLabel'),
+            l10n('sidebar.actions.latestEngineDescription'),
+            'saropaLints.scanWithLatestEngine',
+            'rocket',
+            new vscode.ThemeColor('debugIcon.startForeground'),
+        ));
+    }
+    return items;
 }
 
 // Help commands (Getting Started, About, pub.dev, AI agent instructions) no

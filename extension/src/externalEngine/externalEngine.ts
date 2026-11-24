@@ -12,6 +12,7 @@
  * Pure helpers live here (unit-tested); the vscode glue is in
  * externalEngineCommand.ts.
  */
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 /** Dart SDK floor of the current engine (saropa_lints 17.x). */
@@ -59,4 +60,24 @@ export function buildEngineActivateArgs(): string[] {
  */
 export function buildEngineScanArgs(projectRoot: string, tier: string): string[] {
   return ['pub', 'global', 'run', 'saropa_lints:scan', projectRoot, '--tier', tier, '--format', 'json'];
+}
+
+/**
+ * Dart SDK [major, minor] the project last resolved with, from
+ * `.dart_tool/version` (written by pub). Undefined when absent/unreadable so
+ * callers never act on a guess.
+ */
+export function readProjectDartVersion(projectRoot: string): [number, number] | undefined {
+  try {
+    const raw = fs.readFileSync(path.join(projectRoot, '.dart_tool', 'version'), 'utf8').trim();
+    const m = /^(\d+)\.(\d+)/.exec(raw);
+    return m ? [Number(m[1]), Number(m[2])] : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** True when the project's SDK is known and below the engine floor. */
+export function projectNeedsExternalEngine(version: readonly [number, number] | undefined): boolean {
+  return version !== undefined && !isDartNewEnough(version);
 }

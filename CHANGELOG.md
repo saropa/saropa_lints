@@ -80,7 +80,7 @@ Fewer false positives: over 20 rules no longer flag code that was already correc
 
 ### Added
 
-- VS Code: **Saropa Lints: Scan with Latest Engine (Older Dart Projects)** runs the newest scan engine under a newer Dart SDK (PATH `dart`, or `saropaLints.externalEngine.dartSdkPath`) against a project pinned below Dart 3.11, and lists the findings in the Problems panel. The first run asks before installing the engine globally; the project's `pubspec.yaml` and SDK pin are untouched. New guide: `doc/guides/older_dart_sdks.md`.
+- VS Code: **Saropa Lints: Scan with Latest Engine (Older Dart Projects)** runs the newest scan engine under a newer Dart SDK (PATH `dart`, or `saropaLints.externalEngine.dartSdkPath`) against a project pinned below Dart 3.11, and lists the findings in the Problems panel. It also appears as a **Scan with latest engine** row in the sidebar Actions list, shown only when the project's Dart SDK is below 3.11. The first run asks before installing the engine globally; the project's `pubspec.yaml` and SDK pin are untouched. New guide: `doc/guides/older_dart_sdks.md`.
 
 ### Fixed
 

@@ -2818,6 +2818,8 @@
     "actions": {
       "runAnalysisLabel": "Run analysis",
       "runAnalysisDescription": "Re-run analyzer",
+      "latestEngineLabel": "Scan with latest engine",
+      "latestEngineDescription": "This project's Dart SDK is too old for live analysis",
       "updateConfigLabel": "Update config",
       "updateConfigDescription": "Initialize or refresh analysis options"
     },
