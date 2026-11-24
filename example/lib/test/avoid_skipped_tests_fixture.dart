@@ -172,3 +172,16 @@ void _goodTestExplicitlyNotSkipped() {
     expect(1, equals(1));
   }, skip: false);
 }
+
+// GOOD: Should NOT trigger avoid_skipped_tests — Platform.environment gate.
+void _goodEnvGatedSkipPlatform() {
+  test('renders golden', () {}, skip: Platform.environment['CI'] == null);
+}
+
+// BAD: Should trigger avoid_skipped_tests — a same-named local that is NOT
+// env-derived must not be exempted by an unrelated env const elsewhere.
+// expect_lint: avoid_skipped_tests
+void _badSkippedViaPlainLocal() {
+  const bool _screenshotsEnabled = true;
+  test('computes total', () {}, skip: _screenshotsEnabled); // LINT
+}

@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../fixes/test/replace_expect_with_expect_later_fix.dart';
@@ -4064,26 +4065,42 @@ class AvoidSkippedTestsRule extends SaropaLintRule {
 
   /// True when [expr] is computed from a compile-time/process environment
   /// source: `bool/String/int.fromEnvironment`, `hasEnvironment`, or
-  /// `Platform.environment`. Identifiers in [expr] are followed (by name,
-  /// within the same file) to their variable initializers so
+  /// `Platform.environment`. Identifiers in [expr] are followed to their
+  /// const initializers so
   /// `const enabled = bool.fromEnvironment('X'); ... skip: !enabled` is
-  /// recognized. String/bool literals contain no such reference, so a plain
+  /// recognized. Resolved elements are used first (scope-correct, works across
+  /// files); only an unresolved identifier falls back to a same-file name
+  /// match. String/bool literals contain no such reference, so a plain
   /// `skip: true` or `skip: 'reason'` is still reported.
   static bool _dependsOnEnvironment(Expression expr, AstNode context) {
-    final AstNode root = context.root;
-    final Set<String> visited = <String>{};
+    final Set<Object> visited = <Object>{};
+    // Name -> initializers for unresolved identifiers; built at most once.
+    Map<String, List<Expression>>? byName;
     final List<AstNode> pending = <AstNode>[expr];
     while (pending.isNotEmpty) {
       final _EnvRefVisitor finder = _EnvRefVisitor();
       pending.removeLast().accept(finder);
       if (finder.found) return true;
-      // Follow each referenced identifier to its declaration initializer.
-      // `visited` stops cycles and repeated work on shared names.
-      for (final String name in finder.identifiers) {
-        if (!visited.add(name)) continue;
-        final _VarInitFinder decl = _VarInitFinder(name);
-        root.accept(decl);
-        pending.addAll(decl.initializers);
+      for (final SimpleIdentifier ref in finder.identifiers) {
+        Element? el = ref.element;
+        // A top-level/static const is referenced through its getter.
+        if (el is PropertyAccessorElement) el = el.variable;
+        if (el is VariableElement) {
+          // `visited` stops cycles and repeated work on shared variables.
+          if (!visited.add(el)) continue;
+          final Expression? init = el.constantInitializer;
+          if (init != null) pending.add(init);
+        } else if (el == null) {
+          // Unresolved (e.g. analysis without full resolution): match by
+          // name within this file only.
+          if (!visited.add(ref.name)) continue;
+          if (byName == null) {
+            final _VarInitFinder decls = _VarInitFinder();
+            context.root.accept(decls);
+            byName = decls.initializersByName;
+          }
+          pending.addAll(byName[ref.name] ?? const <Expression>[]);
+        }
       }
     }
     return false;
@@ -4094,7 +4111,7 @@ class AvoidSkippedTestsRule extends SaropaLintRule {
 /// identifiers it mentions so the caller can chase them to declarations.
 class _EnvRefVisitor extends RecursiveAstVisitor<void> {
   bool found = false;
-  final Set<String> identifiers = <String>{};
+  final List<SimpleIdentifier> identifiers = <SimpleIdentifier>[];
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
@@ -4106,14 +4123,21 @@ class _EnvRefVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     // `const bool.fromEnvironment('X')` parses as a constructor call.
-    if (node.constructorName.name?.name == 'fromEnvironment') found = true;
+    // Without resolution the parser reads `bool.fromEnvironment` as an
+    // import-prefixed type name (`bool` prefix, `fromEnvironment` name), so
+    // check the type name as well as the constructor name.
+    if (node.constructorName.name?.name == 'fromEnvironment' ||
+        node.constructorName.type.name.lexeme == 'fromEnvironment') {
+      found = true;
+    }
     super.visitInstanceCreationExpression(node);
   }
 
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
     // `Platform.environment` (dart:io).
-    if (node.prefix.name == 'Platform' && node.identifier.name == 'environment') {
+    if (node.prefix.name == 'Platform' &&
+        node.identifier.name == 'environment') {
       found = true;
     }
     super.visitPrefixedIdentifier(node);
@@ -4121,12 +4145,14 @@ class _EnvRefVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitPropertyAccess(PropertyAccess node) {
-    // Only `Platform.environment` (e.g. `dart:io` via a prefix) counts; an
-    // unrelated `config.environment` must not exempt a skip.
+    // `io.Platform.environment` (import prefix) parses as a property access
+    // on a prefixed identifier. An unrelated `config.environment` must not
+    // exempt a skip, so the target must be the `Platform` class.
     final Expression? target = node.target;
-    if (node.propertyName.name == 'environment' &&
-        target is SimpleIdentifier &&
-        target.name == 'Platform') {
+    final bool targetIsPlatform =
+        (target is SimpleIdentifier && target.name == 'Platform') ||
+        (target is PrefixedIdentifier && target.identifier.name == 'Platform');
+    if (node.propertyName.name == 'environment' && targetIsPlatform) {
       found = true;
     }
     super.visitPropertyAccess(node);
@@ -4134,23 +4160,23 @@ class _EnvRefVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    identifiers.add(node.name);
+    identifiers.add(node);
     super.visitSimpleIdentifier(node);
   }
 }
 
-/// Collects initializers of every variable declaration named [name] in a
-/// unit (top-level, field, or local — name match only, unresolved).
+/// Maps every variable name in a unit to its initializers (top-level, field,
+/// or local — name match only, used for unresolved identifiers).
 class _VarInitFinder extends RecursiveAstVisitor<void> {
-  _VarInitFinder(this.name);
-
-  final String name;
-  final List<AstNode> initializers = <AstNode>[];
+  final Map<String, List<Expression>> initializersByName =
+      <String, List<Expression>>{};
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
     final Expression? init = node.initializer;
-    if (node.name.lexeme == name && init != null) initializers.add(init);
+    if (init != null) {
+      (initializersByName[node.name.lexeme] ??= <Expression>[]).add(init);
+    }
     super.visitVariableDeclaration(node);
   }
 }

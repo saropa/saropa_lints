@@ -41,8 +41,8 @@ wrapper, instead of at 12 call sites.
 
 `avoid_skipped_tests` reported every `skip:` argument that was not the literal `false`, including opt-in gates driven by `bool.fromEnvironment`. The rule now exempts skip expressions that reference an environment source.
 
-- `AvoidSkippedTestsRule` (`lib/src/rules/testing/test_rules.dart`) calls `_dependsOnEnvironment`, which detects `fromEnvironment`, `hasEnvironment` and `Platform.environment`, and follows identifiers by name within the same file to their variable initializers (cycle-guarded).
-- `skip: true` and string-reason skips are still reported.
-- Fixture `example/lib/test/avoid_skipped_tests_fixture.dart` gained a const-gated and an inline-gated GOOD case.
-- Known limits: name-based lookup (no scoping; a same-named unrelated variable can cause a false negative); flag constants declared in other files are not followed; the file is re-traversed per distinct identifier.
-- Verified: `dart test test/rules/testing/test_rules_test.dart` passes (69 tests). The rule itself has not been run against the fixture with the scan CLI.
+- `AvoidSkippedTestsRule` (`lib/src/rules/testing/test_rules.dart`) calls `_dependsOnEnvironment`, which detects `fromEnvironment`, `hasEnvironment`, `Platform.environment` and `io.Platform.environment`, and follows identifiers to their const initializers via resolved elements (`VariableElement.constantInitializer`, works across files; cycle-guarded). Unresolved identifiers fall back to a same-file name match built once per call.
+- `skip: true`, string reasons and plain consts are still reported; `config.environment` is not treated as an env source.
+- Fixture `example/lib/test/avoid_skipped_tests_fixture.dart` gained const-gated, inline-gated, `Platform.environment` GOOD cases and a plain-local BAD case.
+- Known limits: non-const (`final`) variables have no `constantInitializer` and are not followed when resolved; the name fallback has no scoping.
+- Verified: `dart test test/rules/testing/test_rules_test.dart` passes (69 tests); scan CLI on a scratch test file (`D:	mp\skipscan`) in both default and `--resolve` modes flags exactly `skip: true`, `skip: 'reason'` and a plain const, and exempts the five env-gated forms.
