@@ -26,7 +26,7 @@
       "monitoring": {
         "header": "Baru: Pemantauan Kesehatan Mesin",
         "body": "Ekstensi sekarang memantau RAM sistem, setiap server analisis Dart, Flutter daemon, dan proses latar belakang — bukan hanya yang miliknya sendiri. Indikator Anggaran Alat Pengembangan memberi peringatan ketika alat pengembangan melebihi bagian RAM yang dapat dikonfigurasi, dan proses yang terlantar dari sesi yang crash terdeteksi saat startup.",
-        "why": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.",
+        "why": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.",
         "actionDashboard": "Buka Kesehatan Mesin",
         "actionThresholds": "Konfigurasikan Ambang Batas"
       },
@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Aturan & Tingkatan",
-        "description": "Konfigurasikan aturan dari 2.300+ yang berjalan dan pada tingkat keparahan apa."
+        "description": "Konfigurasikan mana dari 2.350+ aturan yang berjalan dan pada tingkat keparahan apa."
       },
       "catalog": {
         "label": "Katalog Komando Katalog Perintah",
@@ -236,7 +236,7 @@
       "boolean_naming": "Boolean harus menggunakan is/has/can/should prefix sehingga intent jelas dalam kondisional dan API.",
       "code_style_preferences": "Cara menulis return, conditionals, dan loops — return segera, for-in, getter vs method, dan shorthand serupa.",
       "function_parameter_style": "Fungsi panah ketika ringkas, semua parameter bernama, panggilan balik inline, dan tidak ada penugasan ulang parameter.",
-      "widget_style": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Keluaran HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Pilihan widget Flutter — SizedBox.square, center over align, spacing over SizedBox, dan menghindari shrinkWrap dalam scrolls. Flutter proyek hanya.",
+      "widget_style": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Pilihan widget Flutter — SizedBox.square, center over align, spacing over SizedBox, dan menghindari shrinkWrap dalam scrolls. Flutter projects only.",
       "class_record_style": "Kelas vs jenis pengembalian rekaman, awalan underscore pribadi, dan eksplisit ini di mana ia memperjelas.",
       "formatting": "Atur letak baris kosong, koma di akhir, dan gaya literal serta komentar. Bisa menghasilkan banyak peringatan — banyak file mungkin memerlukan perubahan.",
       "comments_documentation": "TODO dan FIXME format, kasus kalimat, periode setelah komentar doc, /// lebih dari //, dan tidak ada kode dikomentari-out.",
@@ -258,8 +258,8 @@
     "domainDesc": {
       "state-management": "Block, Riverpod, Provider, GetX dan state-related serta dependence injection libraries.",
       "networking-apis": "HTTP klien, GraphQL, Firebase, Supabase dan konektivitas.",
-      "storage-persistence": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Basis data lokal dan penyimpanan kunci-nilai — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Routing dan penanganan deep-link — auto_route, go_router, app_links, url_launcher, dan webview.",
+      "storage-persistence": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Basis data lokal dan penyimpanan kunci-nilai — Drift, Hive, Isar, sqflite, shared_preferences.",
+      "navigation-deep-links": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Routing dan penanganan deep-link — auto_route, go_router, app_links, url_launcher, dan webview.",
       "media-graphics": "Gambar, SVG, animasi, audio, peta, pemetik dan mesin Flame.",
       "device-platform": "Sensor, lokasi, izin, biometrik, pemberitahuan dan pekerjaan latar belakang.",
       "identity-sharing": "Penyedia login, berbagi dan review in-app.",
@@ -1959,7 +1959,7 @@
       "progress": "{percent}% — {done}/{total} file"
     },
     "reports": {
-      "intro": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Laporan CLI satu klik yang sebelumnya memerlukan terminal. Setiap tombol Run mengalirkan output langsung alat di bawah kartu dan menyimpan salinan di bawah reports/.saropa_lints/reports-tab/",
+      "intro": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Laporan CLI satu klik yang sebelumnya memerlukan terminal. Setiap tombol Run mengalirkan output langsung alat di bawah kartu dan menyimpan salinan di bawah reports/.saropa_lints/reports-tab/",
       "runButton": "Jalankan",
       "notRunYet": "Belum dijalankan",
       "running": "Berjalan…",
@@ -2185,7 +2185,7 @@
         "ci": "Membaca dan menulis .github/workflows/saropa-lints.yml di pohon kerja Anda untuk mengaktifkan atau menonaktifkan workflow GitHub Actions yang dikemas. Ini mencerminkan file pada cabang saat ini Anda — salinan dari cabang default adalah yang sebenarnya mengatur pull request, dan keduanya dapat berbeda. Mengaktifkan atau menonaktifkan tidak pernah menjalankan atau menghapus workflow; Anda tetap meninjau dan mengkomit perubahan tersebut sendiri."
       },
       "recommended": {
-        "analyzerPlugin": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang telah diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Direkomendasikan: MATI saat Server LSP sedang aktif. Nyalakan (dengan LSP MATI) jika aturan berhenti memicu di bawah LSP.",
+        "analyzerPlugin": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TERTULIS, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Direkomendasikan: MATI saat Server LSP aktif. Nyalakan (dengan LSP MATI) jika aturan berhenti memicu di bawah LSP.",
         "scanDaemon": "Rekomendasi: ON.",
         "lspServer": "Rekomendasi: ON (default, beta). Menutupi diagnosa langsung.",
         "ci": "Rekomendasi: NYALAKAN hanya jika Anda ingin pull request di- gate."
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints plugin dalam proses diaktifkan kembali. Mengulang restart server analisis Dart untuk memuat ulangnya.",
       "reenableNothingToRestore": "Saropa Lints: tidak ada yang bisa dikembalikan. Plugin dalam proses tidak saat ini dinonaktifkan melalui ekstensi.",
       "noOpenDartFiles": "Saropa Lints: tidak ada file Dart yang terbuka. Buka kembali file Dart atau nonaktifkan pengaturan \"Hanya buka editor\".",
+      "analysisScanning": "Memindai workspace… {percent}% ({count} masalah sejauh ini)",
       "configUpdated": "Saropa Lints config diperbarui (tier: {tier}). dan lain-lain.",
       "configWriteFailed": "Config write gagal. {details}",
       "scaffoldGateTitle": "Komposisi analiser plugin scaffolding perancah.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "Menggunakan pub get… ({elapsed}s)",
       "progressConfigWrite": "Menulis konfigurasi… ({elapsed}s)",
       "progressAnalysis": "Analisis sedang berjalan… ({elapsed}s)",
-      "progressBaseline": "Melakukan pemindaian dasar… ({elapsed}s)",
-      "analysisScanning": "Memindai workspace… {percent}% ({count} masalah sejauh ini)"
+      "progressBaseline": "Melakukan pemindaian dasar… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Analisis Jalur Set",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Tidak ditemukan server Drift Advisor. Mulai aplikasi Anda dengan server yang berjalan, lalu klik Refresh.",
     "integrationOff": "Drift Advisor integrasi dimatikan. Aktifkan di pengaturan (saropaLints.driftAdvisor.integration), lalu klik Segarkan."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Tindakan Penyensor (sengaja SDK lama)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Perbarui",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints gratis dan open source. Peringkat atau ulasan singkat membantu developer lain menemukannya — dan masukan serta laporan bug di GitHub membuatnya terus lebih baik.",
       "marketplace": "Beri peringkat di Marketplace",
       "openVsx": "Beri peringkat di Open VSX",
+      "dismiss": "Tidak sekarang",
       "never": "Jangan tanya lagi"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "Pemindaian melambatkan diri sendiri dari {from} ke {to} pekerja untuk menjaga komputer Anda tetap responsif ({reason}).",
+    "aborted": "Pemindaian dihentikan lebih awal untuk melindungi komputer Anda ({reason}). Hasilnya tidak lengkap.",
+    "deepNotEnoughMemory": "Scan berbasis tipe membutuhkan sekitar {needed}, tetapi hanya {free} yang tersedia (mempertahankan {reserve} untuk segala hal lainnya). Scan cepat selesai jauh lebih cepat dan menggunakan memori yang jauh lebih sedikit.",
+    "deepPaused": "Pemindaian dijeda: memori bebas adalah {free}, di bawah {reserve} yang dipertahankan bebas untuk komputer Anda. Ini akan berlanjut secara otomatis ketika memori tersedia kembali.",
+    "fastDone": "Pindaian cepat selesai: {files} file, {issues} masalah dalam {seconds}.",
+    "fastDoneOfferDeep": "Pindaian cepat selesai: {files} file, {issues} masalah dalam {seconds}. Pindaian yang tipe-aware dapat menemukan lebih banyak, tetapi memakan waktu sekitar {minutes} menit dan {memory} memori.",
+    "fastDoneDeepUnavailable": "Pindaian cepat selesai: {files} file, {issues} masalah dalam {seconds}. Pindaian yang tipe-aware membutuhkan sekitar {needed}, tetapi hanya {free} yang tersedia saat ini.",
+    "daemonLowMemory": "Pemindaian berbasis tipe membutuhkan sekitar {needed}, tetapi hanya {free} memori yang tersedia (menggunakan {reserve} untuk hal lainnya). Pemindaian tanpa tipe untuk sementara waktu agar komputer Anda tetap responsif.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Gunakan Profil Lembut",
+      "openSettings": "Buka Pengaturan",
+      "runFast": "Jalankan Pindaian Cepat",
+      "runDeep": "Jalankan Pindaian Mendalam",
+      "runDeepAnyway": "Jalankan Pindaian Mendalam Tetap saja",
+      "resume": "Lanjutkan Sekarang",
+      "cancelScan": "Batalkan Pindaian",
+      "turnOffTypeResolution": "Matikan Resolusi Tipe",
+      "startAnyway": "Mulai Sekarang",
+      "notNow": "Tidak sekarang, tidak sekarang.",
+      "neverAskDeep": "Jangan Tanya Lagi",
+      "applyPlugin": "Terapkan",
+      "noThanks": "Tidak, Terima Kasih",
+      "restartAnalysisServer": "Restart Analisis Server"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Pemindaian Kinerja",
+      "machine": "{cores} inti CPU · {free} bebas dari {total}",
+      "recommended": "direkomendasikan untuk komputer ini",
+      "resources": "{jobs} pekerja(s) · {memory} anggaran memori",
+      "openSettings": "Buka semua pengaturan scan",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Lembut",
+        "balanced": "Seimbang",
+        "fast": "Cepat"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Tidak mengganggu: maksimal 2 pekerja dan seperempat memori bebas. Terbaik untuk laptop.",
+        "balanced": "Mengosongkan satu core dan menggunakan hingga setengah dari memori bebas. Cocok untuk sebagian besar mesin.",
+        "fast": "Menggunakan setiap memori inti dan hingga 70% memori bebas. Selesai lebih cepat tetapi dapat memperlambat bagian lain dari komputer Anda."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Juga batasi analisis live (plugin analizer Dart) sekitar {limit} dan hilangkan aturan dengan tingkat keparahan rendah secara mulus ketika memori habis? Tanpa batas, proyek besar dapat membuat server analisis tumbuh hingga beberapa GB.",
+      "offerSmallMachine": "Komputer ini memiliki {total} memori. Membatasi analisis live hanya sekitar {limit}, dan melepas aturan dengan tingkat keparahan rendah secara elegan ketika memori mulai berkurang, menjaga responsifnya. Terapkan ini?",
+      "applied": "Disimpan: analisis langsung terbatas sekitar {limit}. Mulai ulang server analisis untuk menerapkannya.",
+      "writeFailed": "Tidak dapat memperbarui analysis_options_custom.yaml. Periksa apakah file tersebut dapat ditulis."
     }
   }
 }

@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Regels & Tiers",
-        "description": "Configureer welke van de 2.300+ regels actief zijn en op welke ernst."
+        "description": "Stel in welke van de 2.350+ regels actief zijn en op welke ernst."
       },
       "catalog": {
         "label": "Bevelslijst Katalogus Commando Catalogus",
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints in-process plugin is opnieuw ingeschakeld. Herstarten van de Dart analyse-server om het op te laden.",
       "reenableNothingToRestore": "Saropa Lints: niets te herstellen. Het in-proces plugin is momenteel niet gedeactiveerd via de extensie.",
       "noOpenDartFiles": "Saropa Lints: geen open Dart bestanden gevonden. Heropen een Dart bestand of de instelling \"Alleen open editors\" uitschakelen.",
+      "analysisScanning": "Werkruimte scannen… {percent}% ({count} problemen tot nu toe)",
       "configUpdated": "Saropa Lints config is bijgewerkt (tier: {tier}). het is een soort van",
       "configWriteFailed": "Config schrijven mislukte. {details}",
       "scaffoldGateTitle": "Composite analyzer plugin scaffold steigerwerk.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "pub get uitvoeren… ({elapsed}s)",
       "progressConfigWrite": "Config schrijven… ({elapsed}s)",
       "progressAnalysis": "Analyseren... ({elapsed}s)",
-      "progressBaseline": "Baseline-scan uitvoeren… ({elapsed}s)",
-      "analysisScanning": "Werkruimte scannen… {percent}% ({count} problemen tot nu toe)"
+      "progressBaseline": "Baseline-scan uitvoeren… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Analyseer Regel",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Geen Drift Advisor server gevonden. Start je app met de server draaiend, daarna klik je op Vernieuwen.",
     "integrationOff": "Drift Advisor integratie is uitgeschakeld. Schakel het in de instellingen in (saropaLints.driftAdvisor.integration), daarna klik je op Vernieuwen."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Dempen (bewuste oude SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Upgrade upgraden is een upgrade.",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints is gratis en open source. Een korte beoordeling of review helpt andere ontwikkelaars het te ontdekken, en feedback en bugmeldingen op GitHub maken het steeds beter.",
       "marketplace": "Beoordelen op Marketplace",
       "openVsx": "Beoordelen op Open VSX",
+      "dismiss": "Niet nu",
       "never": "Niet meer vragen"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "De scan vertraagde zichzelf van {from} naar {to} werkers om uw computer responsief te houden ({reason}).",
+    "aborted": "De scan is vroegtijdig gestopt om je computer te beschermen ({reason}). Resultaten zijn gedeeltelijk.",
+    "deepNotEnoughMemory": "Een type-aware scan heeft ongeveer {needed}, maar alleen {free} is vrij ({reserve} wordt gebruikt voor alles anders). De snelle scan eindigt veel sneller en gebruikt veel minder geheugen.",
+    "deepPaused": "Scan is gepauzeerd: vrije geheugenruimte is {free}, onder de {reserve} die vrijgehouden wordt voor uw computer. Het houdt automatisch verder als geheugen vrijkomt.",
+    "fastDone": "Snel scan voltooid: {files} bestanden, {issues} probleem(s) in {seconds}s.",
+    "fastDoneOfferDeep": "Snel scan voltooid: {files} bestanden, {issues} probleem(en) in {seconds}s. Een type-gerichte scan kan meer vinden, maar duurt ongeveer {minutes} minuten en {memory} van geheugen.",
+    "fastDoneDeepUnavailable": "Snel scan voltooid: {files} bestanden, {issues} probleem(en) in {seconds}s. Een type-gerichte scan vereist ongeveer {needed}, maar er is nu alleen {free} vrij.",
+    "daemonLowMemory": "Type-aware scanning vereist ongeveer {needed}, maar er is alleen {free} aan geheugen vrij ({reserve} wordt gebruikt voor alles anders). Scannen zonder types voor nu zodat je computer blijft responsief.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Gebruik Gentle Profiel",
+      "openSettings": "Instellingen openen",
+      "runFast": "Snelle Scans uitvoeren",
+      "runDeep": "Deep Scan uitvoeren",
+      "runDeepAnyway": "Doorgaan met diepe scan",
+      "resume": "Nu opnieuw opstarten",
+      "cancelScan": "Scan annuleren",
+      "turnOffTypeResolution": "Type Resolutie Uitzetten",
+      "startAnyway": "Start toch",
+      "notNow": "Nu niet, nu niet.",
+      "neverAskDeep": "Niet Vraag Opnieuw",
+      "applyPlugin": "Toepassen",
+      "noThanks": "Niet dankjewel",
+      "restartAnalysisServer": "Analyseer Server opnieuw"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Prestatie scan",
+      "machine": "{cores} CPU-kernen · {free} vrij van {total}",
+      "recommended": "aanbevolen voor deze computer",
+      "resources": "{jobs} werker(s) · {memory} geheugen budget",
+      "openSettings": "Alle scaninstellingen openen",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Zacht",
+        "balanced": "Balans",
+        "fast": "Snel"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Blijft uit de weg: maximaal 2 werkers en een kwart vrije geheugen. Ideaal voor laptops.",
+        "balanced": "Laat één core vrij en gebruikt tot halverwege de vrije geheugen. Juist voor de meeste machines.",
+        "fast": "Gebruikt elke kern en tot 70% van de vrije geheugen. Beëindigt sneller, maar kan de rest van je computer vertragen."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Beperk ook live analyse (het Dart analyzer plug-in) tot ongeveer {limit} en verlaag zachtseveriteit regels zachtjes bij beperkte geheugen? Zonder beperking kan een groot project de analyse server tot meerdere GB laten groeien.",
+      "offerSmallMachine": "Deze computer heeft {total} aan geheugen. Beperken van live analyse tot ongeveer {limit} en loslaten van lage ernst regels wanneer het geheugen op het minimum zakt, houdt het responsief. Toepassen?",
+      "applied": "Bewaard: live analyse is beperkt tot ongeveer {limit}. Start de analyse-server op om het toe te passen.",
+      "writeFailed": "Kon analysis_options_custom.yaml niet bijwerken. Controleer of het bestand schrijfbaar is."
     }
   }
 }

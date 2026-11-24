@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints プラグインが再び有効になりました。Dart 分析サーバーを再起動してそのプラグインを再読み込みしています。",
       "reenableNothingToRestore": "Saropa Lints: 恢復するものがありません。拡張機能によって現在、インプロセスプラグインは無効にしていません。",
       "noOpenDartFiles": "Saropa Lints: フォローしている オープンした Dartファイルが見つかりませんでした. Dart ファイルを再開するか\",編集者のみを開く\"の設定をオフにします.",
+      "analysisScanning": "ワークスペースをスキャン中… {percent}%（これまでに {count} 件の問題）",
       "configUpdated": "Saropa Lintsコンフィギュレーションを更新しました (Tier: {tier}). フォローしている",
       "configWriteFailed": "コンフィギュレーション書き込みが失敗しました. {details}",
       "scaffoldGateTitle": "複合分析器プラグインのエスカフォールド",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "pub getを実行中…（{elapsed}s）",
       "progressConfigWrite": "設定を書いている…（{elapsed}s）",
       "progressAnalysis": "解析中… ({elapsed}s)",
-      "progressBaseline": "ベースラインスキャンを実行中…（{elapsed}s）",
-      "analysisScanning": "ワークスペースをスキャン中… {percent}%（これまでに {count} 件の問題）"
+      "progressBaseline": "ベースラインスキャンを実行中…（{elapsed}s）"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: アナリシスレーンの設定",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Drift Advisorサーバーが見つかりません。アプリを起動する際はサーバーを事前に起動し、その後リフレッシュをクリックしてください。",
     "integrationOff": "Drift Advisor インテグレーションはオフです。設定（saropaLints.driftAdvisor.integration）で有効にして、その後リフレッシュをクリックしてください。"
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "抑制（意図的な旧SDK）"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "アップグレードアップデート",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints は無料のオープンソースです。簡単な評価やレビューは他の開発者が見つける助けになり、GitHub へのフィードバックやバグ報告は改善につながります。",
       "marketplace": "Marketplace で評価",
       "openVsx": "Open VSX で評価",
+      "dismiss": "今すぐではない",
       "never": "今後は確認しない"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "スキャンは {from} から {to} に作業を減らして、あなたのコンピュータが応答性を保つようにしました ({reason})。",
+    "aborted": "スキャンはあなたのコンピュータを保護するため早期に停止しました ({reason})。結果は一部です。",
+    "deepNotEnoughMemory": "タイプアウェアなスキャンには約{needed}が必要ですが、無料で利用できるのは{free}のみ（その他すべてのために{reserve}を保持します）。高速スキャンははるかに早く終わり、メモリ使用量も大幅に減少します。",
+    "deepPaused": "スキャン一時停止: 空きメモリは{free}で、あなたのコンピュータのために保持される{reserve}の下にある。メモリが解放されると自動的に再開されます。",
+    "fastDone": "スキャン完了: {files}ファイル、{issues}の問題が{seconds}にあります。",
+    "fastDoneOfferDeep": "スキャン完了: {files}ファイル、{issues}の問題が{seconds}にあります。型を意識したスキャンはより多くの問題を見つけますが、約{minutes}分と{memory}のメモリが必要です。",
+    "fastDoneDeepUnavailable": "スキャン完了: {files}ファイル、{issues}の問題が{seconds}にあります。型を意識したスキャンには約{needed}が必要ですが、現在は{free}のみが無料です。",
+    "daemonLowMemory": "型を意識したスキャンは{needed}について必要ですが、現在はメモリの{free}が空いており（他のすべてのために{reserve}を確保しています）、型なしでスキャンしていますので、コンピュータが応答性を保つことができます。",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Gentle Profileを使用する",
+      "openSettings": "設定を開く",
+      "runFast": "高速スキャンを実行",
+      "runDeep": "深くスキャンを実行",
+      "runDeepAnyway": "深くスキャンを実行する",
+      "resume": "再開する",
+      "cancelScan": "スキャンを中止",
+      "turnOffTypeResolution": "タイプ解決をオフにする",
+      "startAnyway": "即時開始",
+      "notNow": "今,今ではない.",
+      "neverAskDeep": "もう一度尋ねない",
+      "applyPlugin": "適用する",
+      "noThanks": "ノー・サンキュー",
+      "restartAnalysisServer": "分析サーバーを再起動"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "スキャンパフォーマンス",
+      "machine": "{cores} CPUコア · {free}が{total}から解放されました",
+      "recommended": "このコンピュータ向けの推奨",
+      "resources": "{jobs} ワーカー(s) · {memory} メモリ バジェット",
+      "openSettings": "スキャン設定をすべて開く",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "穏やか",
+        "balanced": "バランス取れた",
+        "fast": "スピーディー"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "邪魔にならない: 最大で2つのワーカーと自由メモリの四分の一。ラップトップには最適。",
+        "balanced": "1コアを空けており、空いているメモリの半分まで使用します。ほとんどのマシンに適しています。",
+        "fast": "すべてのコアを使用し、空きメモリの最大70%を使用します。早めに終了しますが、コンピュータの他の部分を遅くする可能性があります。"
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "また、ライブ分析（Dartアナライザプラグイン）の制限を約{limit}にし、メモリが不足したときに低重要度のルールを優雅に削除してください。制限がないと、大規模なプロジェクトは分析サーバーを数GBにまで拡大します。",
+      "offerSmallMachine": "このコンピュータは{total}のメモリを持っています。メモリが不足したときに低深刻度のルールを優雅に削除し、ライブ分析を{limit}程度に制限することで、応答性を保ちます。適用しますか？",
+      "applied": "保存済み: ライブ分析は約{limit}に制限されています。分析サーバーを再起動して適用してください。",
+      "writeFailed": "analysis_options_custom.yaml を更新できませんでした。ファイルが書き込み可能であることを確認してください。"
     }
   }
 }

@@ -7,7 +7,7 @@
   "views.actions.name": "Acties",
   "views.status.name": "Status",
   "command.auditFolder.title": "Saropa: Audit Map...",
-  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2350+ Dart en Flutter lint-regels voor beveiliging, toegankelijkheid en prestaties.\n\nVereist een Dart of Flutter project.\n\nOpen een map die een `pubspec.yaml` bevat om te beginnen.\n\n[Lees meer online](https://pub.dev/packages/saropa_lints)\n[Blader door alle commando's](command:saropaLints.showCommandCatalog)\n[Over Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2350+ Dart en Flutter lint regels voor beveiliging, toegankelijkheid en prestaties.\n\nVereist een Dart of Flutter project.\n\nOpen een map met een `pubspec.yaml` om te beginnen.\n\n[Lees meer online](https://pub.dev/packages/saropa_lints)\n[Blader door alle commando's](command:saropaLints.showCommandCatalog)\n[Over Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Project instellen (pubspec + config)",
   "command.disable.title": "Saropa Lints: Lint-integratie uitschakelen",
   "command.reenablePlugin.title": "Saropa Lints: In-Process Plugin opnieuw activeren",
@@ -113,6 +113,8 @@
   "command.showWelcome.title": "Saropa Lints: Wat is er nieuw",
   "command.openHelpHub.title": "Saropa Lints: Help",
   "command.openPubDevSaropaLints.title": "Saropa Lints: Open de verpakking op pub.dev.",
+  "command.rateOnMarketplace.title": "Saropa Lints: Beoordelen op VS Code Marketplace",
+  "command.rateOnOpenVsx.title": "Saropa Lints: Beoordelen op Open VSX",
   "command.createSaropaInstructions.title": "Creëer Saropa Lints Instructies voor AI-agenten.",
   "command.packageVibrancy.scan.title": "Scanpakketten Scannen Pakketten",
   "command.packageVibrancy.rescan.title": "Rescan pakketten (vers)",
@@ -375,5 +377,5 @@
   "config.property.lspServer.scanDirectories.description": "Directories om te scannen bij opstarten (relatief ten opzichte van de projectwortel). Alleen gebruikt wanneer Workspace Scan is ingeschakeld. Pas dit aan om overeen te komen met je projectstructuur — bijv. voeg 'src' toe of verwijder 'test' als testbestanden niet relevant zijn.",
   "command.toggleLints.title": "Saropa Lints: Aan / Uit",
   "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version met pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
+  "command.showStatusBarMenu.title": "Saropa Lints: Statusmenu"
 }

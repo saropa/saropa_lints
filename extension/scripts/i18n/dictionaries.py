@@ -80,6 +80,7 @@ COGNATES: dict[str, list[str]] = {
 # selectors, so the translation reads naturally only for counts ≥5.
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "nl": {
+        "Gentle": "Zacht",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -426,6 +427,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "**Scan on save (saropa_lints daemon).** When **on** (default), rescans Dart files on save and shows findings as squiggles and Problems panel entries. Turn **off** to stop only this scan-on-save path—not the whole extension: the LSP server (`saropaLints.lspServer.enabled`) and the in-editor analyzer plugin are separate switches shown on the sidebar's Engines row (open **Saropa Lints: Show Process Health** for details). Use **Saropa Lints: Set Up Project** when you need to add `saropa_lints` to pubspec and write `analysis_options`.": "**محفوظ کرنے پر اسکین (saropa_lints ڈیمون)۔** جب **آن** (ڈیفالٹ) ہو، تو محفوظ کرنے پر Dart فائلوں کو دوبارہ اسکین کرتا ہے اور نتائج کو لہروں اور Problems پینل کے اندراجات کے طور پر دکھاتا ہے۔ صرف اس اسکین-آن-سیو راستے کو روکنے کے لیے **آف** کریں — پوری ایکسٹینشن نہیں: LSP سرور (`saropaLints.lspServer.enabled`) اور ایڈیٹر کا analyzer پلگ ان الگ سوئچز ہیں جو سائیڈبار کی Engines قطار میں دکھائے جاتے ہیں (تفصیلات کے لیے **Saropa Lints: Show Process Health** کھولیں)۔ جب آپ کو `saropa_lints` کو pubspec میں شامل کرنا ہو اور `analysis_options` لکھنا ہو تو **Saropa Lints: Set Up Project** استعمال کریں۔",
     },
     "de": {
+        "{jobs} worker(s) · {memory} memory budget": "{jobs} Worker · {memory} Speicherbudget",
         # Removed: old "enabled" description curated here for bold/backtick fidelity.
         # Source text changed substantially (daemon label, LSP/plugin separation,
         # Engines row reference) — old German no longer matches. Let MT re-translate;
@@ -530,6 +532,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Set Cap": "Limit festlegen",
     },
     "es": {
+        "Suppress (intentional old SDK)": "Suprimir (SDK antiguo intencional)",
+        "{jobs} worker(s) · {memory} memory budget": "{jobs} proceso(s) · {memory} de memoria",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -595,6 +599,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Doctor": "Doctor",
     },
     "it": {
+        "{jobs} worker(s) · {memory} memory budget": "{jobs} worker · {memory} di memoria",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -659,6 +664,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{grade} · {score}/100 · Gate failing": "{grade} · {score}/100 · Gate non superato",
     },
     "pt": {
+        "Gentle": "Suave",
+        "Suppress (intentional old SDK)": "Suprimir (SDK antigo intencional)",
+        "{jobs} worker(s) · {memory} memory budget": "{jobs} processo(s) · {memory} de memória",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1189,6 +1197,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "fil": {
+        "{jobs} worker(s) · {memory} memory budget": "{jobs} worker · {memory} badyet sa memorya",
         # Manual: MT returned the English unchanged for this drift label.
         "Cross-project drift": "Drift sa iba't ibang proyekto",
         # Removed: "Analyzer Plugin" is not a standalone source string (only appears
@@ -1467,6 +1476,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Status:": "Status:",
     },
     "pl": {
+        "Gentle": "Łagodny",
+        "Start Anyway": "Uruchom mimo to",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1524,6 +1535,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Manual: "Trend" is a Polish loanword; "RSS" stays as the technical abbreviation.
     },
     "sw": {
+        "Balanced": "Sawazishwa",
+        "Gentle": "Laini",
+        "Could not update analysis_options_custom.yaml. Check that the file is writable.": "Imeshindwa kusasisha analysis_options_custom.yaml. Hakikisha faili linaweza kuandikwa.",
         # Manual: cached MT output for these five degenerated (repetition-loop garbage, one
         # ending in a leaked English fragment resembling a translation-run prompt artifact,
         # and one that mistranslated the literal `--resolve` CLI flag into `--suluhisha`).
@@ -1658,6 +1672,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "tr": {
+        "Suppress (intentional old SDK)": "Bastır (bilinçli eski SDK)",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1764,6 +1779,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Run Code Health to see your score": "Запустіть Code Health, щоб побачити свій бал",
     },
     "vi": {
+        "Gentle": "Nhẹ nhàng",
+        "{jobs} worker(s) · {memory} memory budget": "{jobs} tiến trình · {memory} bộ nhớ",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.

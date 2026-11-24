@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "قواعد ومستويات",
-        "description": "حدد أي من القواعد التي تزيد عن 2350 قاعدة تعمل وأيها تُنفذ بمستوى خطورة معين."
+        "description": "ضبط أي من القواعد التي تزيد عن 2350 قاعدة تعمل وأي درجة خطورتها."
       },
       "catalog": {
         "label": "قائمة القيادة كتالوج الأوامر",
@@ -2858,6 +2858,11 @@
     "noServerFound": "لم يتم العثور على خادم Drift Advisor. ابدأ تطبيقك مع تشغيل الخادم، ثم اضغط على تحديث.",
     "integrationOff": "التكامل Drift Advisor غير مفعل. قم بتفعيله في الإعدادات (saropaLints.driftAdvisor.integration)، ثم اضغط تحديث."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "تثبيط (النسخة القديمة المقصودة من SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "ترقية الترقيات الارتقاء",
@@ -3056,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "المسح تباطأ من {from} إلى {to} عمال لضمان استمرارية جهازك ({reason}).",
+    "aborted": "المسح توقف مبكرًا لحماية جهازك ({reason}). النتائج جزئية.",
+    "deepNotEnoughMemory": "يحتاج مسح نوعي إلى حوالي {needed}، ولكن فقط {free} متوفر (ويتم الحفاظ على {reserve} لكل شيء آخر). ينتهي المسح السريع بشكل أسرع بكثير ويستخدم ذاكرة أقل بكثير.",
+    "deepPaused": "المسح متوقف: ذاكرة مخصصة حرة هي {free}، أقل من {reserve} المخصصة حرة للكمبيوتر الخاص بك. فإنه يستأنف تلقائيًا عندما تصبح الذاكرة خالية.",
+    "fastDone": "المسح السريع اكتمل: {files} ملفات، {issues} مشكلة(ات) في {seconds}s.",
+    "fastDoneOfferDeep": "المسح السريع اكتمل: {files} ملفات، {issues} مشكلة(ات) في {seconds}. يمكن للمسح المُحسّن نوعياً اكتشاف المزيد، لكنه يستغرق حوالي {minutes} دقيقة و {memory} من الذاكرة.",
+    "fastDoneDeepUnavailable": "المسح السريع اكتمل: {files} ملفات، {issues} مشكلة(ات) في {seconds}. يحتاج المسح النوعي إلى حوالي {needed}، ولكن فقط {free} متوفرة الآن.",
+    "daemonLowMemory": "المسح الوعي بالأنواع يحتاج إلى {needed}، ولكن فقط {free} من الذاكرة متوفرة (الاحتفاظ بـ {reserve} لكل شيء آخر). يتم المسح بدون أنواع الآن لضمان استمرار استجابة جهازك.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "استخدم الملف الشخصي اللطيف",
+      "openSettings": "فتح إعدادات",
+      "runFast": "تشغيل مسح سريع",
+      "runDeep": "تشغيل مسح عميق",
+      "runDeepAnyway": "التحقق من العميقAnyway",
+      "resume": "استمر الآن",
+      "cancelScan": "إلغاء المسح",
+      "turnOffTypeResolution": "إيقاف تحليل نوع البيانات",
+      "startAnyway": "ابدأAnyway",
+      "notNow": "ليس الآن وليس الآن",
+      "neverAskDeep": "لا تطلب مرة أخرى",
+      "applyPlugin": "تطبيق",
+      "noThanks": "لا شكرًا",
+      "restartAnalysisServer": "إعادة تشغيل خادم التحليل"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "فحص الأداء",
+      "machine": "الوحدات المركزية {cores} · {free} متوفرة من {total}",
+      "recommended": "مُوصى به لهذا الكمبيوتر",
+      "resources": "{jobs} عامل(ة) · {memory} ميزانية الذاكرة",
+      "openSettings": "فتح جميع إعدادات المسح",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "متواضع",
+        "balanced": "متوازن",
+        "fast": "سريع"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "يظل بعيدًا عن الطريق: حتى 2 عامل وربع ذاكرة فارغة. أفضل للكمبيوترات المحمولة.",
+        "balanced": "تترك جهازًا وحيدًا مفتوحًا وتعمل على ما يصل إلى نصف الذاكرة الحرة. مناسبة لمعظم الأجهزة.",
+        "fast": "يستخدم كل الذاكرة الحرة وصل 70% منها. ينتهي بشكل أسرع ولكن قد يبطئ باقي جهازك."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "يُرجى أيضًا تقييد تحليل الحالة الحية (الملحق Dart للملحق) إلى حوالي {limit} وتفريغ القواعد ذات الدرجة المنخفضة بلطف عند نفاد الذاكرة؟ بدون حد أقصى، يمكن لمشروع كبير أن يزيد حجم خادم التحليل إلى عدة جيجابايت.",
+      "offerSmallMachine": "هذا الكمبيوتر لديه {total} من الذاكرة. تقييد تحليل الحياة إلى حوالي {limit}، وتخلي قواعد الأهمية المنخفضة بشكل لطيف عندما تنفد الذاكرة، يبقيه سريع الاستجابة. هل ترغب في تطبيق هذا؟",
+      "applied": "تم الحفظ: تحليل مباشر محدود إلى حوالي {limit}. إعادة تشغيل خادم التحليل لتطبيقه.",
+      "writeFailed": "لم يتم تحديث analysis_options_custom.yaml. تحقق من أن الملف قابل للكتابة."
     }
   }
 }

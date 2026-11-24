@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "নিয়ম এবং স্তর",
-        "description": "২,৩০০ এর বেশি নিয়মগুলোর মধ্যে কোনটি চালু করতে হবে এবং কোন গুরুত্বপূর্ণতা স্তরে চালু করতে হবে তা সেট করুন।"
+        "description": "২,৩৫০টির বেশি নিয়মগুলোর মধ্যে কোনটি চালু করতে হবে এবং কোন গুরুত্বপূর্ণতা স্তরে চালু করতে হবে তা সেট করুন।"
       },
       "catalog": {
         "label": "কমান্ড ক্যাটালগ কমান্ট ক্যাটলগ",
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints প্রক্রিয়ায় প্লাগইন ফেরত সক্রিয় করা হয়েছে। Dart বিশ্লেষণ সার্ভারটিকে পুনরাবৃত্তি করে এটিকে পুনরায় চালু করা হচ্ছে।",
       "reenableNothingToRestore": "Saropa Lints: কিছু ফিরিয়ে আনা যাবে না। বর্তমানে এক্সটেনশন দ্বারা ইন-প্রসেস প্লাগইনটি অক্ষম করা হয়নি।",
       "noOpenDartFiles": "Saropa Lints: কোন খোলা Dart ফাইল খুঁজে পাওয়া যায়নি। একটি Dart ফাইল আবার খুলুন বা \"বাইরের এডিটর কেবল\" সেটিং অন করুন।",
+      "analysisScanning": "ওয়ার্কস্পেস স্ক্যান করা হচ্ছে… {percent}% (এখন পর্যন্ত {count}টি সমস্যা)",
       "configUpdated": "Saropa Lints কনফিগ আপডেট করা হয়েছে (স্তরঃ স্তরঃ {tier}). . . এইচপিও",
       "configWriteFailed": "কনফিগ লিখতে ব্যর্থ হয়েছে. {details}",
       "scaffoldGateTitle": "কম্পোজিট বিশ্লেষক প্লাগইন স্কেফোল্ড কাঠামোর স্ক্যাফোর্ড",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "পাব গেট চালানো হচ্ছে… ({elapsed}s)",
       "progressConfigWrite": "লিখন কনফিগ... ({elapsed}s)",
       "progressAnalysis": "অ্যানালাইসিস চালানো হচ্ছে... ({elapsed}s)",
-      "progressBaseline": "বেসলাইন স্ক্যান চালানো হচ্ছে… ({elapsed}s)",
-      "analysisScanning": "ওয়ার্কস্পেস স্ক্যান করা হচ্ছে… {percent}% (এখন পর্যন্ত {count}টি সমস্যা)"
+      "progressBaseline": "বেসলাইন স্ক্যান চালানো হচ্ছে… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: অ্যানালাইসিস লেন",
@@ -2858,6 +2858,11 @@
     "noServerFound": "কোন Drift Advisor সার্ভার পাওয়া যায়নি। সার্ভার চালু রেখে আপনার অ্যাপ শুরু করুন, তারপর রিফ্রেশ ক্লিক করুন।",
     "integrationOff": "Drift Advisor ইন্টিগ্রেশন অফ অবস্থায়। সেটিংস (saropaLints.driftAdvisor.integration) এ এনেবল করুন, তারপর রিফ্রেশ ক্লিক করুন।"
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "সাপ্প্রেস (উদ্দেশ্যমূলক পুরাতন SDK) /নো_থিং"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "আপগ্রেড করুন আপগ্রিড আপগ্রেস।",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints বিনামূল্যে ও ওপেন সোর্স। একটি দ্রুত রেটিং বা রিভিউ অন্য ডেভেলপারদের এটি খুঁজে পেতে সাহায্য করে — আর GitHub-এ আপনার মতামত ও বাগ রিপোর্ট এটিকে ক্রমাগত আরও ভালো করে তোলে।",
       "marketplace": "Marketplace-এ রেট করুন",
       "openVsx": "Open VSX-এ রেট করুন",
+      "dismiss": "না এখন",
       "never": "আর জিজ্ঞাসা করবেন না"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "স্ক্যানটি আপনার কম্পিউটারকে স্পীড করে রাখতে {from} থেকে {to} কাজকর্মী কমিয়ে দিল ({reason})।",
+    "aborted": "স্ক্যান আপনার কম্পিউটার ({reason}) রক্ষা করতে আগে থামিয়ে গেলো। ফলাফল অসম্পূর্ণ।",
+    "deepNotEnoughMemory": "একটি ধরন-সচেতন স্ক্যান প্রায় {needed} প্রয়োজন, কিন্তু কেবল {free} স্বাচ্ছন্দ্য (সব অন্যগুলো জন্য {reserve} রাখা হয়)। দ্রুত স্ক্যান অনেক দ্রুত শেষ হয় এবং অনেক কম মেমরি ব্যবহার করে।",
+    "deepPaused": "স্ক্যান বন্ধ: স্বাচ্ছন্দ্য মেমোরি হল {free}, আপনার কম্পিউটারের জন্য রক্ষিত মেমোরি থেকে নিচে রয়েছে {reserve}। মেমোরি ফ্রিড হওয়ার সাথে সাথে এটি আবার শুরু হবে।",
+    "fastDone": "ত্রুটিগুলি শেষ করেছেন: {files} ফাইল, {issues} ত্রুটি(গুলি) এর মধ্যে {seconds} গুলি।",
+    "fastDoneOfferDeep": "ত্রুটিগুলো সম্পূর্ণ হয়েছে: {files} ফাইল, {issues} সমস্যা {seconds} এ। একটি ধরণ সচেতন স্ক্যান বেশি খুঁজে পাবে, কিন্তু প্রায় {minutes} মিনিট এবং {memory} মেমরি নেবে।",
+    "fastDoneDeepUnavailable": "ঘটনা সম্পন্ন: {files} ফাইল, {issues} সমস্যা {seconds} এ। একটি ধরণ সচেতন স্ক্যান প্রায় {needed} সময় লাগে, কিন্তু এখন কেবল আছে {free}।",
+    "daemonLowMemory": "টাইপ বিষয়ক স্ক্যানিং জন্য {needed} নিয়ে কাজ করা প্রয়োজন, কিন্তু মাত্র {free} মেমরি স্বাচ্ছন্দ্য রয়েছে (সব জিনিসের জন্য {reserve} রাখা হয়েছে)। এখন টাইপ ছাড়া স্ক্যানিং করছি যাতে আপনার কম্পিউটার স্পন্ড থাকে।",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "গুঁঢ়ী প্রোফাইল ব্যবহার করুন",
+      "openSettings": "সেটিংস খুলুন",
+      "runFast": "ফেস্ট স্ক্যান চালান ✅",
+      "runDeep": "ডিপ স্ক্যান চালানো",
+      "runDeepAnyway": "কোনও পরিবর্তন ছাড়া গভীর স্ক্যান চালানো যাক",
+      "resume": "পুনরাবৃত্তি করুন এখন",
+      "cancelScan": "স্ক্যান বাতিল করুন",
+      "turnOffTypeResolution": "টাইপ সমাধান অফ করুন",
+      "startAnyway": "স্টার্ট এ্যানিওয়াই",
+      "notNow": "এখন না, এখন নয়।",
+      "neverAskDeep": "আবার জিজ্ঞাসা করবেন না",
+      "applyPlugin": "অ্যাপ্লাই",
+      "noThanks": "না ধন্যবাদ",
+      "restartAnalysisServer": "পুনরাবৃত্তি বিশ্লেষণ সার্ভার"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "প্রদর্শন স্ক্যান",
+      "machine": "{cores} CPU কোর · {free} ফ্রিয়ে আছে {total}",
+      "recommended": "এই কম্পিউটারের জন্য পরামর্শ দেওয়া হয়েছে",
+      "resources": "{jobs} কাজকর্তা(র) · {memory} মেমোরি বাজেট",
+      "openSettings": "স্ক্যান সেটিংস খুলুন",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "হালকা",
+        "balanced": "সামঞ্জস্যপূর্ণ",
+        "fast": "বেশি দ্রুত"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "স্থানান্তরিত হয় না: সর্বোচ্চ ২ জন কাজকর্মী এবং এক চতুর্থাংশ স্বাধীন মেমরি। ল্যাপটপের জন্য সর্বোত্তম।",
+        "balanced": "একটি কারে ফ্রি রাখে এবং ফ্রি মেমরির অর্ধেক ব্যবহার করে। বেশিরভাগ মেশিনের জন্য সঠিক।",
+        "fast": "প্রতিটি কেন্দ্রীয় এবং সম্পূর্ণ ৭০% ফ্রিয় মেমরি ব্যবহার করে। আপনার কম্পিউটারের অন্যান্য অংশকে ধীরে ধীরে করে দেয় কিন্তু আপনার কম্পিউটার দ্রুত শেষ হয়।"
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "সাথে সীমিত জীবন্ত বিশ্লেষণ (Dart এনালাইজার প্লাগইন) প্রায় {limit} এর মধ্যে সীমিত করুন এবং মেমরি কমে যখন কম গুরুত্বপূর্ণ নিয়মগুলি সুষ্ঠুভাবে ছাড় দিন? সীমিত না থাকলে একটি বড় প্রকল্প বিশ্লেষণ সার্ভারকে কয়েক জিবি পর্যন্ত বৃদ্ধি করতে পারে।",
+      "offerSmallMachine": "এই কম্পিউটারটি মেমরি হিসাবে {total} রয়েছে। মেমরি কম হওয়া পর্যন্ত জীবন বিশ্লেষণকে প্রায় {limit} পর্যন্ত সীমিত করে দেওয়া এবং মেমরি কম হওয়া সময় কম গুরুত্বপূর্ণ নিয়মগুলি সুষ্ঠুভাবে ছেড়ে দেওয়া এটিকে সংবেদনশীল রাখে। এটি প্রয়োগ করুন?",
+      "applied": "সংরক্ষিত: জীবনধারণ বিশ্লেষণ প্রায় {limit} পর্যন্ত সীমিত। বিশ্লেষণ সার্ভারটি পুনরাবৃত্তি করুন যাতে এটি প্রয়োগ করা যায়।",
+      "writeFailed": "analysis_options_custom.yaml আপডেট করা যায় নি। ফাইলটি লেখা যায় কিনা তা পরিক্ষণ করুন।"
     }
   }
 }

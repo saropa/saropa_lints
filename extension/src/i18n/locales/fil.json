@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Mga Tala at Mga Antas",
-        "description": "I-configure kung alin sa 2,350+ na mga rule ang mag-run at sa anong antas ng kahalagahan."
+        "description": "I-configure kung alin sa 2,350+ na mga rule ang magpapatakbo at sa anong antas ng kahimtan."
       },
       "catalog": {
         "label": "Command Catalogue Katalogo ng Pag-uutos",
@@ -256,7 +256,7 @@
       "tooltip": "Ang mga pack na ito ay nagsasalamin sa iba't ibang pangunahing bersyon ng parehong dependency. Lamang isang pack ang gumagana sa isang panahon — pagsusulit ng isang pack ay nagtatanggal ng mga iba pang mga pack."
     },
     "domainDesc": {
-      "state-management": "Ang Block, Riverpod, Provider, GetX at ang mga kaugnay na library ng estado at dependency-injection.",
+      "state-management": "Bloc, Riverpod, Provider, GetX, at mga kaugnay na librarya para sa state at dependency injection.",
       "networking-apis": "Mga kliyente ng HTTP, GraphQL, Firebase, Supabase at koneksyon.",
       "storage-persistence": "Local na mga database at key-value stores — Drift, Hive, Isar, sqflite, shared_preferences.",
       "navigation-deep-links": "Paggawa ng routing at pagpapahanda ng deep-link — auto_route, go_router, app_links, url_launcher, at webview.",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Huwag paganahin",
       "actionEnable": "Paganahin",
       "bulkRuleToggleConfirm": "{verb} {count} mga patakaran? Ito ay nag-update ng analysis_options_custom.yaml.",
-      "setupPrompt": "Nakadetekta ang Saropa Lints ng isang Dart project nang walang saropa_lints na nakakonfigure. Mag-set up ngayon para sa 2350+ lint rules.",
+      "setupPrompt": "Saropa Lints ay nakadetektuhan ng isang Dart proyekto nang walang saropa_lints na nakakonfigure. Mag-set up ngayon para sa 2350+ lint rules.",
       "actionSetUpProject": "I-set up ang proyekto, i-setup ang proyekto.",
       "actionNotNow": "Hindi ngayon, hindi pa."
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints plugin na ginamit sa proseso ay nagsimula muli. Nagrerestart ng server ng analisis ng Dart upang i-load ito muli.",
       "reenableNothingToRestore": "Saropa Lints: walang nangangailangan i-restore. Ang plugin na nasa proseso ay hindi kasalukuyang naka-disable sa pamamagitan ng extension.",
       "noOpenDartFiles": "Saropa Lints: ang mga ito ay may _ph0__. walang bukas na Dart file natagpuan. Buksan muli ang isang Dart file o i-off ang \"Open editors only\" setting.",
+      "analysisScanning": "Sina-scan ang workspace… {percent}% ({count} isyu sa ngayon)",
       "configUpdated": "Saropa Lints config na-update (tier: ang antas ng pag-config ay hindi dapat i-upgrade) {tier}). sa pamamagitan ng .",
       "configWriteFailed": "Ang Config write ay nabigo. {details}",
       "scaffoldGateTitle": "Composite analyzer plugin scaffolding ng mga gusali.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "Pumuproseso ang pub get… ({elapsed}s)",
       "progressConfigWrite": "Paghahatag ng config... ({elapsed}s)",
       "progressAnalysis": "Pagsusuri... ({elapsed}s)",
-      "progressBaseline": "Pagsusimula ng baseline scan… ({elapsed}s)",
-      "analysisScanning": "Sina-scan ang workspace… {percent}% ({count} isyu sa ngayon)"
+      "progressBaseline": "Pagsusimula ng baseline scan… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Itakda ang Analysis Lane",
@@ -2679,7 +2679,7 @@
     "costLight": "Liwanag",
     "exclusions": "Pang-exclude",
     "noExclusions": "Walang mga pag-ihiin ginawa o inirerekomenda — ang workspace ay nangangahulugan na maayos na naka-target.",
-    "applyAll": "Pangalawang Paggamit: Ang lahat ng mga patakaran ay inilapat",
+    "applyAll": "Pangalawang Patakaran:",
     "applySelected": "Pangkatin ang napiling",
     "apply": "Pangkatin",
     "remove": "Alisin ang alisan ng pag-alis",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Walang inilabas na server ng Drift Advisor. Simulan ang iyong app kasama ang server na nagsisimula, pagkatapos ay i-click ang Refresh.",
     "integrationOff": "Ang integrasyon ng Drift Advisor ay naka-off. I-enable ito sa mga setting (saropaLints.driftAdvisor.integration), pagkatapos ay i-click ang Refresh."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Ipinagbawal (intentional old SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Mag-upgrade ng Upgrade na Pagpapahusay",
@@ -2964,7 +2969,7 @@
       "noCompatible": "Walang inilabas na bersyon ng saropa_lints ang gumagana sa Dart SDK ng proyekto.",
       "noVersions": "Walang mga bersyon ng saropa_lints na available para irekomenda.",
       "probeFailed": "Hindi maitanong kung ano ang bersyon ng saropa_lints na pwedeng gamitin ang proyekto dahil ang tooling ng Dart ay hindi pa nagsimula ({detail}). Siguraduhin na ang dart o flutter ay nasa iyong PATH at ikaw ay online, pagkatapos i-check muli.",
-      "staleVersions": "Ang listahan ng mga bersyon ay hindi maitatanggal (offline), kaya ang payo ay maaaring nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangungunang nangung.",
+      "staleVersions": "Ang listahan ng mga bersyon ay hindi maitatagpo (offline), kaya ang payo ay maaaring nangungunang hindi nakakabatid.",
       "blockerSdk": "saropa_lints {version} ay nangangailangan ng mas bagong Dart SDK kaysa sa {dart}.",
       "blockerMeta": "saropa_lints {version} ay hindi kompatible sa meta version {pin} na in-pin na ng iyong Flutter SDK.",
       "blockerPackage": "{package} ang nagpapahibaro ng installation sa pamamagitan ng paglalagay ng iba't-ibang bersyon ng analyzer.",
@@ -3034,6 +3039,7 @@
       "message": "Libre at open source ang Saropa Lints. Nakakatulong ang mabilis na rating o review para madiskubre ito ng ibang developer — at pinapabuti pa ito ng feedback at bug report sa GitHub.",
       "marketplace": "I-rate sa Marketplace",
       "openVsx": "I-rate sa Open VSX",
+      "dismiss": "Hindi ngayon",
       "never": "Huwag nang magtanong muli"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "Ang pag-scan ay nag-ugnay sa sarili nito mula {from} hanggang {to} mga worker upang manatiling responsibo ang iyong computer ({reason}).",
+    "aborted": "Ang pag-scan ay nagsimula nang maaga upang protektahan ang iyong computer ({reason}). Ang mga resulta ay bahagi lamang.",
+    "deepNotEnoughMemory": "Ang isang scan na type-aware ay nangangailangan ng tungkol sa {needed}, ngunit ang {free} lamang ang libre (nag-iingat sa {reserve} para sa lahat ng iba pang mga bagay). Ang mabilis na scan ay nagtatapos nang mabilis at gumagamit ng maliit na memorya.",
+    "deepPaused": "Skan nagsuspende: libreng memorya ay {free}, sa ibaba ng {reserve} na inilagay para sa iyong computer. Ito ay sumusunod nang automatic kapag ang memorya ay malayang gamitin.",
+    "fastDone": "Mabilis na pag-scan ay tapos: {files} mga file, {issues} problema(s) sa {seconds}s.",
+    "fastDoneOfferDeep": "Mabilis na pag-scan ay tapos: {files} mga file, {issues} issue(s) sa {seconds}s. Ang isang pag-scan na may kakayahang mag-identify ng uri ay makakahanap ng mas marami, ngunit tumatagal ito ng tungkol sa {minutes} min at {memory} ng memory.",
+    "fastDoneDeepUnavailable": "Mabilis na pag-scan ay tapos: {files} mga file, {issues} issue(s) sa {seconds}s. Ang isang pag-scan na may type-aware ay nangangailangan ng tungkol sa {needed}, ngunit lamang ang {free} ay libre ngayon.",
+    "daemonLowMemory": "Nagagawa ang pag-scan na may pag-unawa sa type para sa {needed}, ngunit ang libreng memorya ay lamang {free} (nag-iingat ng {reserve} para sa lahat ng iba pang mga bagay). Nagagawa ang pag-scan nang walang type para ngayon upang manatiling responsive ang iyong computer.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Gamit ang Gentle Profile",
+      "openSettings": "Ibigay ang mga Setting",
+      "runFast": "I-run Fast Scan",
+      "runDeep": "I-run Deep Scan",
+      "runDeepAnyway": "Mag-continue sa Malalim na Pag-scan Anyway",
+      "resume": "Pumunta uli",
+      "cancelScan": "Ibuwisit ang Pag-scan",
+      "turnOffTypeResolution": "I-off Type Resolution",
+      "startAnyway": "Magmula Saanman",
+      "notNow": "Hindi ngayon, hindi pa.",
+      "neverAskDeep": "Hindi Mo Na Ito Aayos",
+      "applyPlugin": "Pangkatin",
+      "noThanks": "Wala Kang Salita",
+      "restartAnalysisServer": "Ibalik ang Server ng Pagsusuri"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Pamamaraan ng Pag-scan",
+      "machine": "{cores} CPU cores · {free} libre sa {total}",
+      "recommended": "nangunguna para sa computer na ito",
+      "resources": "{jobs} worker · {memory} badyet sa memorya",
+      "openSettings": "I-unlock ang lahat ng mga setting ng scan",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Ginintuang",
+        "balanced": "Balansado",
+        "fast": "Mabilis"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Nag-iisip sa likod: hanggang 2 mga worker at isang kuarto ng libreng memorya. Pinakamahusay para sa laptop.",
+        "balanced": "Mag-iilaw ng isang core at gumagamit ng hanggang sa kalahati ng libreng memorya. Angkop para sa karamihan sa mga machine.",
+        "fast": "Gumagamit ng bawat core at hanggang 70% ng libreng memory. Nakakatapos nang mas maaga ngunit maaaring magbawas sa iba pang bahagi ng iyong computer."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Maglimita rin sa live analysis (ang plugin ng Dart analyzer) sa tungkol sa {limit} at alisin nang maayos ang mga rule na may maliit na antas ng kahimlayan kapag ang memorya ay tumataas? Kung walang limit, ang malaking proyekto ay maaaring magbago sa analysis server hanggang sa makuha ang ilang GB.",
+      "offerSmallMachine": "Ang computer na ito ay may {total} ng memorya. Ang paglimita sa live analysis sa abot ng {limit}, at ang pag-iiwan ng mga rule na may mas mababang severity nang maayos kapag ang memorya ay nagsisimula nang mawala, ay nagpapanatag sa responsivity nito. Magapply ng bagay na ito?",
+      "applied": "Nakalikha: ang live analysis ay limitado sa tungkol sa {limit}. I-restart ang server ng analysis upang magamit ito.",
+      "writeFailed": "Hindi maaaring i-update ang analysis_options_custom.yaml. Tiyaking ang file ay makapag-write."
     }
   }
 }

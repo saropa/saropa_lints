@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "नियम एवं स्तर",
-        "description": "2,350+ नियमों में से कौन से नियम चलाए जाएं और किस गंभीरता पर."
+        "description": "2,350+ नियमों में से कौन से नियम चलाए जाएं और किस गंभीरता पर।"
       },
       "catalog": {
         "label": "कमांड कैटलॉग कमांड सूची",
@@ -2441,7 +2441,7 @@
       "actionDisable": "अक्षम करें अक्षम करना",
       "actionEnable": "सक्षम करें सक्षम करें",
       "bulkRuleToggleConfirm": "{verb} {count} नियम? यह analysis_options_custom.yaml.l को अपडेट करता है।",
-      "setupPrompt": "Saropa Lints द्वारा एक Dart प्रोजेक्ट का पता लगाया गया है जिसमें saropa_lints नहीं निर्धारित किया गया है। 2350+ लिंट नियमों के लिए अब सेट अप करें।",
+      "setupPrompt": "Saropa Lints एक Dart प्रोजेक्ट के अस्तित्व का पता लगाया जिसमें saropa_lints नहीं निर्धारित किया गया है। 2350+ लिंट नियमों के लिए अब सेट अप करें।",
       "actionSetUpProject": "परियोजना की स्थापना करें",
       "actionNotNow": "अब नहीं, अभी नहीं।"
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints अंतर्निहित प्लगइन पुनः सक्रिय किया गया है। Dart विश्लेषण सर्वर को पुनः शुरू करके इसे पुनः लोड कर रहे हैं।",
       "reenableNothingToRestore": "Saropa Lints: कुछ बहाल करने के लिए नहीं। वर्तमान प्रक्रिया प्लगइन वर्तमान में एक्सटेंशन के माध्यम से अक्षम नहीं है।",
       "noOpenDartFiles": "Saropa Lints: कोई खुले हुए Dart फ़ाइल नहीं मिले। एक Dart फ़ाइल फिर से खोलें या \"केवल खुले हुए संपादक\" सेटिंग को बंद कर दें।",
+      "analysisScanning": "कार्यक्षेत्र स्कैन हो रहा है… {percent}% (अब तक {count} समस्याएँ)",
       "configUpdated": "Saropa Lints config अपडेट किया गया (स्तरः {tier}). . . यह एक बहुत ही अच्छा विचार है.",
       "configWriteFailed": "कॉन्फ़िग लिखना विफल. {details}",
       "scaffoldGateTitle": "कम्पोजिट विश्लेषक प्लगइन मचान",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "पब गेट चल रहा है... ({elapsed}s)",
       "progressConfigWrite": "लिखना विन्यासन... ({elapsed}s)",
       "progressAnalysis": "एनालिसिस चल रहा है... ({elapsed}s)",
-      "progressBaseline": "आधार खोज चल रही है... ({elapsed}s)",
-      "analysisScanning": "कार्यक्षेत्र स्कैन हो रहा है… {percent}% (अब तक {count} समस्याएँ)"
+      "progressBaseline": "आधार खोज चल रही है... ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: एनालिसिस लेन",
@@ -2858,6 +2858,11 @@
     "noServerFound": "कोई Drift Advisor सर्वर नहीं मिला। अपने एप्लिकेशन को सर्वर के साथ शुरू करें, फिर रीफ्रेश करें।",
     "integrationOff": "Drift Advisor एक्सपोर्ट बंद है। सेटिंग्स में इसे सक्षम करें (saropaLints.driftAdvisor.integration), फिर रीफ्रेश करें।"
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "अपवाद (संकल्पनात्मक पुराना SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "अपग्रेड करें उन्नयन।",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints मुफ़्त और ओपन सोर्स है। एक त्वरित रेटिंग या समीक्षा अन्य डेवलपर को इसे खोजने में मदद करती है — और GitHub पर प्रतिक्रिया व बग रिपोर्ट इसे लगातार बेहतर बनाती हैं।",
       "marketplace": "Marketplace पर रेट करें",
       "openVsx": "Open VSX पर रेट करें",
+      "dismiss": "अब नहीं",
       "never": "दोबारा न पूछें"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "स्कैन आपके कंप्यूटर के संसाधनों के लिए संतुलित रहे ({reason}) के लिए {from} से {to} कामकर्ता तक धीमा हो गया।",
+    "aborted": "स्कैन आपके कंप्यूटर ({reason}) के सुरक्षा के लिए जल्दी रोक दिया गया। रिजल्ट आंशिक हैं।",
+    "deepNotEnoughMemory": "एक प्रकार-संवेदी खोज के लिए लगभग {needed} की आवश्यकता होती है, लेकिन केवल {free} मुफ्त है (सभी अन्य चीजों के लिए {reserve} रखे रहते हैं)। तेज खोज बहुत जल्दी समाप्त हो जाती है और बहुत कम स्मृति का उपयोग करती है।",
+    "deepPaused": "स्कैन रोक दिया गया: रिक्त स्थान {free} है, जो आपके कंप्यूटर के लिए रखे गए {reserve} के नीचे है। जब स्मृति मुक्त हो जाएगी तो यह स्वतंत्र रूप से फिर से शुरू हो जाएगा।",
+    "fastDone": "त्वरित स्कैन पूरा: {files} फ़ाइल, {issues} समस्या(एं) {seconds} में।",
+    "fastDoneOfferDeep": "त्वरित स्कैन पूरा: {files} फ़ाइल, {issues} समस्या(एं) {seconds} में। एक प्रकार-संवेदी स्कैन अधिक खोज सकता है, लेकिन लगभग {minutes} मिनट और {memory} मेमोरी के लिए लेता है।",
+    "fastDoneDeepUnavailable": "त्वरित स्कैन पूरा: {files} फ़ाइल, {issues} समस्या(एं) {seconds} में। एक प्रकार-संवेदनशील स्कैन के लिए लगभग {needed} आवश्यक है, लेकिन अब केवल {free} मुफ्त है।",
+    "daemonLowMemory": "प्रकार-संवेदी स्कैनिंग आवश्यकता है लगभग {needed}, लेकिन केवल {free} मेमोरी खाली है (सभी अन्य चीजों के लिए {reserve} रखे जा रहे हैं)। अब प्रकार के बिना स्कैनिंग कर रहे हैं ताकि आपका कंप्यूटर संवेदनशील रहे।",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "गुन्जन विश्लेषण का उपयोग करें",
+      "openSettings": "सेटिंग्स खोलें",
+      "runFast": "फास्ट स्कैन चलाएं",
+      "runDeep": "डीप स्कैन चलाएं",
+      "runDeepAnyway": "कोई भी गहरा स्कैन चलाएं",
+      "resume": "अब जारी रखें",
+      "cancelScan": "स्कैन रद्द करें",
+      "turnOffTypeResolution": "टाइप रेज़ोल्यूशन बन्द करें",
+      "startAnyway": "कार्य शुरू करें",
+      "notNow": "अब नहीं, अभी नहीं।",
+      "neverAskDeep": "नए सवाल पूछो नहीं",
+      "applyPlugin": "अनुप्रयोग",
+      "noThanks": "नो धन्यवाद",
+      "restartAnalysisServer": "एनालिसिस सर्वर रीस्टार्ट करें"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "स्कैन प्रदर्शन",
+      "machine": "{cores} CPU कोर · {free} {total} में खाली",
+      "recommended": "इस कंप्यूटर के लिए सिफारिश किया गया",
+      "resources": "{jobs} कर्मचारी(ए) · {memory} स्मृति बजट",
+      "openSettings": "सभी स्कैन सेटिंग खोलें",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "मृदु",
+        "balanced": "संतुलित",
+        "fast": "त्वरित"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "काम करते समय अपने रास्ते से दूर रहता है: अधिकतम 2 कार्यकर्ता और एक चौथाई मुक्त स्मृति। लैपटॉप के लिए सबसे अच्छा।",
+        "balanced": "एक कोर मुक्त रखता है और मुक्त स्मृति के आधा हिस्सा उपयोग करता है। अधिकांश मशीनों के लिए उपयुक्त है।",
+        "fast": "प्रत्येक कोर और मुक्त स्मृति के तकनीकी 70% तक उपयोग करता है। जल्दी समाप्त हो जाता है लेकिन आपके कंप्यूटर के बाकी हिस्सों को धीमा कर सकता है।"
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "भी जीवित विश्लेषण (Dart विश्लेषक प्लगइन) को लगभग {limit} तक सीमित करें और जब समय कम हो जाए तो कम गंभीर नियमों को शांतिपूर्वक छोड़ दें? बिना सीमा के, एक बड़ा प्रोजेक्ट विश्लेषण सर्वर को कई जीबी तक बढ़ा सकता है।",
+      "offerSmallMachine": "इस कंप्यूटर में {total} मेमोरी है। मेमोरी कम हो जाने पर निम्न गुणवत्ता वाले नियमों को धीरे धीरे हटाकर लाइव विश्लेषण को लगभग {limit} तक सीमित रखना, इसे संवेदनशील बनाए रखता है। इसका उपयोग करें?",
+      "applied": "संचित: जीवित विश्लेषण केवल लगभग {limit} तक सीमित है। विश्लेषण सर्वर को फिर से शुरू करें ताकि इसे लागू किया जा सके।",
+      "writeFailed": "analysis_options_custom.yaml को अपडेट नहीं किया जा सकता। जांच करें कि फ़ाइल लिखने योग्य है।"
     }
   }
 }

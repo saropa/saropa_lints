@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Правила и уровни",
-        "description": "Настройте, какие из более чем 2 300 правил выполняются и при какой серьезности."
+        "description": "Настройте, какие из более чем 2 350 правил запускать и на каком уровне серьёзности."
       },
       "catalog": {
         "label": "Каталог команд каталога.",
@@ -259,7 +259,7 @@
       "state-management": "Блок, Riverpod, Provider, GetX и связанные с ними библиотеки состояния и инъекции зависимостей.",
       "networking-apis": "HTTP-клиенты, GraphQL, Firebase, Supabase и подключение.",
       "storage-persistence": "Локальные базы данных и хранилища ключ-значение — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Правила строгие: \n1. Возвращайте ТОЛЬКО переведенную строку вывода. \n2. НЕ включайте объяснения, введение, markdown-обозначения или кавычки вокруг. \n3. Текст может содержать токены-заполнители: токены-заполнители. Копируйте каждый из них в перевод ТОЧНО как написано, в правильной грамматической позиции. Никогда не переводите, удаляйте или переписывайте токен. \n4. КРИТИЧЕСКИ ВАЖНО: каждый символ вывода должен быть кириллическим символом. Переводите КАЖДОЕ слово в кириллицу — НЕ оставляйте или заменяйте никакое слово на латиницу, тайский, арабский, кириллицу, корейский, японский или любой другой скрипт. Пробелы, цифры, пунктуация и токены-заполнители — единственные исключения.",
+      "navigation-deep-links": "Правила строгие: \n1. Возвращайте ТОЛЬКО переведенную строку вывода. \n2. НЕ включайте объяснения, введение, markdown-нотацию или кавычки вокруг. \n3. Текст может содержать плейсхолдеры: плейсхолдеры. Копируйте каждый из них в перевод ТОЧНО как написано, в грамматически правильной позиции. Никогда не переводите, удаляйте или переписывайте токен. \n4. КРИТИЧЕСКИ: каждый символ вывода должен быть кириллическим символом. Переводите КАЖДОЕ слово на кириллицу — НЕ оставляйте или заменяйте никакое слово на латинском, тайском, арабском, кириллице, китайском, японском или любом другом скрипте. Пробелы, цифры, пунктуация и плейсхолдеры — единственные исключения.",
       "media-graphics": "Изображения, SVG-файлы, анимация, аудио, карты, сборщики и движок Flame.",
       "device-platform": "Датчики, местоположение, разрешения, биометрические данные, уведомления и фоновая работа.",
       "identity-sharing": "Поставщики услуг входа, обмен и рецензирование внутри приложения.",
@@ -1575,7 +1575,7 @@
       },
       "status": {
         "label": "Статус - это статус, состояние.",
-        "tooltip": "Статус использования: показывает ли пакет неиспользованным в вашем коде."
+        "tooltip": "Статус использования: whether the package appears unused in your code"
       },
       "description": {
         "label": "Описание описания опись.",
@@ -2181,7 +2181,7 @@
         "master": "Расширение-wide switch (saropaLints.enabled workspace setting). Когда выключен, Scan on Save останавливается и панель боковая отчет о расширении как отключено. Live Analysis и LSP Server имеют свои собственные переключатели.",
         "analyzerPlugin": "Выполняется внутри анализатора Dart — живые подсказки в редакторе при вводе текста, сканирование не требуется. Переключение переписывает плагины: блок в analysis_options.yaml.",
         "scanDaemon": "Процесс в фоне, который пересканирует весь проект при сохранении и записывает отчёты/.saropa_lints/violations.json. Выключение приостанавливает его; следующее сохранение возобновляет его.",
-        "lspServer": "Строгое правило: \n1. Возвращайте ТОЛЬКО переведенную строку вывода.\n2. НЕ включайте объяснения, введение, markdown-обозначения или кавычки вокруг.\n3. Текст может содержать плейсхолдеры: плейсхолдеры. Копируйте каждый из них в перевод ТОЧНО как написано, в грамматически правильное положение. Никогда не переводите, удаляйте или переписывайте токен.\n4. КРИТИЧЕСКИ: каждый символ вывода должен быть кириллическим символом. Переводите КАЖДОЕ слово на кириллицу — НЕ оставляйте или заменяйте никакое слово на латиницу, тайский, арабский, кириллицу, китайский, японский или любой другой скрипт. Пробелы, цифры, пунктуация и плейсхолдеры — единственные исключения.",
+        "lspServer": "Строгие правила: \n1. Возвращайте ТОЛЬКО переведенную строку вывода. \n2. НЕ включайте объяснения, введение, markdown-нотацию или кавычки вокруг. \n3. Текст может содержать плейсхолдеры: плейсхолдеры. Копируйте каждый из них в перевод ТОЧНО как написано, в грамматически правильное положение. Никогда не переводите, удаляйте или переписывайте токен. \n4. КРИТИЧЕСКИ: каждый символ вывода должен быть кириллическим символом. Переводите КАЖДОЕ слово на кириллицу — НЕ оставляйте или заменяйте никакое слово на латинском, тайском, арабском, кириллице, китайском, японском или любом другом скрипте. Пробелы, цифры, пунктуация и плейсхолдеры — единственные исключения.",
         "ci": "Читает и записывает .github/workflows/saropa-lints.yml в вашем рабочем дереве, чтобы включить или отключить встроенные GitHub Actions workflow. Это отражает файл на вашей текущей ветке — копия главной ветки является той, которая на самом деле проверяет запросы на слияние, и они могут расходиться. Переключение никогда не запускает или удаляет workflow; вы всё ещё проверяете и коммитите изменения самостоятельно."
       },
       "recommended": {
@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable отключить.",
       "actionEnable": "Enable - включить.",
       "bulkRuleToggleConfirm": "{verb} {count} правила? ________ Правило, которое вы должны соблюдать. Это обновляет analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints обнаружил проект Dart без настроенных saropa_lints. Настройте сейчас для 2350+ правил проверки.",
+      "setupPrompt": "Saropa Lints обнаружил проект Dart без настроенной saropa_lints. Настройте сейчас для 2350+ правил проверки.",
       "actionSetUpProject": "Настройка проекта.",
       "actionNotNow": "Не сейчас, не сейчас."
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints встроенный плагин снова включен. Перезапуск анализатора Dart для перезагрузки.",
       "reenableNothingToRestore": "Saropa Lints: ничего восстанавливать нечего. Встроенный плагин в настоящее время не отключен через расширение.",
       "noOpenDartFiles": "Saropa Lints: не найдены открытые Dart файлы. Перезапустите Dart файл или отключите настройку \"Открывать только редакторы\".",
+      "analysisScanning": "Сканирование рабочей области… {percent}% (проблем пока: {count})",
       "configUpdated": "Saropa Lints конфигурация обновлена (уровень: {tier}). это и есть",
       "configWriteFailed": "Не удалось записать конфигурацию. {details}",
       "scaffoldGateTitle": "Композитный анализатор плагин леса эшафот.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "Выполнение pub get… ({elapsed}s)",
       "progressConfigWrite": "Запись конфига… ({elapsed}s)",
       "progressAnalysis": "Анализ выполняется… ({elapsed}s)",
-      "progressBaseline": "Сканирование базовой линии… ({elapsed}s)",
-      "analysisScanning": "Сканирование рабочей области… {percent}% (проблем пока: {count})"
+      "progressBaseline": "Сканирование базовой линии… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Установите Анализ Полосы",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Нет найдено сервера Drift Advisor. Запустите ваше приложение с работающим сервером, затем нажмите Обновить.",
     "integrationOff": "Интеграция Drift Advisor отключена. Включите её в настройках (saropaLints.driftAdvisor.integration), затем нажмите Обновить."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Подавить (намеренное устаревшее SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Обновление обновления.",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints бесплатен и имеет открытый исходный код. Быстрая оценка или отзыв помогает другим разработчикам найти его, а отзывы и сообщения об ошибках на GitHub делают его лучше.",
       "marketplace": "Оценить в Marketplace",
       "openVsx": "Оценить в Open VSX",
+      "dismiss": "Не сейчас",
       "never": "Больше не спрашивать"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "Сканирование замедлилось с {from} до {to} работников, чтобы сохранить отзывчивость вашего компьютера ({reason}).",
+    "aborted": "Сканирование было прервано досрочно для защиты вашего компьютера ({reason}). Результаты частичные.",
+    "deepNotEnoughMemory": "Типо-ориентированный сканер требует около {needed}, но только {free} свободен (оставляя {reserve} для всего остального). Быстрый сканер завершается намного быстрее и использует гораздо меньше памяти.",
+    "deepPaused": "Сканирование приостановлено: свободная память составляет {free}, ниже порога {reserve}, оставляемой свободной для вашего компьютера. Оно возобновляется автоматически, когда память освободится.",
+    "fastDone": "Быстрая проверка завершена: {files} файлов, {issues} проблем(ы) в {seconds}ах.",
+    "fastDoneOfferDeep": "Быстрая проверка завершена: {files} файлов, {issues} проблем(ы) в {seconds}ах. Проверка с типами может найти больше, но занимает около {minutes} минут и {memory} памяти.",
+    "fastDoneDeepUnavailable": "Быстрая проверка завершена: {files} файлов, {issues} проблем(ы) в {seconds}ах. Проверка с типами требует около {needed}, но сейчас свободно только {free}.",
+    "daemonLowMemory": "Типо-осознанное сканирование требует около {needed}, но свободно памяти {free} (оставляя {reserve} для всего остального). Сканирование без типов временно, чтобы ваш компьютер оставался отзывчивым.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Используйте Мягкий Профиль",
+      "openSettings": "Открыть настройки",
+      "runFast": "Запустить быстрый скан",
+      "runDeep": "Запустить глубокий скан",
+      "runDeepAnyway": "Запустить глубокий скан в любом случае",
+      "resume": "Продолжить сейчас",
+      "cancelScan": "Отменить сканирование",
+      "turnOffTypeResolution": "Выключить разрешение типов",
+      "startAnyway": "Начать Всё-таки",
+      "notNow": "Не сейчас, не сейчас.",
+      "neverAskDeep": "Не спрашивать снова",
+      "applyPlugin": "Применить",
+      "noThanks": "Нет, благодарю",
+      "restartAnalysisServer": "Перезапуск анализатора сервера"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Анализ производительности",
+      "machine": "{cores} ядер процессора · {free} свободно из {total}",
+      "recommended": "рекомендуется для этого компьютера",
+      "resources": "{jobs} worker(ы) · {memory} memory budget",
+      "openSettings": "Открыть все настройки сканирования",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Мягкий",
+        "balanced": "Балансированный",
+        "fast": "Быстро"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Не мешает: не более 2 рабочих и четверть свободной памяти. Идеально для ноутбуков.",
+        "balanced": "Освобождает один ядро и использует до половины свободной памяти. Подходит для большинства компьютеров.",
+        "fast": "Использует каждое ядро и до 70% свободной памяти. Завершает раньше, но может замедлить остальную часть вашего компьютера."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Также ограничьте живой анализ (плагин анализатора Dart) до около {limit} и мягко отключайте правила низкой серьёзности при недостатке памяти? Без ограничения большой проект может привести к увеличению анализатора на несколько ГБ.",
+      "offerSmallMachine": "Этот компьютер имеет {total} памяти. Ограничение анализа в реальном времени до около {limit} и постепенное отключение правил низкой серьёзности при исчерпании памяти, позволяет сохранять его отзывчивым. Применить это?",
+      "applied": "Сохранено: живой анализ ограничен до около {limit}. Перезапустите сервер анализа для применения.",
+      "writeFailed": "Не удалось обновить analysis_options_custom.yaml. Проверьте, что файл можно записывать."
     }
   }
 }

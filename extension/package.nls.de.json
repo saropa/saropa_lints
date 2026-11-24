@@ -113,6 +113,8 @@
   "command.showWelcome.title": "Saropa Lints: Was ist neu",
   "command.openHelpHub.title": "Saropa Lints: Hilfe Hilf",
   "command.openPubDevSaropaLints.title": "Saropa Lints: Öffnen Sie das Paket auf pub.dev",
+  "command.rateOnMarketplace.title": "Saropa Lints: Im VS Code Marketplace bewerten",
+  "command.rateOnOpenVsx.title": "Saropa Lints: Auf Open VSX bewerten",
   "command.createSaropaInstructions.title": "Erstellen Sie Saropa Lints Anweisungen für KI-Agenten.",
   "command.packageVibrancy.scan.title": "Scan-Pakete Scannen Sie Pakete.",
   "command.packageVibrancy.rescan.title": "Rescan-Pakete (frisch)",
@@ -321,7 +323,7 @@
   "walkthrough.gettingStarted.title": "Anfängen mit Saropa Lints",
   "walkthrough.gettingStarted.description": "Gesundheitsbewertung, Ergebnis-Dashboard, Sicherheitsmatrix, Triage und Trends – Aktivitätsleiste plus Editor-Registerkarten in voller Breite.",
   "walkthrough.step.walkthrough.healthScore.title": "Gesundheitsbewertung",
-  "walkthrough.step.walkthrough.healthScore.description": "Die Qualität Ihres Projekts im Überblick: ein **0–100 Score** in der Statusleiste und im Überblick-Ansicht.\n\nGrün (80+), gelb (50–79), rot (<50). Fehler belasten stark.",
+  "walkthrough.step.walkthrough.healthScore.description": "Die Qualität Ihres Projekts im Überblick: ein **0–100 Score** in der Statusleiste und im Überblicksansicht.\n\nGrün (80+), gelb (50–79), rot (<50). Fehler werden stark bestraft.\n\n[Analyse ausführen](command:saropaLints.runAnalysis) · [Projekt einrichten](command:saropaLints.enable)",
   "walkthrough.step.walkthrough.issues.title": "Verstöße und Inline-Anmerkungen",
   "walkthrough.step.walkthrough.issues.description": "Findings in der **Findings Dashboard**-Editor-Tab, gruppiert nach Schweregrad und Datei. **Error Lens-style**-Anmerkungen zeigen Warnungen am Ende jeder Zeile.\n\nFiltern Sie nach Text, Schweregrad, Auswirkung oder Regel. Klicken Sie mit der rechten Maustaste, um Lärmen zu unterdrücken.\n\n[Analyse ausführen](command:saropaLints.runAnalysis)",
   "walkthrough.step.walkthrough.security.title": "Sicherheits-Haltung der Sicherheitshaltung",
@@ -374,6 +376,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "Sekunden warten, nachdem der Analyzer bereit ist, bevor der Workspace-Scan gestartet wird. Lassen Sie VS Code seinen Startburst zuerst beenden, damit der Scan nicht mit der initialen Dateianalyse konkurriert. Auf 0 setzen, um keine Verzögerung zu haben.",
   "config.property.lspServer.scanDirectories.description": "Stricteste Regeln:  \n1. Geben Sie AUSSCHLIESSLICH den übersetzten Text aus.  \n2. Fügen Sie KEINE Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.  \n3. Der Text kann Platzhalter-Token enthalten: placeholder tokens. Kopieren Sie jeden davon exakt so, wie er geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.  \n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.  \n\nText: Verzeichnisse zum Scannen beim Start (relativ zum Projektroot). Nur dann verwendet, wenn Workspace Scan aktiviert ist. Passen Sie dies an, um Ihre Projektstruktur zu matchen — z. B. fügen Sie „src“ hinzu oder entfernen Sie „test“, wenn Testdateien nicht relevant sind.",
   "command.toggleLints.title": "Saropa Lints: Ein / Aus",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.syncPluginVersion.title": "Saropa Lints: Plugin-Version mit pubspec.lock synchronisieren",
   "command.showStatusBarMenu.title": "Saropa Lints: Status-Menü"
 }

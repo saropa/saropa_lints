@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Règles & Niveaux",
-        "description": "Configurer quelles des 2 300+ règles s'exécutent et à quel niveau de gravité."
+        "description": "Configurer quels parmi les 2 350+ règles s'exécutent et à quel niveau de gravité."
       },
       "catalog": {
         "label": "Catalogue de commande du catalogue de commandes.",
@@ -236,7 +236,7 @@
       "boolean_naming": "Les Booléens doivent utiliser les préfixes est/a/peut/devrait afin que l'intention soit claire dans les conditionnels et API.",
       "code_style_preferences": "Comment sont écrits les retours, les conditionnels et les boucles — retour immédiat, for-in, getter vs méthode, et autres raccourcis similaires.",
       "function_parameter_style": "Les fonctions de flèche sont concises, contiennent tous les paramètres nommés, des rappels en ligne et aucune réaffectation de paramètre.",
-      "widget_style": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel qu'écrit, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : Flutter choix de widgets — SizedBox.square, center over align, spacing over SizedBox, et éviter shrinkWrap dans les scrolls. Flutter projets seulement.",
+      "widget_style": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : Flutter choix de widgets — SizedBox.square, center over align, spacing over SizedBox, et éviter shrinkWrap dans les scrolls. Flutter projets seulement.",
       "class_record_style": "Classes vs types de retour d'enregistrement, préfixes privés sous-titres et explicite ceci là où il clarifie.",
       "formatting": "Placements des lignes vides, virgules en fin de ligne, et style des littéraux et commentaires. Peut être bruyant — beaucoup de fichiers peuvent nécessiter des modifications.",
       "comments_documentation": "Le format TODO et FIXME, cas de phrase, un point après les commentaires du document, /// plus //, et aucun code sans commentaire.",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Désactiver désactiver.",
       "actionEnable": "L'option Activer est activée.",
       "bulkRuleToggleConfirm": "Les règles de {verb} {count} ? Cela met à jour analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints a détecté un projet Dart sans saropa_lints configuré. Configurez maintenant pour plus de 2350 règles de linter.",
+      "setupPrompt": "Saropa Lints a détecté un projet Dart sans saropa_lints configuré. Configurez maintenant pour 2350+ règles de linter.",
       "actionSetUpProject": "Mettre en place le projet de mise en place du projet.",
       "actionNotNow": "Pas maintenant, pas tout de suite."
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints plugin en cours de traitement réactivé. Redémarrage du serveur d'analyse Dart pour le recharger.",
       "reenableNothingToRestore": "Saropa Lints : rien à restaurer. Le plugin en cours de traitement n'est pas actuellement désactivé via l'extension.",
       "noOpenDartFiles": "Saropa Lints: Il s'agit de la réponse à une question. Aucun fichier ouvert Dart n'a été trouvé. Réouvrez un fichier Dart ou désactivez le paramètre \" Ouvrir uniquement les éditeurs \".",
+      "analysisScanning": "Analyse de l’espace de travail… {percent} % ({count} problèmes jusqu’ici)",
       "configUpdated": "Saropa Lints config est mis à jour (niveau: {tier}). est une forme de phono.",
       "configWriteFailed": "L'écriture de configuration a échoué. {details}",
       "scaffoldGateTitle": "L'échafaudage du plugin de l'analyseur composite est un échafaud.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "Exécution de pub get… ({elapsed}s)",
       "progressConfigWrite": "Écriture de la configuration… ({elapsed}s)",
       "progressAnalysis": "Analyse en cours… ({elapsed}s)",
-      "progressBaseline": "Scan de base en cours… ({elapsed}s)",
-      "analysisScanning": "Analyse de l’espace de travail… {percent} % ({count} problèmes jusqu’ici)"
+      "progressBaseline": "Scan de base en cours… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints : Analyse de la voie",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Aucun serveur Drift Advisor trouvé. Démarragez votre application avec le serveur en cours d'exécution, puis cliquez sur Rafraîchir.",
     "integrationOff": "L'intégration Drift Advisor est désactivée. Activez-la dans les paramètres (saropaLints.driftAdvisor.integration), puis cliquez sur Rafraîchir."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Ignorer (SDK obsolète intentionnel)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Mise à niveau de mise à jour.",
@@ -2925,7 +2930,7 @@
       "offerNoDart": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. Voulez-vous migrer ?",
       "offerRenames": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. {count} règles ont été renommées depuis {installed}. Migration ?",
       "offerNoDartRenames": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. {count} règles ont été renommées depuis {installed}. Migration ?",
-      "offerRenamesUnknown": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie de la chaîne traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un d'entre eux dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
+      "offerRenamesUnknown": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie de la chaîne traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un d'entre eux dans la traduction EXACTEMENT tel qu'écrit, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
       "offerNoDartRenamesUnknown": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
       "actionMigrate": "Migrer"
     },
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints est gratuit et open source. Une note ou un avis rapide aide d’autres développeurs à le découvrir, et les retours et rapports de bogues sur GitHub l’améliorent sans cesse.",
       "marketplace": "Noter sur le Marketplace",
       "openVsx": "Noter sur Open VSX",
+      "dismiss": "Pas maintenant",
       "never": "Ne plus demander"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "Le scan s'est ralenti de {from} à {to} workers pour garder votre ordinateur réactif ({reason}).",
+    "aborted": "Le scan s'est arrêté prématurément pour protéger votre ordinateur ({reason}). Les résultats sont partiels.",
+    "deepNotEnoughMemory": "Un scan typé nécessite environ {needed}, mais seul {free} est libre (en conservant {reserve} pour tout le reste). Le scan rapide se termine bien plus rapidement et utilise bien moins de mémoire.",
+    "deepPaused": "Scan suspendu : la mémoire libre est {free}, inférieure à la {reserve} conservée libre pour votre ordinateur. Il reprend automatiquement lorsque la mémoire sera libérée.",
+    "fastDone": "Scan rapide terminé : {files} fichiers, {issues} problème(s) dans {seconds}s.",
+    "fastDoneOfferDeep": "Scan rapide terminé : {files} fichiers, {issues} problème(s) dans {seconds}. Un scan typé peut trouver davantage, mais prend environ {minutes} min et {memory} d'espace mémoire.",
+    "fastDoneDeepUnavailable": "Scan rapide terminé : {files} fichiers, {issues} problème(s) dans {seconds}. Un scan typé nécessite environ {needed}, mais seulement {free} est libre en ce moment.",
+    "daemonLowMemory": "Scannage typé nécessite environ {needed}, mais seulement {free} de mémoire est libre (en réservant {reserve} pour tout le reste). Scannage sans types pour l'instant afin que votre ordinateur reste réactif.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Utiliser le profil doux",
+      "openSettings": "Ouvrir les paramètres",
+      "runFast": "Exécutez un scan rapide",
+      "runDeep": "Exécutez le scan approfondi",
+      "runDeepAnyway": "Exécuter l'analyse approfondie malgré tout",
+      "resume": "Reprendre maintenant",
+      "cancelScan": "Annuler la scan",
+      "turnOffTypeResolution": "Désactiver la résolution des types",
+      "startAnyway": "Démarrer de toute façon",
+      "notNow": "Pas maintenant, pas tout de suite.",
+      "neverAskDeep": "Ne pas demander à nouveau",
+      "applyPlugin": "Appliquer",
+      "noThanks": "Pas de merci /no_thanks",
+      "restartAnalysisServer": "Redémarrer le serveur d'analyse"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Analyse de performance",
+      "machine": "Cœurs CPU {cores} · {free} libérés sur {total}",
+      "recommended": "recommandé pour cet ordinateur",
+      "resources": "{jobs} worker(s) · {memory} budget mémoire",
+      "openSettings": "Ouvrir tous les paramètres de scan",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Gentil",
+        "balanced": "Équilibré",
+        "fast": "Rapide"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Reste en arrière-plan : au plus 2 workers et un quart de mémoire libre. Idéal pour les ordinateurs portables.",
+        "balanced": "Laisse un noyau libre et utilise jusqu'à la moitié de la mémoire libre. Idéal pour la plupart des machines.",
+        "fast": "Utilise chaque noyau et jusqu'à 70 % de la mémoire libre. Termine plus tôt mais peut ralentir le reste de votre ordinateur."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Limitez également l'analyse en temps réel (le plugin d'analyse Dart) à environ {limit} et supprimez doucement les règles de faible gravité lorsque la mémoire devient limitée ? Sans limite, un grand projet peut faire croître le serveur d'analyse jusqu'à plusieurs gigaoctets.",
+      "offerSmallMachine": "Cet ordinateur dispose de {total} d'octets de mémoire. Limiter l'analyse en temps réel à environ {limit}, et faire tomber les règles de faible gravité de manière élégante lorsqu'il reste peu de mémoire, permet de garder l'application réactive. Appliquer cela ?",
+      "applied": "Enregistré : l'analyse en temps réel est limitée à environ {limit}. Redémarrez le serveur d'analyse pour l'appliquer.",
+      "writeFailed": "Impossible de mettre à jour analysis_options_custom.yaml. Vérifiez que le fichier est modifiable."
     }
   }
 }

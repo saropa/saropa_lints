@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Reglas y Niveles",
-        "description": "Configura cuáles de las 2.300+ reglas se ejecutan y en qué nivel de gravedad."
+        "description": "Configura cuáles de las 2.350+ reglas se ejecutan y en qué nivel de severidad."
       },
       "catalog": {
         "label": "Catálogo de comandos del catálogo.",
@@ -236,7 +236,7 @@
       "boolean_naming": "Los booleanos deben usar los prefijos es/tiene/puede/debe para que la intención sea clara en las condiciones y API.",
       "code_style_preferences": "Cómo se escriben los retornos, condicionales y bucles — retorno inmediato, for-in, getter vs método, y otros atajos similares.",
       "function_parameter_style": "Las funciones de flecha cuando son concisas, todos los parámetros nombrados, devoluciones en línea y no hay reasignación de parámetro.",
-      "widget_style": "Reglas estrictas:\n1. Devolver ÚNICAMENTE la salida de la cadena traducida.\n2. NO incluir explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copiar cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca traducir, eliminar o reformatear un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambiar a otro idioma en medio de una oración.\n\nTexto: Flutter opciones de widget — SizedBox.square, center over align, spacing over SizedBox, y evitar shrinkWrap en scrolls. Flutter proyectos solo.",
+      "widget_style": "Reglas estrictas:\n1. Devolver ÚNICAMENTE la salida traducida.\n2. NO incluir explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copiar cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca traducir, eliminar o reformatear un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambiar a otro idioma en medio de una oración.\n\nTexto: Flutter opciones de widget — SizedBox.square, centrar sobre alinear, espaciado sobre SizedBox, y evitar shrinkWrap en scrolls. Flutter proyectos solo.",
       "class_record_style": "Clase vs. tipos de devolución de registros, prefijos privados para subrayar y explícito esto donde se aclara.",
       "formatting": "Ubicación de líneas en blanco, comas al final, y estilo de literales y comentarios. Puede ser ruidoso — muchos archivos pueden necesitar ediciones.",
       "comments_documentation": "TODO y FIXME formato, caso de oración, un período después de comentarios doc, /// más //, y no comentó-fuera del código.",
@@ -259,7 +259,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX y las bibliotecas de estado e inyección de dependencias relacionadas.",
       "networking-apis": "Clientes HTTP, GraphQL, Firebase, Supabase y conectividad.",
       "storage-persistence": "Bases de datos locales y almacenes clave-valor — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Reglas estrictas:\n1. Devuelve SOLAMENTE la salida de la cadena traducida.\n2. NO incluyas explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copia cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca lo traduzcas, elimines o reformates un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambies a otro idioma en medio de una oración.\n\nTexto: Ruteo y manejo de enlaces profundos — auto_route, go_router, app_links, url_launcher, y webview.",
+      "navigation-deep-links": "Reglas estrictas:\n1. Devuelve ÚNICAMENTE la salida de la cadena traducida.\n2. NO incluyas explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de lugar: tokens de lugar. Copia cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca lo traduzcas, elimines o reformates un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambies a otro idioma en medio de una oración.\n\nTexto: Routing y manejo de deep-link — auto_route, go_router, app_links, url_launcher, y webview.",
       "media-graphics": "Imágenes, SVG, animación, audio, mapas, recolectores y el motor Flame.",
       "device-platform": "Sensores, ubicación, permisos, biometría, notificaciones y trabajo en segundo plano.",
       "identity-sharing": "Proveedores de inicio de sesión, intercambio y revisión en la aplicación.",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Desactivar deshabilitar el servicio.",
       "actionEnable": "Habilitar habilitar para permitir.",
       "bulkRuleToggleConfirm": "¿Reglas {verb} {count}? Esto actualiza analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints detectó un proyecto Dart sin saropa_lints configurado. Configure ahora para 2350+ reglas de lint.",
+      "setupPrompt": "Saropa Lints detectó un proyecto Dart sin saropa_lints configurado. Configure ahora para 2350+ reglas de análisis.",
       "actionSetUpProject": "Establecer el proyecto Configurar el proyecto",
       "actionNotNow": "Ahora no, ahora no."
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints plugin reactivado en proceso. Reiniciando el servidor de análisis Dart para recargarlo.",
       "reenableNothingToRestore": "Saropa Lints: nada que restaurar. El plugin en proceso no está actualmente desactivado a través de la extensión.",
       "noOpenDartFiles": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin no se encontraron archivos abiertos Dart. Reabre un archivo Dart o desactiva la configuración \"Abrir sólo editores\".",
+      "analysisScanning": "Analizando el espacio de trabajo… {percent} % ({count} problemas hasta ahora)",
       "configUpdated": "Saropa Lints configuración actualizada (nivel: {tier})",
       "configWriteFailed": "No se pudo escribir la configuración. {details}",
       "scaffoldGateTitle": "Plugin analizador compuesto andamiaje de la plataforma.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "Ejecutando pub get… ({elapsed}s)",
       "progressConfigWrite": "Escribiendo configuración… ({elapsed}s)",
       "progressAnalysis": "Análisis en ejecución… ({elapsed}s)",
-      "progressBaseline": "Ejecutando escaneo de base… ({elapsed}s)",
-      "analysisScanning": "Analizando el espacio de trabajo… {percent} % ({count} problemas hasta ahora)"
+      "progressBaseline": "Ejecutando escaneo de base… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Establecer Análisis de Vía",
@@ -2858,6 +2858,11 @@
     "noServerFound": "No se encontró ningún servidor Drift Advisor. Inicie su aplicación con el servidor en ejecución, luego haga clic en Actualizar.",
     "integrationOff": "La integración Drift Advisor está desactivada. Actívala en la configuración (saropaLints.driftAdvisor.integration), luego haz clic en Refrescar."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Suprimir (SDK antiguo intencional)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Actualizar actualizaciones.",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints es gratuito y de código abierto. Una valoración o reseña rápida ayuda a otros desarrolladores a descubrirlo, y los comentarios e informes de errores en GitHub lo mejoran cada día.",
       "marketplace": "Valorar en Marketplace",
       "openVsx": "Valorar en Open VSX",
+      "dismiss": "No ahora",
       "never": "No volver a preguntar"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "El escaneo se ralentizó desde {from} hasta {to} trabajadores para mantener tu computadora responda ({reason}).",
+    "aborted": "La escaneo se detuvo temprano para proteger su computadora ({reason}). Los resultados son parciales.",
+    "deepNotEnoughMemory": "Un escaneo tipo consciente necesita aproximadamente {needed}, pero solo {free} está libre (manteniendo {reserve} para todo lo demás). El escaneo rápido termina mucho más pronto y utiliza mucho menos memoria.",
+    "deepPaused": "Escaneo pausado: memoria libre es {free}, por debajo de la {reserve} mantenida libre para su computadora. Se reanuda automáticamente cuando la memoria esté disponible.",
+    "fastDone": "Escaneo rápido completado: {files} archivos, {issues} problema(s) en {seconds}s.",
+    "fastDoneOfferDeep": "Escaneo rápido completado: {files} archivos, {issues} problema(s) en {seconds}s. Un escaneo con conciencia de tipos puede encontrar más, pero toma aproximadamente {minutes} min y {memory} de memoria.",
+    "fastDoneDeepUnavailable": "Escaneo rápido completado: {files} archivos, {issues} problema(s) en {seconds}s. Un escaneo tipo-aware necesita aproximadamente {needed}, pero solo {free} está disponible en este momento.",
+    "daemonLowMemory": "Escaneo tipo-orientado necesita sobre {needed}, pero solo {free} de memoria está libre (reservando {reserve} para todo lo demás). Escaneo sin tipos por ahora para que tu computadora permanezca responda.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Usar Perfil Suave",
+      "openSettings": "Abrir Configuración",
+      "runFast": "Ejecutar Escaneo Rápido",
+      "runDeep": "Ejecutar Escaneo Profundo",
+      "runDeepAnyway": "Ejecutar Escaneo Profundo de Todos Modos",
+      "resume": "Resumir ahora",
+      "cancelScan": "Cancelar Escaneo",
+      "turnOffTypeResolution": "Desactivar Resolución de Tipos",
+      "startAnyway": "Continuar de todos modos",
+      "notNow": "Ahora no, ahora no.",
+      "neverAskDeep": "No preguntar de nuevo",
+      "applyPlugin": "Aplicar",
+      "noThanks": "No Gracias /no_thanks",
+      "restartAnalysisServer": "Reiniciar Servidor de Análisis"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Escaneo de rendimiento",
+      "machine": "{cores} núcleos de CPU · {free} libres de {total}",
+      "recommended": "recomendado para este computador",
+      "resources": "{jobs} proceso(s) · {memory} de memoria",
+      "openSettings": "Abrir todas las configuraciones de escaneo",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Amable",
+        "balanced": "Equilibrado",
+        "fast": "Rápido"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Mantiene un perfil bajo: máximo 2 trabajadores y un cuarto de memoria libre. Mejor para laptops.",
+        "balanced": "Deja un núcleo libre y utiliza hasta la mitad de la memoria libre. Adecuado para la mayoría de las máquinas.",
+        "fast": "Utiliza cada núcleo y hasta el 70% de la memoria libre. Termina más pronto pero puede ralentizar el resto de tu computadora."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "También limite el análisis en vivo (el plugin del analizador Dart) a aproximadamente {limit} y elimine suavemente las reglas de baja severidad cuando la memoria se agote. Sin límite, un gran proyecto puede hacer crecer al servidor de análisis a varios GB.",
+      "offerSmallMachine": "Esta computadora tiene {total} de memoria. Limitar el análisis en vivo a aproximadamente {limit}, y eliminar suavemente las reglas de baja severidad cuando la memoria se agote, mantiene la respuesta. Aplicar esto?",
+      "applied": "Guardado: el análisis en vivo está limitado a aproximadamente {limit}. Reinicie el servidor de análisis para aplicarlo.",
+      "writeFailed": "No se pudo actualizar analysis_options_custom.yaml. Verifique que el archivo sea escribible."
     }
   }
 }

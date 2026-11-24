@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Regras & Níveis",
-        "description": "Configure qual dos 2.300+ regras são executadas e em que gravidade."
+        "description": "Configure qual dos 2.350+ regras são executadas e em que severidade."
       },
       "catalog": {
         "label": "Catálogo de comando do catálogo.",
@@ -1250,7 +1250,7 @@
       "perFileRules": "{count} arquivo(s) com regras ocultas por arquivo",
       "severityHides": "{count} gravidade(s) oculta(s)",
       "impactHides": "{count} impacto(s) oculto(s)",
-      "activeHides": "Couro ativo: {counts}.",
+      "activeHides": "Hidem ativos: {counts}.",
       "viewHidesFooter": "Esses hides reduzem apenas a lista de Problemas / painel; eles não são escritos para `violations.json`.",
       "clearViewHides": "Limpe todas as vistas oculta visão.",
       "foldersSample": "Carpetas (amostra)",
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints plugin reativado no processo. Reiniciando o servidor de análise Dart para re carregar.",
       "reenableNothingToRestore": "Saropa Lints: nada para restaurar. O plugin em processo não está atualmente desativado via extensão.",
       "noOpenDartFiles": "Saropa Lints: nenhum arquivo Dart aberto encontrado. Reabra um arquivo Dart ou desative a configuração \"Apenas editores abertos\".",
+      "analysisScanning": "Analisando o workspace… {percent}% ({count} problemas até agora)",
       "configUpdated": "Saropa Lints config atualizado (nível: {tier}). é um termo usado para descrever a",
       "configWriteFailed": "Escrever configuração falhou. {details}",
       "scaffoldGateTitle": "Plugin analisador composto e o andaime do plugin.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "Executando pub get… ({elapsed}s)",
       "progressConfigWrite": "Escrevendo config... ({elapsed}s)",
       "progressAnalysis": "Análise em execução… ({elapsed}s)",
-      "progressBaseline": "Escaneando baseline... ({elapsed}s)",
-      "analysisScanning": "Analisando o workspace… {percent}% ({count} problemas até agora)"
+      "progressBaseline": "Escaneando baseline... ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Definição de Análise de Faixa",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Nenhum servidor Drift Advisor encontrado. Inicie seu app com o servidor rodando, em seguida clique em Atualizar.",
     "integrationOff": "A integração Drift Advisor está desativada. Ative-a nas configurações (saropaLints.driftAdvisor.integration), depois clique em Atualizar."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Suprimir (SDK antigo intencional)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Atualização de atualização.",
@@ -3034,6 +3039,7 @@
       "message": "O Saropa Lints é gratuito e de código aberto. Uma avaliação ou resenha rápida ajuda outros desenvolvedores a descobri-lo, e feedback e relatórios de bugs no GitHub o mantêm em constante melhoria.",
       "marketplace": "Avaliar no Marketplace",
       "openVsx": "Avaliar no Open VSX",
+      "dismiss": "Agora não",
       "never": "Não perguntar novamente"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "A varredura reduziu a si mesma de {from} para {to} trabalhadores para manter seu computador responsivo ({reason}).",
+    "aborted": "A verificação foi interrompida precocemente para proteger seu computador ({reason}). Os resultados são parciais.",
+    "deepNotEnoughMemory": "Uma varredura tipo-orientada precisa de aproximadamente {needed}, mas apenas {free} está livre (mantendo {reserve} para tudo mais). A varredura rápida termina muito mais cedo e usa muito menos memória.",
+    "deepPaused": "Varredura pausada: memória livre é {free}, abaixo da {reserve} mantida livre para seu computador. Ela retoma automaticamente quando a memória estiver disponível.",
+    "fastDone": "Varredura rápida concluída: {files} arquivos, {issues} problema(s) em {seconds}s.",
+    "fastDoneOfferDeep": "Varredura rápida concluída: {files} arquivos, {issues} problema(s) em {seconds}s. Uma varredura com tipo pode encontrar mais, mas leva cerca de {minutes} min e {memory} de memória.",
+    "fastDoneDeepUnavailable": "Varredura rápida concluída: {files} arquivos, {issues} problema(s) em {seconds}s. Uma varredura com tipo requer cerca de {needed}, mas apenas {free} está disponível no momento.",
+    "daemonLowMemory": "Varredura tipo-orientada precisa de aproximadamente {needed}, mas apenas {free} de memória está livre (mantendo {reserve} para tudo mais). Varredura sem tipos por enquanto para que seu computador permaneça responsivo.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Use Profile Gentil",
+      "openSettings": "Abrir Configurações",
+      "runFast": "Executar Varredura Rápida",
+      "runDeep": "Executar Varredura Profunda",
+      "runDeepAnyway": "Executar Varredura Profunda Mesmo Assim",
+      "resume": "Resumir Agora",
+      "cancelScan": "Cancelar Varredura",
+      "turnOffTypeResolution": "Desligar Resolução de Tipo",
+      "startAnyway": "Começar de qualquer forma",
+      "notNow": "Agora Não, Agora Não.",
+      "neverAskDeep": "Não Perguntar Novamente",
+      "applyPlugin": "Aplicar",
+      "noThanks": "Não Obrigado /no_thanks",
+      "restartAnalysisServer": "Reiniciar Servidor de Análise"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Escaneamento de Desempenho",
+      "machine": "{cores} núcleos de CPU · {free} livres de {total}",
+      "recommended": "recomendado para este computador",
+      "resources": "{jobs} processo(s) · {memory} de memória",
+      "openSettings": "Abrir todas as configurações de varredura",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Suave",
+        "balanced": "Equilibrado",
+        "fast": "Rápido"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Fica fora do caminho: no máximo 2 workers e um quarto da memória livre. Ideal para laptops.",
+        "balanced": "Deixa um núcleo livre e utiliza até metade da memória livre. Adequado para a maioria das máquinas.",
+        "fast": "Usa cada núcleo e até 70% da memória livre. Termina mais cedo, mas pode lentificar o resto do seu computador."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Também limite a análise em tempo real (o plugin do analisador Dart) para cerca de {limit} e remova regras de baixa gravidade de forma elegante quando a memória estiver escassa? Sem limite, um grande projeto pode fazer o servidor de análise crescer para vários GB.",
+      "offerSmallMachine": "Este computador tem {total} de memória. Limitar a análise em tempo real a cerca de {limit} e descartar regras de baixa gravidade de forma elegante quando a memória estiver escassa, mantém o sistema responsivo. Aplicar isso?",
+      "applied": "Salvo: análise em tempo real é limitada a cerca de {limit}. Reinicie o servidor de análise para aplicá-la.",
+      "writeFailed": "Não foi possível atualizar analysis_options_custom.yaml. Verifique se o arquivo é gravável."
     }
   }
 }

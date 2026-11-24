@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Regeln & Ebenen",
-        "description": "Konfigurieren Sie, welche der über 2.300 Regeln laufen und mit welcher Schweregrad."
+        "description": "Strict Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das richtige Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Konfigurieren Sie, welche der über 2.350 Regeln laufen und mit welcher Schweregrad."
       },
       "catalog": {
         "label": "Befehlskatalog, der Katalog für die Kommandoführung.",
@@ -1323,7 +1323,7 @@
     "hintNoPerRule": "Diese Ausfuhr hat keine pro-Regel Ausgabe zählt. Wieder analysieren mit einem aktuellen Saropa Lints Plugin.",
     "hintBuildFailed": "konnte keine Triage aus dieser Export-Datenbank erstellen. Führen Sie eine neue Analyse durch.",
     "summaryVolume": "Regeln Triage (Volumen / müssen fixieren / stilistisch)",
-    "hintSameAsTree": "Strengere Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das richtige Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Gleiche Gruppierung wie im Triage-Aktivitätsleiste-Baum: filtern Sie Issues oder deaktivieren/aktivieren Sie Regeln in `analysis_options_custom.yaml`. Große Gruppen können eine Bestätigung erfordern."
+    "hintSameAsTree": "Strengere Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Gleiche Gruppierung wie im Triage-Aktivitätsleiste-Baum: filtern Sie Issues oder deaktivieren/aktivieren Sie Regeln in `analysis_options_custom.yaml`. Große Gruppen können eine Bestätigung erfordern."
   },
   "kbdOverlay": {
     "toggleTitle": "Zeigen Sie Tastatur-Verknüpfungen (?) an.",
@@ -1821,7 +1821,7 @@
       "functionOther": "{count} Funktionen",
       "avgFormat": "avg {score} ({grade}) ist ein",
       "gatesFailing": "Gatter scheitern, wenn sie versagen.",
-      "gatesPassing": "Pforten, die durchgehen."
+      "gatesPassing": "Gatter durchgegangen"
     },
     "gate": {
       "fallback": "Qualitätstore fehlgeschlagen – überprüfen Sie die Schwellenwerte in den Code-Integritätseinstellungen.",
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints in-process Plugin wurde wieder aktiviert. Der Dart Analyse-Server wird neu gestartet, um es zu laden.",
       "reenableNothingToRestore": "Saropa Lints: nichts zum Wiederherstellen. Der im Prozess laufende Plugin ist derzeit nicht über die Erweiterung deaktiviert.",
       "noOpenDartFiles": "Saropa Lints: Keine offenen Dart-Dateien gefunden. Öffnen Sie eine Dart-Datei erneut oder deaktivieren Sie die Einstellung „Nur geöffnete Editoren“.",
+      "analysisScanning": "Arbeitsbereich wird gescannt… {percent} % ({count} Probleme bisher)",
       "configUpdated": "Saropa Lints config aktualisiert (Tier: {tier}). und die sind sehr gut.",
       "configWriteFailed": "Config-Schreibfehler. {details}",
       "scaffoldGateTitle": "Composite-Analysator Plugin Gerüst und Gestell",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "pub get ausführen… ({elapsed}s)",
       "progressConfigWrite": "Konfiguration schreiben… ({elapsed}s)",
       "progressAnalysis": "Analyse läuft… ({elapsed}s)",
-      "progressBaseline": "Baseline-Scan läuft… ({elapsed}s)",
-      "analysisScanning": "Arbeitsbereich wird gescannt… {percent} % ({count} Probleme bisher)"
+      "progressBaseline": "Baseline-Scan läuft… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Analyse der Analyse-Spur",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Kein Drift Advisor Server gefunden. Starten Sie Ihre App mit dem laufenden Server, dann klicken Sie auf Auffrischen.",
     "integrationOff": "Drift Advisor Integration ist deaktiviert. Aktivieren Sie sie in den Einstellungen (saropaLints.driftAdvisor.integration), dann klicken Sie auf Auffrischen."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Unterdrücken (absichtliche alte SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Upgrade",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints ist kostenlos und Open Source. Eine kurze Bewertung hilft anderen Entwicklern, es zu entdecken – und Feedback sowie Fehlerberichte auf GitHub machen es immer besser.",
       "marketplace": "Im Marketplace bewerten",
       "openVsx": "Auf Open VSX bewerten",
+      "dismiss": "Nicht jetzt",
       "never": "Nicht mehr fragen"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "Die Scan-Aktion hat sich selbst von {from} auf {to} Arbeiter reduziert, um Ihren Computer reaktionsschnell zu halten ({reason}).",
+    "aborted": "Die Scan wurde früh beendet, um Ihren Computer ({reason}) zu schützen. Die Ergebnisse sind unvollständig.",
+    "deepNotEnoughMemory": "Ein typensensibler Scan benötigt etwa {needed}, aber nur {free} ist frei ({reserve} wird für alles andere reserviert). Der schnelle Scan beendet sich viel früher und verwendet deutlich weniger Speicher.",
+    "deepPaused": "Scan pausiert: freier Speicher ist {free}, unter dem {reserve} beibehalten wird, um Ihren Computer zu schützen. Der Scan startet automatisch, sobald der Speicher wieder frei wird.",
+    "fastDone": "Schnelle Scan-Beendigung: {files} Dateien, {issues} Problem(e) in {seconds}s.",
+    "fastDoneOfferDeep": "Schnelle Scan-Abgeschlossen: {files} Dateien, {issues} Problem(e) in {seconds}s. Ein typenbewusster Scan kann mehr finden, benötigt aber etwa {minutes} Min und {memory} Speicher.",
+    "fastDoneDeepUnavailable": "Schnelle Scan-Beendigung: {files} Dateien, {issues} Problem(e) in {seconds}. Ein type-aware Scan benötigt etwa {needed}, aber nur {free} ist aktuell frei.",
+    "daemonLowMemory": "Typensensibles Scannen benötigt etwa {needed}, aber nur {free} Speicher ist frei ({reserve} für alles andere reserviert). Scannen ohne Typen, um Ihren Computer weiterhin reaktionsschnell zu halten.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Gentle Profil verwenden",
+      "openSettings": "Einstellungen öffnen",
+      "runFast": "Schnelle Scan ausführen",
+      "runDeep": "Tiefe Scan ausführen",
+      "runDeepAnyway": "Trotzdem tiefen Scan durchführen",
+      "resume": "Jetzt fortsetzen",
+      "cancelScan": "Scan abbrechen",
+      "turnOffTypeResolution": "Typeauflösung deaktivieren",
+      "startAnyway": "Auf jeden Fall starten",
+      "notNow": "Nicht jetzt, nicht jetzt.",
+      "neverAskDeep": "Nicht erneut fragen",
+      "applyPlugin": "Anwenden",
+      "noThanks": "Keine Dankes /no_thanks",
+      "restartAnalysisServer": "Analyse-Server neu starten"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Scan-Performance",
+      "machine": "{cores} CPU-Kerne · {free} frei von {total}",
+      "recommended": "empfohlen für dieses Computer",
+      "resources": "{jobs} Worker · {memory} Speicherbudget",
+      "openSettings": "Alle Scan-Einstellungen öffnen",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Sanft",
+        "balanced": "Gleichgewicht",
+        "fast": "Schnell"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Stößt nicht in den Weg: maximal 2 Worker und ein Viertel der freien Speicher. Best für Laptops.",
+        "balanced": "Einen Kern frei und verwendet bis zu die Hälfte der freien Speicher. Einfach für die meisten Maschinen.",
+        "fast": "Verwendet jede Kernel und bis zu 70% der freien Arbeitsspeicher. Beendet früher, kann aber den Rest Ihres Computers verlangsamen."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Auch die Live-Analyse (das Dart Analyzer-Plugin) auf etwa {limit} beschränken und niedrigschwere Regeln sanft bei geringem Arbeitsspeicher freigeben? Ohne Grenze kann ein großes Projekt den Analyse-Server auf mehrere GB anwachsen.",
+      "offerSmallMachine": "Dieses Gerät hat {total} an RAM. Die Begrenzung der Live-Analyse auf etwa {limit} und das sanfte Wegwerfen von Regeln mit geringer Schweregrad, wenn der RAM knapp wird, hält es responsiv. Dies anwenden?",
+      "applied": "Gespeichert: Live-Analyse ist auf etwa {limit} beschränkt. Starten Sie den Analyseserver, um dies anzuwenden.",
+      "writeFailed": "Kann analysis_options_custom.yaml nicht aktualisieren. Prüfen Sie, ob die Datei schreibbar ist."
     }
   }
 }

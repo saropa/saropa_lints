@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "חוקי שיווי משקל / גובה שיווי משקל",
-        "description": "הגדר אילו מהחוקים של 2,350+ יוצאים בפעולה ובמה רמת האזהרה."
+        "description": "הגדר אילו מהחוקים של 2,350+ יישומים ירוצו ובאיזה רמת חמימות."
       },
       "catalog": {
         "label": "קטלוג פיקוד קאטלוג",
@@ -394,11 +394,11 @@
     },
     "watcher": {
       "title": "מונחור",
-      "hint": "קבצים ותיקיות VS Code שמנוסחן המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המונה של המONENT",
+      "hint": "קבצים ותיקיות VS Code שמנוסח האזהרה שלהם צריך להתעלם מהם. המספרים באים מהסריקה של סיכון במרחב העבודה; השתמש ב רשימה כדי לראות את הנתיבים, ואז התרחק מהם מהאזהרה שסרקה.",
       "scanning": "סריקה של המרחב העבודה...",
       "affected": "{count} שונף",
       "list": "רשימה",
-      "recommended": "Recommended excludes not yet in files.watcherExclude"
+      "recommended": "הצגת שגיאות לא נמצאות עדיין בקבצי watcherExclude"
     },
     "extension": {
       "hint": "העדפות הצגת הרחבת ההרחבה",
@@ -942,7 +942,7 @@
       "categoryTypeResolving": "ניתוח סוגים (יקר)",
       "categoryHighCost": "הIGH-cost",
       "categoryInfoSeverity": "INFO אינטנסיביות",
-      "categoryWarningSeverity": "경고 중증도",
+      "categoryWarningSeverity": "경고 중량",
       "moreRules": "יותר לא רשומים",
       "restartButton": "إعادة تشغيل המ phân석",
       "restartTooltip": "הפעל מחדש את שרת ניתוח Dart כדי לנקות את לחץ הזיכרון ולשחזר את כללי השידור."
@@ -2208,7 +2208,7 @@
       "masterToggleOn": "מצב מנהל: הפעלה...",
       "masterToggleOff": "מצב מנהל: כיבוי...",
       "killAll": "הכבה הכל: עצמה כל מנועים שוטפים.",
-      "restartAll": "إعادة تشغيل جميع: تم إعادة تشغيل جميع المحركات القابلة للتحكم.",
+      "restartAll": "إعادة تشغيل كل: تم إعادة تشغيل جميع المحركات القابلة للتحكم.",
       "lspToggleOn": "שרת LSP: הפעלה...",
       "lspToggleOff": "שרת LSP: אכיפה...",
       "lspStarted": "שרת LSP: התחיל.",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable disable - כבלי את היכולת",
       "actionEnable": "Enable enable אפשר את הפעלת",
       "bulkRuleToggleConfirm": "{verb} {count} כללים? זה מעדכן את analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints נתן זיהוי פרויקט Dart ללא saropa_lints מוגדר. תצטרכו להכין עכשיו עבור 2350+ правила לינט.",
+      "setupPrompt": "Saropa Lints גילה פרויקט Dart ללא saropa_lints מוגדר. תורם עכשיו ל-2350+ правила לינט.",
       "actionSetUpProject": "הקמת פרויקט, הגדרת פרוייקט.",
       "actionNotNow": "לא עכשיו, לא עכשיו."
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "המוצר Saropa Lints של ההרחבה בפועל הופעל מחדש. אתחול מחדש את שרת ניתוח Dart כדי לטעון אותו.",
       "reenableNothingToRestore": "Saropa Lints: אין מה לשחזר. הרחבת הפלוגין בתהליך אינה מושבתת כרגע.",
       "noOpenDartFiles": "Saropa Lints: זה היה חרא. לא נמצאו קבצי Dart פתוחים. פתח מחדש קובץ Dart או לכבות את ההגדרה \"פתוח עורך בלבד\".",
+      "analysisScanning": "סורק את סביבת העבודה… {percent}% ({count} בעיות עד כה)",
       "configUpdated": "Saropa Lints config עדכון (שכבה: {tier}).היא הייתה בתפקיד.",
       "configWriteFailed": "כתיבת התצורה נכשלה. {details}",
       "scaffoldGateTitle": "מנותק מורכב plugin scaffold ניתוחי.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "מבצעת pub get… ({elapsed}s)",
       "progressConfigWrite": "כתיבה של קובץ Yapı… ({elapsed}s)",
       "progressAnalysis": "ניתוח ביצועים... ({elapsed}s)",
-      "progressBaseline": "סריקה בסיסית בדיקה... ({elapsed}s)",
-      "analysisScanning": "סורק את סביבת העבודה… {percent}% ({count} בעיות עד כה)"
+      "progressBaseline": "סריקה בסיסית בדיקה... ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: הגדרת ניתוח מסלול",
@@ -2858,6 +2858,11 @@
     "noServerFound": "לא נמצאו שרת Drift Advisor. התחילו את האפליקציה עם השרת פעיל, ואז לחצו על עדכון.",
     "integrationOff": "האינטגרציה Drift Advisor מוטה. הפעל אותה ב설比利ות (saropaLints.driftAdvisor.integration), ואז לחץ על עדכון."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "השתלט (בוגר SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "שדרוג עדכון",
@@ -2977,7 +2982,7 @@
       "fixAlignPlugin": "הגדר את גרסה הפלוגין ב analysis_options.yaml ל {version}."
     },
     "card": {
-      "heading": "совместимость версий",
+      "heading": "תואם גרסאות",
       "loading": "בדיקה באיזה גרסה של saropa_lints ניתן להשתמש בפרויקט זה...",
       "notDetected": "לא נודע",
       "dart": "Dart SDK",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints הוא חינמי ובקוד פתוח. דירוג או ביקורת מהירים עוזרים למפתחים אחרים לגלות אותו, ומשוב ודיווחי באגים ב-GitHub משפרים אותו כל הזמן.",
       "marketplace": "דרגו ב-Marketplace",
       "openVsx": "דרגו ב-Open VSX",
+      "dismiss": "לא עכשיו",
       "never": "אל תשאל שוב"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "הסריקה עצרה עצמה מהרמת {from} ל {to} עוברים כדי לשמור על המחשב שלך רגיש ({reason}).",
+    "aborted": "הסריקה נעצמה מוקדם כדי להגן על המחשב שלך ({reason}). תוצאות חלקיות.",
+    "deepNotEnoughMemory": "סריקה מודעת לסוג צריך כמות של {needed}, אך רק {free} היא פנימית (מקיימת {reserve} לכל מה שנותר). סריקה מהירה מסתיימת הרבה מהר ומשתמשת בפחות זיכרון.",
+    "deepPaused": "הסריקה נעצה: זיכרון פנוי הוא {free}, מתחת ל-{reserve} שמוחזק פנוי עבור המחשב שלך. היא מ возращת אוטומטית כאשר זיכרון פנוי.",
+    "fastDone": "סריקה מהירה הושלמה: {files} קבצים, {issues} בעיה(ות) ב-{seconds}.",
+    "fastDoneOfferDeep": "סריקה מהירה הושלמה: {files} קבצים, {issues} בעיה(ות) ב-{seconds}. סריקה מודעת לסוגים יכולה למצא יותר, אך דורשת כ {minutes} דקות ו-{memory} של זיכרון.",
+    "fastDoneDeepUnavailable": "סריקה מהירה הושלמה: {files} קבצים, {issues} בעיה(ות) ב-{seconds}. סריקה מודעת לסוגים דורשת כ {needed}, אך רק {free} זמין כרגע.",
+    "daemonLowMemory": "סריקה מודעת לסוגים צריכה על {needed}, אך רק {free} של זיכרון פנוי (מונעת {reserve} לכול השאר). סריקה ללא סוגים כרגע כדי שהמחשב יישאר רגיש.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "השתמש בפרופיל עדין",
+      "openSettings": "פתח הגדרות",
+      "runFast": "הרץ ס캔 מהיר",
+      "runDeep": "ריצה של ס캔 עמוק",
+      "runDeepAnyway": "הפעל סקר עמוק בכל מקרה",
+      "resume": "استمر עכשיו",
+      "cancelScan": "הפסק ס캔",
+      "turnOffTypeResolution": "השבית שיקוב סוגים",
+      "startAnyway": "התחל בכל מקרה",
+      "notNow": "לא עכשיו, לא עכשיו.",
+      "neverAskDeep": "אל תשאל שוב",
+      "applyPlugin": "הפעלה",
+      "noThanks": "לא תודה /no_thanks",
+      "restartAnalysisServer": "إعادة تشغيل خادم האנליזה"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "איסוף ביצועים",
+      "machine": "çekות {cores} · {free} פנויים מ {total}",
+      "recommended": "מומלץ למחשב זה",
+      "resources": "עובד(ים) {jobs} · חיזוק הזיכרון {memory}",
+      "openSettings": "פתוח את כל הגדרות הסקן",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "קלה",
+        "balanced": "מונחה שיווי משקל",
+        "fast": "מהיר"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "מונע מהסיבוב: עד 2 עוברים ורבע מזכרון פנוי. מתאים טוב למחשבים ניידים.",
+        "balanced": "מ解放ת גרעין אחד ומשתמש במחצית של הזיכרון החופשי. מתאים לרוב המכונות.",
+        "fast": "משתמש בכל המרכזים ועד 70% מהזכרון החופשי. מסתיים מהר יותר אך יכול לזרוק את שארית המחשב שלך."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "הגביל גם ניתוח אינטראקטיבי (המוצר Dart של האנליטיקס) לבערך {limit} ותודה לתקנות נחותות בדידות כאשר הזיכרון מתמלא? ללא הגבלת זיכרון, פרויקט גדול יכול להגדיל את שרת האנליטיקס לאלפים של ג'יגה bait.",
+      "offerSmallMachine": "המחשב הזה יש {total} של זיכרון. הגבלת ניתוח פעיל לבערך {limit}, והסרת правила עם דרגת חומרה נמוכה בצורה חלקה כש Zodiac זיכרון נמוך, מונעת את התגובה. להחיל את זה?",
+      "applied": "נשמר: ניתוח לוחץ הוא מוגבל לבערך {limit}. עצור את שרת האנליזה כדי להפעיל אותו.",
+      "writeFailed": "לא ניתן לעדכן את analysis_options_custom.yaml. בדוק שהקובץ ניתן לכתיבה."
     }
   }
 }

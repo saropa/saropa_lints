@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Moto ya Kifundisho na Mwaka wa Kifundisho",
-        "description": "Tambua kwa nani ya 2,350+ kati ya nizawa ya kuzalisha na kwa kati ya kifedha."
+        "description": "Tambua kwa nani ya 2,350+ rule zinazofanikiwa na kwa ule ule wa severity."
       },
       "catalog": {
         "label": "Katalogi ya amri ya amri Catalog.",
@@ -253,7 +253,7 @@
     "allPackagesHint": "Kila pakiti inayopatikana, pamoja na zile ambazo hazikugunduliwa katika mradi huu. Ruhusu kundi kuchagua sheria zake.",
     "versionGroup": {
       "tag": "Chagua toleo moja la kuchagua.",
-      "tooltip": "Kipaka hizi kubadilisha version mbalimbali ya kipambo kati ya kipambo kati ya kipambo. Kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kipambo kati ya kip."
+      "tooltip": "Kipaka hizi kubadilisha version mbalimbali ya kifedha kati ya kifedha same. Kati ya kipaka moja kuzalishwa, kipaka mbalimbali kuzalishwa kufuta."
     },
     "domainDesc": {
       "state-management": "Block, Riverpod, Provider, GetX na maktaba zinazohusiana za hali na sindano ya utegemezi.",
@@ -1292,7 +1292,7 @@
   "ruleExplain": {
     "toggle": {
       "disableButton": "Kifungua kileyo rule",
-      "disableTitle": "Kifungua kifungua hiki kwa kujitokeza kwa project kimoja — inakwenda analysis_options_custom.yaml. Tafuta kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifungua kwa kujitokeza kwa kujitokeza kifung.",
+      "disableTitle": "Kifungua kileyo rule kwa kujitokeza kwa project kimoja — inakwenda analysis_options_custom.yaml. Tafuta analysis kwa kuzingatia kifungua kileyo.",
       "enableButton": "Tumia kujaribu kifungua kipengele hiki",
       "enableTitle": "Washa upya kanuni hii — huondoa ubatilishaji katika analysis_options_custom.yaml. Endesha uchanganuzi tena ili kuona mabadiliko yakitekelezwa."
     },
@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable Disable Kulemaza",
       "actionEnable": "Enable Kuwezesha kuwezesha",
       "bulkRuleToggleConfirm": "{verb} {count} sheria? Hii inasasisha analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints amesha kujaribu project ya Dart bila kujaribu saropa_lints. Tafakari kwa 2350+ rules ya lint.",
+      "setupPrompt": "Saropa Lints amesha kujaribu project ya Dart bila kujaribu saropa_lints. Tafakari kwa kuzingatia 2350+ rules ya lint.",
       "actionSetUpProject": "Kuanzisha Mradi wa kuanzisha mradi.",
       "actionNotNow": "Sio sasa, sio sasa."
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Unganisha plugin wa kati Saropa Lints. Kupakia server wa analizi ya Dart kujaribu kujaribu.",
       "reenableNothingToRestore": "Saropa Lints: hapa kujitambua. Plugin in-process haukotambua kwa makini kwa extension.",
       "noOpenDartFiles": "Saropa Lints:: kwa hiyo ni sawa. hakuna faili wazi za Dart zilizopatikana. Fungua tena faili ya Dart au uzime mipangilio \"Fungua wahariri tu\".",
+      "analysisScanning": "Inakagua nafasi ya kazi… {percent}% (matatizo {count} hadi sasa)",
       "configUpdated": "Saropa Lints config updated (tier: tier: imefanywa kuwa ya kisasa) {tier}). kwa hiyo, ni lazima uwe na",
       "configWriteFailed": "Config write imeshindwa. {details}",
       "scaffoldGateTitle": "Composite analyzer Plugin jukwaa la ujenzi.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "Kupata pub get… ({elapsed}s)",
       "progressConfigWrite": "Kushiriki config… ({elapsed}s)",
       "progressAnalysis": "Unganisha matokeo... ({elapsed}s)",
-      "progressBaseline": "Kupata skani ya mbingu... ({elapsed}s)",
-      "analysisScanning": "Inakagua nafasi ya kazi… {percent}% (matatizo {count} hadi sasa)"
+      "progressBaseline": "Kupata skani ya mbingu... ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Weka Njia ya Uchambuzi",
@@ -2792,7 +2792,7 @@
       "driftOnly": "Makosa \"{folder}\" inaonekana katika analyzer: exclude: ya analysis_options.yaml, ambayo inaonekana kushughulika diagnostics yake. Pia ongeza kwenye dart.analysisExcludedFolders kwa kusitishia server ya analysis kushughulika.",
       "imported": "Jumla \"{folder}\" inakwenda kuzalishia, lakini jumla ya kipatikanisi kwenye pubspec.yaml inapata kwenye yake, kwa hiyo kuzalishia inakwenda kushinda.",
       "large": "{count} faili ya Dart inapakia kwenye kompyuta inayoitwa {ram} GB ya RAM. Oneshuka kipengele ambayo huna kujaribu kuanza kujifunza ili kuzingatia uso wa RAM na kuzalisha mabadiliko ya kipengele kwa muda mfupi.",
-      "largeNoRam": "Faili {count} Dart zilizotambulika. Ongeza kifunge kote kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuzunguka kwa kuz."
+      "largeNoRam": "Faili {count} Dart zilizotambulika. Ongeza kifunge kozobadilika kwa kuzunguka maelezo ya kuzalisha kwa kuzingatia maelezo ya kuzalisha."
     },
     "quickFix": {
       "title": "Ona katika dart.analysisExcludedFolders",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Hakuna server Drift Advisor. Hatua aplikasi wako na server inayotumika, kisha chagua Refresh.",
     "integrationOff": "Unganisha Drift Advisor ni of. Ondoa kwenye mipango (saropaLints.driftAdvisor.integration), sasa bonye na Refresh."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Supress (intentional old SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Upgrade Kuboresha.",
@@ -2909,7 +2914,7 @@
     "bareNames": "Mwisho wa kujaribu (kukosa matokeo ya kisasa bila kipengele ya saropa_lints/): {items}.",
     "clashes": "Kabla na baada ya jina la rule inapangwa, tafakari kwa kifupi: {items}",
     "skipped": "Imeunguka: {items}",
-    "failedRestored": "Unganisha kwa kuhakikisha {detail} Kila faili ilikuwa imetokeleka kwa maandishi yao ya muda mwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa k.",
+    "failedRestored": "Rule ya kuanza kujifunza kifanyika: {detail} Wote faili zilifanikisha kwa maandishi yao ya muda mlima.",
     "failedNotRestored": "Unganisha kwa kuhusisha kwa {detail}: Tafuta kwa kuzingatia faili zinazozalishwa kwa kutambua; tafuta kwa git.",
     "offer": "Unganisha {hits} kati ya {count} faili?",
     "offerPreview": "Hakiki",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints ni bure na chanzo huria. Ukadiriaji au maoni ya haraka huwasaidia wasanidi wengine kuigundua — na maoni na ripoti za hitilafu kwenye GitHub huifanya iendelee kuwa bora.",
       "marketplace": "Kadiria kwenye Marketplace",
       "openVsx": "Kadiria kwenye Open VSX",
+      "dismiss": "Hakuna sasa",
       "never": "Usiulize tena"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "Scan yalifanikisha kwa {from} hadi {to} workers kujifunza kompyuta yako kuzalishwa ({reason}).",
+    "aborted": "Skanu ilifungua kwa njia ya kwanza kujitambua kompyuta yako ({reason}). Nafasi ya matokeo ni mazito.",
+    "deepNotEnoughMemory": "Scan ya kifaa kuzalishwa inaitwa {needed}, lakini kwa sasa {free} ina kufanya (kutumia {reserve} kwa kila nini). Scan ya kifaa ya kutosha inafinisha kwa kipindi kubwa na ina kufanya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kipindi kubwa ya kip.",
+    "deepPaused": "Scan ya kwanza iliyopata: maelezo ya mifano ya memory ni {free}, kati ya {reserve} ya mifano ya memory ya kwanza kwa kompyuta wako. Iliyopata kwa muda mwingi kama memory ina kufaniki.",
+    "fastDone": "Kuzingia kifanisi kikubwa: {files} faili, {issues} miongoni mwa masalama kwenye {seconds}.",
+    "fastDoneOfferDeep": "Scan ya kifaa ya kutosha: {files} faili, {issues} maswala ya kifaa ya kutosha kwenye {seconds}. Scan ya kifaa ya kutosha ya kifaa ya kutosha ina kufanya zaidi, lakini ina kufanya kifaa ya kutosha kwenye {minutes} minuta na {memory} ya kifaa ya kutosha.",
+    "fastDoneDeepUnavailable": "Scan ya kifaa ya kutosha: {files} faili, {issues} maswala(s) katika {seconds}s. Scan ya kifaa ya kutosha ya kifaa ina kuhusika {needed}, lakini kuna {free} kwa sasa.",
+    "daemonLowMemory": "Kuzingia kwa kutoa kwa {needed}, lakini kuna muda muda mwa {free} ya memory (kutumia {reserve} kwa kila nini). Kuzingia kwa kutoa kwa kila nini kwa sasa kwa kuzalisha kompyuta yako kuzalisha.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Tumia Profile ya Moyo",
+      "openSettings": "Opende Settings",
+      "runFast": "Tuma Fast Scan",
+      "runDeep": "Tuma Skani Moyo",
+      "runDeepAnyway": "Tumeleka Deep Scan Sasa",
+      "resume": "Kifungu Kwa Kati",
+      "cancelScan": "Kusimamisha Kifungu",
+      "turnOffTypeResolution": "Kifungua Type Resolution",
+      "startAnyway": "Shuru Kwa Mwaka Mpya",
+      "notNow": "Sio sasa, sio sasa.",
+      "neverAskDeep": "Hakuna Kufunga Tazama Pili",
+      "applyPlugin": "Tuma",
+      "noThanks": "Hakuna Moyo",
+      "restartAnalysisServer": "Tumia Analizi Server"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Kuzingia Kipimani ya Kujaribu",
+      "machine": "{cores} CPU cores · {free} ya kujifunza ya {total}",
+      "recommended": "inayozungumzika kwa kompyuta hii",
+      "resources": "Wandamini wa {jobs} · {memory} budget ya memory",
+      "openSettings": "Opend all scan settings",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Laini",
+        "balanced": "Sawazishwa",
+        "fast": "Sasa"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Hakufanikia kwenye joto: kwa kawaida 2 workers na nusu ya mifano ya memory. Moyo ya kipengele kwa laptops.",
+        "balanced": "Kupungua core mbili na kuzingatia kati ya kati ya memory ya kipya. Sogani kwa makamu ya kipya.",
+        "fast": "Kutumia kila core na kati ya 70% ya memory ya free. Ikiwemo kufinish kwa kipindi, inaweza kusababisha kutoa kati ya kompyuta yako."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Kabisa ukifaniki analysis ya kipindi (plugin ya analyzer ya Dart) kwa kati ya {limit} na kushinda kwa kibingine kwa kipindi ya kifaniki kama ujumbe unapakia? Bila kipindi, project ya kubwa inaweza kushinda server ya analysis kwa kipindi ya kubwa.",
+      "offerSmallMachine": "Kompyuta hii ina {total} ya memory. Kufanikisha analizi ya kipindi kwa kati {limit}, na kufuta kwa kibali kwa nini kwa kipindi ya kifedha kwa memory kufika kifedha, inaonekana kwa kipindi. Tafuta kifedha hii?",
+      "applied": "Imeandika: analizi ya kipindi kikubwa inapata kwa kati ya {limit}. Tumia server ya analizi ya kipindi kikubwa kujaribu.",
+      "writeFailed": "Imeshindwa kusasisha analysis_options_custom.yaml. Hakikisha faili linaweza kuandikwa."
     }
   }
 }

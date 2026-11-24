@@ -3089,10 +3089,10 @@
       "title": "Quét Hiệu suất",
       "machine": "{cores} lõi CPU · {free} trống của {total}",
       "recommended": "được khuyến nghị cho máy tính này",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
+      "resources": "{jobs} tiến trình · {memory} bộ nhớ",
       "openSettings": "Mở tất cả cài đặt quét",
       "profile": {
-        "gentle": "Gentle",
+        "gentle": "Nhẹ nhàng",
         "balanced": "Cân bằng",
         "fast": "Nhanh"
       },

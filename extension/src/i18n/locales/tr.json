@@ -2860,7 +2860,7 @@
   },
   "vibrancy": {
     "sdkConstraint": {
-      "suppressOldSdk": "Suppress (intentional old SDK)"
+      "suppressOldSdk": "Bastır (bilinçli eski SDK)"
     }
   },
   "blastRadius": {
