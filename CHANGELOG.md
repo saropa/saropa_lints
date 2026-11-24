@@ -80,6 +80,7 @@ Fewer false positives: over 20 rules no longer flag code that was already correc
 
 ### Added
 
+- New rule `prefer_generated_data_classes` (Professional, INFO): in projects that depend on dart_mappable, freezed or json_serializable, flags a class that hand-writes `toJson`, `fromJson`, `copyWith`, or `==` together with `hashCode`. Classes annotated `@MappableClass`, `@freezed`, `@unfreezed` or `@JsonSerializable`, classes using a generated mixin, and abstract classes are skipped; `toString` alone does not trigger it. Reported in #415.
 - VS Code: **Saropa Lints: Scan with Latest Engine (Older Dart Projects)** runs the newest scan engine under a newer Dart SDK (PATH `dart`, or `saropaLints.externalEngine.dartSdkPath`) against a project pinned below Dart 3.11, and lists the findings in the Problems panel. It also appears as a **Scan with latest engine** row in the sidebar Actions list, shown only when the project's Dart SDK is below 3.11. The first run asks before installing the engine globally; the project's `pubspec.yaml` and SDK pin are untouched. New guide: `doc/guides/older_dart_sdks.md`.
 
 ### Fixed
