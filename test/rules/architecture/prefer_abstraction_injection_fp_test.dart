@@ -10,9 +10,7 @@ bool _flags(String typeSrc) {
     content: 'class A { A($typeSrc p); }',
     throwIfDiagnostics: false,
   ).unit;
-  final ctor = (unit.declarations.first as ClassDeclaration)
-      .body
-      .childEntities
+  final ctor = (unit.declarations.first as ClassDeclaration).body.childEntities
       .whereType<ConstructorDeclaration>()
       .first;
   final param = ctor.parameters.parameters.first as RegularFormalParameter;

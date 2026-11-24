@@ -1107,8 +1107,7 @@ class _ClearFlagGuardVisitor extends RecursiveAstVisitor<void> {
     while (true) {
       if (cond is ParenthesizedExpression) {
         cond = cond.expression;
-      } else if (cond is PrefixExpression &&
-          cond.operator.lexeme == '!') {
+      } else if (cond is PrefixExpression && cond.operator.lexeme == '!') {
         cond = cond.operand;
       } else {
         break;

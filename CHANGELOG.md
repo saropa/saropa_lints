@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.8.0] — Unreleased
+## [17.8.0]
 
 Fewer false positives: over 20 rules no longer flag code that was already correct (cached notifiers, loop-disposed controllers, `InkWell` hover/focus, button busy spinners, projects without an `ios/` folder and more), the VS Code LSP server stops rewriting `pubspec.lock` in FVM-pinned projects, and published rule counts and the Vietnamese comparison label are fixed. [log](https://github.com/saropa/saropa_lints/blob/v17.8.0/CHANGELOG.md)
 

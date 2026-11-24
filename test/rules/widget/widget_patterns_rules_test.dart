@@ -837,8 +837,9 @@ void main() {
         final src = File(path).readAsStringSync();
         // Positive: the expect_lint line is followed by a GestureDetector.
         expect(
-          RegExp(r'expect_lint: \w+\n[^\n]*\n\s*GestureDetector\(')
-              .hasMatch(src),
+          RegExp(
+            r'expect_lint: \w+\n[^\n]*\n\s*GestureDetector\(',
+          ).hasMatch(src),
           isTrue,
         );
         // Negative: the InkWell good case carries no expect_lint marker.

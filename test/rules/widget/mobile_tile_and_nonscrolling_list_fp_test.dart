@@ -12,19 +12,19 @@ import '../../support/syntactic_rule_harness.dart';
 /// the parse-only harness yields InstanceCreationExpression nodes (bare calls
 /// stay MethodInvocation until resolved).
 void main() {
-  int count(SaropaLintRule rule, String body) =>
-      runRuleSyntactic(
-        rule,
-        // Flutter import + widget class so file-type gates classify as widget.
-        "import 'package:flutter/material.dart';\n"
-        'class W extends StatelessWidget { void f() { $body } }',
-      ).length;
+  int count(SaropaLintRule rule, String body) => runRuleSyntactic(
+    rule,
+    // Flutter import + widget class so file-type gates classify as widget.
+    "import 'package:flutter/material.dart';\n"
+    'class W extends StatelessWidget { void f() { $body } }',
+  ).length;
 
   group('marker / Semantics-button tap targets', () {
     const String bare = 'new GestureDetector(onTap: f, child: x)';
     const String inMarker = 'new Marker(child: $bare)';
     const String inSemantics = 'new Semantics(button: true, child: $bare)';
-    const String inSemanticsNoButton = 'new Semantics(label: "a", child: $bare)';
+    const String inSemanticsNoButton =
+        'new Semantics(label: "a", child: $bare)';
 
     test('require_focus_indicator', () {
       expect(count(RequireFocusIndicatorRule(), '$bare;'), 1);
@@ -50,7 +50,10 @@ void main() {
     final rule = AvoidGestureWithoutBehaviorRule();
 
     test('flags a bare detector over a plain child (true positive)', () {
-      expect(count(rule, 'new GestureDetector(onTap: f, child: new Text(a));'), 1);
+      expect(
+        count(rule, 'new GestureDetector(onTap: f, child: new Text(a));'),
+        1,
+      );
     });
 
     test('skips sized Stack and painted-box children', () {
@@ -106,25 +109,37 @@ void main() {
         ),
         0,
       );
-      expect(count(r, 'new AlertDialog(content: new ListView(children: c));'), 0);
+      expect(
+        count(r, 'new AlertDialog(content: new ListView(children: c));'),
+        0,
+      );
       expect(
         count(r, 'showDialog(builder: (c) => new ListView(children: c));'),
         0,
       );
     });
 
-    test('require_refresh_indicator / require_scroll_controller stay silent', () {
-      expect(count(RequireRefreshIndicatorRule(), '$never;'), 0);
-      expect(count(RequireScrollControllerRule(), '$never;'), 0);
-      expect(
-        count(RequireRefreshIndicatorRule(), 'new AlertDialog(content: $plain);'),
-        0,
-      );
-      expect(
-        count(RequireScrollControllerRule(), 'new AlertDialog(content: $plain);'),
-        0,
-      );
-    });
+    test(
+      'require_refresh_indicator / require_scroll_controller stay silent',
+      () {
+        expect(count(RequireRefreshIndicatorRule(), '$never;'), 0);
+        expect(count(RequireScrollControllerRule(), '$never;'), 0);
+        expect(
+          count(
+            RequireRefreshIndicatorRule(),
+            'new AlertDialog(content: $plain);',
+          ),
+          0,
+        );
+        expect(
+          count(
+            RequireScrollControllerRule(),
+            'new AlertDialog(content: $plain);',
+          ),
+          0,
+        );
+      },
+    );
   });
 
   group('widget_ancestor_utils helpers (true positives)', () {

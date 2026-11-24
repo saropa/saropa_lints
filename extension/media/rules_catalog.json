@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2387,
+  "ruleCount": 2388,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -29142,6 +29142,28 @@
       "correction": "Use Future.wait([future1, future2]) to run independent futures concurrently, or (future1, future2).wait in Dart 3.",
       "problemMessage": "[prefer_future_wait] Sequential awaits could run in parallel with Future.wait. {v2}",
       "impact": "warning",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "prefer_generated_data_classes": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "codegen"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Annotate the class with @MappableClass() (dart_mappable), @freezed, or @JsonSerializable() and remove the hand-written members.",
+      "problemMessage": "[prefer_generated_data_classes] This class hand-writes serialization or value-equality code (toJson, fromJson, copyWith, or == with hashCode) even though the project depends on a code generator. Hand-written boilerplate invites type and key-name typos and repeated string literals; generated code is consistent and cannot drift from the fields. {v1}",
+      "impact": "info",
       "owasp": {
         "mobile": [],
         "web": []

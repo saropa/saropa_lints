@@ -3765,7 +3765,8 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
         // Also skip decorative icons whose owning widget already carries a
         // text label (FP: a semanticLabel would make screen readers announce
         // the name twice, e.g. "Focus, Focus").
-        if (!_hasSemanticExclusion(node) && !isDecorativeBesideTextLabel(node)) {
+        if (!_hasSemanticExclusion(node) &&
+            !isDecorativeBesideTextLabel(node)) {
           reporter.atNode(node.constructorName, code);
         }
       }

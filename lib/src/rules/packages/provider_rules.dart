@@ -653,7 +653,8 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
     // Confirm the name is a field of the enclosing class.
     // In newer analyzers a method's parent is the class BODY node, not the
     // ClassDeclaration, so use the ancestor lookup instead of `.parent`.
-    final ClassDeclaration? cls = build.thisOrAncestorOfType<ClassDeclaration>();
+    final ClassDeclaration? cls = build
+        .thisOrAncestorOfType<ClassDeclaration>();
     if (cls == null) return false;
     // bodyMembers (analyzer_compat) works across analyzer versions where
     // ClassDeclaration.body / .members differ.
@@ -697,7 +698,7 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
   }
 }
 
-/// Detects a local variable declaration named [_name] inside a method body.
+/// Detects a local variable declaration named `_name` inside a method body.
 /// Used by [AvoidChangeNotifierInWidgetRule] so a local that shadows a field
 /// is not mistaken for a State-cached field.
 class _LocalNameFinder extends RecursiveAstVisitor<void> {

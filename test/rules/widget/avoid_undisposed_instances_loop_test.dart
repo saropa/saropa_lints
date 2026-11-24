@@ -6,9 +6,8 @@ import '../../support/syntactic_rule_harness.dart';
 /// Regression: avoid_undisposed_instances must credit fields disposed via a
 /// for-in loop over a list literal inside dispose().
 void main() {
-  Set<String> run(String body) => reportedRuleCodesSyntactic(
-    AvoidUndisposedInstancesRule(),
-    '''
+  Set<String> run(String body) =>
+      reportedRuleCodesSyntactic(AvoidUndisposedInstancesRule(), '''
 import 'package:flutter/material.dart';
 class W extends StatefulWidget {}
 class _S extends State<W> {
@@ -21,13 +20,13 @@ $body
     super.dispose();
   }
 }
-''',
-    pathHint: 'lib/widgets/w.dart',
-  );
+''', pathHint: 'lib/widgets/w.dart');
 
   test('fields disposed via for-in over list literal are not reported', () {
     expect(
-      run('for (final c in [_name, _city]) { c.removeListener(_cb); c.dispose(); }'),
+      run(
+        'for (final c in [_name, _city]) { c.removeListener(_cb); c.dispose(); }',
+      ),
       isEmpty,
     );
   });

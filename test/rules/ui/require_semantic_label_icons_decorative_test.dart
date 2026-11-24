@@ -47,7 +47,9 @@ void main() {
 
     test('icon slot without any text label still needs a label', () {
       expect(
-        _decorative('IconButton(onPressed: () {}, icon: const Icon(Icons.add))'),
+        _decorative(
+          'IconButton(onPressed: () {}, icon: const Icon(Icons.add))',
+        ),
         isFalse,
       );
     });

@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "القواعد الصارمة:\n1. العودة فقط إلى النص المترجم.",
   "command.toggleLints.title": "Saropa Lints: تشغيل / إيقاف",
   "command.syncPluginVersion.title": "Saropa Lints: تزامن إصدار الإضافة مع pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: قائمة الحالة"
+  "command.showStatusBarMenu.title": "Saropa Lints: قائمة الحالة",
+  "command.scanWithLatestEngine.title": "Saropa Lints: مسح باستخدام المحرك الأحدث (مشاريع Dart القديمة)",
+  "config.property.externalEngine.dartSdkPath.description": "مجلد Dart SDK (يحتوي على bin/dart) المستخدم بواسطة \"المسح باستخدام المحرك الأحدث\". يجب أن يكون Dart 3.11 أو أحدث. تركه فارغًا لاستخدام dart الموجود في PATH."
 }
