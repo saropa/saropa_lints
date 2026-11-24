@@ -45,3 +45,9 @@ No diagnostic when `onPressed` is (or can be) null; that is the disabled state.
 ## Environment
 
 saropa_lints 17.7.9; downstream app d:\src\jupiter-tablet, lib/ui/school_link_step.dart.
+
+---
+
+## Closed (2026-11-24)
+
+By design. require_disabled_state intentionally flags a button whose onPressed is a conditional containing null and which has no style: argument; it asks for explicit disabled styling (disabledBackgroundColor / disabledForegroundColor). The reported code is the rules documented bad example (example/lib/widget_patterns/require_disabled_state_fixture.dart, expect_lint at line 113). Reporter guidance: add a style: with disabled colors, or use // ignore: require_disabled_state with a reason, or disable the rule for the project.
