@@ -15,6 +15,7 @@ import 'package:analyzer/dart/element/type.dart';
 import '../../element_identifier_utils.dart';
 import '../../flutter_widget_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../widget_ancestor_utils.dart';
 import '../../fixes/accessibility/increase_animation_duration_fix.dart';
 import '../../fixes/accessibility/unwrap_redundant_semantics_fix.dart';
 
@@ -1840,12 +1841,9 @@ class _InteractiveChildVisitor extends RecursiveAstVisitor<void> {
 /// ```dart
 /// Text(
 ///   'Hello',
-///   style: TextStyle(fontSize: 14), // Fixed size - won't scale!
-/// )
-/// Text(
-///   'Hello',
 ///   textScaleFactor: 1.0, // Forces no scaling!
 /// )
+/// Text('Hello', textScaler: TextScaler.noScaling)
 /// ```
 ///
 /// **GOOD:**
@@ -1854,11 +1852,8 @@ class _InteractiveChildVisitor extends RecursiveAstVisitor<void> {
 ///   'Hello',
 ///   style: Theme.of(context).textTheme.bodyMedium, // Scales with system
 /// )
-/// // Or use relative sizing:
-/// Text(
-///   'Hello',
-///   style: TextStyle(fontSize: 14 * MediaQuery.textScaleFactorOf(context)),
-/// )
+/// // A literal fontSize is fine: Text scales it by default.
+/// Text('Hello', style: TextStyle(fontSize: 14))
 /// ```
 class PreferScalableTextRule extends SaropaLintRule {
   PreferScalableTextRule() : super(code: _code);
@@ -1893,23 +1888,37 @@ class PreferScalableTextRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      // FP fix: a literal TextStyle(fontSize: 24) is NOT a scaling problem.
+      // Flutter's Text/RichText multiply fontSize by the ambient
+      // MediaQuery.textScaler unless the widget opts out. The rule therefore
+      // flags only the opt-out, not literal font sizes.
       final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'TextStyle') return;
+      if (typeName != 'Text' && typeName != 'RichText') return;
 
-      // Check for fontSize argument with literal value
       for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'fontSize') {
-          final Expression valueExpr = arg.argumentExpression;
-
-          // Report if it's a literal number
-          if (valueExpr is IntegerLiteral || valueExpr is DoubleLiteral) {
-            reporter.atNode(arg);
-            return;
-          }
+        if (arg is! NamedArgument) continue;
+        final String paramName = arg.name.lexeme;
+        if (paramName != 'textScaler' && paramName != 'textScaleFactor') {
+          continue;
+        }
+        if (_disablesScaling(arg.argumentExpression.toSource())) {
+          reporter.atNode(arg);
+          return;
         }
       }
     });
   }
+
+  /// Matches values that pin the text scale to 1 (scaling disabled):
+  /// `TextScaler.noScaling`, `TextScaler.linear(1[.0])`, or a bare `1`/`1.0`
+  /// (legacy `textScaleFactor`). Any other value (a variable, a clamp, a
+  /// factor != 1) still scales or is undeterminable, so it is not reported.
+  static final RegExp _noScalingPattern = RegExp(
+    r'^(?:TextScaler\.noScaling|TextScaler\.linear\(\s*1(?:\.0*)?\s*\)|1(?:\.0*)?)$',
+  );
+
+  static bool _disablesScaling(String valueSource) =>
+      _noScalingPattern.hasMatch(valueSource.trim());
 }
 
 /// Warns when custom tap targets lack Semantics with button: true.
@@ -3215,8 +3224,10 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
-      // Check for custom interactive widgets (not built-in buttons)
-      if (typeName != 'GestureDetector' && typeName != 'InkWell') return;
+      // InkWell/InkResponse are focusable by default and paint a focus
+      // highlight (focusColor / theme overlay), so only GestureDetector,
+      // which has neither, needs an explicit Focus indicator.
+      if (typeName != 'GestureDetector') return;
 
       // Check if has tap handler
       bool hasTapHandler = false;
@@ -3234,6 +3245,11 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
 
       // Check if wrapped in Focus widget
       if (_hasFocusAncestor(node)) return;
+
+      // FP fix: a tap target inside a map Marker, or under a
+      // Semantics(button: true) wrapper, has no keyboard focus chrome by
+      // design (touch map) and the parent already exposes the button role.
+      if (isMarkerOrSemanticButtonTapTarget(node)) return;
 
       reporter.atNode(node.constructorName, code);
     });
@@ -3746,11 +3762,77 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
 
       if (!hasSemanticLabel) {
         // Check if wrapped in ExcludeSemantics or Semantics with excludeSemantics: true
-        if (!_hasSemanticExclusion(node)) {
+        // Also skip decorative icons whose owning widget already carries a
+        // text label (FP: a semanticLabel would make screen readers announce
+        // the name twice, e.g. "Focus, Focus").
+        if (!_hasSemanticExclusion(node) && !isDecorativeBesideTextLabel(node)) {
           reporter.atNode(node.constructorName, code);
         }
       }
     });
+  }
+
+  /// Argument names through which an icon is slotted into a labeled widget.
+  static const Set<String> _iconSlotNames = <String>{
+    'icon',
+    'prefixIcon',
+    'suffixIcon',
+    'leading',
+  };
+
+  /// Sibling argument names that supply the visible text label.
+  static const Set<String> _labelSlotNames = <String>{
+    'label',
+    'labelText',
+    'title',
+    'child',
+  };
+
+  /// True when [iconNode] is passed via an icon slot (`icon:`, `prefixIcon:`,
+  /// `suffixIcon:`, `leading:`) of a widget/decoration that also has a
+  /// sibling text label (`label:`/`title:`/`child:` holding a `Text`, or
+  /// `labelText:`). Such an icon is decorative: the label already names it,
+  /// so requiring semanticLabel would cause a duplicate announcement.
+  ///
+  /// Purely syntactic (names only, no element lookup) so it behaves the same
+  /// in resolved analyzer runs and unresolved `scan` runs, and so it can be
+  /// unit-tested with `parseString`.
+  static bool isDecorativeBesideTextLabel(AstNode iconNode) {
+    // The icon must be the direct value of a named argument in an icon slot.
+    final AstNode? slot = iconNode.parent;
+    if (slot is! NamedArgument || !_iconSlotNames.contains(slot.name.lexeme)) {
+      return false;
+    }
+
+    // Owner may be a constructor call (resolved) or a method-style call such
+    // as `FilledButton.icon(...)` before resolution rewrites it.
+    final AstNode? list = slot.parent;
+    if (list is! ArgumentList) return false;
+
+    for (final Argument sibling in list.arguments) {
+      if (sibling is! NamedArgument || identical(sibling, slot)) continue;
+      final String name = sibling.name.lexeme;
+      if (!_labelSlotNames.contains(name)) continue;
+      final Expression value = sibling.argumentExpression;
+      // labelText is a plain String: any non-null value names the field.
+      if (name == 'labelText' && value is! NullLiteral) return true;
+      if (_isTextWidget(value)) return true;
+    }
+    return false;
+  }
+
+  /// True for `Text(...)` / `Text.rich(...)` in either AST shape (the parser
+  /// yields a MethodInvocation until resolution creates an instance creation).
+  static bool _isTextWidget(Expression expr) {
+    if (expr is InstanceCreationExpression) {
+      return expr.constructorName.type.name.lexeme == 'Text';
+    }
+    if (expr is MethodInvocation) {
+      final Expression? target = expr.target;
+      if (target == null) return expr.methodName.name == 'Text';
+      return target is SimpleIdentifier && target.name == 'Text';
+    }
+    return false;
   }
 
   bool _hasSemanticExclusion(AstNode node) {

@@ -122,7 +122,7 @@ void main() {
         // Healthy for two ticks, then the machine runs out of free memory.
         avail: () => ++ticks < 3 ? 8000 : 300,
       );
-      expect(r.diagnostics.length, 80);
+      expect(r.diagnostics, hasLength(80));
       expect(r.report.minAllowedWorkers, 1);
       expect(r.report.throttleEvents.any((e) => e.to < e.from), isTrue);
       expect(r.report.aborted, isFalse);
@@ -140,7 +140,7 @@ void main() {
           return (ticks > 2 && ticks < 8) ? 300 : 8000;
         },
       );
-      expect(r.diagnostics.length, 200);
+      expect(r.diagnostics, hasLength(200));
       expect(r.report.throttleEvents.any((e) => e.to > e.from), isTrue);
     });
 
@@ -169,7 +169,7 @@ void main() {
         chunkTimeout: const Duration(milliseconds: 800),
       );
       expect(r.report.skippedFiles, ['hang_me.dart']);
-      expect(r.diagnostics.length, 19);
+      expect(r.diagnostics, hasLength(19));
       expect(
         r.diagnostics.map((d) => d.filePath),
         isNot(contains('hang_me.dart')),
@@ -182,7 +182,7 @@ void main() {
         final files = _files(20)..[4] = 'die_here.dart';
         final r = await _run(files, spec: {'die': 'die_here'}, jobs: 2);
         expect(r.report.skippedFiles, ['die_here.dart']);
-        expect(r.diagnostics.length, 19);
+        expect(r.diagnostics, hasLength(19));
         expect(r.report.workersRestarted, greaterThan(0));
       },
     );
@@ -191,7 +191,7 @@ void main() {
       final files = _files(15)..[3] = 'bad.dart';
       final r = await _run(files, spec: {'throwOn': 'bad'}, jobs: 2);
       expect(r.report.skippedFiles, ['bad.dart']);
-      expect(r.diagnostics.length, 14);
+      expect(r.diagnostics, hasLength(14));
     });
 
     test(

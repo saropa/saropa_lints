@@ -112,11 +112,21 @@ final context = BuildContext();
 void _bad13() {
   Text(
     'Hello',
-    style: TextStyle(fontSize: 14), // Fixed size - won't scale!
-  );
-  Text(
-    'Hello',
     textScaleFactor: 1.0, // Forces no scaling!
+  );
+}
+
+// BAD: textScaler opt-out. Must trigger.
+// expect_lint: prefer_scalable_text
+void _bad13NoScaling() {
+  Text('Hello', textScaler: TextScaler.noScaling);
+}
+
+// GOOD: literal fontSize still scales by default (FP regression).
+void _goodLiteralFontSize() {
+  Text(
+    'Send to',
+    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
   );
 }
 

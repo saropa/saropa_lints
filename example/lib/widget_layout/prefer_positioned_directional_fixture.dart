@@ -114,6 +114,20 @@ void _bad1323() {
   Stack(children: [Positioned(left: 10, child: Icon(Icons.arrow_back))]);
 }
 
+// GOOD: absolute canvas coordinates from Offset geometry (.dx/.dy) must not
+// trigger; mirroring them in RTL would detach nodes from painted edges.
+void _goodAbsoluteCanvas(dynamic center, double w, double h) {
+  Stack(
+    children: [
+      Positioned(
+        left: center.dx - w / 2,
+        top: center.dy - h / 2,
+        child: Icon(Icons.arrow_back),
+      ),
+    ],
+  );
+}
+
 // GOOD: Should NOT trigger prefer_positioned_directional
 void _good1323() {
   Stack(

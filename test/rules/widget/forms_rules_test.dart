@@ -164,6 +164,17 @@ void main() {
       expect(fixtures, isNotEmpty);
     });
 
+    // avoid_keyboard_overlap: FP case (bare Column form, scroll view owned by
+    // a caller) must be in the fixture as GOOD, and the Scaffold+Column true
+    // positive must stay marked expect_lint.
+    test('avoid_keyboard_overlap fixture covers FP and true positive', () {
+      final src = File(
+        'example/lib/forms/avoid_keyboard_overlap_fixture.dart',
+      ).readAsStringSync();
+      expect(src, contains('_goodFieldOnlyForm'));
+      expect(src, contains('// expect_lint: avoid_keyboard_overlap'));
+    });
+
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/forms/${fixture}_fixture.dart');

@@ -115,7 +115,6 @@ final userName = 'John';
 void _bad1410() {
   Text(userName); // Dynamic content may overflow
   Text('$firstName $lastName'); // Interpolated string
-  Expanded(child: Text(description)); // Constrained width
 }
 
 // GOOD: Should NOT trigger require_text_overflow_handling
@@ -128,6 +127,9 @@ void _good1410() {
     maxLines: 1,
   ); // Ellipsis OK when truncation is intentional
   Text(userName, maxLines: 3); // Multi-line cap keeps text readable
+  // Wrapping slots bound width and wrap by default — no lint
+  SwitchListTile(title: Text(userName), subtitle: Text(userName));
+  Expanded(child: Text(userName));
   Text('OK'); // Static short text is fine
   Text('Submit', maxLines: 1); // Has maxLines
 }

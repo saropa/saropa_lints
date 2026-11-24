@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart' show DartType;
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/internationalization/require_directional_widgets_fix.dart';
@@ -2396,11 +2397,49 @@ class PreferNumberFormatRule extends SaropaLintRule {
 
       final typeName = exprType.getDisplayString();
       if (typeName == 'double' || typeName == 'int' || typeName == 'num') {
+        // FP fix: DateTime components (day, hour, minute, ...) are bounded
+        // below 1000, so no grouping/decimal separator can ever apply.
+        if (_isDateTimeComponent(expr)) return;
         if (_isInsideTextWidget(node)) {
           reporter.atNode(node);
         }
       }
     });
+  }
+
+  /// Getters on `DateTime` whose values are structurally bounded (<= 999),
+  /// so locale grouping/decimal formatting is irrelevant. `year` is excluded
+  /// on purpose: it is 4 digits and some locales do group those.
+  static const Set<String> _boundedDateTimeGetters = <String>{
+    'day',
+    'hour',
+    'minute',
+    'second',
+    'millisecond',
+    'microsecond',
+    'month',
+    'weekday',
+  };
+
+  /// True when [expr] is `<DateTime>.day` etc. (PrefixedIdentifier or
+  /// PropertyAccess). Checks the receiver's static type so an unrelated
+  /// class with a `day` getter is still reported.
+  bool _isDateTimeComponent(Expression expr) {
+    final String name;
+    final DartType? targetType;
+    if (expr is PrefixedIdentifier) {
+      name = expr.identifier.name;
+      targetType = expr.prefix.staticType;
+    } else if (expr is PropertyAccess) {
+      name = expr.propertyName.name;
+      targetType = expr.realTarget.staticType;
+    } else {
+      return false;
+    }
+    if (!_boundedDateTimeGetters.contains(name)) return false;
+    // getDisplayString on a nullable type yields 'DateTime?'; accept both.
+    final String? display = targetType?.getDisplayString();
+    return display == 'DateTime' || display == 'DateTime?';
   }
 
   bool _isInsideTextWidget(AstNode node) {

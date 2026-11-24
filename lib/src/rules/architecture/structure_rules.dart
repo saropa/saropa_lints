@@ -2237,10 +2237,26 @@ class PreferStaticMethodRule extends SaropaLintRule {
 
   bool _usesThisOrInstanceMembers(MethodDeclaration node) {
     bool usesThis = false;
+    // Collect the enclosing class's instance member names for the unresolved
+    // identifier fallback (see _ThisUsageFinder.visitSimpleIdentifier).
+    final Set<String> names = <String>{};
+    final ClassDeclaration? cls = node.thisOrAncestorOfType<ClassDeclaration>();
+    final ClassBody? body = cls?.body;
+    if (body is BlockClassBody) {
+      for (final ClassMember m in body.members) {
+        if (m is FieldDeclaration && !m.isStatic) {
+          for (final VariableDeclaration v in m.fields.variables) {
+            names.add(v.name.lexeme);
+          }
+        } else if (m is MethodDeclaration && !m.isStatic && m != node) {
+          names.add(m.name.lexeme);
+        }
+      }
+    }
     node.body.visitChildren(
       _ThisUsageFinder(() {
         usesThis = true;
-      }),
+      }, instanceMemberNames: names),
     );
     return usesThis;
   }
@@ -2295,8 +2311,12 @@ class _InstanceCallFinder extends RecursiveAstVisitor<void> {
 }
 
 class _ThisUsageFinder extends RecursiveAstVisitor<void> {
-  _ThisUsageFinder(this.onFound);
+  _ThisUsageFinder(this.onFound, {this.instanceMemberNames = const <String>{}});
   final void Function() onFound;
+
+  /// Names of non-static fields/methods declared on the enclosing class; used
+  /// only as a fallback when an identifier is unresolved.
+  final Set<String> instanceMemberNames;
 
   @override
   void visitThisExpression(ThisExpression node) {
@@ -2368,6 +2388,21 @@ class _ThisUsageFinder extends RecursiveAstVisitor<void> {
     if (element is ExecutableElement &&
         !element.isStatic &&
         element.enclosingElement is InterfaceElement) {
+      onFound();
+    }
+    // FP fix: a bare read of a `final` field can resolve to the FieldElement
+    // itself (not its implicit getter), which is not an ExecutableElement, so
+    // the branch above missed it and the method was reported as static-able.
+    // A non-static field is instance state.
+    if (element is FieldElement && !element.isStatic) {
+      onFound();
+    }
+    // FP fix: when the scan CLI leaves the identifier unresolved (element is
+    // still null after the write-target fallback), match by name against the
+    // enclosing class's declared instance members. A local or parameter that
+    // shadows a member resolves to a non-null element, so only genuinely
+    // unresolved names reach this check.
+    if (element == null && instanceMemberNames.contains(node.name)) {
       onFound();
     }
     super.visitSimpleIdentifier(node);

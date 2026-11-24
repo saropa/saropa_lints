@@ -122,3 +122,17 @@ void _good25() {
   // Or for decorative icons that should be ignored:
   Semantics(excludeSemantics: true, child: Icon(Icons.star));
 }
+
+// GOOD: decorative icon in a slot of a widget that has a text label; the
+// label already names it, so semanticLabel would be announced twice.
+void _good25Decorative() {
+  FilledButton.icon(
+    onPressed: () {},
+    icon: const Icon(Icons.arrow_forward),
+    label: const Text('Continue'),
+  );
+  const InputDecoration(
+    labelText: 'School sign-in link',
+    prefixIcon: Icon(Icons.link),
+  );
+}

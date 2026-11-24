@@ -207,6 +207,32 @@ dependencies:
     });
   });
 
+  // Regression: require_ios_multitasking_support fired in an Android+Windows
+  // project with no ios/ directory.
+  group('ProjectContext.hasIosPlatform', () {
+    test('Flutter project with android/ + windows/ only (no ios/) → false', () {
+      final path = writeProject(
+        flutterPubspec,
+        platformDirs: {'android', 'windows'},
+      );
+      expect(ProjectContext.hasIosPlatform(path), isFalse);
+    });
+
+    test('Flutter project with ios/ → true (true positive still fires)', () {
+      final path = writeProject(flutterPubspec, platformDirs: {'ios'});
+      expect(ProjectContext.hasIosPlatform(path), isTrue);
+    });
+
+    test('Pure Dart library → true', () {
+      final path = writeProject(pureDartPubspec);
+      expect(ProjectContext.hasIosPlatform(path), isTrue);
+    });
+
+    test('null filePath → true (unknown → strict)', () {
+      expect(ProjectContext.hasIosPlatform(null), isTrue);
+    });
+  });
+
   group('Cross-predicate sanity', () {
     test('pure-mobile project: web false, non-web true, pointer false', () {
       // The canonical mobile-only shape. `hasWebSupport` is false (no

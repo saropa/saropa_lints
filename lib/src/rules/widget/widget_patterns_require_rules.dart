@@ -19,6 +19,7 @@ import '../../android_manifest_utils.dart';
 import '../../fixes/widget/wrap_text_in_expanded_fix.dart';
 import '../../info_plist_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../widget_ancestor_utils.dart';
 
 class RequireTextOverflowHandlingRule extends SaropaLintRule {
   RequireTextOverflowHandlingRule() : super(code: _code);
@@ -92,6 +93,12 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
       final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
+      // FP fix: slots that already bound width and wrap by default cannot
+      // overflow horizontally; truncating there would hide copy users must
+      // read. Skip ListTile-family title/subtitle and direct children of
+      // Expanded/Flexible.
+      if (_isInWrappingSlot(node)) return;
+
       final Expression firstArg = args.first.argumentExpression;
 
       // Skip if it's a short static string (likely a label/button text)
@@ -116,6 +123,44 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+
+  /// ListTile-family widgets whose `title`/`subtitle` slots bound width and wrap.
+  static const Set<String> _tileWidgets = {
+    'ListTile',
+    'SwitchListTile',
+    'CheckboxListTile',
+    'RadioListTile',
+    'ExpansionTile',
+  };
+
+  /// Wrappers that give their child a bounded width (the rule's own
+  /// correction message recommends them).
+  static const Set<String> _boundingWrappers = {'Expanded', 'Flexible'};
+
+  /// True when [text] is the `title`/`subtitle` of a ListTile-family widget,
+  /// or the `child` of Expanded/Flexible. Syntactic check on the parent
+  /// argument so it also works on unresolved ASTs (scan CLI).
+  static bool _isInWrappingSlot(InstanceCreationExpression text) {
+    final AstNode? slot = text.parent;
+    if (slot is! NamedArgument) return false;
+    final AstNode? list = slot.parent;
+    if (list is! ArgumentList) return false;
+
+    // Owner may be a constructor call or an unresolved bare call.
+    final AstNode? owner = list.parent;
+    final String? ownerName = owner is InstanceCreationExpression
+        ? owner.constructorName.type.name.lexeme
+        : owner is MethodInvocation
+        ? owner.methodName.name
+        : null;
+    if (ownerName == null) return false;
+
+    final String slotName = slot.name.lexeme;
+    if (_tileWidgets.contains(ownerName)) {
+      return slotName == 'title' || slotName == 'subtitle';
+    }
+    return _boundingWrappers.contains(ownerName) && slotName == 'child';
   }
 }
 
@@ -506,8 +551,10 @@ class RequireHoverStatesRule extends SaropaLintRule {
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
-      // Only check InkWell and MouseRegion
-      if (typeName != 'InkWell' && typeName != 'GestureDetector') return;
+      // Only GestureDetector: it has no built-in hover handling. InkWell and
+      // InkResponse paint hover highlights from the theme (hoverColor /
+      // overlayColor) by default, so reporting them was a false positive.
+      if (typeName != 'GestureDetector') return;
 
       bool hasOnTap = false;
       bool hasHoverHandling = false;
@@ -525,6 +572,10 @@ class RequireHoverStatesRule extends SaropaLintRule {
           }
         }
       }
+
+      // FP fix: marker tap targets on a touch map (and widgets under a
+      // Semantics(button: true) wrapper) have no hover chrome by design.
+      if (isMarkerOrSemanticButtonTapTarget(node)) return;
 
       if (hasOnTap && !hasHoverHandling) {
         reporter.atNode(node.constructorName, code);
@@ -726,6 +777,12 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
 
       // Only check ListView.builder which typically shows dynamic content
       if (typeName != 'ListView' || constructorName != 'builder') return;
+
+      // FP fix: non-scrolling lists (NeverScrollableScrollPhysics) cannot be
+      // pulled and the parent owns refresh; dialog/popup lists hold local
+      // toggles rather than remote data.
+      if (hasNeverScrollablePhysics(node.argumentList)) return;
+      if (isInsideTransientOverlay(node)) return;
 
       // Check if already wrapped in RefreshIndicator
       AstNode? current = node.parent;

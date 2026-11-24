@@ -1541,11 +1541,19 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
       AstNode? current = node.parent;
       bool inColumn = false;
       bool hasScrollParent = false;
+      // FP fix: only a Scaffold in the same widget tree proves this file owns
+      // the page. Form widgets that return a bare Column are mounted by a
+      // page frame in another file (e.g. a shared scroll wrapper), so the
+      // keyboard decision belongs to that caller and cannot be seen here.
+      bool hasScaffoldParent = false;
 
       while (current != null) {
         if (current is InstanceCreationExpression) {
           final parentType = current.constructorName.type.name.lexeme;
 
+          if (parentType == 'Scaffold') {
+            hasScaffoldParent = true;
+          }
           if (parentType == 'Column') {
             inColumn = true;
           }
@@ -1586,6 +1594,12 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
       }
 
       if (hasScrollParent) {
+        return;
+      }
+
+      // No Scaffold owned by this widget: the host page (another file) decides
+      // keyboard handling, so reporting here would be a false positive.
+      if (!hasScaffoldParent) {
         return;
       }
 

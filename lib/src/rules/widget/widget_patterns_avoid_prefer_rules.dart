@@ -17,6 +17,7 @@ import 'package:analyzer/dart/element/type.dart';
 import '../../catch_body_logging_utils.dart';
 import '../core/compound_performance_patterns.dart';
 import '../../saropa_lint_rule.dart';
+import '../../widget_ancestor_utils.dart';
 import '../../fixes/common/remove_named_argument_fix.dart';
 import '../../fixes/widget_patterns/comment_out_print_fix.dart';
 import '../../fixes/widget_patterns/replace_empty_text_with_sized_box_fix.dart';
@@ -3915,10 +3916,62 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
         }
       }
 
-      if (!hasBehavior) {
+      // FP fix: when the child is a Stack (sized by its own children or an
+      // enclosing SizedBox) or a box that paints its own color/decoration,
+      // hit testing already covers the intended area, so deferToChild is
+      // the deliberate default rather than a missed-tap risk.
+      if (!hasBehavior && !_childHitTestsItsArea(node)) {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+
+  /// Wrappers that merely size/pad and defer hit testing to their child.
+  static const Set<String> _transparentWrappers = <String>{
+    'SizedBox',
+    'Padding',
+    'Center',
+    'Align',
+  };
+
+  /// Boxes that paint a color/decoration and therefore hit-test their area.
+  static const Set<String> _paintedBoxes = <String>{
+    'Container',
+    'DecoratedBox',
+    'ColoredBox',
+  };
+
+  /// True when the GestureDetector's `child` (after unwrapping pure
+  /// sizing/padding wrappers) is a Stack or a painted box.
+  static bool _childHitTestsItsArea(InstanceCreationExpression gesture) {
+    Expression? child = _namedArg(gesture.argumentList, 'child');
+    // Bounded unwrap loop: SizedBox(child: Padding(child: ...)) chains.
+    for (int i = 0; i < 4 && child != null; i++) {
+      final String? name = widgetCallName(child);
+      if (name == null) return false;
+      if (name == 'Stack') return true;
+      if (_paintedBoxes.contains(name)) {
+        final ArgumentList? args = widgetArguments(child);
+        return args != null &&
+            (_namedArg(args, 'color') != null ||
+                _namedArg(args, 'decoration') != null ||
+                name == 'ColoredBox' ||
+                name == 'DecoratedBox');
+      }
+      if (!_transparentWrappers.contains(name)) return false;
+      final ArgumentList? args = widgetArguments(child);
+      child = args == null ? null : _namedArg(args, 'child');
+    }
+    return false;
+  }
+
+  static Expression? _namedArg(ArgumentList args, String name) {
+    for (final Argument arg in args.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == name) {
+        return arg.argumentExpression;
+      }
+    }
+    return null;
   }
 }
 
@@ -4098,11 +4151,10 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  static const Set<String> _interactiveWidgets = <String>{
-    'InkWell',
-    'GestureDetector',
-    'InkResponse',
-  };
+  // Only GestureDetector: InkWell/InkResponse resolve mouseCursor to the click
+  // cursor automatically when onTap is set, so flagging them was a false
+  // positive. GestureDetector has no cursor handling at all.
+  static const Set<String> _interactiveWidgets = <String>{'GestureDetector'};
 
   @override
   void runWithReporter(
@@ -4135,6 +4187,10 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
           }
         }
       }
+
+      // FP fix: marker tap targets on a touch map (and widgets under a
+      // Semantics(button: true) wrapper) show no pointer cursor by design.
+      if (isMarkerOrSemanticButtonTapTarget(node)) return;
 
       if (hasOnTap && !hasMouseCursor) {
         reporter.atNode(node.constructorName, code);

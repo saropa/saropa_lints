@@ -1506,23 +1506,36 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
       final FormalParameterList params = node.parameters;
 
       for (final FormalParameter param in params.parameters) {
-        String? typeStr;
+        TypeAnnotation? type;
 
         if (param is RegularFormalParameter &&
             param.functionTypedSuffix == null) {
-          typeStr = param.type?.toSource();
+          type = param.type;
         } else if (param is FieldFormalParameter) {
-          typeStr = param.type?.toSource();
+          type = param.type;
         }
 
-        if (typeStr != null && _isLikelyConcrete(typeStr)) {
+        if (isConcreteInjectionType(type)) {
           reporter.atNode(param);
         }
       }
     });
   }
 
-  bool _isLikelyConcrete(String typeName) {
+  /// Whether [type] is a concrete-implementation type worth flagging.
+  ///
+  /// FP fix: a generic function type such as `Dio Function()?` is a factory
+  /// closure - the closure itself is the injection seam (tests pass a fake
+  /// factory). Its source text contains the return type name, so the regex
+  /// match on the whole string flagged it as an injected concrete `Dio`.
+  /// Function types are therefore skipped before any name matching.
+  static bool isConcreteInjectionType(TypeAnnotation? type) {
+    if (type == null) return false;
+    if (type is GenericFunctionType) return false;
+    return _isLikelyConcrete(type.toSource());
+  }
+
+  static bool _isLikelyConcrete(String typeName) {
     for (final RegExp re in _concreteRegexes) {
       if (re.hasMatch(typeName)) return true;
     }

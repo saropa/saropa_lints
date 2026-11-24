@@ -148,6 +148,18 @@ void _goodIconHitbox() {
   SizedBox(width: 20, height: 20, child: CircularProgressIndicator());
 }
 
+// GOOD: SizedBox used as sibling spacing / fixed row height inside a
+// children list. Regression guard for
+// bugs/avoid_ios_hardcoded_status_bar_false_positive_sizedbox_spacing.md
+Widget _goodListSpacing() => ListView(
+  children: [
+    Text('Name'),
+    SizedBox(height: 20),
+    Text('Search'),
+    SizedBox(height: 44),
+  ],
+);
+
 // BAD: pure vertical spacer with no width and no Icon-like child — still
 // flagged because this IS the shape of a hardcoded status-bar offset.
 // expect_lint: avoid_ios_hardcoded_status_bar

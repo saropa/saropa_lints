@@ -15,6 +15,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:meta/meta.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../widget_ancestor_utils.dart';
 import '../../fixes/widget_layout/add_automatic_keep_alive_client_mixin_fix.dart';
 import '../../fixes/widget_layout/add_clamping_scroll_physics_fix.dart';
 import '../../fixes/widget_layout/add_item_extent_placeholder_fix.dart';
@@ -1687,6 +1688,11 @@ class RequireScrollControllerRule extends SaropaLintRule {
 
       // Only check ListView.builder for paginated content
       if (typeName != 'ListView' || constructorName != 'builder') return;
+
+      // FP fix: a list that never scrolls itself, or lives in a dialog/popup
+      // of local toggles, has no scroll position worth tracking.
+      if (hasNeverScrollablePhysics(node.argumentList)) return;
+      if (isInsideTransientOverlay(node)) return;
 
       bool hasController = false;
       for (final Argument arg in node.argumentList.arguments) {

@@ -233,6 +233,16 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
       return true;
     }
 
+    // A SizedBox that is an element of a list literal (`children: [...]` of
+    // ListView / Column / Row / Wrap) is sibling spacing or a fixed row
+    // height, never a status-bar offset. FP fix: `SizedBox(height: 20)` and
+    // `SizedBox(height: 44)` between form rows were flagged because 20/44
+    // collide with the status-bar set. A real top-inset offset is a
+    // standalone widget (Padding / Stack / Positioned child), not a list item.
+    if (node.parent is ListLiteral) {
+      return true;
+    }
+
     final Expression? child = node.getNamedParameterValue('child');
     if (child is InstanceCreationExpression) {
       final String childType = child.typeName;

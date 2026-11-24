@@ -144,3 +144,29 @@ void _badIndeterminateNullValue(double? progress) {
     return CircularProgressIndicator(value: null);
   }
 }
+
+// GOOD: Spinner as a button's busy icon is not a content placeholder
+void _goodButtonBusyIcon(bool busy) {
+  FilledButton.icon(
+    onPressed: busy ? null : () {},
+    icon: busy
+        ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : const Icon(Icons.arrow_forward),
+    label: const Text('Continue'),
+  );
+}
+
+// BAD: Spinner outside a button slot still triggers (true positive kept)
+// expect_lint: prefer_skeleton_over_spinner
+void _badSpinnerNextToButton(bool busy) {
+  Column(
+    children: [
+      if (busy) CircularProgressIndicator(),
+      ElevatedButton(onPressed: () {}, child: Text('Go')),
+    ],
+  );
+}

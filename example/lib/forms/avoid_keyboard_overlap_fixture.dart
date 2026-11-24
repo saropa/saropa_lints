@@ -122,6 +122,12 @@ void _bad407() {
   );
 }
 
+// GOOD: bare Column form widget, no Scaffold here; the page that mounts it
+// (another file) owns scrolling/keyboard handling.
+Widget _goodFieldOnlyForm() {
+  return Column(children: [TextField()]);
+}
+
 // GOOD: Should NOT trigger avoid_keyboard_overlap
 void _good407() {
   Scaffold(

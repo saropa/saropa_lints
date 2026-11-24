@@ -916,6 +916,14 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
         return;
       }
 
+      // A spinner in a button's icon/child slot is the in-button busy cue for
+      // a one-shot action. A skeleton replaces content layouts, not button
+      // state, so the recommendation has nothing to apply to (bug: FP on
+      // `FilledButton.icon(icon: busy ? SizedBox(...Spinner) : Icon(...))`).
+      if (_isInsideButtonSlot(node)) {
+        return;
+      }
+
       // Check if inside conditional (loading state)
       AstNode? current = node.parent;
       while (current != null) {
@@ -933,6 +941,57 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
         current = current.parent;
       }
     });
+  }
+
+  /// Button widget names whose `icon:`/`child:` slot hosts an inline busy
+  /// indicator. Matched by suffix so FilledButton/ElevatedButton/TextButton/
+  /// OutlinedButton/IconButton and custom `*Button` wrappers are covered.
+  static const String _buttonSuffix = 'Button';
+
+  /// Argument names that make up a button's visible content slot.
+  static const Set<String> _buttonSlotNames = {'icon', 'child', 'label'};
+
+  /// True when [node] sits (possibly via SizedBox/Padding/conditional
+  /// wrappers) in the icon/child/label argument of a `*Button` widget.
+  /// Walks up to the nearest enclosing named argument only; stops at
+  /// method/function boundaries so unrelated outer buttons never match.
+  bool _isInsideButtonSlot(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration || current is FunctionDeclaration) {
+        return false;
+      }
+      if (current is NamedArgument) {
+        final AstNode? list = current.parent;
+        final AstNode? owner = list?.parent;
+        // Only the slot argument of a button counts; any other named arg
+        // (e.g. `body:` of a Scaffold) keeps climbing to find the owner.
+        if (_buttonSlotNames.contains(current.name.lexeme) &&
+            owner != null &&
+            _isButtonOwner(owner)) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// True when [owner] is a constructor call (`FilledButton.icon(...)`,
+  /// `TextButton(...)`) of a `*Button` type. Handles both the resolved
+  /// InstanceCreationExpression and the unresolved MethodInvocation shapes.
+  bool _isButtonOwner(AstNode owner) {
+    if (owner is InstanceCreationExpression) {
+      return owner.constructorName.type.name.lexeme.endsWith(_buttonSuffix);
+    }
+    if (owner is MethodInvocation) {
+      final Expression? target = owner.target;
+      final String name = target is SimpleIdentifier
+          ? target.name
+          : owner.methodName.name;
+      return name.endsWith(_buttonSuffix);
+    }
+    return false;
   }
 
   bool _hasDeterminateValue(InstanceCreationExpression node) {

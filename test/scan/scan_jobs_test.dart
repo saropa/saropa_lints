@@ -233,25 +233,31 @@ void main() {
       expect(parseCgroupMemoryBytes('9223372036854771712'), isNull);
       expect(parseCgroupMemoryBytes('2147483648'), 2147483648);
     });
-    test('CI detection', () {
-      expect(detectCi({}), isFalse);
-      expect(detectCi({'CI': 'true'}), isTrue);
-      expect(detectCi({'GITHUB_ACTIONS': 'true'}), isTrue);
-      expect(detectCi({'CI': 'false'}), isFalse);
-      expect(detectCi({'CI': '0'}), isFalse);
-    });
+    test(
+      'detectCi returns true for CI or GITHUB_ACTIONS env and false when unset, false, or 0',
+      () {
+        expect(detectCi({}), isFalse);
+        expect(detectCi({'CI': 'true'}), isTrue);
+        expect(detectCi({'GITHUB_ACTIONS': 'true'}), isTrue);
+        expect(detectCi({'CI': 'false'}), isFalse);
+        expect(detectCi({'CI': '0'}), isFalse);
+      },
+    );
   });
 
   group('parseScanArgs resource flags', () {
     ScanCliArgs ok(List<String> a) =>
         (parseScanArgs(['.', ...a]) as ScanParseOk).args;
-    test('--jobs / -j', () {
-      expect(ok(['--jobs', '4']).jobs, 4);
-      expect(ok(['-j', '2']).jobs, 2);
-      expect(ok(['--jobs', 'auto']).jobs, 0);
-      expect(ok(['--jobs', 'off']).jobs, 1);
-      expect(ok([]).jobs, isNull);
-    });
+    test(
+      'parseScanArgs maps --jobs and -j to jobs count, auto to 0, off to 1, and omitted to null',
+      () {
+        expect(ok(['--jobs', '4']).jobs, 4);
+        expect(ok(['-j', '2']).jobs, 2);
+        expect(ok(['--jobs', 'auto']).jobs, 0);
+        expect(ok(['--jobs', 'off']).jobs, 1);
+        expect(ok([]).jobs, isNull);
+      },
+    );
     test('--max-memory-mb, --chunk-timeout, --progress, --slow-file-ms', () {
       final a = ok([
         '--max-memory-mb',
@@ -268,22 +274,25 @@ void main() {
       expect(a.progress, 'json');
       expect(a.slowFileMs, 500);
     });
-    test('--max-issues', () {
-      expect(ok(['--max-issues', '0']).maxIssues, 0);
-      expect(ok(['--max-issues', '250']).maxIssues, 250);
-      expect(ok([]).maxIssues, isNull);
-      for (final bad in [
-        ['--max-issues'],
-        ['--max-issues', '-1'],
-        ['--max-issues', 'lots'],
-      ]) {
-        expect(
-          parseScanArgs(['.', ...bad]),
-          isA<ScanParseInvalid>(),
-          reason: '$bad',
-        );
-      }
-    });
+    test(
+      'parseScanArgs parses --max-issues as a non-negative int and returns invalid for missing, negative, or non-numeric values',
+      () {
+        expect(ok(['--max-issues', '0']).maxIssues, 0);
+        expect(ok(['--max-issues', '250']).maxIssues, 250);
+        expect(ok([]).maxIssues, isNull);
+        for (final bad in [
+          ['--max-issues'],
+          ['--max-issues', '-1'],
+          ['--max-issues', 'lots'],
+        ]) {
+          expect(
+            parseScanArgs(['.', ...bad]),
+            isA<ScanParseInvalid>(),
+            reason: '$bad',
+          );
+        }
+      },
+    );
     test('rejects invalid values', () {
       for (final bad in [
         ['--jobs'],

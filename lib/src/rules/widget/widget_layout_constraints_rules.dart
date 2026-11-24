@@ -2342,6 +2342,13 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
         if (arg is NamedArgument && arg.name.lexeme == 'crossAxisAlignment') {
           final String value = arg.argumentExpression.toSource();
           if (value.contains('stretch')) {
+            // FP fix: a stretch Column only needs IntrinsicWidth when its
+            // width is unbounded, i.e. it is a direct (non-Expanded) child
+            // of a Row. Anywhere else the parent already bounds the width,
+            // and IntrinsicWidth would shrink the Column to its widest
+            // child (changing layout) plus add a second layout pass.
+            if (!_isDirectRowChild(node)) return;
+
             // Check if already wrapped in IntrinsicWidth
             AstNode? current = node.parent;
             while (current != null) {
@@ -2359,6 +2366,25 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when [column] is a literal element of a Row's `children` list
+  /// (wrapping widgets such as Expanded/Flexible break the direct link, which
+  /// is correct: they hand the Column a bounded width).
+  static bool _isDirectRowChild(InstanceCreationExpression column) {
+    final AstNode? list = column.parent;
+    if (list is! ListLiteral) return false;
+    final AstNode? arg = list.parent;
+    if (arg is! NamedArgument || arg.name.lexeme != 'children') return false;
+    final AstNode? args = arg.parent;
+    final AstNode? owner = args?.parent;
+    if (owner == null) return false;
+    final String? name = owner is InstanceCreationExpression
+        ? owner.constructorName.type.name.lexeme
+        : owner is MethodInvocation
+        ? owner.methodName.name
+        : null;
+    return name == 'Row';
   }
 }
 
@@ -3433,6 +3459,10 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  /// Matches `.dx` / `.dy` member access, the marker of Offset-derived
+  /// absolute canvas coordinates (not direction-relative layout).
+  static final RegExp _absoluteGeometry = RegExp(r'\.d[xy]\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3448,6 +3478,14 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
         if (arg is NamedArgument) {
           final String argName = arg.name.lexeme;
           if (argName == 'left' || argName == 'right') {
+            // FP fix: offsets derived from Offset geometry (`.dx` / `.dy`)
+            // are absolute canvas coordinates in one fixed left-origin
+            // space (e.g. graph nodes aligned with a CustomPainter's
+            // edges). PositionedDirectional would mirror only the nodes in
+            // RTL and detach them from the painted lines, so skip them.
+            if (_absoluteGeometry.hasMatch(arg.argumentExpression.toSource())) {
+              continue;
+            }
             usesLeftRight = true;
             break;
           }

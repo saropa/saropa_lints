@@ -115,6 +115,11 @@ void _bad22() {
   GestureDetector(onTap: _handleTap, child: Container());
 }
 
+// GOOD: InkWell is focusable with a built-in highlight; must NOT trigger
+void _goodInkWellBuiltin() {
+  InkWell(onTap: _handleTap, child: Container());
+}
+
 // GOOD: Should NOT trigger require_focus_indicator
 void _good22() {
   Focus(

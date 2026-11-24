@@ -110,6 +110,11 @@ dynamic child;
 // BAD: Should trigger prefer_cursor_for_buttons
 // expect_lint: prefer_cursor_for_buttons
 void _bad1417() {
+  GestureDetector(onTap: () => doSomething(), child: Text('Click me'));
+}
+
+// GOOD: InkWell resolves the click cursor itself; must NOT trigger (FP fix)
+void _goodInkWellBuiltin() {
   InkWell(onTap: () => doSomething(), child: Text('Click me'));
 }
 

@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
@@ -980,6 +981,16 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
           flaggedParams.add(paramName);
         }
       }
+      // FP fix: a boolean clear flag (`noExtra ? null : (extra ?? this.extra)`)
+      // is a valid way to null a field, so `??` there does not lose the
+      // ability to clear. Drop params whose `??` is guarded by such a flag.
+      final Set<String> declaredParamNames = <String>{
+        for (final FormalParameter p in params.parameters)
+          if (p.name?.lexeme case final String n) n,
+      };
+      flaggedParams.removeWhere(
+        (String name) => hasClearFlagGuard(name, declaredParamNames, body),
+      );
       if (flaggedParams.isEmpty) return;
 
       // The rule only matters when the underlying class FIELD is nullable --
@@ -997,6 +1008,25 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
 
       reporter.atNode(node);
     });
+  }
+
+  /// True when every `[param] ??` in [body] sits inside a conditional whose
+  /// condition is a clear-flag parameter for [param] (e.g. `noExtra`,
+  /// `clearExtra`, `removeExtra`), so the caller can still null the field.
+  ///
+  /// Public static so it can be unit-tested against parsed source without
+  /// running the analyzer plugin. [paramNames] restricts flags to actual
+  /// parameters of the same copyWith (a same-named field/local is not a flag).
+  static bool hasClearFlagGuard(
+    String param,
+    Set<String> paramNames,
+    FunctionBody body,
+  ) {
+    final visitor = _ClearFlagGuardVisitor(param, paramNames);
+    body.accept(visitor);
+    // Require at least one guarded `??` and no unguarded one: an unguarded
+    // `??` on the same param is still a real null-handling gap.
+    return visitor.guarded > 0 && visitor.unguarded == 0;
   }
 
   /// Walks up from the `copyWith` method to its enclosing class and collects
@@ -1045,6 +1075,67 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
       }
     }
     return nullableFieldNames;
+  }
+}
+
+/// Counts `param ?? x` expressions that are / are not guarded by a clear flag.
+///
+/// Guarded means: inside the then/else branch of a [ConditionalExpression]
+/// whose condition (after stripping `!` and parentheses) is a parameter named
+/// `no|clear|remove|reset|unset|null` + the param name, case-insensitive.
+class _ClearFlagGuardVisitor extends RecursiveAstVisitor<void> {
+  _ClearFlagGuardVisitor(this.param, this.paramNames)
+    : _flagPattern = RegExp(
+        '^(no|clear|remove|reset|unset|null)${RegExp.escape(param)}\$',
+        caseSensitive: false,
+      );
+
+  final String param;
+  final Set<String> paramNames;
+  final RegExp _flagPattern;
+
+  /// Number of flag-guarded conditional expressions currently enclosing the
+  /// visit position (nesting-safe).
+  int _guardDepth = 0;
+  int guarded = 0;
+  int unguarded = 0;
+
+  @override
+  void visitConditionalExpression(ConditionalExpression node) {
+    Expression cond = node.condition;
+    // Unwrap `!flag` and `(flag)` so inverted flags are recognized too.
+    while (true) {
+      if (cond is ParenthesizedExpression) {
+        cond = cond.expression;
+      } else if (cond is PrefixExpression &&
+          cond.operator.lexeme == '!') {
+        cond = cond.operand;
+      } else {
+        break;
+      }
+    }
+    final bool isFlag =
+        cond is SimpleIdentifier &&
+        paramNames.contains(cond.name) &&
+        _flagPattern.hasMatch(cond.name);
+    if (isFlag) _guardDepth++;
+    super.visitConditionalExpression(node);
+    if (isFlag) _guardDepth--;
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    final Expression left = node.leftOperand;
+    if (node.operator.lexeme == '??' &&
+        left is SimpleIdentifier &&
+        left.name == param) {
+      if (_guardDepth > 0) {
+        guarded++;
+      } else {
+        unguarded++;
+      }
+    }
+    super.visitBinaryExpression(node);
   }
 }
 

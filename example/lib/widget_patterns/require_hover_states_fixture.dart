@@ -110,6 +110,11 @@ dynamic child;
 // BAD: Should trigger require_hover_states
 // expect_lint: require_hover_states
 void _bad1418() {
+  GestureDetector(onTap: () => doSomething(), child: MyButton());
+}
+
+// GOOD: InkWell has built-in hover highlight; must NOT trigger (FP fix)
+void _goodInkWellBuiltin() {
   InkWell(onTap: () => doSomething(), child: MyButton());
 }
 

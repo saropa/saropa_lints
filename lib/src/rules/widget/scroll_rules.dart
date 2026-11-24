@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
+import '../../widget_ancestor_utils.dart';
 import '../../fixes/scroll/replace_sliver_to_box_adapter_fix.dart';
 
 /// Warns when shrinkWrap: true is used inside a ScrollView.
@@ -887,6 +888,12 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
       if (!_listViewGridViewPattern.hasMatch(typeName)) {
         return;
       }
+
+      // FP fix: a non-scrolling list (NeverScrollableScrollPhysics) cannot
+      // be pulled, and the parent scrollable owns refresh. A list inside a
+      // dialog/popup holds local toggles, not refreshable remote data.
+      if (hasNeverScrollablePhysics(node.argumentList)) return;
+      if (isInsideTransientOverlay(node)) return;
 
       // Check if already wrapped in RefreshIndicator
       AstNode? current = node.parent;

@@ -137,6 +137,23 @@ class _GoodClass1354_State extends State<_GoodClass1354_MyWidget> {
   Widget build(BuildContext context) => Container();
 }
 
+// GOOD: fields disposed through a for-in loop over a list literal.
+class _LoopState extends State<_GoodClass1354_MyWidget> {
+  final _name = TextEditingController();
+  final _city = TextEditingController();
+
+  @override
+  void dispose() {
+    for (final c in [_name, _city]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
 // GOOD: disposed via a multi-section null-aware cascade where dispose() is the
 // last section. The field IS disposed; the cascade also removes a listener.
 class _CascadeState extends State<_GoodClass1354_MyWidget> {

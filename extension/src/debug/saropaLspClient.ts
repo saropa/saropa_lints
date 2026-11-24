@@ -17,14 +17,9 @@ import {
   type LanguageClientOptions,
   type ServerOptions,
 } from 'vscode-languageclient/node';
-import { isSaropaLintsResolved } from './lspResolution';
+import { isSaropaLintsResolved, resolveDartExecutable, LSP_SERVER_ARGS } from './lspResolution';
 import { l10n } from '../i18n/runtime';
 import { HealthPanel } from '../systemHealth/healthPanel';
-
-// CVE-2024-27980 / PATHEXT: on Windows, `dart` resolves to `dart.bat` which
-// needs a shell to execute. Without this, spawn() returns ENOENT.
-// Same rationale as scanOnSaveRunner.ts SPAWN_USE_SHELL.
-const SPAWN_USE_SHELL = process.platform === 'win32';
 
 /** Output channel name surfaced in VS Code's "Output" dropdown. */
 const OUTPUT_CHANNEL_NAME = 'Saropa Lints LSP';
@@ -129,20 +124,24 @@ export class SaropaLspClient implements vscode.Disposable {
       return;
     }
 
-    // Server spawn configuration — identical for run and debug because
-    // the Dart VM doesn't need a separate debug launch profile here.
-    // shell: true on Windows so `dart.bat` resolves via PATHEXT.
+    // Use the SDK the workspace is pinned to (Dart-Code settings / FVM), not the
+    // PATH `dart`: a mismatched SDK made `dart run` re-resolve and rewrite
+    // pubspec.lock and package_config.json on every server start.
+    const dartCfg = vscode.workspace.getConfiguration('dart');
+    const dart = resolveDartExecutable(this._projectRoot, {
+      dartSdkPath: dartCfg.get<string>('sdkPath'),
+      flutterSdkPath: dartCfg.get<string>('flutterSdkPath'),
+    });
+    this._outputChannel.appendLine(`[SaropaLspClient] Using dart (${dart.source}): ${dart.command}`);
+
+    // Identical for run and debug (no separate debug profile needed).
+    // `--no-pub` (LSP_SERVER_ARGS) blocks the implicit pub get. The shell is
+    // only used for the bare PATH `dart` on Windows so `dart.bat` resolves via
+    // PATHEXT; a resolved absolute exe is spawned directly.
+    const spawnOptions = { cwd: this._projectRoot, shell: dart.useShell };
     const serverOptions: ServerOptions = {
-      run: {
-        command: 'dart',
-        args: ['run', 'saropa_lints:lsp_server'],
-        options: { cwd: this._projectRoot, shell: SPAWN_USE_SHELL },
-      },
-      debug: {
-        command: 'dart',
-        args: ['run', 'saropa_lints:lsp_server'],
-        options: { cwd: this._projectRoot, shell: SPAWN_USE_SHELL },
-      },
+      run: { command: dart.command, args: [...LSP_SERVER_ARGS], options: spawnOptions },
+      debug: { command: dart.command, args: [...LSP_SERVER_ARGS], options: spawnOptions },
     };
 
     // Client configuration — route Dart files through this server and

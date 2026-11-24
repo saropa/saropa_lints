@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:saropa_lints/src/analyzer_compat.dart';
 import 'package:saropa_lints/src/rules/packages/equatable_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
@@ -111,6 +114,63 @@ void main() {
         expect(file.existsSync(), isTrue);
       });
     }
+  });
+
+  group('require_copy_with_null_handling - clear flag guard', () {
+    /// Parses a class and runs the guard check for `extra` against copyWith.
+    bool guarded(String src) {
+      final unit = parseString(content: src, throwIfDiagnostics: false).unit;
+      final cls = unit.declarations.whereType<ClassDeclaration>().first;
+      final m = cls.bodyMembers.whereType<MethodDeclaration>().first;
+      final names = <String>{
+        for (final p in m.parameters!.parameters)
+          if (p.name?.lexeme case final String n) n,
+      };
+      return RequireCopyWithNullHandlingRule.hasClearFlagGuard(
+        'extra',
+        names,
+        m.body,
+      );
+    }
+
+    test('FP: noExtra flag guards ?? (no report)', () {
+      expect(
+        guarded('''
+class A { final String? extra;
+  A copyWith({String? extra, bool noExtra = false}) =>
+      A(extra: noExtra ? null : (extra ?? this.extra)); }'''),
+        isTrue,
+      );
+    });
+
+    test('FP: clearExtra flag guards ?? (no report)', () {
+      expect(
+        guarded('''
+class A { final String? extra;
+  A copyWith({String? extra, bool clearExtra = false}) =>
+      A(extra: clearExtra ? null : extra ?? this.extra); }'''),
+        isTrue,
+      );
+    });
+
+    test('TP: plain ?? without a flag still reports', () {
+      expect(
+        guarded('''
+class A { final String? extra;
+  A copyWith({String? extra}) => A(extra: extra ?? this.extra); }'''),
+        isFalse,
+      );
+    });
+
+    test('TP: unrelated bool condition does not exempt', () {
+      expect(
+        guarded('''
+class A { final String? extra;
+  A copyWith({String? extra, bool flag = false}) =>
+      A(extra: flag ? null : (extra ?? this.extra)); }'''),
+        isFalse,
+      );
+    });
   });
 
   // Stub-only behavior tests were removed from this file. Keep rule metadata

@@ -3708,6 +3708,11 @@ class RequireIosMultitaskingSupportRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // FP fix: Split View / Slide Over are iPad-only. A project with no `ios/`
+    // directory (e.g. Android + Windows only) can never run on an iPad, so
+    // the diagnostic is meaningless there. Unknown projects default to true.
+    if (!ProjectContext.hasIosPlatform(context.filePath)) return;
+
     final String fileSource = context.fileContent;
 
     // Skip if responsive patterns are used

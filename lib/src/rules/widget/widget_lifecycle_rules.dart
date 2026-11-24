@@ -3520,6 +3520,48 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
     }
   }
 
+  /// Handles `for (final c in [_a, _b]) { c.dispose(); }` in dispose().
+  ///
+  /// Bug fixed: the loop variable `c` was recorded as the disposed name, never
+  /// the fields `_a`/`_b` listed in the literal, so every listed field read as
+  /// leaked. When the loop body disposes the loop variable, each identifier in
+  /// the list/set literal is credited as disposed.
+  @override
+  void visitForStatement(ForStatement node) {
+    // Keep default traversal so other disposals in the body still count.
+    super.visitForStatement(node);
+
+    final ForLoopParts parts = node.forLoopParts;
+    if (parts is! ForEachPartsWithDeclaration) return;
+
+    final Expression iterable = parts.iterable;
+    // Only literal collections can be mapped back to fields syntactically.
+    final List<CollectionElement> elements;
+    if (iterable is ListLiteral) {
+      elements = iterable.elements;
+    } else if (iterable is SetOrMapLiteral && iterable.isSet) {
+      elements = iterable.elements;
+    } else {
+      return;
+    }
+
+    // Run a scratch visitor over the body to learn whether the loop variable
+    // itself is disposed (without polluting disposedFields on a miss).
+    final Set<String> bodyDisposed = <String>{};
+    node.body.accept(
+      _DisposeVisitor(
+        disposedFields: bodyDisposed,
+        methodBodies: methodBodies,
+        visitedMethods: <String>{..._visitedMethods},
+      ),
+    );
+    if (!bodyDisposed.contains(parts.loopVariable.name.lexeme)) return;
+
+    for (final CollectionElement element in elements) {
+      if (element is Expression) _extractFieldName(element);
+    }
+  }
+
   /// Extracts the field name from various target expression types.
   void _extractFieldName(Expression? target) {
     if (target == null) return;

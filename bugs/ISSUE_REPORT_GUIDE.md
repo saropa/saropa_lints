@@ -88,6 +88,13 @@ Paste the zero-match result. If you get a match, file the bug in that repo inste
 
 If the report is about a diagnostic whose label resembles `saropa_lints` but the positive grep returns nothing, **stop**. The emitter lives in another plugin or extension. Name the suspected emitter, paste the positive grep from that repo, and file the bug in that repo's `bugs/` folder. Do not open a bug here on the theory that "saropa_lints probably registers it somehow" — that guess has cost us real round-trips.
 
+### One-command check, and two more reasons to stop
+
+Run `python scripts/checks/check_report_attribution.py <code>` (or `--file bugs/<report>.md`) before filing or fixing. Exit 0 = the rule is defined in `lib/src/rules/`; exit 1 = not a saropa_lints rule.
+
+- **Dart SDK diagnostics are never ours.** `deprecated_member_use`, `unused_result`, `unused_import`, `dead_code` and similar come from the Dart analyzer (Problems panel source `dart` / `dartAnalysisLSP`). Report them upstream (dart-lang/sdk or the owning package); never file them here.
+- **Check the version first.** If the report's saropa_lints version is older than the latest release, retest on the latest before filing. A fix may already have shipped.
+
 ### Why this section exists
 
 We have had bugs misattributed in both directions — `saropa_lints` rules filed against `saropa_drift_advisor` and `drift_advisor` diagnostics filed against `saropa_lints`. In every case, the fix agent saw a label, assumed a repo, and either punted the work as "somebody else's" or shipped a fix in the wrong tree. The only defense is grep evidence pasted directly in the bug report.

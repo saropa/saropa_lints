@@ -290,6 +290,37 @@ void main() {
     });
   });
 
+  // FP regression: prefer_scalable_text must not flag a literal fontSize
+  // (Flutter scales it by default); only a textScaler/textScaleFactor opt-out.
+  group('prefer_scalable_text - literal fontSize FP', () {
+    final String src = File(
+      'example/lib/accessibility/prefer_scalable_text_fixture.dart',
+    ).readAsStringSync();
+
+    test('fixture good case (literal fontSize) has no expect_lint', () {
+      final int i = src.indexOf('void _goodLiteralFontSize');
+      expect(i, greaterThan(0));
+      expect(src.substring(i - 80, i).contains('expect_lint'), isFalse);
+    });
+
+    test('true positives (opt-outs) remain marked in fixture', () {
+      final int i = src.indexOf('void _bad13NoScaling');
+      expect(src.substring(i - 80, i).contains('expect_lint'), isTrue);
+      expect(src.contains('textScaleFactor: 1.0'), isTrue);
+    });
+
+    test('rule source no longer reports TextStyle fontSize', () {
+      final String rule = File(
+        'lib/src/rules/ui/accessibility_rules.dart',
+      ).readAsStringSync();
+      final int s = rule.indexOf('class PreferScalableTextRule');
+      final int e = rule.indexOf('class RequireButtonSemanticsRule');
+      final String body = rule.substring(s, e);
+      expect(body.contains("!= 'TextStyle'"), isFalse);
+      expect(body.contains('noScaling'), isTrue);
+    });
+  });
+
   // Stub-only behavior tests were removed from this file. Keep rule metadata
   // and fixture checks while migrating to analyzer-backed behavior tests.
 }

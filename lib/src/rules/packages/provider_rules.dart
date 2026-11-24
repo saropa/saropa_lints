@@ -12,6 +12,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../analyzer_compat.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/packages/provider/remove_listen_false_fix.dart';
 
@@ -594,6 +595,12 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
       while (current != null) {
         if (current is MethodDeclaration) {
           if (current.name.lexeme == 'build') {
+            // FP fix: `_field ??= Notifier()` creates the notifier once and
+            // caches it in a State field (disposed in dispose()), so it is
+            // NOT re-instantiated on every rebuild. Skip that pattern.
+            if (_isCachedInFieldViaNullAware(node, current)) {
+              return;
+            }
             reporter.atNode(node.constructorName, code);
           }
           return;
@@ -601,6 +608,69 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
         current = current.parent;
       }
     });
+  }
+
+  /// True when [node] is the right-hand side of `field ??= <node>` and the
+  /// assigned target is a field declared on the class enclosing [build].
+  ///
+  /// Only fields qualify: `local ??= Notifier()` inside build() still
+  /// re-creates the notifier on every rebuild, so it must keep firing.
+  /// Uses a syntactic field-name lookup so it behaves the same in the
+  /// resolved analyzer pass and the unresolved scan CLI pass.
+  static bool _isCachedInFieldViaNullAware(
+    InstanceCreationExpression node,
+    MethodDeclaration build,
+  ) {
+    // Walk up through parentheses to the owning assignment, if any.
+    AstNode child = node;
+    AstNode? parent = node.parent;
+    while (parent is ParenthesizedExpression) {
+      child = parent;
+      parent = parent.parent;
+    }
+    if (parent is! AssignmentExpression ||
+        parent.operator.lexeme != '??=' ||
+        parent.rightHandSide != child) {
+      return false;
+    }
+
+    // Extract the assigned name from `x`, `this.x` (PropertyAccess) or
+    // `prefix.x` forms; anything else is not a simple field cache.
+    final Expression left = parent.leftHandSide;
+    final String? name;
+    if (left is SimpleIdentifier) {
+      name = left.name;
+    } else if (left is PropertyAccess && left.target is ThisExpression) {
+      name = left.propertyName.name;
+    } else {
+      name = null;
+    }
+    if (name == null) return false;
+
+    // A local variable declared inside build() shadows any field: reject it.
+    if (_declaresLocal(build, name)) return false;
+
+    // Confirm the name is a field of the enclosing class.
+    // In newer analyzers a method's parent is the class BODY node, not the
+    // ClassDeclaration, so use the ancestor lookup instead of `.parent`.
+    final ClassDeclaration? cls = build.thisOrAncestorOfType<ClassDeclaration>();
+    if (cls == null) return false;
+    // bodyMembers (analyzer_compat) works across analyzer versions where
+    // ClassDeclaration.body / .members differ.
+    for (final ClassMember member in cls.bodyMembers) {
+      if (member is! FieldDeclaration) continue;
+      for (final VariableDeclaration v in member.fields.variables) {
+        if (v.name.lexeme == name) return true;
+      }
+    }
+    return false;
+  }
+
+  /// True when build()'s body declares a local variable called [name].
+  static bool _declaresLocal(MethodDeclaration build, String name) {
+    bool found = false;
+    build.body.visitChildren(_LocalNameFinder(name, () => found = true));
+    return found;
   }
 
   /// Check if the constructed type extends ChangeNotifier
@@ -624,6 +694,22 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
       }
     }
     return false;
+  }
+}
+
+/// Detects a local variable declaration named [_name] inside a method body.
+/// Used by [AvoidChangeNotifierInWidgetRule] so a local that shadows a field
+/// is not mistaken for a State-cached field.
+class _LocalNameFinder extends RecursiveAstVisitor<void> {
+  _LocalNameFinder(this._name, this._onFound);
+
+  final String _name;
+  final void Function() _onFound;
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    if (node.name.lexeme == _name) _onFound();
+    super.visitVariableDeclaration(node);
   }
 }
 

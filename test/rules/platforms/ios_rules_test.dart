@@ -569,6 +569,18 @@ void main() {
       expect(src, contains('_badTextNoScaling'));
     });
 
+    // FP regression: SizedBox(height: 20/44) as a list element is spacing,
+    // not a status-bar offset. The fixture must keep the GOOD list case and
+    // the BAD standalone spacer (true positive) so the exemption stays narrow.
+    test('avoid_ios_hardcoded_status_bar fixture covers list spacing FP', () {
+      final src = File(
+        'example/lib/ios/avoid_ios_hardcoded_status_bar_fixture.dart',
+      ).readAsStringSync();
+      expect(src, contains('_goodListSpacing'));
+      expect(src, contains('_badPureSpacer'));
+      expect(src, contains('// expect_lint: avoid_ios_hardcoded_status_bar'));
+    });
+
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/ios/${fixture}_fixture.dart');

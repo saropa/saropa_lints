@@ -17,4 +17,12 @@ class _GoodDI {
   _GoodDI(ApiClient client); // Abstract interface — testable
 }
 
+class _Dio {}
+
+// GOOD: a factory closure returning a concrete-named type is the injection
+// seam itself (tests pass a fake factory) - must NOT trigger.
+class _GoodFactoryDI {
+  _GoodFactoryDI({_Dio Function()? dioFactory});
+}
+
 void main() {}

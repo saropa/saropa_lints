@@ -821,6 +821,36 @@ void main() {
     }
   });
 
+  // FP regression: InkWell/InkResponse have built-in hover, focus and click
+  // cursor, so require_hover_states / prefer_cursor_for_buttons /
+  // require_focus_indicator must only report GestureDetector. The fixtures
+  // encode both sides: GestureDetector BAD (true positive still expected) and
+  // InkWell GOOD (must not fire).
+  group('InkWell built-in hover/focus/cursor - fixture contract', () {
+    const fixtures = <String>[
+      'example/lib/widget_patterns/require_hover_states_fixture.dart',
+      'example/lib/widget_patterns/prefer_cursor_for_buttons_fixture.dart',
+      'example/lib/accessibility/require_focus_indicator_fixture.dart',
+    ];
+    for (final path in fixtures) {
+      test('$path: GestureDetector flagged, bare InkWell not', () {
+        final src = File(path).readAsStringSync();
+        // Positive: the expect_lint line is followed by a GestureDetector.
+        expect(
+          RegExp(r'expect_lint: \w+\n[^\n]*\n\s*GestureDetector\(')
+              .hasMatch(src),
+          isTrue,
+        );
+        // Negative: the InkWell good case carries no expect_lint marker.
+        expect(
+          RegExp(r'expect_lint: \w+\n[^\n]*\n\s*InkWell\(').hasMatch(src),
+          isFalse,
+        );
+        expect(src.contains('_goodInkWellBuiltin'), isTrue);
+      });
+    }
+  });
+
   // Stub-only behavior groups were removed. This file now keeps tests that
   // validate rule metadata and fixture presence instead of tautological asserts.
 }

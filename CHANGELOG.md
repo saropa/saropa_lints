@@ -66,16 +66,38 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.7.1] — Unreleased
+## [17.8.0] — Unreleased
 
-Published rule counts are now consistent across the README, extension, migration guides and in-product text, and the Vietnamese comparison label reads correctly. [log](https://github.com/saropa/saropa_lints/blob/v17.7.1/CHANGELOG.md)
+Fewer false positives: over 20 rules no longer flag code that was already correct (cached notifiers, loop-disposed controllers, `InkWell` hover/focus, button busy spinners, projects without an `ios/` folder and more), the VS Code LSP server stops rewriting `pubspec.lock` in FVM-pinned projects, and published rule counts and the Vietnamese comparison label are fixed. [log](https://github.com/saropa/saropa_lints/blob/v17.8.0/CHANGELOG.md)
 
 ### Changed
 
 - Rule-count claims in the README, extension README, extension manifest strings, translated catalogs, welcome panel fallback, About pages, Professional Services page and every migration guide now say "2350+" instead of a mix of 1400+, 1500+, 2100+ and 2300+; no action required.
 
+### Internal
+
+- New `scripts/checks/check_report_attribution.py` proves a reported diagnostic is a saropa_lints rule before a bug is filed or fixed; `bugs/ISSUE_REPORT_GUIDE.md` now routes Dart SDK diagnostics upstream and asks reporters to retest on the latest release.
+
 ### Fixed
 
+- VS Code: **Run analysis** in the sidebar now restarts the Dart analysis server, shows scan progress with a Cancel button, and refreshes the views and status bar with the issue count; previously it only re-copied existing diagnostics and showed nothing when issues were found.
+- VS Code: the LSP server now launches with the workspace's pinned Dart SDK (`dart.sdkPath`, `dart.flutterSdkPath`, or `.fvm/flutter_sdk`, falling back to PATH) and runs with `--no-pub`, so it no longer rewrites `pubspec.lock` or `package_config.json` in FVM-pinned projects.
+- `avoid_change_notifier_in_widget` no longer flags a notifier created with `_field ??= Notifier()` inside `build()`, since it is cached in a State field; no action required.
+- `avoid_ios_hardcoded_status_bar` no longer flags `SizedBox(height: 20/44/47/59)` used as spacing or a fixed row height inside a `children` list; no action required.
+- `avoid_keyboard_overlap` no longer flags a TextField inside a widget that returns a bare Column/Row with no Scaffold of its own, because the scroll view is owned by the hosting page; no action required.
+- `avoid_undisposed_instances` no longer flags controllers disposed by a `for (final c in [_a, _b]) c.dispose();` loop in `dispose()`; no action required.
+- Hover, focus, cursor, refresh-indicator, scroll-controller, intrinsic-dimensions and gesture-behavior lints no longer fire on map-marker or `Semantics(button: true)` tap targets, non-scrolling or dialog/popup lists, or stretch Columns whose width is already bounded; no action required.
+- `prefer_abstraction_injection` no longer flags factory-function parameters such as `Dio Function()? dioFactory`, since the closure is the injection seam; no action required.
+- `prefer_number_format` no longer flags `DateTime` day/hour/minute/month/weekday values in text, since they never need locale grouping; no action required.
+- `prefer_positioned_directional` no longer flags `Positioned` whose `left`/`right` derive from Offset `.dx`/`.dy` geometry (absolute canvas layouts); no action required.
+- `prefer_scalable_text` no longer flags a literal `TextStyle(fontSize:)`, since Flutter scales it by default; it now reports only `Text` or `RichText` that disables scaling (`TextScaler.noScaling` or `textScaleFactor: 1`); no action required.
+- `prefer_skeleton_over_spinner` no longer flags a progress indicator used as a button's busy icon (`icon:`, `child:` or `label:` of a `*Button` widget); spinners outside buttons are still reported; no action required.
+- `prefer_static_method` no longer flags instance methods that read only bare `final` instance fields (for example immutable value classes); no action required.
+- `require_copy_with_null_handling` no longer flags a `copyWith` that clears a nullable field through a boolean flag such as `noExtra` or `clearExtra`; no action required.
+- `require_hover_states`, `prefer_cursor_for_buttons` and `require_focus_indicator` no longer flag `InkWell`/`InkResponse`, which already provide hover, focus and click cursor; only `GestureDetector` is reported; no action required.
+- `require_ios_multitasking_support` no longer fires in projects with no `ios/` directory (for example Android/Windows-only apps); no action required.
+- `require_semantic_label_icons` no longer flags decorative icons passed as `icon:`, `prefixIcon:`, `suffixIcon:` or `leading:` to a widget that already has a text label (`ButtonSegment`, `FilledButton.icon`, `InputDecoration.labelText`); no action required.
+- `require_text_overflow_handling` no longer flags dynamic `Text` used as the `title`/`subtitle` of ListTile-family widgets or as the direct child of `Expanded`/`Flexible`, since those slots already wrap and bound width; no action required.
 - The Vietnamese label under the package count in the comparison view no longer reads "so sánh trong khi so sánh." and now reads "đang so sánh"; no action required.
 
 ---

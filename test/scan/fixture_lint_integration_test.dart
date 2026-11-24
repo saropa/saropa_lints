@@ -330,13 +330,21 @@ void main() {
 
         expect(
           fixtureViolations.length,
-          equals(2),
+          equals(3),
           reason:
-              'Fixture has two BAD indeterminate cases and determinate value: '
-              'cases that must not trigger; got ${fixtureViolations.length}',
+              'Fixture has three BAD indeterminate cases (incl. spinner beside '
+              'a button); determinate values and the in-button busy icon must '
+              'not trigger; got ${fixtureViolations.length}',
         );
 
         final lines = fixtureViolations.map((v) => v.line).toSet();
+        // True positive kept: spinner in a Column next to (not inside) a
+        // button slot still fires.
+        expect(
+          lines.contains(168),
+          isTrue,
+          reason: 'Spinner outside a button slot must still lint',
+        );
         expect(lines.contains(115), isTrue, reason: 'Should lint bare spinner');
         expect(
           lines.contains(144),

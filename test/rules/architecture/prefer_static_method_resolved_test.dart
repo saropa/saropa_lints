@@ -89,6 +89,20 @@ class Counter {
       expect(codes, isNot(contains('prefer_static_method')));
     });
 
+    test('does NOT flag methods reading only bare final fields '
+        '(immutable class, no this., no instance calls)', () async {
+      final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
+class Range {
+  const Range(this.start, this.end);
+  final int? start;
+  final int? end;
+
+  bool covers(int? s, int? e) => start == s && end == e;
+}
+''');
+      expect(codes, isNot(contains('prefer_static_method')));
+    });
+
     test('does NOT flag a bare field read inside a nested closure', () async {
       final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
 class Counter {

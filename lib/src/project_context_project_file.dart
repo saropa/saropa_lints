@@ -238,6 +238,19 @@ class ProjectContext {
     return getProjectInfo(filePath)?.hasPointerPlatform ?? true;
   }
 
+  /// Returns `true` when the project containing [filePath] can produce an iOS
+  /// build: the Flutter project has an `ios/` directory, or it is a pure Dart
+  /// library (consumer targets unknown).
+  ///
+  /// **Why:** iPad-specific guidance (e.g. `require_ios_multitasking_support`
+  /// Split View / Slide Over) cannot apply to an Android/Windows-only app, so
+  /// such rules must stay silent there. **Defaults to `true` when unknown**
+  /// (no path, no pubspec, unparseable) so rules keep firing when the
+  /// project cannot be read.
+  static bool hasIosPlatform(String? filePath) {
+    return getProjectInfo(filePath)?.hasIosPlatform ?? true;
+  }
+
   /// Returns `true` when the project containing [filePath] declares a build
   /// target for [platformId] (one of `web`, `windows`, `macos`, `linux`),
   /// determined by the presence of the matching `flutter create` platform
@@ -622,6 +635,9 @@ class _ProjectInfo {
     required this.targetPlatforms,
     required this.isCliOrToolPackage,
     this.isMobileOnlyApp = false,
+    // Defaults true so the unknown-pubspec fallback constructors need no
+    // change: unknown project => assume iOS may be a target (rules still fire).
+    this.hasIosPlatform = true,
   });
 
   factory _ProjectInfo._fromProjectRoot(String projectRoot) {
@@ -754,6 +770,9 @@ class _ProjectInfo {
           if (hasMacosDir) 'macos',
           if (hasLinuxDir) 'linux',
         },
+        // iOS target present only when `ios/` exists; pure Dart libraries
+        // default true since their consumers' platforms are unknown.
+        hasIosPlatform: hasIosDir || !isFlutter,
         // Flutter app with android/ and/or ios/ and no web or desktop dir.
         isMobileOnlyApp:
             isFlutter &&
@@ -810,6 +829,9 @@ class _ProjectInfo {
       );
     }
   }
+
+  /// Whether the project can build for iOS. See [ProjectContext.hasIosPlatform].
+  final bool hasIosPlatform;
 
   /// Flutter app targeting only Android/iOS (see [ProjectContext.isMobileOnlyApp]).
   final bool isMobileOnlyApp;
