@@ -11,13 +11,14 @@
  * `vscode-languageclient` is listed in extension/package.json dependencies.
  */
 
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 import {
   LanguageClient,
   type LanguageClientOptions,
   type ServerOptions,
 } from 'vscode-languageclient/node';
-import { isSaropaLintsResolved, resolveDartExecutable, LSP_SERVER_ARGS } from './lspResolution';
+import { findLspServerMissing, isSaropaLintsResolved, MIN_LSP_VERSION, MIN_LSP_DART, isDartSdkTooOld, resolveDartExecutable, buildLspServerArgs } from './lspResolution';
 import { l10n } from '../i18n/runtime';
 import { HealthPanel } from '../systemHealth/healthPanel';
 
@@ -124,6 +125,35 @@ export class SaropaLspClient implements vscode.Disposable {
       return;
     }
 
+    // Resolved but too old to ship the lsp_server executable (e.g. 4.15.1):
+    // spawning would crash-loop 5x and disable the server. Name the installed
+    // version, the minimum, and the real blocker (an old Dart SDK makes a
+    // dependency bump alone fail at `pub get`).
+    const outdated = findLspServerMissing(this._projectRoot);
+    if (outdated) {
+      const need = `saropa_lints ${MIN_LSP_VERSION} or newer (requires Dart ${MIN_LSP_DART.join('.')}+)`;
+      this._outputChannel.appendLine(
+        `[SaropaLspClient] Installed saropa_lints ${outdated.version} has no bin/lsp_server.dart — not starting. Needs ${need}.`,
+      );
+      const fix = isDartSdkTooOld(this._projectRoot)
+        ? `This project's Dart SDK is below ${MIN_LSP_DART.join('.')}, so no LSP-capable version can be installed. Upgrade the Dart/Flutter SDK (or the .fvmrc pin) first, then set saropa_lints to ^${MIN_LSP_VERSION}.`
+        : `In pubspec.yaml set saropa_lints to ^${MIN_LSP_VERSION}, then run 'dart pub get'.`;
+      void vscode.window
+        .showWarningMessage(
+          `Saropa Lints: the LSP server needs ${need}, but this project uses ${outdated.version}. ${fix}`,
+          'Open pubspec.yaml',
+        )
+        .then((pick) => {
+          if (pick === 'Open pubspec.yaml') {
+            void vscode.commands.executeCommand(
+              'vscode.open',
+              vscode.Uri.file(path.join(this._projectRoot, 'pubspec.yaml')),
+            );
+          }
+        });
+      return;
+    }
+
     // Use the SDK the workspace is pinned to (Dart-Code settings / FVM), not the
     // PATH `dart`: a mismatched SDK made `dart run` re-resolve and rewrite
     // pubspec.lock and package_config.json on every server start.
@@ -135,13 +165,15 @@ export class SaropaLspClient implements vscode.Disposable {
     this._outputChannel.appendLine(`[SaropaLspClient] Using dart (${dart.source}): ${dart.command}`);
 
     // Identical for run and debug (no separate debug profile needed).
-    // `--no-pub` (LSP_SERVER_ARGS) blocks the implicit pub get. The shell is
+    // buildLspServerArgs runs the script directly (no pub resolution). The shell is
     // only used for the bare PATH `dart` on Windows so `dart.bat` resolves via
     // PATHEXT; a resolved absolute exe is spawned directly.
+    const lspArgs = buildLspServerArgs(this._projectRoot);
+    this._outputChannel.appendLine(`[SaropaLspClient] Args: ${lspArgs.join(' ')}`);
     const spawnOptions = { cwd: this._projectRoot, shell: dart.useShell };
     const serverOptions: ServerOptions = {
-      run: { command: dart.command, args: [...LSP_SERVER_ARGS], options: spawnOptions },
-      debug: { command: dart.command, args: [...LSP_SERVER_ARGS], options: spawnOptions },
+      run: { command: dart.command, args: lspArgs, options: spawnOptions },
+      debug: { command: dart.command, args: lspArgs, options: spawnOptions },
     };
 
     // Client configuration — route Dart files through this server and

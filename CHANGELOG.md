@@ -80,6 +80,7 @@ Fewer false positives: over 20 rules no longer flag code that was already correc
 
 ### Fixed
 
+- VS Code: the LSP server no longer crash-loops five times when the project's locked `saropa_lints` is older than 15.2.10 (no `bin/lsp_server.dart`, e.g. 4.15.1); the extension skips the spawn and shows one warning naming the installed version, the minimum, the exact `pubspec.yaml` edit (or the Dart SDK upgrade needed first when the project is below Dart 3.9), and an **Open pubspec.yaml** button.
 - `avoid_skipped_tests` no longer flags a `skip:` driven by `bool.fromEnvironment` / `String.fromEnvironment` / `Platform.environment` (directly or via a variable initialized from one), since that is an opt-in gate; `skip: true` and string reasons are still reported; no action required.
 - VS Code: **Run analysis** in the sidebar now restarts the Dart analysis server, shows scan progress with a Cancel button, and refreshes the views and status bar with the issue count; previously it only re-copied existing diagnostics and showed nothing when issues were found.
 - VS Code: the LSP server now launches with the workspace's pinned Dart SDK (`dart.sdkPath`, `dart.flutterSdkPath`, or `.fvm/flutter_sdk`, falling back to PATH) and runs with `--no-pub`, so it no longer rewrites `pubspec.lock` or `package_config.json` in FVM-pinned projects.

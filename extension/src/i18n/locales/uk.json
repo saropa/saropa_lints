@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Правила та рівні",
-        "description": "Налаштуйте, які з правил більш ніж 2 300 виконуються та на якій важливості."
+        "description": "Налаштуйте, які з правил більш ніж 2 350 виконуються та на якій серйозності."
       },
       "catalog": {
         "label": "Каталог командних каталогів.",
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints вбудований плагін відновлено. Перезапуск аналізового сервера Dart для перезавантаження.",
       "reenableNothingToRestore": "Saropa Lints: нічого не можна відновити. Плагін в процесі не вимкнено через розширення наразі.",
       "noOpenDartFiles": "Saropa Lints: не знайдено відкритих Dart файлів. Перевідкрійте файл Dart або вимкніть налаштування \"Відкриття лише редакторів\".",
+      "analysisScanning": "Сканування робочої області… {percent}% (проблем поки що: {count})",
       "configUpdated": "Saropa Lints конфігурація оновлена (рівня: {tier}). в) В. Прізвиток",
       "configWriteFailed": "Невдало написати конфігурацію. {details}",
       "scaffoldGateTitle": "Композитний аналізатор плагін скелевий вал.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "Виконання pub get… ({elapsed}s)",
       "progressConfigWrite": "Написання конфігурації… ({elapsed}s)",
       "progressAnalysis": "Виконання аналізу… ({elapsed}s)",
-      "progressBaseline": "Виконання базового сканування… ({elapsed}s)",
-      "analysisScanning": "Сканування робочої області… {percent}% (проблем поки що: {count})"
+      "progressBaseline": "Виконання базового сканування… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Встановити аналіз ланки",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Не знайдено сервера Drift Advisor. Запустіть ваш додаток з запущеним сервером, потім натисніть Оновити.",
     "integrationOff": "Інтеграція Drift Advisor вимкнена. Увімкніть її в налаштуваннях (saropaLints.driftAdvisor.integration), потім натисніть Оновити."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Придушити (умисне старе SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Оновлення оновлення перейменування.",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints безкоштовний і має відкритий код. Швидка оцінка або відгук допомагає іншим розробникам його знайти, а відгуки та звіти про помилки на GitHub роблять його кращим.",
       "marketplace": "Оцінити в Marketplace",
       "openVsx": "Оцінити в Open VSX",
+      "dismiss": "Не зараз",
       "never": "Більше не питати"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "Скан зменшився від {from} до {to} робітників, щоб утримувати ваш комп'ютер відповідним ({reason}).",
+    "aborted": "Сканування припинено рано, щоб захистити ваш комп'ютер ({reason}). Результати неповні.",
+    "deepNotEnoughMemory": "Сканування, що враховує типи, потребує приблизно {needed}, але вільно лише {free} (залишається {reserve} для усього іншого). Швидкий скан завершується набагато раніше та використовує набагато менше пам'яті.",
+    "deepPaused": "Скан призупинено: вільна пам'ять становить {free}, нижче {reserve}, що зберігається вільною для вашого комп'ютера. Він відновлюється автоматично, коли пам'ять звільнилася.",
+    "fastDone": "Швидкий сканування завершено: {files} файлів, {issues} проблема(и) в {seconds}.",
+    "fastDoneOfferDeep": "Швидкий сканування завершено: {files} файлів, {issues} проблема(и) в {seconds}. Сканування з урахуванням типів може знайти більше, але витрачає приблизно {minutes} хвилин і {memory} пам'яті.",
+    "fastDoneDeepUnavailable": "Швидкий сканування завершено: {files} файлів, {issues} проблема(и) в {seconds}. Сканування з урахуванням типів потребує приблизно {needed}, але наразі вільно лише {free}.",
+    "daemonLowMemory": "Типовий сканування потребує приблизно {needed}, але доступно лише {free} пам'яті (залишаючи {reserve} для усього іншого). Сканування без типів наразі, щоб ваш комп'ютер залишився відповідним.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Використовуйте М’який Профіль",
+      "openSettings": "Відкрити налаштування",
+      "runFast": "Запустити швидкий сканування",
+      "runDeep": "Запустити глибокий сканування",
+      "runDeepAnyway": "Виконати глибокий сканування незалежно",
+      "resume": "Повернутися до резюме тепер",
+      "cancelScan": "Відмінити сканування",
+      "turnOffTypeResolution": "Вимкнути Вирішення Типу",
+      "startAnyway": "Почати незважаючи на те",
+      "notNow": "Не зараз, не тепер.",
+      "neverAskDeep": "Не питати знову",
+      "applyPlugin": "Застосувати",
+      "noThanks": "Ні, дякую",
+      "restartAnalysisServer": "Перезапустити сервер аналізу"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Сканування продуктивності",
+      "machine": "{cores} ядра CPU · {free} вільних {total}",
+      "recommended": "рекомендовано для цього комп'ютера",
+      "resources": "{jobs} worker(и) · {memory} memory budget",
+      "openSettings": "Відкрити всі налаштування сканування",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "М’якокірний",
+        "balanced": "Балансований",
+        "fast": "Швидкий"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Не заважає: максимум 2 робітники та четверть вільної пам'яті. Найкраще для ноутбуків.",
+        "balanced": "Звільняє один ядро та використовує до половини вільної пам'яті. Вірно для більшості комп'ютерів.",
+        "fast": "Використовує кожен ядро та до 70% вільної пам'яті. Завершує раніше, але може повільнувати решту вашого комп'ютера."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Також обмежте живий аналіз (плагін аналізатора Dart) приблизно до {limit} і повільно відмовляйте від правил низької важливості, коли пам'ять закінчується? Без обмежень великий проект може збільшити аналізатор сервера до кількох ГБ.",
+      "offerSmallMachine": "Цей комп'ютер має {total} пам'яті. Обмеження живого аналізу до приблизно {limit}, та поступове відкидання правил низької серйозності при закінченні пам'яті, зберігає його відповідність. Застосувати це?",
+      "applied": "Збережено: живий аналіз обмежено приблизно до {limit}. Перезапустіть сервер аналізу, щоб застосувати його.",
+      "writeFailed": "Не вдалося оновити analysis_options_custom.yaml. Перевірте, чи файл доступний для запису."
     }
   }
 }

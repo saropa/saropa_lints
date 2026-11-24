@@ -2901,15 +2901,24 @@
     }
   },
   "ruleMigration": {
-    "skip": {
-      "generated": "Skipped generated file {file}.",
-      "unreadable": "Skipped {file}: it could not be read.",
-      "unparseable": "Skipped {file}: it is not valid JSON."
-    },
-    "finding": {
-      "bareName": "{file}:{line} ignores {name} without the saropa_lints/ prefix. Left unchanged; add the prefix and run the migration again.",
-      "clash": "{file}:{line} has both {name} and its replacement. Kept the replacement and removed {name}."
-    }
+    "none": "No renamed rules need migrating.",
+    "noWorkspace": "Open a Dart project folder to migrate rule names.",
+    "pickTitle": "Migrate renamed rules",
+    "pickPlaceholder": "Choose the files to update",
+    "fileHits": "{hits} change(s)",
+    "diffTitle": "Rule rename: {file}",
+    "confirm": "Apply rule renames to {count} file(s)? The diffs are open for review.",
+    "apply": "Apply",
+    "progress": "Migrating renamed rules",
+    "applied": "Updated {hits} rule reference(s) in {count} file(s): {files}.",
+    "bareNames": "Left unchanged (ignore comments without the saropa_lints/ prefix): {items}.",
+    "clashes": "Both the old and new rule name are set, please merge by hand: {items}.",
+    "skipped": "Skipped: {items}.",
+    "failedRestored": "Rule migration failed: {detail} All files were restored to their previous content.",
+    "failedNotRestored": "Rule migration failed: {detail} Some files could not be restored automatically; check them with git.",
+    "offer": "Rename {hits} renamed rules in {count} files?",
+    "offerPreview": "Preview",
+    "offerNotNow": "Not now"
   },
   "compat": {
     "startup": {
@@ -3008,26 +3017,6 @@
       "cancelledNotRestored": "The version change was cancelled, but the files could not be restored automatically; check pubspec.yaml and analysis_options.yaml."
     }
   },
-  "ruleMigration": {
-    "none": "No renamed rules need migrating.",
-    "noWorkspace": "Open a Dart project folder to migrate rule names.",
-    "pickTitle": "Migrate renamed rules",
-    "pickPlaceholder": "Choose the files to update",
-    "fileHits": "{hits} change(s)",
-    "diffTitle": "Rule rename: {file}",
-    "confirm": "Apply rule renames to {count} file(s)? The diffs are open for review.",
-    "apply": "Apply",
-    "progress": "Migrating renamed rules",
-    "applied": "Updated {hits} rule reference(s) in {count} file(s): {files}.",
-    "bareNames": "Left unchanged (ignore comments without the saropa_lints/ prefix): {items}.",
-    "clashes": "Both the old and new rule name are set, please merge by hand: {items}.",
-    "skipped": "Skipped: {items}.",
-    "failedRestored": "Rule migration failed: {detail} All files were restored to their previous content.",
-    "failedNotRestored": "Rule migration failed: {detail} Some files could not be restored automatically; check them with git.",
-    "offer": "Rename {hits} renamed rules in {count} files?",
-    "offerPreview": "Preview",
-    "offerNotNow": "Not now"
-  },
   "lintsSwitch": {
     "statusOn": "Saropa Lints: On",
     "statusOff": "Saropa Lints: Off",
@@ -3119,5 +3108,18 @@
       "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
       "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
     }
+  },
+  "externalEngine": {
+    "noProject": "Open a Dart project folder first.",
+    "sdkTooOld": "The latest Saropa Lints engine needs Dart {required} or newer, but the Dart used here is {found}. Install a newer Dart SDK and set \"saropaLints.externalEngine.dartSdkPath\" to its folder.",
+    "sdkUnknown": "unknown",
+    "install": {
+      "prompt": "This installs the latest Saropa Lints engine globally (dart pub global activate saropa_lints) using a newer Dart SDK, then scans this project with it. This project's pubspec.yaml and SDK pin are not changed.",
+      "confirm": "Install and scan"
+    },
+    "progress": "Saropa Lints: scanning with the latest engine…",
+    "installFailed": "Could not install the Saropa Lints engine: {detail}",
+    "scanFailed": "The latest-engine scan failed: {detail}",
+    "done": "Saropa Lints: {count} issue(s) found by the latest engine (Dart {version})."
   }
 }

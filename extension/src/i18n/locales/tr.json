@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Kurallar & Seviyeler",
-        "description": "2.300'den fazla kuralın hangilerinin çalıştığını ve hangi ciddiyet seviyesinde çalıştığını yapılandırın."
+        "description": "2.350'den fazla kuralın hangilerinin çalıştığını ve hangi ciddiyet seviyesinde çalıştığını ayarlayın."
       },
       "catalog": {
         "label": "Komut Kataloğu Komuta Katalogu",
@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable Deaktive Etme İşlemleri",
       "actionEnable": "Olanak vermek",
       "bulkRuleToggleConfirm": "{verb} {count} kuralları? Bu, analysis_options_custom.yaml'i güncelliyor.",
-      "setupPrompt": "Saropa Lints, saropa_lints yapılandırılmadığı bir Dart projesi tespit etti. 2350+ linter kuralı için şimdi ayarlayın.",
+      "setupPrompt": "Saropa Lints, saropa_lints yapılandırılmadığı bir Dart projesi tespit etti. 2350+ lint kuralı için şimdi ayarlayın.",
       "actionSetUpProject": "Projeyi Kurmak Projesi Yapılandırma",
       "actionNotNow": "Şimdi değil şimdi, şimdi değil."
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints iç süreç eklentisi yeniden etkinleştirildi. Dart analiz sunucusunu yeniden başlatarak onu yeniden yüklüyor.",
       "reenableNothingToRestore": "Saropa Lints: geri yüklenmesi gereken şey yok. Eklenti aracılığıyla şu anda işlem içi eklenti devre dışı bırakılmamıştır.",
       "noOpenDartFiles": "Saropa Lints: açılmış Dart dosyası bulunamadı. Bir Dart dosyasını tekrar açın veya \"Yalnızca açılan düzenleyiciler\" ayarını kapatın.",
+      "analysisScanning": "Çalışma alanı taranıyor… %{percent} (şu ana kadar {count} sorun)",
       "configUpdated": "Saropa Lints konfigürasyonu güncellenmiştir (kat: {tier}).) olarak tanımlanır.",
       "configWriteFailed": "Config write başarısız oldu. {details}",
       "scaffoldGateTitle": "Kompozite analiz cihazı eklentisi iskele yapısı.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "pub get çalıştırılıyor… ({elapsed}s)",
       "progressConfigWrite": "Yazılım yapılandırması… ({elapsed}s)",
       "progressAnalysis": "Analiz çalıştırılıyor… ({elapsed}s)",
-      "progressBaseline": "Temel tarama çalıştırılıyor… ({elapsed}s)",
-      "analysisScanning": "Çalışma alanı taranıyor… %{percent} (şu ana kadar {count} sorun)"
+      "progressBaseline": "Temel tarama çalıştırılıyor… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Analiz Yolu Belirle",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Drift Advisor sunucusu bulunamadı. Uygulamanızı sunucunun çalıştığı sürece başlatın ve sonra Yenile'ye tıklayın.",
     "integrationOff": "Drift Advisor entegrasyonu devre dışı. Ayarlar (saropaLints.driftAdvisor.integration) içinde etkinleştirin, ardından Yenile'ye tıklayın."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Suppress (intentional old SDK)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Yükseltme Geliştirme Güncelleme",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints ücretsiz ve açık kaynaklıdır. Hızlı bir puan veya yorum diğer geliştiricilerin onu keşfetmesine yardımcı olur; GitHub’daki geri bildirimler ve hata raporları da onu sürekli geliştirir.",
       "marketplace": "Marketplace’te puanla",
       "openVsx": "Open VSX’te puanla",
+      "dismiss": "Şimdi değil",
       "never": "Bir daha sorma"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "Tarama, bilgisayarınızın yanıt vermesini sağlamak için {from}'dan {to}'ye kadar işleyiciyi yavaşlattı ({reason}).",
+    "aborted": "Tarama erken durduruldu bilgisayarınızı korumak için ({reason}). Sonuçlar kısmi.",
+    "deepNotEnoughMemory": "Tip bilgisiyle bir tarama yaklaşık {needed} ihtiyaç duyar, ancak sadece {free} serbesttir (her şey için {reserve} tutulur). Hızlı tarama çok daha erken biter ve çok daha az bellek kullanır.",
+    "deepPaused": "Tarama durduruldu: serbest bellek {free}, bilgisayarınız için saklanan {reserve}'tan daha az. Bellek serbest kalınca otomatik olarak devam eder.",
+    "fastDone": "Hızlı tarama tamamlandı: {files} dosya, {issues} tane {seconds} sorunu.",
+    "fastDoneOfferDeep": "Hızlı tarama tamamlandı: {files} dosya, {issues} tane {seconds} içinde. Tür bilgisi olan bir tarama daha fazla bulabilir, ancak yaklaşık {minutes} dakika ve {memory} bellek kullanır.",
+    "fastDoneDeepUnavailable": "Hızlı tarama tamamlandı: {files} dosya, {issues} tane {seconds} sorunu. Bir tür bilgisi taraması yaklaşık {needed} sürecektir, ancak şu an sadece {free} ücretsizdir.",
+    "daemonLowMemory": "Tip bilgisiyle tarama {needed} hakkında gereklidir, ancak yalnızca {free} bellek boş (her şey için {reserve}'yi tutuyor). Şimdilik türler olmadan tarama yapılıyor, böylece bilgisayarınız yanıt verir.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Gentle Profil Kullan",
+      "openSettings": "Ayarları Aç",
+      "runFast": "Hızlı Tarama ÇalıĢtır",
+      "runDeep": "Derin Tarama Çalıştır",
+      "runDeepAnyway": "Her Zaman Derin Tarama Yap",
+      "resume": "Devam Et",
+      "cancelScan": "Taramayı İptal Et",
+      "turnOffTypeResolution": "Tip Çözünürlüğünü Kapat",
+      "startAnyway": "Devam Et",
+      "notNow": "Şimdi değil şimdi, şimdi değil.",
+      "neverAskDeep": "Tekrar Sorma",
+      "applyPlugin": "Uygula",
+      "noThanks": "Hayır Teşekkürler",
+      "restartAnalysisServer": "Analiz Sunucusunu Yeniden Başlat"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "Performans Tarama",
+      "machine": "{cores} CPU çekirdeği · {free} {total} den özgür",
+      "recommended": "bu bilgisayara önerilir",
+      "resources": "{jobs} işçisi(s) · {memory} bellek bütçesi",
+      "openSettings": "Tarama ayarlarını aç",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "Güvenli",
+        "balanced": "Dengeli",
+        "fast": "Hızlı"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Gizli kalır: en fazla 2 işçü ve yarım bellek boşluğu. Laptop için en iyi.",
+        "balanced": "Bir çekirdek boş bırakır ve boş bellek alanının yarısını kullanır. Çoğu makine için uygun bir ayar.",
+        "fast": "Her çekirdek ve ücretsiz bellekten en fazla %70'ini kullanır. Daha erken biter ancak bilgisayarınızın geri kalanını yavaşlatabilir."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Ayrıca canlı analiz (Dart analizör eklentisi) için yaklaşık {limit}'a sınırlama getirin ve bellek yetersiz olduğunda hafif ciddiyetli kuraları yumuşak bir şekilde kaldırın? Sınırsız bir durumda büyük bir proje analiz sunucusunu birkaç GB'ya kadar büyütebilir.",
+      "offerSmallMachine": "Bu bilgisayarda {total} bellek vardır. Bellek yetersiz olduğunda düşük ciddiyetli kuraları yumuşak bir şekilde atarak yaklaşık {limit}'lık canlı analiz yapmak, yanıt verme hızını korur. Uygula mı?",
+      "applied": "Kaydedildi: canlı analiz yaklaşık {limit}'a sınırlıdır. Analiz sunucusunu yeniden başlatarak uygulayın.",
+      "writeFailed": "analysis_options_custom.yaml güncellenemedi. Dosyanın yazılabilir olduğundan emin olun."
     }
   }
 }

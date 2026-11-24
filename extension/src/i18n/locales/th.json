@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "กฎและระดับ",
-        "description": "กำหนดให้กฎที่มีมากกว่า 2,350 กฎทำงานและระดับความรุนแรงที่จะใช้"
+        "description": "กำหนดให้กฎที่มีมากกว่า 2,350 กฎทำงานและระดับความรุนแรงในการทำงาน"
       },
       "catalog": {
         "label": "คาตอล็อกบัญชาการ Command Catalogue การกํากับและการใช้",
@@ -259,7 +259,7 @@
       "state-management": "โบล็อก, Riverpod, Provider, GetX และสมุดการฉีดภาวะและความพึ่งพาที่เกี่ยวข้อง",
       "networking-apis": "คลินท์ HTTP, GraphQL, Firebase, Supabase และการเชื่อมต่อ",
       "storage-persistence": "ฐานข้อมูลท้องถิ่นและคีย์-มูลค่าของร้านค้า Drift, Hive, Isar, sqflite, shared_preferences. ความชอบที่แบ่งปันกัน",
-      "navigation-deep-links": "กฎที่เข้มงวด: \n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว \n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown รวมถึงเครื่องหมายอัญประกาศที่ครอบคลุม \n3. ข้อความอาจมีโทเคนที่ใช้แทนได้: โทเคนที่ใช้แทนได้ คัดลอกแต่ละตัวเข้าไปในการแปลแบบตรงตัว ตามตำแหน่งทางไวยากรณ์ที่ถูกต้อง ห้ามแปล ลบ หรือปรับรูปแบบโทเคนใดๆ \n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามปล่อยหรือแทนที่คำใดๆ ด้วยตัวอักษรละติน ไทย อารบิก ไซลิลิก เกาหลี ญี่ปุ่น หรืออักษรใดๆ ทั้งหมด ตัวอักษร ตัวเลข เครื่องหมายวรรคตอน และโทเคนที่ใช้แทนได้เป็นเพียงข้อยกเว้นเดียว",
+      "navigation-deep-links": "กฎที่เข้มงวด: \n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว \n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown รวมถึงเครื่องหมายคำพูดรอบข้อความ \n3. ข้อความอาจมีตัวแทนของโทเคน: โทเคนตัวแทน คัดลอกแต่ละตัวให้ตรงกับการเขียนที่ระบุไว้ อย่างเคร่งครัด ไม่แปล ลบ หรือปรับรูปแบบโทเคน \n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามปล่อยหรือแทนที่คำใดในอักษรละติน ไทย อารบิก ไซลิลิก เกาหลี ญี่ปุ่น หรืออักษรใดๆ ทั้งหมด ตัวอักษร ตัวเลข เครื่องหมายวรรคตอน และโทเคนตัวแทนคือข้อยกเว้นเพียงอย่างเดียว",
       "media-graphics": "ภาพ, SVG, การ์ตูนอนิเมชั่น, เสียง, แผนที่, ผู้เก็บและเครื่องยนต์ Flame.",
       "device-platform": "เซนเซอร์, ตําแหน่ง, การอนุญาต, ไบโอเมทริกส์, คําแจ้งเตือน และงานเบื้องหลัง",
       "identity-sharing": "ผู้ให้บริการ Log-in, การแบ่งปัน และ In-App Review",
@@ -686,7 +686,7 @@
         "title": "เปิดใช้งานการตั้งค่า saropaLints.enabled และปลั๊กอิน analyzer พร้อมกัน"
       },
       "pill": {
-        "statusOn": "กฎเข้มงวด:\n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว\n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown และไม่ใช้เครื่องหมายอัญประกาศใด ๆ รอบข้อความ\n3. ข้อความอาจมีตัวแทนของโทเคน: โทเคนตัวแทน คัดลอกแต่ละตัวให้ตรงกับการเขียนที่ระบุไว้โดยไม่แปล ลบ หรือปรับรูปแบบ\n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามเว้นหรือแทนที่คำใด ๆ ในอักษรละติน ไทย อารบิก เซอริลลิก คีริน ญี่ปุ่น หรืออักษรใด ๆ อื่น ๆ ตัวอักษร ตัวเลข จุดวรรค หรือโทเคนตัวแทนคือข้อยกเว้นเพียงอย่างเดียว",
+        "statusOn": "กฎเข้มงวด:\n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว\n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown และอัญประกาศที่ครอบคลุม\n3. ข้อความอาจมีตัวแทนของโทเคน: โทเคนตัวแทน คัดลอกแต่ละตัวเข้าไปในการแปลแบบตรงตัว อย่างถูกต้องทางไวยากรณ์ ห้ามแปล ลบ หรือปรับรูปแบบโทเคน\n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามปล่อยหรือแทนที่คำใด ๆ ในอักษรละติน ไทย อารบิก เซอริลลิก เกาหลี ญี่ปุ่น หรืออักษรใด ๆ ทั้งหมด ตัวอักษร ตัวเลข จุดวรรค และโทเคนตัวแทนคือข้อยกเว้นเดียวที่เหลือ",
         "findings": "เปิดรายงานข้อผิดพลาด",
         "vibrancy": "เปิดแพ็กเกจดัชบอร์ด"
       },
@@ -2441,7 +2441,7 @@
       "actionDisable": "Disable ปิดการใช้งาน",
       "actionEnable": "Enable enable เปิดให้ใช้ได้",
       "bulkRuleToggleConfirm": "{verb} {count} กฎกติกา? การอัพเดท analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints พบโปรเจกต์ Dart ที่ไม่มี saropa_lints ตั้งค่า ตั้งค่าทันทีเพื่อกฎการตรวจสอบ 2350+ ข้อ",
+      "setupPrompt": "กฎที่เข้มงวด:\n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว\n2. ห้ามใส่คำอธิบาย บทนำ ตัวอักษร markdown หรือเครื่องหมายอัญประกาศใด ๆ\n3. ข้อความอาจมีตัวแทนของโทเคน: โทเคนตัวแทน คัดลอกแต่ละตัวเข้าไปในการแปลแบบตรงตัว อย่างเคร่งครัด ไม่แปล ลบ หรือปรับรูปแบบโทเคนใด ๆ\n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามเหลือหรือแทนที่คำใด ๆ ในอักษรละติน ไทย อารบิก เซอริลลิก เกาหลี ญี่ปุ่น หรืออักษรใด ๆ ทั้งหมด ตัวอักษร ตัวเลข จุดวรรค และโทเคนตัวแทนคือข้อยกเว้นเพียงอย่างเดียว\n\nข้อความ: Saropa Lints ตรวจพบโปรเจกต์ Dart ที่ไม่ได้กำหนด saropa_lints ตั้งค่าตอนนี้เพื่อกฎการตรวจสอบ 2350+ ข้อ",
       "actionSetUpProject": "ตั้งโครงการ Set Up Project จัดทําโครต",
       "actionNotNow": "ไม่ตอนนี้ ไม่ใช่ ตอนนี้"
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints ปลั๊กอินในกระบวนการถูกเปิดใช้งานอีกครั้ง กำลังเริ่มต้น Dart เซิร์ฟเวอร์การวิเคราะห์เพื่อโหลดมันใหม่",
       "reenableNothingToRestore": "Saropa Lints: ไม่มีอะไรให้กู้คืน ปลั๊กอินที่ทำงานในกระบวนการไม่ได้ถูกปิดใช้งานผ่านการขยายในขณะนี้",
       "noOpenDartFiles": "Saropa Lints: เป็นการประกอบของ ไม่พบไฟล์ Dart เปิด เปิดไฟล์ Dart อีกครั้ง หรือปิดการตั้งค่า \"เปิดเฉพาะบรรณาธิการ\"",
+      "analysisScanning": "กำลังสแกนเวิร์กสเปซ… {percent}% (พบ {count} ปัญหาจนถึงตอนนี้)",
       "configUpdated": "Saropa Lints ได้รับการอัปเดต (tier: {tier})",
       "configWriteFailed": "Config write ไม่สําเร็จ {details} การเขียนการตั้งค่า",
       "scaffoldGateTitle": "พลัคนีวิเคราะห์ Composite Analyzer แพล็กกิน สะพานกาง",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "กำลังดำเนินการ pub get… ({elapsed}s)",
       "progressConfigWrite": "การเขียนค่ากำหนด... ({elapsed}s)",
       "progressAnalysis": "วิเคราะห์อยู่… ({elapsed}s)",
-      "progressBaseline": "กำลังดำเนินการสแกนพื้นฐาน… ({elapsed}s)",
-      "analysisScanning": "กำลังสแกนเวิร์กสเปซ… {percent}% (พบ {count} ปัญหาจนถึงตอนนี้)"
+      "progressBaseline": "กำลังดำเนินการสแกนพื้นฐาน… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: ตั้งค่าช่องทางการวิเคราะห์",
@@ -2858,6 +2858,11 @@
     "noServerFound": "ไม่พบเซิร์ฟเวอร์ Drift Advisor ใดๆ อยู่ กรุณาเริ่มแอปของคุณพร้อมที่เซิร์ฟเวอร์กำลังทำงาน แล้วคลิก Refresh",
     "integrationOff": "การผสาน Drift Advisor ถูกปิด ให้เปิดใช้งานในตั้งค่า (saropaLints.driftAdvisor.integration) จากนั้นคลิก Refresh"
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "ปิด (ตั้งใจใช้ SDK เก่า)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "อัพเกรดอัปเดรด Upgrade",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints ใช้ฟรีและเป็นโอเพนซอร์ส การให้คะแนนหรือรีวิวสั้น ๆ ช่วยให้นักพัฒนาคนอื่นค้นพบได้ และข้อเสนอแนะกับรายงานบั๊กบน GitHub ช่วยให้ดียิ่งขึ้นเรื่อย ๆ",
       "marketplace": "ให้คะแนนบน Marketplace",
       "openVsx": "ให้คะแนนบน Open VSX",
+      "dismiss": "ไม่ตอนนี้",
       "never": "ไม่ต้องถามอีก"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "การสแกนได้ชะลอตัวลงจาก {from} ไปยัง {to} งานเพื่อรักษาให้คอมพิวเตอร์ของคุณตอบสนองได้ ({reason})",
+    "aborted": "การสแกนหยุดลงก่อนหน้าเพื่อปกป้องคอมพิวเตอร์ของคุณ ({reason}) ผลลัพธ์มีเพียงบางส่วน",
+    "deepNotEnoughMemory": "การสแกนที่มีความรู้เกี่ยวกับประเภทต้องการประมาณ {needed} แต่เพียง {free} เท่านั้นที่มีให้ใช้ (เก็บ {reserve} สำหรับสิ่งอื่นๆ) การสแกนที่เร็วจะเสร็จสิ้นได้เร็วกว่ามากและใช้หน่วยความจำน้อยกว่ามาก",
+    "deepPaused": "สแกนถูกหยุด: หน่วยความจำที่ใช้เสรีคือ {free} ซึ่งต่ำกว่า {reserve} ที่รักษาไว้เพื่อคอมพิวเตอร์ของคุณ มันจะเริ่มต้นอัตโนมัติเมื่อหน่วยความจำมีอิสระขึ้น",
+    "fastDone": "การสแกนเร็วเสร็จสิ้น: {files} ไฟล์, {issues} ปัญหาใน {seconds}s",
+    "fastDoneOfferDeep": "การสแกนเร็วเสร็จสิ้น: {files} ไฟล์, {issues} ปัญหาใน {seconds}s การสแกนที่มีความรู้เกี่ยวกับประเภทสามารถค้นพบได้มากขึ้น แต่ใช้เวลาประมาณ {minutes} นาทีและ {memory} ของหน่วยความจำ",
+    "fastDoneDeepUnavailable": "การสแกนเร็วเสร็จสิ้น: {files} ไฟล์, {issues} ปัญหาใน {seconds}s. การสแกนที่มีความรู้เกี่ยวกับประเภทต้องใช้เวลาประมาณ {needed} แต่ตอนนี้มีเพียง {free} ที่ใช้ได้",
+    "daemonLowMemory": "การสแกนแบบรู้ประเภทต้องการพื้นที่เก็บข้อมูลประมาณ {needed} แต่พื้นที่เก็บข้อมูลที่ว่างมีเพียง {free} (สำรอง {reserve} สำหรับสิ่งอื่นๆ) จึงสแกนโดยไม่ใช้ประเภทชั่วคราว เพื่อให้คอมพิวเตอร์ของคุณยังคงตอบสนองได้",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "ใช้โปรไฟล์ที่นุ่มนวล",
+      "openSettings": "เปิดตั้งค่า",
+      "runFast": "สแกนเร็ว",
+      "runDeep": "วิเคราะห์ลึก",
+      "runDeepAnyway": "ดำเนินการสแกนลึกต่อไป",
+      "resume": "เริ่มต้นอีกครั้ง",
+      "cancelScan": "ยกเลิกการสแกน",
+      "turnOffTypeResolution": "ปิดการแก้ไขประเภท",
+      "startAnyway": "เริ่มต้นต่อไป",
+      "notNow": "ไม่ตอนนี้ ไม่ใช่ ตอนนี้",
+      "neverAskDeep": "อย่าถามอีก",
+      "applyPlugin": "ใช้",
+      "noThanks": "ไม่ต้องการ",
+      "restartAnalysisServer": "รีสตาร์ทเซิร์ฟเวอร์การวิเคราะห์"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "การสแกนประสิทธิภาพ",
+      "machine": "แกนซีพียู {cores} · {free} ว่างของ {total}",
+      "recommended": "แนะนำสำหรับเครื่องนี้",
+      "resources": "{jobs} ผู้ทำงาน(ส) · {memory} งบประมาณความจำ",
+      "openSettings": "เปิดการตั้งค่าการสแกนทั้งหมด",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "นุ่มนวล",
+        "balanced": "สมดุล",
+        "fast": "เร็ว"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "อยู่ห่างจากทาง: จำนวนการทำงานสูงสุด 2 ตัว และหน่วยความจำว่างประมาณหนึ่งในสี่ เหมาะกับแล็ปท็อปที่สุด",
+        "balanced": "ปล่อยให้คอร์หนึ่งไว้และใช้หน่วยความจำส่วนหนึ่งของหน่วยความจำที่ว่างอยู่ เหมาะสมกับเครื่องส่วนใหญ่",
+        "fast": "ใช้ทุกหน่วยความจำหลักและถึง 70% ของหน่วยความจำที่ว่างอยู่ ทำงานเสร็จเร็วขึ้นแต่อาจทำให้เครื่องของคุณช้าลงในส่วนอื่นๆ"
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "จำกัดการวิเคราะห์แบบเรียลไทม์ (ปลั๊กอิน Dart ของเครื่องมือวิเคราะห์) ให้เหลือประมาณ {limit} และปลดกฎที่มีระดับความรุนแรงต่ำอย่างเป็นมิตรเมื่อหน่วยความจำลดลง? หากไม่มีข้อจำกัด โครงการขนาดใหญ่สามารถทำให้เซิร์ฟเวอร์วิเคราะห์เติบโตไปถึงหลาย GB ได้",
+      "offerSmallMachine": "เครื่องนี้มีความจำ {total} บิต จำกัดการวิเคราะห์แบบเรียลไทม์ไว้ที่ประมาณ {limit} และปลดกฎที่มีความรุนแรงต่ำเมื่อความจำเริ่มต่ำลง ทำให้ระบบตอบสนองได้ดีขึ้น ต้องการใช้การนี้หรือไม่?",
+      "applied": "บันทึก: การวิเคราะห์แบบเรียลไทม์มีข้อจำกัดที่ประมาณ {limit} เท่านั้น ให้เริ่มต้นเซิร์ฟเวอร์การวิเคราะห์อีกครั้งเพื่อใช้งาน",
+      "writeFailed": "ไม่สามารถอัปเดต analysis_options_custom.yaml ได้ ตรวจสอบว่าไฟล์สามารถเขียนได้"
     }
   }
 }

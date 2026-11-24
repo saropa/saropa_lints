@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "Quy tắc & Cấp độ",
-        "description": "Cấu hình quy tắc nào trong hơn 2.300 quy tắc chạy và mức độ nghiêm trọng như thế nào."
+        "description": "Cấu hình những quy tắc trong số hơn 2.350 quy tắc chạy và mức độ nghiêm trọng như thế nào."
       },
       "catalog": {
         "label": "Command Catalogue - Danh mục chỉ huy",
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints plugin được kích hoạt lại trong quá trình xử lý. Đang khởi động lại máy chủ phân tích Dart để tải lại nó.",
       "reenableNothingToRestore": "Saropa Lints: không có gì để khôi phục. Plugin trong quá trình không đang bị vô hiệu hóa bởi tiện ích mở rộng hiện tại.",
       "noOpenDartFiles": "Saropa Lints: là người có thể không tìm thấy tệp Dart mở. Mở lại một tập tin Dart hoặc tắt cài đặt \"Chỉ mở các trình soạn thảo\".",
+      "analysisScanning": "Đang quét workspace… {percent}% (đã có {count} vấn đề)",
       "configUpdated": "Saropa Lints config được cập nhật (tier: {tier}). và các loại khác nhau.",
       "configWriteFailed": "Config write failed. {details} Không thành công",
       "scaffoldGateTitle": "Composite analyzer plugin scaffolding giàn giáo.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "Đang chạy pub get… ({elapsed}s)",
       "progressConfigWrite": "Viết config… ({elapsed}s)",
       "progressAnalysis": "Đang phân tích... ({elapsed}s)",
-      "progressBaseline": "Đang chạy quét cơ sở... ({elapsed}s)",
-      "analysisScanning": "Đang quét workspace… {percent}% (đã có {count} vấn đề)"
+      "progressBaseline": "Đang chạy quét cơ sở... ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: Thiết lập Phân tích Lane",
@@ -2858,6 +2858,11 @@
     "noServerFound": "Không tìm thấy máy chủ Drift Advisor. Hãy bắt đầu ứng dụng của bạn với máy chủ đang chạy, sau đó nhấn Làm mới.",
     "integrationOff": "Tích hợp Drift Advisor đã bị tắt. Bật nó trong cài đặt (saropaLints.driftAdvisor.integration), sau đó nhấn Làm mới."
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "Tắt (ý định sử dụng SDK cũ)"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Nâng cấp nâng cấp Upgrade",
@@ -2879,7 +2884,7 @@
       "breaksOne": "{pkg} {to} sẽ làm hỏng {count} phụ thuộc: {names}",
       "breaksOther": "{pkg} {to} sẽ làm hỏng {count} dependents: {names}",
       "safe": "{pkg} {from} -> {to} trông an toàn",
-      "newestCompatible": "Strict Rules:\n1. Trả lại CHỈ OUTPUT chuỗi dịch.\n2. KHÔNG bao gồm giải thích, giới thiệu, ký hiệu markdown, hoặc dấu ngoặc kép bao quanh.\n3. Văn bản có thể chứa các token chỗ trống: token chỗ trống. Sao chép từng cái vào bản dịch CHÍNH XÁC như được viết, ở vị trí ngữ pháp đúng. KHÔNG dịch, xóa, hoặc thay đổi định dạng token.\n4. OUTPUT PHẢI sử dụng hệ thống viết đúng cho ngôn ngữ đích; không chuyển sang ngôn ngữ khác giữa câu.\n\nText: Newest compatible: {pkg} {version}"
+      "newestCompatible": "Phiên bản mới nhất tương thích: {pkg} {version}"
     }
   },
   "lifecycle": {
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints miễn phí và mã nguồn mở. Một đánh giá hoặc nhận xét nhanh giúp các nhà phát triển khác khám phá nó, còn phản hồi và báo cáo lỗi trên GitHub giúp nó ngày càng tốt hơn.",
       "marketplace": "Đánh giá trên Marketplace",
       "openVsx": "Đánh giá trên Open VSX",
+      "dismiss": "Không ngay",
       "never": "Không hỏi lại"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "Quét đã tự làm chậm từ {from} đến {to} công nhân để giữ cho máy tính của bạn phản hồi ({reason}).",
+    "aborted": "Quét đã dừng sớm để bảo vệ máy tính của bạn ({reason}). Kết quả là không đầy đủ.",
+    "deepNotEnoughMemory": "Một quét có nhận diện kiểu cần khoảng {needed}, nhưng chỉ có {free} là miễn phí (duy trì {reserve} cho mọi thứ khác). Quét nhanh kết thúc nhanh hơn rất nhiều và sử dụng bộ nhớ ít hơn rất nhiều.",
+    "deepPaused": "Quét tạm dừng: bộ nhớ trống là {free}, dưới mức {reserve} được giữ trống cho máy tính của bạn. Nó sẽ tự động tiếp tục khi bộ nhớ được giải phóng.",
+    "fastDone": "Quét nhanh hoàn tất: {files} tệp, {issues} vấn đề trong {seconds}s.",
+    "fastDoneOfferDeep": "Quét nhanh hoàn tất: {files} tệp, {issues} vấn đề trong {seconds}. Một quét có nhận thức về kiểu có thể tìm thấy nhiều hơn, nhưng mất khoảng {minutes} phút và {memory} bộ nhớ.",
+    "fastDoneDeepUnavailable": "Quét nhanh hoàn tất: {files} tệp, {issues} vấn đề trong {seconds}. Một lần quét có nhận thức về kiểu cần khoảng {needed}, nhưng chỉ có {free} là miễn phí lúc này.",
+    "daemonLowMemory": "Quét kiểu dữ liệu cần khoảng {needed}, nhưng chỉ có {free} bộ nhớ trống (duy trì {reserve} cho mọi thứ khác). Hiện đang quét mà không có kiểu dữ liệu để máy tính của bạn vẫn phản hồi được.",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "Sử dụng Profil Gentle",
+      "openSettings": "Mở Cài đặt",
+      "runFast": "Chạy Quét Nhanh",
+      "runDeep": "Chạy Quét Nâng Cao",
+      "runDeepAnyway": "Chạy Quét Nâng Cao Bất Chấp",
+      "resume": "Tiếp tục",
+      "cancelScan": "Hủy Quét",
+      "turnOffTypeResolution": "Tắt Giải quyết Loại",
+      "startAnyway": "Tiếp tục Anyway",
+      "notNow": "Không Bây Giờ",
+      "neverAskDeep": "Đừng Hỏi Lại",
+      "applyPlugin": "Áp dụng",
+      "noThanks": "Không Cảm ơn",
+      "restartAnalysisServer": "Khởi động lại Máy chủ Phân tích"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
+      "title": "Quét Hiệu suất",
+      "machine": "{cores} lõi CPU · {free} trống của {total}",
+      "recommended": "được khuyến nghị cho máy tính này",
       "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "openSettings": "Mở tất cả cài đặt quét",
       "profile": {
         "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "balanced": "Cân bằng",
+        "fast": "Nhanh"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "Không can thiệp nhiều: tối đa 2 worker và một phần tư bộ nhớ trống. Tốt nhất cho laptop.",
+        "balanced": "Giữ lại một core trống và sử dụng tối đa một nửa bộ nhớ trống. Phù hợp với hầu hết các máy tính.",
+        "fast": "Sử dụng toàn bộ bộ nhớ chính và lên đến 70% bộ nhớ trống. Hoàn thành nhanh hơn nhưng có thể làm chậm phần còn lại của máy tính của bạn."
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "Cũng giới hạn phân tích thời gian thực (khoá phân tích Dart) khoảng {limit} và loại bỏ nhẹ các quy tắc một cách lịch sự khi bộ nhớ bị cạn? Nếu không có giới hạn, một dự án lớn có thể làm cho máy chủ phân tích tăng lên vài GB.",
+      "offerSmallMachine": "Máy tính này có {total} bộ nhớ. Hạn chế phân tích live xuống khoảng {limit} và loại bỏ các quy tắc mức độ nghiêm trọng thấp một cách lịch sự khi bộ nhớ cạn kiệt, giúp nó vẫn phản hồi nhanh. Áp dụng điều này?",
+      "applied": "Đã lưu: phân tích thời gian thực bị giới hạn khoảng {limit}. Khởi động lại máy chủ phân tích để áp dụng.",
+      "writeFailed": "Không thể cập nhật analysis_options_custom.yaml. Kiểm tra xem tệp có thể ghi được hay không."
     }
   }
 }

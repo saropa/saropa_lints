@@ -143,6 +143,10 @@
         "title": "%command.scanOnSave.runBaselineScan.title%"
       },
       {
+        "command": "saropaLints.scanWithLatestEngine",
+        "title": "%command.scanWithLatestEngine.title%"
+      },
+      {
         "command": "saropaLints.scan.configurePerformance",
         "title": "Saropa Lints: Scan Performance and Memory Settings…"
       },
@@ -1407,6 +1411,11 @@
             "type": "boolean",
             "default": true,
             "markdownDescription": "%config.property.scanOnSave.resolveTypes.markdownDescription%"
+          },
+          "saropaLints.externalEngine.dartSdkPath": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "%config.property.externalEngine.dartSdkPath.description%"
           },
           "saropaLints.scanOnSave.timeoutSeconds": {
             "type": "number",

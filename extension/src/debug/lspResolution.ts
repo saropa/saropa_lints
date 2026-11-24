@@ -1,5 +1,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /**
  * True when `<projectRoot>/.dart_tool/package_config.json` lists a package
@@ -15,6 +16,73 @@ export function isSaropaLintsResolved(projectRoot: string): boolean {
   } catch {
     return false;
   }
+}
+
+/** First saropa_lints release that ships the `lsp_server` executable (15.2.8 and older do not). */
+export const MIN_LSP_VERSION = '15.2.10';
+
+/** Dart SDK floor of every saropa_lints release that ships `lsp_server` (analyzer 12+). */
+export const MIN_LSP_DART = [3, 9] as const;
+
+/**
+ * True when the project's Dart SDK (from `.dart_tool/version`, written by pub)
+ * is below [MIN_LSP_DART]. Such a project cannot resolve any LSP-capable
+ * saropa_lints, so upgrading the dependency alone will not help — the message
+ * must say the SDK is the blocker. Unreadable file => false (do not guess).
+ */
+export function isDartSdkTooOld(projectRoot: string): boolean {
+  try {
+    const raw = fs.readFileSync(path.join(projectRoot, '.dart_tool', 'version'), 'utf8').trim();
+    const m = /^(\d+)\.(\d+)/.exec(raw);
+    if (!m) {
+      return false;
+    }
+    const [maj, min] = [Number(m[1]), Number(m[2])];
+    return maj < MIN_LSP_DART[0] || (maj === MIN_LSP_DART[0] && min < MIN_LSP_DART[1]);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Directory of the resolved `saropa_lints` package, from `.dart_tool/package_config.json`
+ * (`rootUri` is a file:// URI or a path relative to `.dart_tool`). Undefined when the
+ * config is unreadable, the package is absent, or the directory does not exist.
+ */
+export function resolveSaropaLintsDir(projectRoot: string): string | undefined {
+  try {
+    const cfgDir = path.join(projectRoot, '.dart_tool');
+    const raw = fs.readFileSync(path.join(cfgDir, 'package_config.json'), 'utf8');
+    const pkg = (JSON.parse(raw) as { packages?: Array<{ name?: unknown; rootUri?: unknown }> }).packages?.find(
+      (p) => p?.name === 'saropa_lints',
+    );
+    if (typeof pkg?.rootUri !== 'string') {
+      return undefined;
+    }
+    const dir = pkg.rootUri.startsWith('file:')
+      ? fileURLToPath(pkg.rootUri)
+      : path.resolve(cfgDir, decodeURIComponent(pkg.rootUri));
+    return fs.existsSync(dir) ? dir : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Returns the installed version when the resolved `saropa_lints` package directory
+ * exists on disk and has no `bin/lsp_server.dart`; otherwise undefined. Why: old
+ * versions (e.g. 4.15.1) resolve fine but ship no `lsp_server` executable, so the
+ * spawn exits non-zero and the client crash-loops 5x. Undefined also covers "cannot
+ * tell" so the caller falls through to the normal spawn rather than blocking on a guess.
+ */
+export function findLspServerMissing(projectRoot: string): { readonly version: string } | undefined {
+  const dir = resolveSaropaLintsDir(projectRoot);
+  if (!dir || fs.existsSync(path.join(dir, 'bin', 'lsp_server.dart'))) {
+    return undefined;
+  }
+  // Pub-cache dirs are named `saropa_lints-<version>`; path deps have no version.
+  const m = /saropa_lints-(\d[^\\/]*)[\\/]*$/.exec(dir);
+  return { version: m ? m[1] : 'unknown' };
 }
 
 /** Inputs for [resolveDartExecutable]; settings are the raw Dart-Code values (may be relative or blank). */
@@ -78,7 +146,19 @@ export function resolveDartExecutable(
 }
 
 /**
- * Args for the LSP server. `--no-pub` stops `dart run` from running an implicit
- * `pub get`, which is what rewrote pubspec.lock / package_config.json.
+ * Argv for the LSP server. `dart run --no-pub` is NOT a valid option (Dart 3.8 and
+ * 3.14 both reject it), and plain `dart run <pkg>:<exe>` may implicitly `pub get`,
+ * rewriting pubspec.lock / package_config.json. So when the package directory is
+ * resolvable, run its script file directly against the project's package_config:
+ * no pub resolution happens at all. Falls back to `dart run` only when the path
+ * cannot be resolved.
  */
-export const LSP_SERVER_ARGS: readonly string[] = ['run', '--no-pub', 'saropa_lints:lsp_server'];
+export function buildLspServerArgs(projectRoot: string): string[] {
+  const dir = resolveSaropaLintsDir(projectRoot);
+  const script = dir ? path.join(dir, 'bin', 'lsp_server.dart') : undefined;
+  if (script && fs.existsSync(script)) {
+    const cfg = path.join(projectRoot, '.dart_tool', 'package_config.json');
+    return [`--packages=${cfg}`, script];
+  }
+  return ['run', 'saropa_lints:lsp_server'];
+}

@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "规则与层级",
-        "description": "配置运行的 2350 多条规则以及其严重程度。"
+        "description": "配置运行的 2350 多条规则及其严重程度。"
       },
       "catalog": {
         "label": "命令目录指令目录",
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints 在进程内插件已重新启用。正在重启 Dart 分析服务器以重新加载它。",
       "reenableNothingToRestore": "Saropa Lints：没有内容可还原。当前进程中的插件未通过扩展禁用。",
       "noOpenDartFiles": "Saropa Lints: 没有一个人. 没有找到开放的 Dart 文件. 重新打开一个 Dart 文件或关闭\"仅为编辑器打开\"设置.",
+      "analysisScanning": "正在扫描工作区… {percent}%（目前 {count} 个问题）",
       "configUpdated": "Saropa Lints 配置已更新（等级：{tier}）。",
       "configWriteFailed": "配置写入失败了. {details}",
       "scaffoldGateTitle": "复合分析器插件架构的结构.",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "正在运行 pub get… ({elapsed}s)",
       "progressConfigWrite": "编写配置… ({elapsed}s)",
       "progressAnalysis": "分析中… ({elapsed}s)",
-      "progressBaseline": "正在运行基线扫描… ({elapsed}s)",
-      "analysisScanning": "正在扫描工作区… {percent}%（目前 {count} 个问题）"
+      "progressBaseline": "正在运行基线扫描… ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: 设置分析车道",
@@ -2858,6 +2858,11 @@
     "noServerFound": "未找到 Drift Advisor 服务器。请先启动应用并运行服务器，然后点击刷新。",
     "integrationOff": "Drift Advisor 集成已关闭。在设置中启用它（saropaLints.driftAdvisor.integration），然后点击刷新。"
   },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "抑制（有意使用旧 SDK）"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "升级升级,是为了提高",
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints 免费且开源。快速评分或评论能帮助其他开发者发现它，而在 GitHub 上的反馈和错误报告会让它不断改进。",
       "marketplace": "在 Marketplace 上评分",
       "openVsx": "在 Open VSX 上评分",
+      "dismiss": "现在不处理",
       "never": "不再询问"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "扫描进程已自行从 {from} 个工作者减至 {to} 个工作者，以保持您的计算机响应性 ({reason})。",
+    "aborted": "扫描提前停止以保护您的计算机（{reason}）。结果不完整。",
+    "deepNotEnoughMemory": "一种类型感知的扫描需要大约{needed}，但只有{free}是免费的（保留{reserve}用于其他所有内容）。快速扫描会更快完成，并且使用远少的内存。",
+    "deepPaused": "扫描已暂停：空闲内存为 {free}，低于为您的计算机保留的 {reserve} 空闲内存。当内存释放后将自动恢复。",
+    "fastDone": "快速扫描完成：{files} 个文件，{issues} 个问题在 {seconds} 中。",
+    "fastDoneOfferDeep": "快速扫描完成：{files} 个文件，{issues} 个问题在 {seconds} 中。一种类型感知的扫描可以发现更多问题，但需要约 {minutes} 分钟和 {memory} 的内存。",
+    "fastDoneDeepUnavailable": "快速扫描完成：{files} 个文件，{issues} 个问题在 {seconds} 中。一个类型感知的扫描需要约 {needed}，但目前只有 {free} 是免费的。",
+    "daemonLowMemory": "类型感知扫描需要约{needed}，但只有{free}的内存是空闲的（保留{reserve}用于其他用途）。目前暂时不使用类型进行扫描，以确保您的计算机保持响应。",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "使用温和配置",
+      "openSettings": "打开设置",
+      "runFast": "快速扫描",
+      "runDeep": "运行深度扫描",
+      "runDeepAnyway": "无论如何运行深度扫描",
+      "resume": "立即恢复",
+      "cancelScan": "取消扫描",
+      "turnOffTypeResolution": "关闭类型解析",
+      "startAnyway": "立即开始",
+      "notNow": "现在不是,不应该是.",
+      "neverAskDeep": "不要再次询问",
+      "applyPlugin": "应用",
+      "noThanks": "不，谢谢",
+      "restartAnalysisServer": "重启分析服务器"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "扫描性能",
+      "machine": "{cores} 个 CPU 核心 · {free} 个 {total}",
+      "recommended": "适用于此电脑的推荐设置",
+      "resources": "{jobs} 个 worker · {memory} 内存预算",
+      "openSettings": "打开所有扫描设置",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "轻柔",
+        "balanced": "平衡",
+        "fast": "快速"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "保持低调：最多 2 个 worker 和四分之一的空闲内存。最适合笔记本电脑。",
+        "balanced": "释放一个核心并使用最多一半的空闲内存。适合大多数机器。",
+        "fast": "使用每核并最多占用70%的空闲内存。可以更早完成但可能减缓你电脑的其余部分。"
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "也请限制实时分析（Dart分析器插件）的使用量约为{limit}，并在内存不足时优雅地舍弃低严重级别的规则？如果没有限制，大型项目可能会使分析服务器增长到几GB。",
+      "offerSmallMachine": "这台电脑有 {total} 的内存。限制实时分析到大约 {limit}，并在内存不足时优雅地舍弃低严重程度的规则，可以保持其响应性。应用此设置？",
+      "applied": "已保存：实时分析受限于约 {limit}。重启分析服务器以应用它。",
+      "writeFailed": "无法更新 analysis_options_custom.yaml。请检查文件是否可写。"
     }
   }
 }

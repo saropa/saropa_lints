@@ -156,6 +156,7 @@ import { logReport, logSection, flushReport, findLatestAnalysisReport } from './
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
 import { ScanOnSaveController } from './scanOnSave/scanOnSaveController';
+import { scanWithLatestEngine } from './externalEngine/externalEngineCommand';
 import { showScanPerformancePicker } from './scanResources/scanResourcePicker';
 import { maybeOfferSmallMachineTuning } from './scanResources/pluginMemoryUi';
 import {
@@ -2510,6 +2511,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // 4,478-file project). Populates the Problems panel for files the user
     // hasn't saved this session, which save-triggered scan-on-save alone
     // never reaches.
+    // Runs the newest engine under a newer Dart SDK for projects pinned below 3.11.
+    vscode.commands.registerCommand('saropaLints.scanWithLatestEngine', async () => {
+      await scanWithLatestEngine(context, scanOnSaveDiagCollection);
+    }),
     vscode.commands.registerCommand('saropaLints.scanOnSave.runBaselineScan', async () => {
       await scanOnSaveController.runBaselineScanCommand();
     }),

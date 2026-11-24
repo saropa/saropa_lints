@@ -50,7 +50,7 @@
       },
       "rules": {
         "label": "قواعد و درجات",
-        "description": "2,350+ قواعد میں سے کون سا قاعدہ چلے اور کس سطح کی سنجیدگی پر چلے اس کی ترتیب دیں۔"
+        "description": "نظام کریں کہ 2,350 سے زائد قواعد میں سے کون سا قاعدہ چلے اور کس سطح کی سنجیدگی پر۔"
       },
       "catalog": {
         "label": "کمانڈ کیٹلاگ کا حکم دیں",
@@ -128,9 +128,9 @@
       "noProject": "Saropa: کوئی Dart پروجیکٹ نہیں۔",
       "doneTooltip": "{total} تلاش(s)، {shown} فلٹر کے بعد دکھایا گیا ہے۔",
       "dropped": "Saropa: اسکن مکمل نہ ہو سکا ({count} فائلیں)",
-      "droppedTooltip": "Saropa Lints {count} فائلیں چھوڑ دی گئیں جو آپ کے بجائے دوسرے ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ای\n\n(Note: The placeholder {count} is kept as-is and not translated.)",
+      "droppedTooltip": "Saropa Lints {count} فائلیں چھوڑ دی گئیں جو آپ کے بجائے دوسرے ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ای\n\n(Note: The original text contains a placeholder token {count} which is kept as-is in the translation.)",
       "droppedSuffix": "(+{count} چھوڑ دیا گیا)",
-      "droppedSuffixTooltip": "بھی {count} فائلیں نظر انداز کر دی گئیں جو آپ کے بجائے دوسرے ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ای\nکریں۔ فائل کو بچھا کر اسے اسکن کریں۔"
+      "droppedSuffixTooltip": "بھی {count} فائلیں نظر انداز کر دی گئیں جو آپ کے بجائے دوسرے ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ای\nفائل کو بچھا کر اس کا اسکن کریں۔"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: پراجیکٹ کے تمام فائلیں اسکن کر رہا ہے",
@@ -234,7 +234,7 @@
       "ordering_sorting": "ممبرز، پارامیٹرز، فیلڈس اور میپ کی کیس کو ترتیب دیتا ہے جس سے پیشگی پر ترتیب ہوتی ہے۔ موجودہ کوڈ پر بہت زیادہ ہنگامہ اڑاتا ہے — نیا کوڈ یا چھوٹے ریپوزٹوریز پر سب سے بہتر ہے۔",
       "naming_conventions": "فائلوں ، طریقوں ، مستثنیات ، کال بیک اور بلاک ایونٹس اور اسٹیٹ کے لئے نام لینا۔ بڑے کوڈ بیس پر شور مچانا ہوسکتا ہے۔؛ incrementally. enable incrementally اضافہ کے ساتھ فعال کریں",
       "boolean_naming": "بولینز کو is/has/can/should پریفیکس کا استعمال کرنا چاہیے تاکہ کنڈیشنل اور API میں نیت واضح ہو۔",
-      "code_style_preferences": "کس طرح رجوع، شرائط، اور لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپ\n```",
+      "code_style_preferences": "کس طرح رجوع، شرائط، اور لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپ\n```",
       "function_parameter_style": "جب جامع ، تمام نامزد پیرامیٹرز ، ان لائن کال بیک اور کوئی پیرامیٹرکسٹیشن نہ ہو تو تیر کے افعال۔",
       "widget_style": "Flutter ویجٹ چنہاں — SizedBox.square، مرکزیت کریں اُتے اُلٹ کریں، فاصلہ اُتے SizedBox، اور shrinkWrap کو اُتے اُلٹ کریں۔ Flutter پروجیکٹس ہی۔",
       "class_record_style": "کلاس بمقابلہ ریکارڈ ریٹرن ٹائپس ، نجی انڈر اسکور پریفیکسز ، اور واضح طور پر یہ جہاں وضاحت کرتا ہے۔",
@@ -938,7 +938,7 @@
       "shedSectionTitle": "نگہداشت قواعد (یاد کی دباؤ)",
       "shedHint": "یہ قواعد یادگیری دباؤ ہینڈلر کے ذریعہ مؤقت طور پر غیر فعال کیے جاتے ہیں تاکہ تحلیل کنندہ RSS کو کم کیا جا سکے۔ جب یادگیری دباؤ کم ہو جائے تو وہ خود بخود واپس آ جاتے ہیں۔",
       "shedBadge": "شیڈ",
-      "shedBadgeTooltip": "یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رکھیں کہ یہ قاعدہ گزرت ہے اور یاد رک\n\n\n**Note:** The provided text seems to have repeated and possibly incorrect content. If you meant to provide a specific rule or message, please clarify or provide the correct text for accurate translation.",
+      "shedBadgeTooltip": "یہ قاعدہ یادگیری کے دباؤ کے وقت کیا جا رہا ہے۔",
       "categoryTypeResolving": "نوع تحلیل (مہنگا)",
       "categoryHighCost": "ہائی کوسٹ",
       "categoryInfoSeverity": "معلومات سطح سختی",
@@ -2441,7 +2441,7 @@
       "actionDisable": "غیر فعال کریں Disable",
       "actionEnable": "Enable فعال کریں چالو کریں۔",
       "bulkRuleToggleConfirm": "{verb} {count} قواعد کیا ہیں؟ اس سے analysis_options_custom.yaml کو اپ ڈیٹ کیا گیا ہے۔",
-      "setupPrompt": "Saropa Lints میں Dart پروجیکٹ کا پتہ چلا لیا گیا ہے جس میں saropa_lints کی ترتیب نہیں ہے۔ 2350+ لینٹ قواعد کے لیے اب تیار کریں۔",
+      "setupPrompt": "Saropa Lints میں Dart پروجیکٹ کا پتہ چلا لیا گیا جس میں saropa_lints کی ترتیب نہیں ہے۔ 2350+ لینٹ قواعد کے لیے اب تیار کریں۔",
       "actionSetUpProject": "پروجیکٹ سیٹ اپ کریں منصوبے کی ترتیب دیں",
       "actionNotNow": "اب نہیں، ابھی نہیں۔"
     },
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints ایک پروسیس میں پلاگ ان دوبارہ سے کار کریں۔ Dart تحلیل سرور کو دوبارہ شروع کر کے اس کو لوڈ کرنا۔",
       "reenableNothingToRestore": "Saropa Lints: کچھ بھی بحال نہیں کیا جا سکتا۔ ایک پروسس میں پلاگن موجود ہے اور اسے ایکسٹنسن کے ذریعے اب تک غیر فعال نہیں کیا گیا ہے۔",
       "noOpenDartFiles": "Saropa Lints:۔ کوئی کھلی Dart فائلیں نہیں ملی۔ ایک Dart فائل کو دوبارہ کھولیں یا \"صرف ایڈیٹرز کھولیں\" کی ترتیب بند کردیں۔",
+      "analysisScanning": "ورک اسپیس اسکین ہو رہا ہے… {percent}% (اب تک {count} مسائل)",
       "configUpdated": "Saropa Lints config اپ ڈیٹ کیا گیا (tier: {tier}).پھر اس نے کہا کہ وہ کیا کر رہا ہے.",
       "configWriteFailed": "کنفیگریشن لکھنے میں ناکامی۔ {details}",
       "scaffoldGateTitle": "جامع تجزیہ پلگ ان سکیفولڈ",
@@ -2483,8 +2484,7 @@
       "progressPubGet": "پبل گیٹ کر رہے ہیں... ({elapsed}s)",
       "progressConfigWrite": "لکھنا کنفیگ... ({elapsed}s)",
       "progressAnalysis": "تحلیل کر رہے ہیں... ({elapsed}s)",
-      "progressBaseline": "اسکن بنیادی حد تک جاری ہے... ({elapsed}s)",
-      "analysisScanning": "ورک اسپیس اسکین ہو رہا ہے… {percent}% (اب تک {count} مسائل)"
+      "progressBaseline": "اسکن بنیادی حد تک جاری ہے... ({elapsed}s)"
     },
     "lane": {
       "pickerTitle": "Saropa Lints: تحلیل کرنے والی لین",
@@ -2853,10 +2853,15 @@
   },
   "driftAdvisor": {
     "authRequired": "سرور کی اuthenticatie ضروری ہے۔ سیٹنگس → Saropa Lints → Drift Advisor → Auth Token میں ایک ٹوکن سیٹ کریں، پھر ریفرش کلک کریں۔",
-    "authFailed": "鉴权失败 — 服务器拒绝了配置的令牌。点击以在设置中更新它。",
+    "authFailed": "توثیق ناکام — سرور کی طرف سے ترتیب دی گئی ٹوکن کو مسترد کر دیا گیا۔ سیٹنگس میں اسے اپڈیٹ کرنے کے لیے کلک کریں۔",
     "discovering": "سروسر کی تلاش اور مسائل کی حاصل کرنا...",
     "noServerFound": "Drift Advisor سرور نہیں ملا۔ اپنی ایپ کو سرور کے ساتھ شروع کریں، پھر رفریش کریں۔",
     "integrationOff": "Drift Advisor انتیگریشن آف ہے۔ اسے سیٹنگس (saropaLints.driftAdvisor.integration) میں ایکسٹیبل کریں، پھر ریفرش کلک کریں۔"
+  },
+  "vibrancy": {
+    "sdkConstraint": {
+      "suppressOldSdk": "سکریپس (مقصودہ قدیم SDK) /نوبت_تھک"
+    }
   },
   "blastRadius": {
     "label": {
@@ -2910,7 +2915,7 @@
     "clashes": "دونوں قدیم اور نیا قاعدہ نامہ تیار ہیں، دستی طور پر جوائن کریں: {items}",
     "skipped": "ملک: {items}.",
     "failedRestored": "قواعد منتقل ہونے میں فیل ہو گئیں: {detail} تمام فائلیں ان کے پہلے کنٹینٹ کی طرف لوٹ کر بحال کر دی گئیں۔",
-    "failedNotRestored": "قواعد منتقل ہونے میں فیل ہو گئیں: {detail} کچھ فائلیں تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھوڑی سی تھیں جو تھو ہو گئیں؛ انہیں git سے چیک کریں۔",
+    "failedNotRestored": "قواعد منتقل ہونے میں فیل ہو گئیں: {detail} کچھ فائلیں تھوڑی سی تعمیر نہیں کی جا سکیں؛ ان کو گٹ کے ساتھ چیک کریں۔",
     "offer": "نام دو بار {hits} قواعد کو {count} فائلز میں تبدیل کریں؟",
     "offerPreview": "پیش نظارہ",
     "offerNotNow": "نہ اب"
@@ -3034,6 +3039,7 @@
       "message": "Saropa Lints مفت اور اوپن سورس ہے۔ ایک فوری ریٹنگ یا جائزہ دوسرے ڈویلپرز کو اسے دریافت کرنے میں مدد دیتا ہے، اور GitHub پر رائے اور بگ رپورٹس اسے مسلسل بہتر بناتی ہیں۔",
       "marketplace": "Marketplace پر ریٹ کریں",
       "openVsx": "Open VSX پر ریٹ کریں",
+      "dismiss": "نہ اب",
       "never": "دوبارہ نہ پوچھیں"
     },
     "helpHub": {
@@ -3055,52 +3061,52 @@
     }
   },
   "scanResources": {
-    "throttled": "The scan slowed itself from {from} to {to} workers to keep your computer responsive ({reason}).",
-    "aborted": "The scan stopped early to protect your computer ({reason}). Results are partial.",
-    "deepNotEnoughMemory": "A type-aware scan needs about {needed}, but only {free} is free (keeping {reserve} for everything else). The fast scan finishes much sooner and uses far less memory.",
-    "deepPaused": "Scan paused: free memory is {free}, below the {reserve} kept free for your computer. It resumes automatically when memory frees up.",
-    "fastDone": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s.",
-    "fastDoneOfferDeep": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan can find more, but takes about {minutes} min and {memory} of memory.",
-    "fastDoneDeepUnavailable": "Fast scan complete: {files} files, {issues} issue(s) in {seconds}s. A type-aware scan needs about {needed}, but only {free} is free right now.",
-    "daemonLowMemory": "Type-aware scanning needs about {needed}, but only {free} of memory is free (keeping {reserve} for everything else). Scanning without types for now so your computer stays responsive.",
+    "throttled": "اسکن نے {from} سے {to} کارکن تک اپنی آگ کو کم کر دیا تاکہ آپ کی کمپیوٹر پر پیچیدگی نہ ہو ({reason})۔",
+    "aborted": "اسکن نے آپ کے کمپیوٹر ({reason}) کی حفاظت کے لیے پہلے ہی رک جانا ہے۔ نتائج کچھ ہی ہیں۔",
+    "deepNotEnoughMemory": "ایک نوع اُچتہ چیک کرنے کے لئے تقریبا {needed} کی ضرورت ہوتی ہے، لیکن صرف {free} فری ہے ({reserve} کو چیز کے لئے رکھا جاتا ہے)۔ تیز چیک کافی جلد ختم ہوتا ہے اور کم یاد خرچ کرتا ہے۔",
+    "deepPaused": "سکن ٹھہر گیا: خالی یادگیری {free} ہے، {reserve} کے نیچے آپ کے کمپیوٹر کے لیے خالی رکھا گیا ہے۔ یادگیری ہر وقت یادگیری آزاد ہونے پر خود بخود جاری ہو جائے گی۔",
+    "fastDone": "فیسٹ سکن کمپلیٹ ہو گیا: {files} فائلیں، {issues} مسئلہ(ے) {seconds} میں۔",
+    "fastDoneOfferDeep": "فیسٹ سکن مکمل: {files} فائلیں، {issues} مسئلہ(ات) {seconds} میں۔ ایک نوعیت کے آگاہ سکن زیادہ پایا جا سکتا ہے، لیکن تقریبا {minutes} منٹ اور {memory} یادگیری لے گا۔",
+    "fastDoneDeepUnavailable": "فیسٹ سکن مکمل: {files} فائلیں، {issues} مسئلہ(ات) {seconds} میں۔ ایک ٹائپ اوریئنٹڈ سکن کے لیے تقریبا {needed} ہے، لیکن اب تک只要 {free} فری ہے۔",
+    "daemonLowMemory": "ٹائپ کے ساتھ اسکننگ {needed} کے بارے میں ہے لیکن صرف {free} یاد رکھنے کے لیے ممکن ہے ({reserve} کے لیے ہر چیز کے لیے)۔ اب ٹائپ کے بغیر اسکننگ کر رہے ہیں تاکہ آپ کی گھریلو چیزیں پھر بھی پیچیدہ نہ رہیں۔",
     "action": {
-      "gentleProfile": "Use Gentle Profile",
-      "openSettings": "Open Settings",
-      "runFast": "Run Fast Scan",
-      "runDeep": "Run Deep Scan",
-      "runDeepAnyway": "Run Deep Scan Anyway",
-      "resume": "Resume Now",
-      "cancelScan": "Cancel Scan",
-      "turnOffTypeResolution": "Turn Off Type Resolution",
-      "startAnyway": "Start Anyway",
-      "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again",
-      "applyPlugin": "Apply",
-      "noThanks": "No Thanks",
-      "restartAnalysisServer": "Restart Analysis Server"
+      "gentleProfile": "کم سخت پروفائل استعمال کریں",
+      "openSettings": "Settings کھولیں",
+      "runFast": "فاسٹ سکن رن",
+      "runDeep": "ڈیپ سکن رن",
+      "runDeepAnyway": "کسی بھی صورت گہری گھسیٹ کریں",
+      "resume": "ریزوم کریں اب",
+      "cancelScan": "سکن منسوخ کریں",
+      "turnOffTypeResolution": "ٹائپ ریسولیوشن اُف کریں",
+      "startAnyway": "کام شروع کریں",
+      "notNow": "اب نہیں، ابھی نہیں۔",
+      "neverAskDeep": "نئی سوال نہ کریں",
+      "applyPlugin": "آپلیکیٹ",
+      "noThanks": "نہ مہربانی",
+      "restartAnalysisServer": "تحلیل سرور دوبارہ شروع کریں"
     },
     "picker": {
-      "title": "Scan Performance",
-      "machine": "{cores} CPU cores · {free} free of {total}",
-      "recommended": "recommended for this computer",
-      "resources": "{jobs} worker(s) · {memory} memory budget",
-      "openSettings": "Open all scan settings",
+      "title": "سکن کارکردگی",
+      "machine": "{cores} چپوں · {free} {total} سے آزاد",
+      "recommended": "مخصوص اس کمپیوٹر کے لیے تجویز کیا جاتا ہے",
+      "resources": "{jobs} کارکن(وں) · {memory} یاد کرنے کی چھوٹ",
+      "openSettings": "سکن سیٹنگز کھولیں",
       "profile": {
-        "gentle": "Gentle",
-        "balanced": "Balanced",
-        "fast": "Fast"
+        "gentle": "کریسیکل",
+        "balanced": "میزانی",
+        "fast": "فاست"
       },
       "profileDetail": {
-        "gentle": "Stays out of the way: at most 2 workers and a quarter of free memory. Best for laptops.",
-        "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
-        "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
+        "gentle": "کام کریں: اکثر 2 کارکن اور ایک چوتھائی آزاد یادگیری۔ لپٹوپ کے لیے سب سے بہتر۔",
+        "balanced": "ایک کریک کے لیے خالی رکھتا ہے اور خالی یادگیری کا تقریبا ایک تہائی استعمال کرتا ہے۔ اکثر ماشینوں کے لیے درست ہے۔",
+        "fast": "ہر کرنٹ اور آزاد یادگیری کا 70% استعمال کرتا ہے۔ جلدی ختم ہوتا ہے لیکن آپ کے کمپیوٹر کے باقی حصے کو تیز کر سکتا ہے۔"
       }
     },
     "plugin": {
-      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
-      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
-      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
-      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
+      "offerAfterProfile": "بھی زندہ تحلیل (Dart تحلیل کنندہ پلاگ ان) کو تقریبا {limit} تک محدود کریں اور جب یاد کی کم سطح قواعد کو نرمی سے چھوڑ دیں؟ اگر محدودیت نہ ہو تو ایک بڑا پروجیکٹ تحلیل سرور کو چند گیگا بائٹ تک بڑھا سکتا ہے۔",
+      "offerSmallMachine": "یہ کمپیوٹر میموری میں {total} ہے۔ زیادہ سے زیادہ ہاریکسٹنل اینالیزس کو {limit} تک محدود کر کے، جب میموری کم ہوتی ہے تو کم اہمیت کے قواعد کو ہلکے سے چھوڑ دینا اسے فعال رکھے رکھتا ہے۔ اسے لاگو کریں؟",
+      "applied": "ذخیرہ کیا گیا: زندگی کی تحلیل تقریباً {limit} تک محدود ہے۔ اس کو لاگو کرنے کے لیے تحلیل سرور کو دوبارہ شروع کریں۔",
+      "writeFailed": "analysis_options_custom.yaml کو اپڈیٹ نہیں کیا جا سکتا۔ فائل کی قابلیت کو چیک کریں۔"
     }
   }
 }

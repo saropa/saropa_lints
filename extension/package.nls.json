@@ -377,5 +377,7 @@
   "config.property.lspServer.scanDirectories.description": "Directories to scan on startup (relative to the project root). Only used when Workspace Scan is enabled. Adjust this to match your project structure — e.g. add 'src' or remove 'test' if test files are not relevant.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
   "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
-  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu",
+  "command.scanWithLatestEngine.title": "Saropa Lints: Scan with Latest Engine (Older Dart Projects)",
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK folder (contains bin/dart) used by \"Scan with Latest Engine\". Must be Dart 3.11 or newer. Leave blank to use the dart on PATH."
 }

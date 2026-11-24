@@ -252,6 +252,13 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'search',
   },
   {
+    command: 'saropaLints.scanWithLatestEngine',
+    title: 'Scan with Latest Engine (Older Dart Projects)',
+    description: 'For projects pinned to Dart below 3.11: run the newest Saropa Lints engine under a newer Dart SDK and show the results in the Problems panel. The project pubspec and SDK pin are not changed.',
+    category: 'Analysis',
+    icon: 'rocket',
+  },
+  {
     command: 'saropaLints.scan.configurePerformance',
     title: 'Scan Performance and Memory Settings',
     description: 'See how much of this computer scans may use, what each profile (gentle, balanced, fast) would do here, and pick one — scans always slow themselves down if memory runs low.',
