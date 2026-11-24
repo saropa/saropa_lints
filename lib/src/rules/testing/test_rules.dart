@@ -4040,7 +4040,11 @@ class AvoidSkippedTestsRule extends SaropaLintRule {
           final Expression value = arg.argumentExpression;
           final bool isExplicitlyFalse =
               value is BooleanLiteral && value.value == false;
-          if (!isExplicitlyFalse) {
+          // An opt-in gate (`skip: !bool.fromEnvironment('X')`, or a const
+          // initialized from one) is an intentional, externally-controlled
+          // switch — the test runs when the flag is supplied — so it is not
+          // a silently rotting disabled test.
+          if (!isExplicitlyFalse && !_dependsOnEnvironment(value, node)) {
             // Flag the `skip:` argument itself for a precise error location.
             reporter.atNode(arg);
           }
@@ -4056,6 +4060,98 @@ class AvoidSkippedTestsRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// True when [expr] is computed from a compile-time/process environment
+  /// source: `bool/String/int.fromEnvironment`, `hasEnvironment`, or
+  /// `Platform.environment`. Identifiers in [expr] are followed (by name,
+  /// within the same file) to their variable initializers so
+  /// `const enabled = bool.fromEnvironment('X'); ... skip: !enabled` is
+  /// recognized. String/bool literals contain no such reference, so a plain
+  /// `skip: true` or `skip: 'reason'` is still reported.
+  static bool _dependsOnEnvironment(Expression expr, AstNode context) {
+    final AstNode root = context.root;
+    final Set<String> visited = <String>{};
+    final List<AstNode> pending = <AstNode>[expr];
+    while (pending.isNotEmpty) {
+      final _EnvRefVisitor finder = _EnvRefVisitor();
+      pending.removeLast().accept(finder);
+      if (finder.found) return true;
+      // Follow each referenced identifier to its declaration initializer.
+      // `visited` stops cycles and repeated work on shared names.
+      for (final String name in finder.identifiers) {
+        if (!visited.add(name)) continue;
+        final _VarInitFinder decl = _VarInitFinder(name);
+        root.accept(decl);
+        pending.addAll(decl.initializers);
+      }
+    }
+    return false;
+  }
+}
+
+/// Scans a subtree for environment-sourced values and collects the simple
+/// identifiers it mentions so the caller can chase them to declarations.
+class _EnvRefVisitor extends RecursiveAstVisitor<void> {
+  bool found = false;
+  final Set<String> identifiers = <String>{};
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String name = node.methodName.name;
+    if (name == 'fromEnvironment' || name == 'hasEnvironment') found = true;
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    // `const bool.fromEnvironment('X')` parses as a constructor call.
+    if (node.constructorName.name?.name == 'fromEnvironment') found = true;
+    super.visitInstanceCreationExpression(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    // `Platform.environment` (dart:io).
+    if (node.prefix.name == 'Platform' && node.identifier.name == 'environment') {
+      found = true;
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    // Only `Platform.environment` (e.g. `dart:io` via a prefix) counts; an
+    // unrelated `config.environment` must not exempt a skip.
+    final Expression? target = node.target;
+    if (node.propertyName.name == 'environment' &&
+        target is SimpleIdentifier &&
+        target.name == 'Platform') {
+      found = true;
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    identifiers.add(node.name);
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+/// Collects initializers of every variable declaration named [name] in a
+/// unit (top-level, field, or local — name match only, unresolved).
+class _VarInitFinder extends RecursiveAstVisitor<void> {
+  _VarInitFinder(this.name);
+
+  final String name;
+  final List<AstNode> initializers = <AstNode>[];
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    final Expression? init = node.initializer;
+    if (node.name.lexeme == name && init != null) initializers.add(init);
+    super.visitVariableDeclaration(node);
   }
 }
 

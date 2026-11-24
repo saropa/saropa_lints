@@ -153,6 +153,19 @@ void _goodTest() {
   });
 }
 
+const bool _screenshotsEnabled = bool.fromEnvironment('SCREENSHOTS');
+
+// GOOD: Should NOT trigger avoid_skipped_tests — opt-in gate driven by a
+// --dart-define flag via a const; the test runs when the flag is supplied.
+void _goodEnvGatedSkipViaConst() {
+  test('renders golden', () {}, skip: !_screenshotsEnabled);
+}
+
+// GOOD: Should NOT trigger avoid_skipped_tests — inline fromEnvironment gate.
+void _goodEnvGatedSkipInline() {
+  test('renders golden', () {}, skip: !const bool.fromEnvironment('SCREENSHOTS'));
+}
+
 // GOOD: Should NOT trigger avoid_skipped_tests — skip explicitly disabled.
 void _goodTestExplicitlyNotSkipped() {
   test('computes total', () {

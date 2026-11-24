@@ -128,6 +128,15 @@ Widget _goodFieldOnlyForm() {
   return Column(children: [TextField()]);
 }
 
+// BAD: helper method of a widget whose Scaffold lives in the caller's build();
+// "no Scaffold here" is unknown, so the rule must keep reporting.
+class _HelperHost {
+  Widget _buildBody() {
+    // expect_lint: avoid_keyboard_overlap
+    return Column(children: [Spacer(), TextField()]);
+  }
+}
+
 // GOOD: Should NOT trigger avoid_keyboard_overlap
 void _good407() {
   Scaffold(

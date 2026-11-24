@@ -2402,11 +2402,28 @@ class _ThisUsageFinder extends RecursiveAstVisitor<void> {
     // enclosing class's declared instance members. A local or parameter that
     // shadows a member resolves to a non-null element, so only genuinely
     // unresolved names reach this check.
-    if (element == null && instanceMemberNames.contains(node.name)) {
+    // Review fix: an unresolved name in member-name position (`other.name`,
+    // `x.name()`, a `name:` argument label) is not a bare read of this
+    // class's member, so it must not count as instance-state access.
+    if (element == null &&
+        instanceMemberNames.contains(node.name) &&
+        !_isMemberNamePosition(node)) {
       onFound();
     }
     super.visitSimpleIdentifier(node);
   }
+}
+
+/// True when [node] names a member of another object or a label rather than
+/// reading this class's own member: `x.node`, `x.node()`, or `node:` argument.
+bool _isMemberNamePosition(SimpleIdentifier node) {
+  final AstNode? parent = node.parent;
+  return (parent is PrefixedIdentifier && parent.identifier == node) ||
+      (parent is PropertyAccess && parent.propertyName == node) ||
+      (parent is MethodInvocation &&
+          parent.methodName == node &&
+          parent.target != null) ||
+      parent is Label;
 }
 
 /// Warns when a class with only static members could be abstract final.

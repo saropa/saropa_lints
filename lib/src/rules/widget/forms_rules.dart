@@ -1546,6 +1546,11 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
       // page frame in another file (e.g. a shared scroll wrapper), so the
       // keyboard decision belongs to that caller and cannot be seen here.
       bool hasScaffoldParent = false;
+      // Review fix: the Scaffold gate is only valid when the field sits in
+      // `build()` itself or a free function. In a helper (`_buildBody()`), the Scaffold lives in
+      // the caller's method, so "no Scaffold seen" is unknown, not proof of a
+      // bare form widget; keep reporting there.
+      bool inHelperMethod = false;
 
       while (current != null) {
         if (current is InstanceCreationExpression) {
@@ -1584,6 +1589,7 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
           }
         }
         if (current is MethodDeclaration) {
+          inHelperMethod = current.name.lexeme != 'build';
           break;
         }
         current = current.parent;
@@ -1599,7 +1605,7 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
 
       // No Scaffold owned by this widget: the host page (another file) decides
       // keyboard handling, so reporting here would be a false positive.
-      if (!hasScaffoldParent) {
+      if (!inHelperMethod && !hasScaffoldParent) {
         return;
       }
 

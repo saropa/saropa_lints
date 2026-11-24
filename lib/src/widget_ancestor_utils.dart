@@ -22,7 +22,17 @@ String? widgetCallName(AstNode node) {
   if (node is MethodInvocation) {
     final Expression? target = node.target;
     // `Foo.named(...)` unresolved: the class is the target identifier.
-    if (target is SimpleIdentifier) return target.name;
+    // Review fix: only a type-shaped target (UpperCamel) with a lowercase
+    // method is a named constructor; `marker.copy(...)` or `helper.build()`
+    // are ordinary calls and must not be read as widgets.
+    if (target is SimpleIdentifier) {
+      final String t = target.name;
+      final bool typeShaped =
+          t.isNotEmpty &&
+          t[0] == t[0].toUpperCase() &&
+          t[0] != t[0].toLowerCase();
+      return typeShaped ? t : null;
+    }
     if (target == null) return node.methodName.name;
   }
   return null;

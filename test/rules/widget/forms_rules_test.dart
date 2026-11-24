@@ -172,6 +172,8 @@ void main() {
         'example/lib/forms/avoid_keyboard_overlap_fixture.dart',
       ).readAsStringSync();
       expect(src, contains('_goodFieldOnlyForm'));
+      // Helper-method true positive (Scaffold lives in the caller's build()).
+      expect(src, contains('_HelperHost'));
       expect(src, contains('// expect_lint: avoid_keyboard_overlap'));
     });
 
