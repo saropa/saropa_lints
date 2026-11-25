@@ -119,6 +119,7 @@
   "command.packageVibrancy.scan.title": "Scan Packages",
   "command.packageVibrancy.rescan.title": "Rescan Packages (Fresh)",
   "command.packageVibrancy.openOtherProject.title": "Scan Another Project...",
+  "command.packageVibrancy.explainLastSkip.title": "Explain Last Vibrancy Skip",
   "command.packageVibrancy.showReport.title": "Open Package Dashboard",
   "command.packageVibrancy.showOpportunities.title": "Open Upgrade Opportunities",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Export Full Opportunities Report",

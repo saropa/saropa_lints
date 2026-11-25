@@ -453,6 +453,15 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     internal: true,
   },
   {
+    // Explains why a Vibrancy pub query was skipped (SDK mismatch / stale lock)
+    // and offers `pub get` with the project SDK. Mirrors the status-bar item.
+    command: 'saropaLints.packageVibrancy.explainLastSkip',
+    title: 'Explain Last Vibrancy Skip',
+    description: 'Show why Package Vibrancy skipped a pub query to protect pubspec.lock, and run pub get with the project SDK.',
+    category: 'Package Vibrancy',
+    icon: 'info',
+  },
+  {
     // Upgrade Opportunities dashboard — shows changelog features and usage.
     command: 'saropaLints.packageVibrancy.showOpportunities',
     title: 'Open Upgrade Opportunities',

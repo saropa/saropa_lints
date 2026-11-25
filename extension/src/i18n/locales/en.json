@@ -1,4 +1,59 @@
 {
+  "pubGuard": {
+    "sdkMismatch": "The project was resolved with Dart {project} but the selected SDK is Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock requires Dart {constraint} but the selected SDK is Dart {tool}.",
+    "unknownPathSdk": "The Dart SDK version could not be determined for the dart on PATH, and the project has no readable SDK version.",
+    "staleLock": "pubspec.lock is missing or unreadable, so pub would re-resolve dependencies.",
+    "staleConfig": "The package configuration is missing or does not list the locked packages, so pub would re-resolve dependencies.",
+    "depsNotLocked": "pubspec.yaml declares dependencies that pubspec.lock does not list, so pub would re-resolve dependencies.",
+    "source": {
+      "dartSdkPath": "setting dart.sdkPath",
+      "flutterSdkPath": "setting dart.flutterSdkPath",
+      "fvm": "FVM pin (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "pubspec.lock sdks constraint",
+      "none": "no project SDK evidence"
+    },
+    "statusItem": {
+      "text": "Vibrancy: pub skipped",
+      "tooltip": "Package Vibrancy skipped a pub query so pubspec.lock is not rewritten. Click for details."
+    },
+    "explain": {
+      "title": "Package Vibrancy skipped a pub query",
+      "none": "No Vibrancy pub query has been skipped in this session.",
+      "unknown": "unknown",
+      "reason": "Reason: {reason}",
+      "rule": "Rule: {rule}",
+      "sdk": "Selected SDK: {path} (from {source})",
+      "toolVersion": "Selected SDK version: {version}",
+      "project": "Project SDK: {value} (from {source})",
+      "folder": "Project folder: {cwd}",
+      "time": "Skipped at: {time}",
+      "runPubGet": "Run pub get with project SDK",
+      "pubGetDone": "pub get finished with the project SDK.",
+      "pubGetFailed": "pub get failed: {error}",
+      "pickFolder": "Choose a project folder to explain",
+      "pathConfirm": "The selected SDK comes from PATH, which is the setup that rewrote pubspec.lock with the wrong SDK. Run pub get anyway?",
+      "pathConfirmRun": "Run pub get anyway"
+    },
+    "constraintNotSatisfied": "{name} is locked at {version}, which does not satisfy the constraint {constraint} in pubspec.yaml, so pub would re-resolve dependencies.",
+    "constraintUnverifiable": "A dependency in pubspec.yaml could not be checked against pubspec.lock (git, custom or unparseable constraint), so pub may re-resolve dependencies.",
+    "pathDepNewer": "The path dependency {name} changed after pubspec.lock was written, so pub would re-resolve dependencies.",
+    "rule": {
+      "sdkMismatch": "SDK version mismatch",
+      "lockSdkConstraint": "Lock SDK constraint",
+      "unknownPathSdk": "Unknown PATH SDK",
+      "staleLock": "Missing or unreadable lock file",
+      "staleConfig": "Stale package configuration",
+      "depsNotLocked": "Dependency not locked",
+      "constraintNotSatisfied": "Locked version outside constraint",
+      "constraintUnverifiable": "Constraint not verifiable",
+      "pathDepNewer": "Path dependency changed"
+    }
+  },
   "about": {
     "ruleCountStrip": "{total} lint rules currently ship in this version (essential {essential} · recommended {recommended} · professional {professional} · comprehensive {comprehensive} · pedantic {pedantic} · {stylistic} opt-in stylistic)"
   },

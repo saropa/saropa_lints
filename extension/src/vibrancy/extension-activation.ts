@@ -77,6 +77,9 @@ import { readSiblingConstraints } from './services/sibling-constraints';
 import { buildUpgradeOrder, setOverrideAnalyses } from './scoring/upgrade-sequencer';
 import { executeUpgradePlan, formatUpgradePlan, formatUpgradeReport } from './services/upgrade-executor';
 import { fetchDepGraph, buildReverseDeps } from './services/dep-graph';
+import { decideLockWatcherAction } from './services/scan-gate';
+import { registerSdkCacheInvalidation } from './services/sdk-toolchain';
+import { registerExplainSkip } from './services/pub-guard-explain';
 import { parseDependencyOverrides } from './services/pubspec-parser';
 import {
     countTransitives, findSharedDeps, enrichTransitiveInfo, buildDepGraphSummary,
@@ -342,10 +345,21 @@ export function runActivation(
     registerAnnotateCommand(context);
     registerRegistryCommands(context, registryService);
     registerFileWatcher(context, targets);
+    // Drop cached SDK probes when the selected SDK can have changed, and wire
+    // the "Explain Last Vibrancy Skip" command + status-bar item.
+    context.subscriptions.push(...registerSdkCacheInvalidation(), ...registerExplainSkip());
     registerPubspecListeners(context, cache, pubspecValidator);
     registerSuppressListener(context, targets);
     registerConfigListener(context, codeLensProvider, treeProvider, prereleaseToggle);
     autoScanIfPubspec(targets);
+}
+
+/**
+ * Master switch: `saropaLints.enabled`. When false, no Vibrancy background
+ * process (startup scan, lock watcher) may run for the workspace.
+ */
+export function isExtensionEnabled(): boolean {
+    return vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true);
 }
 
 function registerFileWatcher(
@@ -365,16 +379,30 @@ function registerFileWatcher(
     // so this doesn't penalise manual yaml edits.
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     watcher.onDidChange(() => {
+        // Bug fix: with `saropaLints.enabled: false` this watcher still
+        // triggered a full scan (dart pub outdated/deps) 30s after any lock
+        // change. Re-read the setting on every event so a runtime toggle takes
+        // effect without a reload. The watcher itself stays registered (cheap,
+        // and unregistering would make re-enabling require a window reload).
+        if (!isExtensionEnabled()) { return; }
         if (debounceTimer) { clearTimeout(debounceTimer); }
         debounceTimer = setTimeout(async () => {
             debounceTimer = null;
+            // Re-check at fire time: the user may have disabled the extension
+            // during the 30s debounce window.
+            // The decision lives in a pure function (scan-gate.ts) so the
+            // enabled/unchanged ordering is unit-tested. The hash check runs
+            // only when enabled (it reads the lockfile).
+            const enabled = isExtensionEnabled();
+            if (decideLockWatcherAction(enabled, false) === 'skip-disabled') { return; }
             // Belt-and-suspenders skip: `pub get` can rewrite pubspec.lock
             // with byte-identical contents (timestamp/whitespace shuffles,
             // git checkout that restores the same lock, IDE auto-resolve
             // on an unchanged tree).  If the bytes hash to what we already
             // scanned, there is nothing new to discover — running a 60s+
             // scan would be pure waste.
-            if (await pubspecLockUnchangedSinceLastScan(targets)) { return; }
+            const unchanged = await pubspecLockUnchangedSinceLastScan(targets);
+            if (decideLockWatcherAction(enabled, unchanged) !== 'scan') { return; }
             void runScan(targets);
         }, 30_000);
     });
@@ -921,6 +949,10 @@ function registerCommands(
 async function autoScanIfPubspec(targets: ScanTargets): Promise<void> {
     const config = vscode.workspace.getConfiguration('saropaLints.packageVibrancy');
     if (!config.get<boolean>('scanOnOpen', true)) { return; }
+    // Bug fix: `saropaLints.enabled: false` must stop every background process
+    // the extension starts for the workspace. The startup scan ran
+    // `dart pub outdated/deps` regardless, rewriting pubspec.lock.
+    if (!isExtensionEnabled()) { return; }
 
     const files = await vscode.workspace.findFiles(
         '**/pubspec.yaml', '**/.*/**', 1,

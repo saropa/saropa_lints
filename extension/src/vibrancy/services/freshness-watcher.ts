@@ -128,7 +128,12 @@ export class FreshnessWatcher {
                 ? Math.max(0.25, rawInterval)
                 : 6;
         return {
-            enabled: config.get<boolean>('watchEnabled', true),
+            // Master switch: `saropaLints.enabled: false` disables every
+            // background process the extension starts for the workspace,
+            // including this polling timer (previously it ignored the switch).
+            enabled: config.get<boolean>('watchEnabled', true)
+                && vscode.workspace.getConfiguration('saropaLints')
+                    .get<boolean>('enabled', true),
             intervalHours,
             filterMode: config.get<WatchFilterMode>('watchFilter', 'all'),
             customWatchList: config.get<string[]>('watchList', []),

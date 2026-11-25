@@ -146,6 +146,37 @@ export function resolveDartExecutable(
 }
 
 /**
+ * Picks the `flutter` executable for the workspace's configured SDK. Lives next
+ * to [resolveDartExecutable] so both share ONE candidate order
+ * (`dart.flutterSdkPath`, `<root>/.fvm/flutter_sdk`, then PATH) and cannot drift.
+ * Used by the Vibrancy CLI wrapper; the LSP launcher only needs `dart`.
+ */
+export function resolveFlutterExecutable(
+  projectRoot: string,
+  settings: DartSdkSettings,
+  exists: (p: string) => boolean = fs.existsSync,
+  platform: NodeJS.Platform = process.platform,
+): ResolvedDart {
+  // Flutter ships `flutter.bat` on Windows; even an absolute .bat needs a shell to run.
+  const exe = platform === 'win32' ? 'flutter.bat' : 'flutter';
+  const abs = (p: string): string => (path.isAbsolute(p) ? p : path.join(projectRoot, p));
+  const candidates: Array<{ file: string; source: ResolvedDart['source'] }> = [];
+  const flutterSdk = settings.flutterSdkPath?.trim();
+  if (flutterSdk) {
+    candidates.push({ file: path.join(abs(flutterSdk), 'bin', exe), source: 'dart.flutterSdkPath' });
+  }
+  // FVM pin is honoured even when the user never set a VS Code setting.
+  candidates.push({ file: path.join(abs(path.join('.fvm', 'flutter_sdk')), 'bin', exe), source: 'fvm' });
+  for (const c of candidates) {
+    if (exists(c.file)) {
+      return { command: c.file, useShell: platform === 'win32', source: c.source };
+    }
+  }
+  // Nothing configured: bare PATH `flutter` (shell on Windows so flutter.bat resolves).
+  return { command: 'flutter', useShell: platform === 'win32', source: 'path' };
+}
+
+/**
  * Argv for the LSP server. `dart run --no-pub` is NOT a valid option (Dart 3.8 and
  * 3.14 both reject it), and plain `dart run <pkg>:<exe>` may implicitly `pub get`,
  * rewriting pubspec.lock / package_config.json. So when the package directory is

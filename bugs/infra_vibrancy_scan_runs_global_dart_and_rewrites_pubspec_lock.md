@@ -1,6 +1,6 @@
 # BUG: Package Vibrancy scan runs bare `dart pub outdated` / `dart pub deps` from PATH and rewrites pubspec.lock with the wrong SDK
 
-**Status: Open**
+**Status: Fix implemented — awaiting F5 verification**
 
 Created: 2026-11-24
 Component: extension-native (`extension/src/vibrancy/`)
@@ -120,3 +120,70 @@ Flutter 3.50.0 on PATH.
 ## Reporter
 
 jupiter-tablet
+
+## Finish Report (2026-11-24)
+
+### Root cause
+
+`extension/src/vibrancy/services/flutter-cli.ts` spawned bare `dart` and `flutter` from PATH. In an FVM-pinned project the newer global SDK re-resolved the project and rewrote `pubspec.lock` and `.dart_tool/package_config.json`. The `pubspec.lock` watcher then re-triggered scans, forming a loop, and the startup scan ignored `saropaLints.enabled`.
+
+Correction to the report: `freshness-watcher.ts` only polls pub.dev and never runs `dart pub`. It is gated on `enabled` anyway, as the master switch.
+
+### Fix
+
+- New `extension/src/vibrancy/services/sdk-toolchain.ts`. SDK resolution reuses `resolveDartExecutable` and the new `resolveFlutterExecutable` in `extension/src/debug/lspResolution.ts`. Order: `dart.sdkPath`, `dart.flutterSdkPath`, `.fvm/flutter_sdk` (walking up to the workspace folder), then PATH. Configuration is folder-scoped.
+- Guard before `pub outdated` / `pub deps`. The query is skipped when:
+  - `.dart_tool/version` differs from the tool SDK version;
+  - `.dart_tool/version` is missing and the tool version fails the `pubspec.lock` `sdks: dart:` constraint;
+  - the tool version is unknown (bare PATH);
+  - `pubspec.yaml` is newer than `pubspec.lock`, or the lock is missing;
+  - `package_config.json` is missing or older than the lock.
+- The `dart --version` probe has in-flight dedupe and a 5-minute TTL; failures are not cached.
+- A skip shows one de-duplicated 15-second status-bar note via `l10n`. New `en.json` keys under `pubGuard`: `skipped`, `sdkMismatch`, `lockSdkConstraint`, `unknownPathSdk`, `staleLock`, `staleConfig`.
+- `extension/src/vibrancy/extension-activation.ts`: `isExtensionEnabled()` gates `autoScanIfPubspec` and the `pubspec.lock` watcher callback (re-read per event and again when the debounce fires).
+- `extension/src/vibrancy/services/freshness-watcher.ts` gated on `enabled`.
+
+### Verification
+
+Both `tsc` runs exit 0. Scoped mocha: 75 passing, 0 failing (24 in sdk-toolchain, including an end-to-end `runDartPubOutdated` skip with a fake FVM SDK). Not run in an Extension Development Host: unverified.
+
+### Open items
+
+- F5 checklist:
+  - FVM-pinned project: `pubspec.lock` unchanged after scan.
+  - Monorepo root `.fvm`.
+  - Multi-root workspace with per-folder `dart.sdkPath`.
+  - `saropaLints.enabled: false`, including a runtime toggle and touching `pubspec.lock`.
+  - Stale `pubspec.yaml` or deleted `package_config.json`: one note only.
+  - Edited `.dart_tool/version`: note names both versions.
+  - Healthy unpinned project still scans.
+  - Upgrade command uses the FVM `flutter`.
+  - Read the note wording.
+- No test covers the lock-watcher `enabled` gate: `registerFileWatcher` is not exported and the mock watcher does not fire.
+- Translated locale catalogs not regenerated for the six new `pubGuard` keys. The publish coverage gate fails until they are regenerated.
+- `sdk-pins.ts:72` and `sdk-detector.ts:29,40` still call bare `flutter` / `dart`. They report the wrong SDK but do not mutate the lock. Out of scope.
+
+### Hardening and explain command (2026-11-24)
+
+- Freshness check aligned to pub's `Entrypoint.isResolutionUpToDate` (dart-lang/pub, `lib/src/entrypoint.dart`) instead of a raw mtime rule:
+  - missing `pubspec.lock` or `.dart_tool/package_config.json` → skip (pub resolves unconditionally);
+  - lock strictly newer than `pubspec.yaml` / `pubspec_overrides.yaml` and config not older than lock → allowed (pub's fast path);
+  - otherwise content is checked and, if consistent, the query is allowed (git-checkout skew: pub only touches mtimes). yaml newer → every declared dependency must be in the lock; config older → every locked package must be in `package_config.json`.
+  - Known gap: version-range edits are not re-solved, so a changed constraint with unchanged names is not detected.
+- `sdks: dart:` parser is table-tested (`>=3.8.0 <4.0.0`, `>=2.17.0-0 <4.0.0`, `^3.5.0`, `>=3.0.0`, `any`, malformed). Malformed or missing constraint = unknown; a bare PATH SDK is skipped, a configured/FVM SDK is allowed.
+- `dart --version` probe cache is cleared when `dart.sdkPath` / `dart.flutterSdkPath` change and when `.fvmrc`, `.fvm/fvm_config.json` or `.fvm/flutter_sdk` change (watchers registered in `extension-activation.ts`, disposed with the extension context).
+- Lock-watcher gate extracted to `decideLockWatcherAction` (`services/scan-gate.ts`) and unit-tested for all branches.
+- New command `saropaLints.packageVibrancy.explainLastSkip` ("Explain Last Vibrancy Skip"). Every guard outcome is recorded (`services/pub-guard-record.ts`): selected SDK path and source, project version and its source, tool version, rule key, time, folder. A skip shows a persistent status-bar item that runs the command; the command opens a modal with the details and a "Run pub get with project SDK" action (`runPubGet` through the resolved Flutter), or an "nothing skipped" message. The item clears on the next allowed outcome or when clicked.
+- Replaced the transient 15-second status-bar message and its `pubGuard.skipped` key with the persistent item. New keys under `pubGuard`: `depsNotLocked`, `source.*`, `projectSource.*`, `statusItem.*`, `explain.*`; `package.nls.json`: `command.packageVibrancy.explainLastSkip.title`. Other locale catalogs are not regenerated.
+- Still unverified: not run in an Extension Development Host.
+
+#### Re-review fixes (2026-11-24)
+
+- Freshness check now also covers what pub's `isLockFileUpToDate` does: when `pubspec.yaml` is newer than the lock, every declared dependency (`dependencies`, `dev_dependencies`, `dependency_overrides`, `pubspec_overrides.yaml`) must be locked AND its locked version must satisfy the declared constraint (`^1.0.0` → `^2.0.0` is now caught). Git, inline-map and unparseable forms are treated as unverifiable and skip. A path dependency whose `pubspec.yaml` is newer than the lock skips. New parser: `services/pub-dep-specs.ts`; constraints use `semver` with `includePrerelease`, plus a rewrite so `<X.Y.Z` excludes `X.Y.Z-dev` like pub.
+- `resolution: workspace` members: `findLockRoot` walks up (bounded by the VS Code workspace folder) to the first `pubspec.lock`; lock, `package_config.json` and `.dart_tool/version` are read there, and both the member's and the root's pubspecs are checked.
+- "Run pub get with project SDK" picks `dart pub get` for projects without an `sdk: flutter` dependency and the resolved Flutter otherwise (`planPubGet`). A PATH-resolved SDK needs a second modal confirmation.
+- Skips are kept per folder; an allowed pass clears only its own folder; the status-bar item hides only when no folder has a skip; the command shows a QuickPick when several folders were skipped.
+- Caret on 0.x and prerelease ordering follow pub (`^0.0.3` → `<0.0.4`, `^0.2.1` → `<0.3.0`, `3.8.0-dev` does not satisfy `>=3.8.0`).
+- Accepted limitation: an FVM symlink retargeted without a watched file changing is picked up when the 5-minute probe TTL expires. `.fvm/flutter_sdk/version` is now also watched.
+- Explain modal "Rule:" line shows a localized rule name instead of the raw key. `guardPubCommand` takes an options object. `decideLockWatcherAction` has its own test file. The double `decideLockWatcherAction` call in the watcher is intentional: the first call exits before the lockfile hash is read when the extension is disabled; the second applies the unchanged-lock skip.
+- Still unverified: not run in an Extension Development Host. New en.json keys are not translated.
