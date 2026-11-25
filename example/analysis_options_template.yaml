@@ -1044,7 +1044,7 @@ saropa_lints:
     - require_mock_http_client: false            # ERROR - mock HTTP in tests (v2.3.10)
     - require_test_widget_pump: false            # ERROR - pump after interaction (v2.3.11)
     - require_integration_test_timeout: false    # WARNING - prevent CI hangs (v2.3.11)
-    - prefer_test_find_by_key: false             # INFO - prefer find.byKey over find.byType (v2.5.0)
+    - prefer_test_find_by_key: false             # INFO - prefer find.byKey over find.byType; Tier: stylistic (opt-in) (v2.5.0)
     - prefer_setup_teardown: false               # INFO - extract repeated test setup (v2.5.0)
     - require_test_description_convention: false # INFO - descriptive test names (v2.5.0)
     - prefer_bloc_test_package: false            # INFO - use blocTest() for Bloc testing (v2.5.0)

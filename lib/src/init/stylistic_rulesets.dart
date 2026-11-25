@@ -294,6 +294,7 @@ const Map<String, List<String>> stylisticRuleCategories =
         'prefer_switch_statement',
         'prefer_sync_over_async_where_possible',
         'prefer_test_data_builder',
+        'prefer_test_find_by_key',
         'prefer_wheretype_over_where_is',
       ],
     };

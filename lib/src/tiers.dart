@@ -19,6 +19,9 @@ export 'tiers.dart' show getRulesForTier;
 const Set<String> stylisticRules = <String>{
   // === Debug/Test utility ===
   'prefer_fail_test_case', // Test hook - always fails
+  // find.byType is idiomatic when exactly one instance exists; requiring
+  // find.byKey forces Keys into production widgets, so this is a team preference.
+  'prefer_test_find_by_key',
   // === Ordering & Sorting ===
   'prefer_member_ordering',
   'prefer_arguments_ordering',
@@ -1350,7 +1353,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_firebase_auth_persistence', // INFO - remember me on web
   // Test Rules (Recommended - test quality)
   'avoid_test_print_statements', // WARNING - use expect() instead
-  'prefer_test_find_by_key', // INFO - prefer find.byKey over find.byType
+  // 'prefer_test_find_by_key' moved to stylisticRules (opt-in): it flags every
+  // find.byType() with no ambiguity check, and the fix means adding Keys to
+  // production widgets, which a recommended-tier hint must not demand.
   'prefer_setup_teardown', // INFO - extract repeated test setup
   'require_test_description_convention', // INFO - descriptive test names
   // Test Quality (New assignments)
@@ -4874,7 +4879,8 @@ const Set<String> testingRules = <String>{
   'require_pump_after_interaction',
   'prefer_pump_and_settle',
   'require_test_keys',
-  'prefer_test_find_by_key',
+  // 'prefer_test_find_by_key' is opt-in via stylisticRules; the stylistic
+  // track must stay disjoint from thematic pack rosters (integrity test).
   'prefer_symbol_over_key',
   'avoid_find_all',
   'avoid_find_by_text',
