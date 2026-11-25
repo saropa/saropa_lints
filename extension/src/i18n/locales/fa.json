@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "پکیج ویبرنسی اطلاعات پب جویی را اغما کرد و بنابراین pubspec.lock تغییر نداده شد. {reason}",
     "sdkMismatch": "پروژه با Dart {project} حل شد اما SDK انتخاب شده Dart {tool} است.",
     "lockSdkConstraint": "pubspec.lock نیاز به Dart {constraint} دارد اما SDK انتخاب شده Dart {tool} است.",
-    "unknownPathSdk": "نسخه Dart SDK در PATH تعیین نشد و پروژه نسخه SDK ثبت نشده ای دارد.",
-    "staleLock": "pubspec.yaml جدتر از pubspec.lock است، بنابراین pub وابستگی ها را مجدد حل می کند.",
-    "staleConfig": "پکیج کانفیگوراسیون کم یا قدیمی تر از pubspec.lock است، بنابراین pub وابستگی ها را مجدد حل می کند."
+    "unknownPathSdk": "نسخه Dart SDK مربوط به dart در PATH قابل تشخیص نبود و پروژه نیز نسخه SDK قابل خواندنی ندارد.",
+    "staleLock": "pubspec.lock وجود ندارد یا قابل خواندن نیست، بنابراین pub وابستگی‌ها را دوباره حل می‌کند.",
+    "staleConfig": "پیکربندی بسته‌ها وجود ندارد یا بسته‌های قفل‌شده را فهرست نمی‌کند، بنابراین pub وابستگی‌ها را دوباره حل می‌کند.",
+    "depsNotLocked": "pubspec.yaml وابستگی‌هایی را اعلام کرده که در pubspec.lock فهرست نشده‌اند، بنابراین pub وابستگی‌ها را دوباره حل می‌کند.",
+    "source": {
+      "dartSdkPath": "تنظیم dart.sdkPath",
+      "flutterSdkPath": "تنظیم dart.flutterSdkPath",
+      "fvm": "پین FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "قید sdks در pubspec.lock",
+      "none": "هیچ شواهدی از SDK پروژه وجود ندارد"
+    },
+    "statusItem": {
+      "text": "Vibrancy: pub ردشد",
+      "tooltip": "Vibrancy بسته‌ها یک پرس‌وجوی pub را رد کرد تا pubspec.lock بازنویسی نشود. برای جزئیات کلیک کنید."
+    },
+    "explain": {
+      "title": "Vibrancy بسته‌ها یک پرس‌وجوی pub را رد کرد",
+      "none": "در این نشست هیچ پرس‌وجوی pub در Vibrancy رد نشده است.",
+      "reason": "دلیل: {reason}",
+      "rule": "قانون: {rule}",
+      "sdk": "SDK انتخاب‌شده: {path} (از {source})",
+      "toolVersion": "نسخه SDK انتخاب‌شده: {version}",
+      "project": "SDK پروژه: {value} (از {source})",
+      "folder": "پوشه پروژه: {cwd}",
+      "time": "زمان ردشدن: {time}",
+      "runPubGet": "اجرای pub get با SDK پروژه",
+      "pubGetDone": "pub get با SDK پروژه به پایان رسید.",
+      "pubGetFailed": "pub get ناموفق بود: {error}",
+      "pickFolder": "یک پوشه پروژه برای توضیح انتخاب کنید",
+      "pathConfirm": "SDK انتخاب‌شده از PATH می‌آید؛ همان تنظیمی که pubspec.lock را با SDK نادرست بازنویسی کرد. pub get به‌هرحال اجرا شود؟",
+      "pathConfirmRun": "اجرای pub get به‌هرحال"
+    },
+    "constraintNotSatisfied": "{name} روی نسخه {version} قفل شده که قید {constraint} در pubspec.yaml را برآورده نمی‌کند، بنابراین pub وابستگی‌ها را دوباره حل می‌کند.",
+    "constraintUnverifiable": "یکی از وابستگی‌ها در pubspec.yaml را نمی‌توان با pubspec.lock بررسی کرد (قید git، سفارشی یا غیرقابل تجزیه)، بنابراین ممکن است pub وابستگی‌ها را دوباره حل کند.",
+    "pathDepNewer": "وابستگی مسیری {name} پس از نوشته شدن pubspec.lock تغییر کرده است، بنابراین pub وابستگی‌ها را دوباره حل می‌کند.",
+    "rule": {
+      "sdkMismatch": "ناسازگاری نسخه SDK",
+      "lockSdkConstraint": "قید SDK در فایل قفل",
+      "unknownPathSdk": "SDK ناشناخته در PATH",
+      "staleLock": "فایل قفل وجود ندارد یا قابل خواندن نیست",
+      "staleConfig": "پیکربندی بسته‌ها قدیمی است",
+      "depsNotLocked": "وابستگی قفل نشده است",
+      "constraintNotSatisfied": "نسخه قفل‌شده خارج از قید است",
+      "constraintUnverifiable": "قید قابل بررسی نیست",
+      "pathDepNewer": "وابستگی مسیری تغییر کرد"
+    }
   },
   "about": {
     "ruleCountStrip": "قوانین پرز {total} در حال حاضر در این نسخه ارسال می شود (ضروری {essential} · {recommended} پیشنهادی · {professional} حرفه ای · {comprehensive} جامع · {pedantic} pedantic · سبک انتخابی {stylistic})"

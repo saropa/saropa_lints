@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "חוקי קפדנות:\n1. החזיר רק את התוצאה המתרגמת.\n2. אל תוסיף הסברים, הפתיחה, סימני מardown, או ציטוטים מסביב.\n3. הטקסט עשוי להכיל תокני תחזיות: תוקני תחזיות. העתק כל אחד מהם לתרגום בדיוק כפי שנכתב, במקומו הgrammatically הנכון. אל תתרגם, תמחק או תפורמט תוקן תחזיה.\n4. קריטי: כל אות בתוצאה חייבת להיות אות עברית. תרגל כל מילה לעברית — אל ת deix או תחליף כל מילה בlatin, thai, ערבית, קירילית, קוריאנית, יפנית או כל שפה אחרת. רווחים, מספרים, תבליטים ותוקני תחזיות הם היחסיים היחידיים.\n\nטקסט: חבילת ויברנס עצרה שאילתה פוב, אז pubspec.lock אינה מתחזקת. {reason}",
     "sdkMismatch": "הפרויקט נפתר עם Dart {project} אך הSDK שנבחר הוא Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock דורש Dart {constraint} אך הSDK שנבחר הוא Dart {tool}.",
-    "unknownPathSdk": "הגרסה של Dart SDK שבעת PATH לא יכולה להיבדוק והפרויקט לא מכיל גרסה רשומה של SDK.",
-    "staleLock": "pubspec.yaml הוא עדכני יותר מ-pubspec.lock, ולכן pub יתאים מחדש את התלות.",
-    "staleConfig": "התצורת החבילה חסרה או ישנה יותר מpubspec.lock, ולכן pub ית.resolve מחדש את התלות."
+    "unknownPathSdk": "לא ניתן היה לקבוע את גרסת Dart SDK של dart ב-PATH, ולפרויקט אין גרסת SDK קריאה.",
+    "staleLock": "pubspec.lock חסר או שאינו קריא, ולכן pub יפתור מחדש את התלויות.",
+    "staleConfig": "תצורת החבילות חסרה או שאינה מפרטת את החבילות הנעולות, ולכן pub יפתור מחדש את התלויות.",
+    "depsNotLocked": "pubspec.yaml מצהיר על תלויות ש-pubspec.lock אינו מפרט, ולכן pub יפתור מחדש את התלויות.",
+    "source": {
+      "dartSdkPath": "ההגדרה dart.sdkPath",
+      "flutterSdkPath": "ההגדרה dart.flutterSdkPath",
+      "fvm": "הצמדת FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "אילוץ sdks ב-pubspec.lock",
+      "none": "אין עדות ל-SDK של הפרויקט"
+    },
+    "statusItem": {
+      "text": "Vibrancy: pub דולג",
+      "tooltip": "Vibrancy של החבילות דילג על שאילתת pub כדי ש-pubspec.lock לא ייכתב מחדש. לחץ לפרטים."
+    },
+    "explain": {
+      "title": "Vibrancy של החבילות דילג על שאילתת pub",
+      "none": "לא דולגה אף שאילתת pub של Vibrancy בהפעלה הנוכחית.",
+      "reason": "סיבה: {reason}",
+      "rule": "כלל: {rule}",
+      "sdk": "ה-SDK שנבחר: {path} (מתוך {source})",
+      "toolVersion": "גרסת ה-SDK שנבחרה: {version}",
+      "project": "SDK של הפרויקט: {value} (מתוך {source})",
+      "folder": "תיקיית הפרויקט: {cwd}",
+      "time": "דולג בשעה: {time}",
+      "runPubGet": "הרץ pub get עם ה-SDK של הפרויקט",
+      "pubGetDone": "pub get הסתיים עם ה-SDK של הפרויקט.",
+      "pubGetFailed": "pub get נכשל: {error}",
+      "pickFolder": "בחר תיקיית פרויקט להסבר",
+      "pathConfirm": "ה-SDK שנבחר מגיע מ-PATH, זו ההגדרה שכתבה מחדש את pubspec.lock עם SDK שגוי. להריץ pub get בכל זאת?",
+      "pathConfirmRun": "הרץ pub get בכל זאת"
+    },
+    "constraintNotSatisfied": "{name} נעול על גרסה {version}, שאינה עומדת באילוץ {constraint} ב-pubspec.yaml, ולכן pub יפתור מחדש את התלויות.",
+    "constraintUnverifiable": "לא ניתן היה לבדוק תלות ב-pubspec.yaml מול pubspec.lock (אילוץ git, מותאם אישית או שאינו ניתן לניתוח), ולכן ייתכן ש-pub יפתור מחדש את התלויות.",
+    "pathDepNewer": "תלות הנתיב {name} השתנתה לאחר כתיבת pubspec.lock, ולכן pub יפתור מחדש את התלויות.",
+    "rule": {
+      "sdkMismatch": "אי-התאמה בגרסת SDK",
+      "lockSdkConstraint": "אילוץ SDK בקובץ הנעילה",
+      "unknownPathSdk": "SDK לא ידוע ב-PATH",
+      "staleLock": "קובץ הנעילה חסר או שאינו קריא",
+      "staleConfig": "תצורת החבילות מיושנת",
+      "depsNotLocked": "התלות אינה נעולה",
+      "constraintNotSatisfied": "הגרסה הנעולה מחוץ לאילוץ",
+      "constraintUnverifiable": "לא ניתן לאמת את האילוץ",
+      "pathDepNewer": "תלות נתיב השתנתה"
+    }
   },
   "about": {
     "ruleCountStrip": "חוקי לינט {total} נמצאים כרגע בגרסה זו (חובה {essential} · מומלץ {recommended} · מקצועית {professional} · מפורט {comprehensive} · פדנטי {pedantic} · {stylistic} בחירה חופשית סגנון)"

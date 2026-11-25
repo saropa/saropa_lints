@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "पैकेज विब्रेंसी पब क्वेरी के लिए छोड़ दिया गया है इसलिए pubspec.lock बदला नहीं गया। {reason}",
     "sdkMismatch": "प्रोजेक्ट जोड़े गए हैं Dart {project} लेकिन चयनित SDK है Dart {tool}",
     "lockSdkConstraint": "pubspec.lock {constraint} के लिए Dart आवश्यक है लेकिन चयनित SDK Dart {tool} है।",
-    "unknownPathSdk": "The Dart SDK version on PATH could not be determined and the project has no recorded SDK version.",
-    "staleLock": "pubspec.yaml, pubspec.lock से नए है, इसलिए pub आवश्यकताओं को पुनः निर्धारित करेगा।",
-    "staleConfig": "पैकेज विन्यास अनुपस्थित है या pubspec.lock से पुराना है, इसलिए पब आवश्यकताओं को पुनः निर्धारित करेगा।"
+    "unknownPathSdk": "PATH पर मौजूद dart के लिए Dart SDK संस्करण निर्धारित नहीं किया जा सका, और प्रोजेक्ट में कोई पठनीय SDK संस्करण नहीं है।",
+    "staleLock": "pubspec.lock अनुपस्थित या अपठनीय है, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
+    "staleConfig": "पैकेज कॉन्फ़िगरेशन अनुपस्थित है या उसमें लॉक किए गए पैकेज सूचीबद्ध नहीं हैं, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "none": "प्रोजेक्ट SDK का कोई प्रमाण नहीं",
+      "lockConstraint": "pubspec.lock की sdks बाधा"
+    },
+    "constraintUnverifiable": "pubspec.yaml की किसी निर्भरता की जाँच pubspec.lock के विरुद्ध नहीं की जा सकी (git, कस्टम या पार्स न होने वाली बाधा), इसलिए pub निर्भरताओं को फिर से हल कर सकता है।",
+    "explain": {
+      "pickFolder": "समझाने के लिए प्रोजेक्ट फ़ोल्डर चुनें",
+      "none": "इस सत्र में किसी Vibrancy pub क्वेरी को स्किप नहीं किया गया है।",
+      "title": "पैकेज वाइब्रेंसी ने एक pub क्वेरी स्किप की",
+      "project": "प्रोजेक्ट SDK: {value} ({source} से)",
+      "folder": "प्रोजेक्ट फ़ोल्डर: {cwd}",
+      "reason": "कारण: {reason}",
+      "rule": "नियम: {rule}",
+      "pathConfirmRun": "फिर भी pub get चलाएँ",
+      "runPubGet": "प्रोजेक्ट SDK के साथ pub get चलाएँ",
+      "toolVersion": "चयनित SDK संस्करण: {version}",
+      "sdk": "चयनित SDK: {path} ({source} से)",
+      "time": "स्किप करने का समय: {time}",
+      "pathConfirm": "चयनित SDK PATH से आता है, और इसी सेटअप ने गलत SDK के साथ pubspec.lock को दोबारा लिखा था। फिर भी pub get चलाएँ?",
+      "pubGetFailed": "pub get विफल रहा: {error}",
+      "pubGetDone": "pub get प्रोजेक्ट SDK के साथ पूरा हुआ।"
+    },
+    "rule": {
+      "constraintUnverifiable": "बाधा सत्यापित नहीं की जा सकती",
+      "depsNotLocked": "निर्भरता लॉक नहीं है",
+      "lockSdkConstraint": "लॉक SDK बाधा",
+      "constraintNotSatisfied": "लॉक किया गया संस्करण बाधा से बाहर है",
+      "staleLock": "लॉक फ़ाइल अनुपस्थित या अपठनीय है",
+      "pathDepNewer": "पाथ निर्भरता बदल गई",
+      "sdkMismatch": "SDK संस्करण में असंगति",
+      "staleConfig": "पुराना पैकेज कॉन्फ़िगरेशन",
+      "unknownPathSdk": "अज्ञात PATH SDK"
+    },
+    "source": {
+      "fvm": "FVM पिन (.fvm/flutter_sdk)",
+      "path": "PATH",
+      "flutterSdkPath": "सेटिंग dart.flutterSdkPath",
+      "dartSdkPath": "सेटिंग dart.sdkPath"
+    },
+    "statusItem": {
+      "tooltip": "पैकेज वाइब्रेंसी ने एक pub क्वेरी स्किप की ताकि pubspec.lock दोबारा न लिखा जाए। विवरण के लिए क्लिक करें।",
+      "text": "Vibrancy: pub स्किप हुआ"
+    },
+    "pathDepNewer": "pubspec.lock लिखे जाने के बाद पाथ निर्भरता {name} बदल गई, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
+    "depsNotLocked": "pubspec.yaml ऐसी निर्भरताएँ घोषित करती है जो pubspec.lock में सूचीबद्ध नहीं हैं, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
+    "constraintNotSatisfied": "{name} को {version} पर लॉक किया गया है, जो pubspec.yaml की बाधा {constraint} को पूरा नहीं करता, इसलिए pub निर्भरताओं को फिर से हल करेगा।"
   },
   "about": {
     "ruleCountStrip": "{total} लिंट नियम वर्तमान में इस संस्करण में शामिल हैं (आवश्यक {essential} · अनुशंसित {recommended} · पेशेवर {professional} · व्यापक {comprehensive} · सूक्ष्म {pedantic} · {stylistic} ऐच्छिक शैलीगत)"

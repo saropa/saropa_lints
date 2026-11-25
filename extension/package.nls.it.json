@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: Sincronizza Versione Plugin con pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menu Status",
   "command.scanWithLatestEngine.title": "Saropa Lints: Scansiona con l'Engine più recente (Progetti più vecchi Dart)",
-  "config.property.externalEngine.dartSdkPath.description": "Cartella Dart SDK (contiene bin/dart) utilizzata da \"Scan with Latest Engine\". Deve essere Dart 3.11 o successivo. Lasciare vuoto per utilizzare dart presente nel PATH."
+  "config.property.externalEngine.dartSdkPath.description": "Cartella Dart SDK (contiene bin/dart) utilizzata da \"Scan with Latest Engine\". Deve essere Dart 3.11 o successivo. Lasciare vuoto per utilizzare dart presente nel PATH.",
+  "command.packageVibrancy.explainLastSkip.title": "Spiega l'ultimo salto di Vibrancy"
 }

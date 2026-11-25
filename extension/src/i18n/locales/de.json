@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Package Vibrancy überspringt eine pub Abfrage, daher wird pubspec.lock nicht umgeschrieben. {reason}",
     "sdkMismatch": "Das Projekt wurde mit Dart {project} aufgelöst, aber der ausgewählte SDK ist Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock benötigt Dart {constraint}, aber das ausgewählte SDK ist Dart {tool}.",
-    "unknownPathSdk": "Die Dart SDK-Version auf PATH konnte nicht ermittelt werden und das Projekt hat keine aufgezeichnete SDK-Version.",
-    "staleLock": "pubspec.yaml ist neuer als pubspec.lock, daher würde pub die Abhängigkeiten erneut auflösen.",
-    "staleConfig": "Die Paketkonfiguration fehlt oder ist älter als pubspec.lock, daher würde pub die Abhängigkeiten erneut auflösen."
+    "unknownPathSdk": "Die Dart-SDK-Version konnte für das dart auf PATH nicht ermittelt werden, und das Projekt hat keine lesbare SDK-Version.",
+    "staleLock": "pubspec.lock fehlt oder ist nicht lesbar, daher würde pub die Abhängigkeiten erneut auflösen.",
+    "staleConfig": "Die Paketkonfiguration fehlt oder listet die gesperrten Pakete nicht auf, daher würde pub die Abhängigkeiten erneut auflösen.",
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "none": "kein Hinweis auf ein Projekt-SDK",
+      "lockConstraint": "sdks-Einschränkung in pubspec.lock"
+    },
+    "constraintUnverifiable": "Eine Abhängigkeit in pubspec.yaml konnte nicht gegen pubspec.lock geprüft werden (Git, benutzerdefinierte oder nicht parsbare Einschränkung), daher löst pub die Abhängigkeiten möglicherweise erneut auf.",
+    "explain": {
+      "pickFolder": "Projektordner zum Erklären auswählen",
+      "none": "In dieser Sitzung wurde keine Vibrancy-pub-Abfrage übersprungen.",
+      "title": "Package Vibrancy hat eine pub-Abfrage übersprungen",
+      "project": "Projekt-SDK: {value} (aus {source})",
+      "folder": "Projektordner: {cwd}",
+      "reason": "Grund: {reason}",
+      "rule": "Regel: {rule}",
+      "pathConfirmRun": "pub get trotzdem ausführen",
+      "runPubGet": "pub get mit Projekt-SDK ausführen",
+      "toolVersion": "Ausgewählte SDK-Version: {version}",
+      "sdk": "Ausgewähltes SDK: {path} (aus {source})",
+      "time": "Übersprungen um: {time}",
+      "pathConfirm": "Das ausgewählte SDK stammt aus PATH – genau die Einrichtung, die pubspec.lock mit dem falschen SDK neu geschrieben hat. pub get trotzdem ausführen?",
+      "pubGetFailed": "pub get fehlgeschlagen: {error}",
+      "pubGetDone": "pub get mit dem Projekt-SDK abgeschlossen."
+    },
+    "rule": {
+      "constraintUnverifiable": "Einschränkung nicht prüfbar",
+      "depsNotLocked": "Abhängigkeit nicht gesperrt",
+      "lockSdkConstraint": "SDK-Einschränkung der Sperrdatei",
+      "constraintNotSatisfied": "Gesperrte Version außerhalb der Einschränkung",
+      "staleLock": "Sperrdatei fehlt oder ist nicht lesbar",
+      "pathDepNewer": "Pfadabhängigkeit geändert",
+      "sdkMismatch": "SDK-Version stimmt nicht überein",
+      "staleConfig": "Veraltete Paketkonfiguration",
+      "unknownPathSdk": "Unbekanntes SDK auf PATH"
+    },
+    "source": {
+      "fvm": "FVM-Pin (.fvm/flutter_sdk)",
+      "path": "PATH",
+      "flutterSdkPath": "Einstellung dart.flutterSdkPath",
+      "dartSdkPath": "Einstellung dart.sdkPath"
+    },
+    "statusItem": {
+      "tooltip": "Package Vibrancy hat eine pub-Abfrage übersprungen, damit pubspec.lock nicht neu geschrieben wird. Klicken Sie für Details.",
+      "text": "Vibrancy: pub übersprungen"
+    },
+    "pathDepNewer": "Die Pfadabhängigkeit {name} wurde geändert, nachdem pubspec.lock geschrieben wurde, daher würde pub die Abhängigkeiten erneut auflösen.",
+    "depsNotLocked": "pubspec.yaml deklariert Abhängigkeiten, die pubspec.lock nicht auflistet, daher würde pub die Abhängigkeiten erneut auflösen.",
+    "constraintNotSatisfied": "{name} ist auf {version} gesperrt, was die Einschränkung {constraint} in pubspec.yaml nicht erfüllt, daher würde pub die Abhängigkeiten erneut auflösen."
   },
   "about": {
     "ruleCountStrip": "{total} Lint-Regeln sind in dieser Version enthalten (essentiell {essential} · empfohlen {recommended} · professionell {professional} · umfassend {comprehensive} · pedantisch {pedantic} · {stylistic} opt-in stylistisch)"

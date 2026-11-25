@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Paket Vibrancy bir pub sorgusunu atladı, bu yüzden pubspec.lock yeniden yazılmadı. {reason}",
     "sdkMismatch": "Proje Dart {project} ile çözüldü ancak seçilen SDK Dart {tool}'dır.",
     "lockSdkConstraint": "pubspec.lock, Dart {constraint} gerektirir ancak seçilen SDK Dart {tool}'dır.",
-    "unknownPathSdk": "PATH üzerindeki Dart SDK sürümü belirlenemedi ve proje kaydedilmiş bir SDK sürümüne sahip değil.",
-    "staleLock": "pubspec.yaml, pubspec.lock'dan daha yeni olduğu için pub bağımlılıkları tekrar çözülecektir.",
-    "staleConfig": "Paket yapılandırması eksik veya pubspec.lock'dan eski, bu yüzden pub bağımlılıkları yeniden çözüyordu."
+    "unknownPathSdk": "PATH üzerindeki dart için Dart SDK sürümü belirlenemedi ve projenin okunabilir bir SDK sürümü yok.",
+    "staleLock": "pubspec.lock eksik veya okunamıyor, bu nedenle pub bağımlılıkları yeniden çözecek.",
+    "staleConfig": "Paket yapılandırması eksik veya kilitli paketleri listelemiyor, bu nedenle pub bağımlılıkları yeniden çözecek.",
+    "depsNotLocked": "pubspec.yaml, pubspec.lock dosyasında listelenmeyen bağımlılıklar tanımlıyor, bu nedenle pub bağımlılıkları yeniden çözecek.",
+    "source": {
+      "dartSdkPath": "dart.sdkPath ayarı",
+      "flutterSdkPath": "dart.flutterSdkPath ayarı",
+      "fvm": "FVM sabitlemesi (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "pubspec.lock sdks kısıtlaması",
+      "none": "proje SDK'sına dair kanıt yok"
+    },
+    "statusItem": {
+      "text": "Vibrancy: pub atlandı",
+      "tooltip": "Package Vibrancy, pubspec.lock yeniden yazılmasın diye bir pub sorgusunu atladı. Ayrıntılar için tıklayın."
+    },
+    "explain": {
+      "title": "Package Vibrancy bir pub sorgusunu atladı",
+      "none": "Bu oturumda hiçbir Vibrancy pub sorgusu atlanmadı.",
+      "reason": "Neden: {reason}",
+      "rule": "Kural: {rule}",
+      "sdk": "Seçilen SDK: {path} (kaynak: {source})",
+      "toolVersion": "Seçilen SDK sürümü: {version}",
+      "project": "Proje SDK'sı: {value} (kaynak: {source})",
+      "folder": "Proje klasörü: {cwd}",
+      "time": "Atlanma zamanı: {time}",
+      "runPubGet": "Proje SDK'sı ile pub get çalıştır",
+      "pubGetDone": "pub get proje SDK'sı ile tamamlandı.",
+      "pubGetFailed": "pub get başarısız oldu: {error}",
+      "pickFolder": "Açıklanacak proje klasörünü seçin",
+      "pathConfirm": "Seçilen SDK PATH üzerinden geliyor; pubspec.lock dosyasını yanlış SDK ile yeniden yazan kurulum budur. Yine de pub get çalıştırılsın mı?",
+      "pathConfirmRun": "Yine de pub get çalıştır"
+    },
+    "constraintNotSatisfied": "{name}, pubspec.yaml içindeki {constraint} kısıtlamasını karşılamayan {version} sürümüne kilitli, bu nedenle pub bağımlılıkları yeniden çözecek.",
+    "constraintUnverifiable": "pubspec.yaml içindeki bir bağımlılık pubspec.lock ile karşılaştırılamadı (git, özel veya ayrıştırılamayan kısıtlama), bu nedenle pub bağımlılıkları yeniden çözebilir.",
+    "pathDepNewer": "{name} yol bağımlılığı pubspec.lock yazıldıktan sonra değişti, bu nedenle pub bağımlılıkları yeniden çözecek.",
+    "rule": {
+      "sdkMismatch": "SDK sürümü uyuşmazlığı",
+      "lockSdkConstraint": "SDK kısıtlamasını kilitle",
+      "unknownPathSdk": "Bilinmeyen PATH SDK'sı",
+      "staleLock": "Kilit dosyası eksik veya okunamıyor",
+      "staleConfig": "Eski paket yapılandırması",
+      "depsNotLocked": "Bağımlılık kilitlenmemiş",
+      "constraintNotSatisfied": "Kilitli sürüm kısıtlamanın dışında",
+      "constraintUnverifiable": "Kısıtlama doğrulanamıyor",
+      "pathDepNewer": "Yol bağımlılığı değişti"
+    }
   },
   "about": {
     "ruleCountStrip": "Kurulumdaki şu anda mevcut {total} lint kuralları (temel {essential} · önerilen {recommended} · profesyonel {professional} · kapsamlı {comprehensive} · pedantik {pedantic} · {stylistic} seçeneğiyle stil)"

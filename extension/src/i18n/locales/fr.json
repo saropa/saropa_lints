@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Package Vibrancy skipped a pub query so pubspec.lock is not rewritten. {reason}",
     "sdkMismatch": "Le projet a été résolu avec Dart {project} mais la version SDK sélectionnée est Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock nécessite Dart {constraint} mais la version SDK sélectionnée est Dart {tool}.",
-    "unknownPathSdk": "La version de l'SDK Dart sur PATH ne peut pas être déterminée et le projet n'a pas de version d'SDK enregistrée.",
-    "staleLock": "pubspec.yaml est plus récent que pubspec.lock, donc pub rétablirait les dépendances.",
-    "staleConfig": "La configuration du package est manquante ou plus ancienne que pubspec.lock, donc pub réessayerait de résoudre les dépendances."
+    "unknownPathSdk": "La version du SDK Dart n'a pas pu être déterminée pour le dart présent dans PATH, et le projet n'a aucune version de SDK lisible.",
+    "staleLock": "pubspec.lock est absent ou illisible ; pub résoudrait donc à nouveau les dépendances.",
+    "staleConfig": "La configuration des paquets est absente ou ne liste pas les paquets verrouillés ; pub résoudrait donc à nouveau les dépendances.",
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "none": "aucune preuve de SDK du projet",
+      "lockConstraint": "contrainte sdks de pubspec.lock"
+    },
+    "constraintUnverifiable": "Une dépendance de pubspec.yaml n'a pas pu être vérifiée par rapport à pubspec.lock (contrainte git, personnalisée ou non analysable) ; pub risque donc de résoudre à nouveau les dépendances.",
+    "explain": {
+      "pickFolder": "Choisissez un dossier de projet à expliquer",
+      "none": "Aucune requête pub de Vibrancy n'a été ignorée durant cette session.",
+      "title": "Package Vibrancy a ignoré une requête pub",
+      "project": "SDK du projet : {value} (depuis {source})",
+      "folder": "Dossier du projet : {cwd}",
+      "reason": "Raison : {reason}",
+      "rule": "Règle : {rule}",
+      "pathConfirmRun": "Exécuter pub get quand même",
+      "runPubGet": "Exécuter pub get avec le SDK du projet",
+      "toolVersion": "Version de SDK sélectionnée : {version}",
+      "sdk": "SDK sélectionné : {path} (depuis {source})",
+      "time": "Ignoré à : {time}",
+      "pathConfirm": "Le SDK sélectionné provient de PATH, la configuration qui a réécrit pubspec.lock avec le mauvais SDK. Exécuter pub get quand même ?",
+      "pubGetFailed": "Échec de pub get : {error}",
+      "pubGetDone": "pub get terminé avec le SDK du projet."
+    },
+    "rule": {
+      "constraintUnverifiable": "Contrainte non vérifiable",
+      "depsNotLocked": "Dépendance non verrouillée",
+      "lockSdkConstraint": "Contrainte de SDK du verrou",
+      "constraintNotSatisfied": "Version verrouillée hors contrainte",
+      "staleLock": "Fichier de verrouillage manquant ou illisible",
+      "pathDepNewer": "Dépendance de chemin modifiée",
+      "sdkMismatch": "Version de SDK incompatible",
+      "staleConfig": "Configuration de paquets obsolète",
+      "unknownPathSdk": "SDK PATH inconnu"
+    },
+    "source": {
+      "fvm": "Épingle FVM (.fvm/flutter_sdk)",
+      "path": "PATH",
+      "flutterSdkPath": "paramètre dart.flutterSdkPath",
+      "dartSdkPath": "paramètre dart.sdkPath"
+    },
+    "statusItem": {
+      "tooltip": "Package Vibrancy a ignoré une requête pub afin que pubspec.lock ne soit pas réécrit. Cliquez pour plus de détails.",
+      "text": "Vibrancy : pub ignoré"
+    },
+    "pathDepNewer": "La dépendance de chemin {name} a changé après l'écriture de pubspec.lock ; pub résoudrait donc à nouveau les dépendances.",
+    "depsNotLocked": "pubspec.yaml déclare des dépendances que pubspec.lock ne liste pas ; pub résoudrait donc à nouveau les dépendances.",
+    "constraintNotSatisfied": "{name} est verrouillé à {version}, ce qui ne satisfait pas la contrainte {constraint} de pubspec.yaml ; pub résoudrait donc à nouveau les dépendances."
   },
   "about": {
     "ruleCountStrip": "Règles {total} de lint sont actuellement incluses dans cette version (essentiel {essential} · recommandé {recommended} · professionnel {professional} · complet {comprehensive} · pédant {pedantic} · {stylistic} opt-in stylistique)"

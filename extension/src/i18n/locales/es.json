@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Regla estricta: La consulta pub se omitió, por lo tanto pubspec.lock no se reescribe. {reason}",
     "sdkMismatch": "El proyecto se resolvió con Dart {project} pero la SDK seleccionada es Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock requiere Dart {constraint} pero la SDK seleccionada es Dart {tool}.",
-    "unknownPathSdk": "La versión del SDK Dart en PATH no pudo determinarse y el proyecto no tiene versión del SDK registrada.",
-    "staleLock": "pubspec.yaml es más nuevo que pubspec.lock, por lo tanto pub volvería a resolver las dependencias.",
-    "staleConfig": "La configuración del paquete está ausente o es más antigua que pubspec.lock, por lo tanto pub volvería a resolver las dependencias."
+    "unknownPathSdk": "No se pudo determinar la versión del SDK de Dart del dart en PATH, y el proyecto no tiene una versión de SDK legible.",
+    "staleLock": "pubspec.lock falta o es ilegible, por lo que pub volvería a resolver las dependencias.",
+    "staleConfig": "La configuración de paquetes falta o no incluye los paquetes bloqueados, por lo que pub volvería a resolver las dependencias.",
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "none": "sin evidencia del SDK del proyecto",
+      "lockConstraint": "restricción sdks de pubspec.lock"
+    },
+    "constraintUnverifiable": "No se pudo comprobar una dependencia de pubspec.yaml con pubspec.lock (restricción git, personalizada o no analizable), por lo que pub podría volver a resolver las dependencias.",
+    "explain": {
+      "pickFolder": "Elija una carpeta de proyecto para explicar",
+      "none": "No se ha omitido ninguna consulta pub de Vibrancy en esta sesión.",
+      "title": "Package Vibrancy omitió una consulta pub",
+      "project": "SDK del proyecto: {value} (desde {source})",
+      "folder": "Carpeta del proyecto: {cwd}",
+      "reason": "Motivo: {reason}",
+      "rule": "Regla: {rule}",
+      "pathConfirmRun": "Ejecutar pub get de todos modos",
+      "runPubGet": "Ejecutar pub get con el SDK del proyecto",
+      "toolVersion": "Versión de SDK seleccionada: {version}",
+      "sdk": "SDK seleccionado: {path} (desde {source})",
+      "time": "Omitido a las: {time}",
+      "pathConfirm": "El SDK seleccionado proviene de PATH, la configuración que reescribió pubspec.lock con el SDK equivocado. ¿Ejecutar pub get de todos modos?",
+      "pubGetFailed": "pub get falló: {error}",
+      "pubGetDone": "pub get finalizó con el SDK del proyecto."
+    },
+    "rule": {
+      "constraintUnverifiable": "Restricción no verificable",
+      "depsNotLocked": "Dependencia no bloqueada",
+      "lockSdkConstraint": "Restricción de SDK del bloqueo",
+      "constraintNotSatisfied": "Versión bloqueada fuera de la restricción",
+      "staleLock": "Archivo de bloqueo ausente o ilegible",
+      "pathDepNewer": "Dependencia de ruta modificada",
+      "sdkMismatch": "Versión de SDK incompatible",
+      "staleConfig": "Configuración de paquetes obsoleta",
+      "unknownPathSdk": "SDK de PATH desconocido"
+    },
+    "source": {
+      "fvm": "Fijación de FVM (.fvm/flutter_sdk)",
+      "path": "PATH",
+      "flutterSdkPath": "ajuste dart.flutterSdkPath",
+      "dartSdkPath": "ajuste dart.sdkPath"
+    },
+    "statusItem": {
+      "tooltip": "Package Vibrancy omitió una consulta pub para que pubspec.lock no se reescriba. Haga clic para ver los detalles.",
+      "text": "Vibrancy: pub omitido"
+    },
+    "pathDepNewer": "La dependencia de ruta {name} cambió después de escribir pubspec.lock, por lo que pub volvería a resolver las dependencias.",
+    "depsNotLocked": "pubspec.yaml declara dependencias que pubspec.lock no incluye, por lo que pub volvería a resolver las dependencias.",
+    "constraintNotSatisfied": "{name} está bloqueado en {version}, que no cumple la restricción {constraint} de pubspec.yaml, por lo que pub volvería a resolver las dependencias."
   },
   "about": {
     "ruleCountStrip": "Reglas de lint {total} actualmente incluidas en esta versión (esenciales {essential} · recomendadas {recommended} · profesionales {professional} · completas {comprehensive} · pedantes {pedantic} · {stylistic} de estilo opt-in)"

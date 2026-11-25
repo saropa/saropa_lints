@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Sauti ya Paku ya Vibrancy ilifungua kwa pub query kwa sababu hili pubspec.lock inatokana kwa kushusha. {reason}",
     "sdkMismatch": "Projecti ililifaniki na Dart {project} lakini SDK inayosimamia ni Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock inakwenda Dart {constraint} lakini SDK ya zozungumza lililokwenda ni Dart {tool}.",
-    "unknownPathSdk": "Sauti ya SDK ya Dart katikati ya PATH haikuwa inatoa na project haikuwa inatoa sauti ya SDK ya kihisiano.",
-    "staleLock": "pubspec.yaml inaona kama vile pubspec.lock, kwa hiyo pub inaoneka kwa muda muda kuzalishia kifedha.",
-    "staleConfig": "Mipango ya package inaonekana kwenye kufuta au kama kama pubspec.lock, kwa hiyo pub inaonekana kufuta kipango kwa kipango."
+    "unknownPathSdk": "Toleo la Dart SDK halikuweza kubainishwa kwa dart iliyo kwenye PATH, na mradi hauna toleo la SDK linalosomeka.",
+    "staleLock": "pubspec.lock haipo au haisomeki, kwa hivyo pub itatatua tegemezi upya.",
+    "staleConfig": "Usanidi wa kifurushi haupo au hauorodheshi vifurushi vilivyofungwa, kwa hivyo pub itatatua tegemezi upya.",
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "none": "hakuna ushahidi wa SDK ya mradi",
+      "lockConstraint": "kikwazo cha sdks cha pubspec.lock"
+    },
+    "constraintUnverifiable": "Tegemezi katika pubspec.yaml halikuweza kukaguliwa dhidi ya pubspec.lock (git, kikwazo maalum au kisichoweza kuchanganuliwa), kwa hivyo pub inaweza kutatua tegemezi upya.",
+    "explain": {
+      "pickFolder": "Chagua folda ya mradi ya kuelezea",
+      "none": "Hakuna ombi la pub la Vibrancy lililorukwa katika kipindi hiki.",
+      "title": "Package Vibrancy iliruka ombi la pub",
+      "project": "SDK ya mradi: {value} (kutoka {source})",
+      "folder": "Folda ya mradi: {cwd}",
+      "reason": "Sababu: {reason}",
+      "rule": "Kanuni: {rule}",
+      "pathConfirmRun": "Endesha pub get hata hivyo",
+      "runPubGet": "Endesha pub get kwa SDK ya mradi",
+      "toolVersion": "Toleo la SDK lililochaguliwa: {version}",
+      "sdk": "SDK iliyochaguliwa: {path} (kutoka {source})",
+      "time": "Iliruka saa: {time}",
+      "pathConfirm": "SDK iliyochaguliwa inatoka PATH, ambayo ndiyo mpangilio uliosababisha pubspec.lock kuandikwa upya kwa SDK isiyo sahihi. Endesha pub get hata hivyo?",
+      "pubGetFailed": "pub get imeshindwa: {error}",
+      "pubGetDone": "pub get imekamilika kwa SDK ya mradi."
+    },
+    "rule": {
+      "constraintUnverifiable": "Kikwazo hakiwezi kuthibitishwa",
+      "depsNotLocked": "Tegemezi halijafungwa",
+      "lockSdkConstraint": "Funga kikwazo cha SDK",
+      "constraintNotSatisfied": "Toleo lililofungwa liko nje ya kikwazo",
+      "staleLock": "Faili ya kufunga haipo au haisomeki",
+      "pathDepNewer": "Tegemezi la njia limebadilika",
+      "sdkMismatch": "Toleo la SDK halilingani",
+      "staleConfig": "Usanidi wa kifurushi umepitwa na wakati",
+      "unknownPathSdk": "SDK ya PATH isiyojulikana"
+    },
+    "source": {
+      "fvm": "Pini ya FVM (.fvm/flutter_sdk)",
+      "path": "PATH",
+      "flutterSdkPath": "mpangilio dart.flutterSdkPath",
+      "dartSdkPath": "mpangilio dart.sdkPath"
+    },
+    "statusItem": {
+      "tooltip": "Package Vibrancy iliruka ombi la pub ili pubspec.lock isiandikwe upya. Bofya kwa maelezo.",
+      "text": "Vibrancy: pub imerukwa"
+    },
+    "pathDepNewer": "Tegemezi la njia {name} lilibadilika baada ya pubspec.lock kuandikwa, kwa hivyo pub itatatua tegemezi upya.",
+    "depsNotLocked": "pubspec.yaml inatangaza tegemezi ambazo pubspec.lock haziorodheshi, kwa hivyo pub itatatua tegemezi upya.",
+    "constraintNotSatisfied": "{name} imefungwa kwenye {version}, ambayo haikidhi kikwazo {constraint} katika pubspec.yaml, kwa hivyo pub itatatua tegemezi upya."
   },
   "about": {
     "ruleCountStrip": "{total} maelezo ya kusandika kwa sasa inapakia katika versi hii (mazungumzaji {essential} · mazungumzaji ya kuchangia {recommended} · mazungumzaji ya kifalme {professional} · mazungumzaji ya kifalme {comprehensive} · mazungumzaji ya kifalme {pedantic} · {stylistic} mazungumzaji ya kuchangia)"

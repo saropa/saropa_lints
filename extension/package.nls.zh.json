@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints：同步插件版本到 pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: 状态菜单",
   "command.scanWithLatestEngine.title": "Saropa Lints：使用最新引擎扫描（旧版 Dart 项目）",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK文件夹（包含bin/dart）用于“使用最新引擎扫描”。必须为Dart 3.11或更新版本。留空则使用PATH中的dart。"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK文件夹（包含bin/dart）用于“使用最新引擎扫描”。必须为Dart 3.11或更新版本。留空则使用PATH中的dart。",
+  "command.packageVibrancy.explainLastSkip.title": "说明上次 Vibrancy 跳过"
 }

@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Package Vibrancy skipped a pub query so pubspec.lock is not rewritten. {reason}",
     "sdkMismatch": "Dự án đã được giải quyết với Dart {project} nhưng SDK được chọn là Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock yêu cầu Dart {constraint} nhưng SDK được chọn là Dart {tool}.",
-    "unknownPathSdk": "Phiên bản SDK Dart trên PATH không thể được xác định và dự án không có phiên bản SDK được ghi nhận.",
-    "staleLock": "pubspec.yaml mới hơn pubspec.lock, vì vậy pub sẽ tái giải quyết các phụ thuộc.",
-    "staleConfig": "Bộ cấu hình gói bị thiếu hoặc cũ hơn pubspec.lock, do đó pub sẽ tái giải quyết các phụ thuộc."
+    "unknownPathSdk": "Không thể xác định phiên bản Dart SDK của dart trên PATH và dự án không có phiên bản SDK nào đọc được.",
+    "staleLock": "pubspec.lock bị thiếu hoặc không đọc được, vì vậy pub sẽ giải quyết lại các phụ thuộc.",
+    "staleConfig": "Cấu hình gói bị thiếu hoặc không liệt kê các gói đã khóa, vì vậy pub sẽ giải quyết lại các phụ thuộc.",
+    "depsNotLocked": "pubspec.yaml khai báo các phụ thuộc mà pubspec.lock không liệt kê, vì vậy pub sẽ giải quyết lại các phụ thuộc.",
+    "source": {
+      "dartSdkPath": "cài đặt dart.sdkPath",
+      "flutterSdkPath": "cài đặt dart.flutterSdkPath",
+      "fvm": "ghim FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "ràng buộc sdks của pubspec.lock",
+      "none": "không có bằng chứng về SDK của dự án"
+    },
+    "statusItem": {
+      "text": "Vibrancy: đã bỏ qua pub",
+      "tooltip": "Package Vibrancy đã bỏ qua một truy vấn pub để pubspec.lock không bị ghi đè. Nhấp để xem chi tiết."
+    },
+    "explain": {
+      "title": "Package Vibrancy đã bỏ qua một truy vấn pub",
+      "none": "Chưa có truy vấn pub nào của Vibrancy bị bỏ qua trong phiên này.",
+      "reason": "Lý do: {reason}",
+      "rule": "Quy tắc: {rule}",
+      "sdk": "SDK đã chọn: {path} (từ {source})",
+      "toolVersion": "Phiên bản SDK đã chọn: {version}",
+      "project": "SDK của dự án: {value} (từ {source})",
+      "folder": "Thư mục dự án: {cwd}",
+      "time": "Bỏ qua lúc: {time}",
+      "runPubGet": "Chạy pub get với SDK của dự án",
+      "pubGetDone": "pub get đã hoàn tất với SDK của dự án.",
+      "pubGetFailed": "pub get thất bại: {error}",
+      "pickFolder": "Chọn thư mục dự án để giải thích",
+      "pathConfirm": "SDK đã chọn đến từ PATH, đây là thiết lập đã ghi đè pubspec.lock bằng SDK sai. Vẫn chạy pub get?",
+      "pathConfirmRun": "Vẫn chạy pub get"
+    },
+    "constraintNotSatisfied": "{name} được khóa ở {version}, không thỏa ràng buộc {constraint} trong pubspec.yaml, vì vậy pub sẽ giải quyết lại các phụ thuộc.",
+    "constraintUnverifiable": "Không thể kiểm tra một phụ thuộc trong pubspec.yaml với pubspec.lock (git, tùy chỉnh hoặc ràng buộc không phân tích được), vì vậy pub có thể giải quyết lại các phụ thuộc.",
+    "pathDepNewer": "Phụ thuộc đường dẫn {name} đã thay đổi sau khi pubspec.lock được ghi, vì vậy pub sẽ giải quyết lại các phụ thuộc.",
+    "rule": {
+      "sdkMismatch": "Phiên bản SDK không khớp",
+      "lockSdkConstraint": "Khóa ràng buộc SDK",
+      "unknownPathSdk": "SDK trên PATH không xác định",
+      "staleLock": "Tệp khóa bị thiếu hoặc không đọc được",
+      "staleConfig": "Cấu hình gói đã cũ",
+      "depsNotLocked": "Phụ thuộc chưa được khóa",
+      "constraintNotSatisfied": "Phiên bản đã khóa nằm ngoài ràng buộc",
+      "constraintUnverifiable": "Không thể xác minh ràng buộc",
+      "pathDepNewer": "Phụ thuộc đường dẫn đã thay đổi"
+    }
   },
   "about": {
     "ruleCountStrip": "Quy tắc lint {total} hiện đang được cung cấp trong phiên bản này (cơ bản {essential} · khuyến nghị {recommended} · chuyên nghiệp {professional} · toàn diện {comprehensive} · cầu kỳ {pedantic} · {stylistic} tùy chọn phong cách)"

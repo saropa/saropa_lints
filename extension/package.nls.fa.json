@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: نسخه افزونه هم ارزی را به pubspec.lock تنظیم کنید",
   "command.showStatusBarMenu.title": "Saropa Lints: منو وضعیت",
   "command.scanWithLatestEngine.title": "Saropa Lints: اسکن با انجن آخرین (پروژه های قدیمی Dart)",
-  "config.property.externalEngine.dartSdkPath.description": "پوشه Dart SDK (که bin/dart را شامل می‌کند) که توسط \"Scan with Latest Engine\" استفاده می‌شود. باید Dart 3.11 یا جدیدتر باشد. اگر خالی باشد، dart موجود در PATH استفاده می‌شود."
+  "config.property.externalEngine.dartSdkPath.description": "پوشه Dart SDK (که bin/dart را شامل می‌کند) که توسط \"Scan with Latest Engine\" استفاده می‌شود. باید Dart 3.11 یا جدیدتر باشد. اگر خالی باشد، dart موجود در PATH استفاده می‌شود.",
+  "command.packageVibrancy.explainLastSkip.title": "توضیح آخرین ردشدن Vibrancy"
 }

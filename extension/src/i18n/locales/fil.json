@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Package Vibrancy ay nawawala ang pub query kaya pubspec.lock ay hindi binabalangkas. {reason}",
     "sdkMismatch": "Ang proyekto ay napatunayan na gamit ang Dart {project} ngunit ang napiling SDK ay Dart {tool}.",
     "lockSdkConstraint": "Ang pubspec.lock ay nangangailangan ng Dart {constraint} ngunit ang napiling SDK ay Dart {tool}.",
-    "unknownPathSdk": "Ang bersyon ng Dart SDK sa PATH ay hindi maitakda at ang proyekto ay walang narekord na bersyon ng SDK.",
-    "staleLock": "Ang pubspec.yaml ay mas bagong bersyon kaysa sa pubspec.lock, kaya ang pub ay magsisimula muli sa pag-resolve ng mga dependency.",
-    "staleConfig": "Ang configuration ng package ay nawawala o mas matandang pubspec.lock, kaya ang pub ay magsisimula ulit sa pag-resolve ng mga dependency."
+    "unknownPathSdk": "Hindi matukoy ang bersyon ng Dart SDK para sa dart sa PATH, at walang nababasang bersyon ng SDK ang proyekto.",
+    "staleLock": "Nawawala o hindi mabasa ang pubspec.lock, kaya ire-resolve muli ng pub ang mga dependency.",
+    "staleConfig": "Nawawala ang package configuration o hindi nito inililista ang mga naka-lock na package, kaya ire-resolve muli ng pub ang mga dependency.",
+    "depsNotLocked": "Nagdedeklara ang pubspec.yaml ng mga dependency na wala sa pubspec.lock, kaya ire-resolve muli ng pub ang mga dependency.",
+    "source": {
+      "dartSdkPath": "setting na dart.sdkPath",
+      "flutterSdkPath": "setting na dart.flutterSdkPath",
+      "fvm": "FVM pin (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "constraint ng sdks sa pubspec.lock",
+      "none": "walang ebidensya ng project SDK"
+    },
+    "statusItem": {
+      "text": "Vibrancy: nilaktawan ang pub",
+      "tooltip": "Nilaktawan ng Package Vibrancy ang isang pub query para hindi muling masulat ang pubspec.lock. I-click para sa mga detalye."
+    },
+    "explain": {
+      "title": "Nilaktawan ng Package Vibrancy ang isang pub query",
+      "none": "Walang pub query ng Vibrancy na nilaktawan sa session na ito.",
+      "reason": "Dahilan: {reason}",
+      "rule": "Panuntunan: {rule}",
+      "sdk": "Napiling SDK: {path} (mula sa {source})",
+      "toolVersion": "Napiling bersyon ng SDK: {version}",
+      "project": "Project SDK: {value} (mula sa {source})",
+      "folder": "Project folder: {cwd}",
+      "time": "Nilaktawan noong: {time}",
+      "runPubGet": "Patakbuhin ang pub get gamit ang project SDK",
+      "pubGetDone": "Natapos ang pub get gamit ang project SDK.",
+      "pubGetFailed": "Nabigo ang pub get: {error}",
+      "pickFolder": "Pumili ng project folder na ipapaliwanag",
+      "pathConfirm": "Ang napiling SDK ay galing sa PATH, ang setup na nagsulat muli ng pubspec.lock gamit ang maling SDK. Patakbuhin pa rin ang pub get?",
+      "pathConfirmRun": "Patakbuhin pa rin ang pub get"
+    },
+    "constraintNotSatisfied": "Naka-lock ang {name} sa {version}, na hindi tumutugma sa constraint na {constraint} sa pubspec.yaml, kaya ire-resolve muli ng pub ang mga dependency.",
+    "constraintUnverifiable": "Hindi ma-check ang isang dependency sa pubspec.yaml laban sa pubspec.lock (git, custom, o hindi ma-parse na constraint), kaya maaaring i-resolve muli ng pub ang mga dependency.",
+    "pathDepNewer": "Nagbago ang path dependency na {name} matapos masulat ang pubspec.lock, kaya ire-resolve muli ng pub ang mga dependency.",
+    "rule": {
+      "sdkMismatch": "Hindi tugma ang bersyon ng SDK",
+      "lockSdkConstraint": "I-lock ang SDK constraint",
+      "unknownPathSdk": "Hindi kilalang PATH SDK",
+      "staleLock": "Nawawala o hindi mabasa ang lock file",
+      "staleConfig": "Luma na ang package configuration",
+      "depsNotLocked": "Hindi naka-lock ang dependency",
+      "constraintNotSatisfied": "Ang naka-lock na bersyon ay wala sa constraint",
+      "constraintUnverifiable": "Hindi ma-verify ang constraint",
+      "pathDepNewer": "Nagbago ang path dependency"
+    }
   },
   "about": {
     "ruleCountStrip": "Mga tala ng {total} na mga tala ng lint ay kasama na sa bersyon na ito (essensial {essential} · inirerekomenda {recommended} · profesional {professional} · komprehensibo {comprehensive} · pedantiko {pedantic} · {stylistic} opt-in stylistic)"

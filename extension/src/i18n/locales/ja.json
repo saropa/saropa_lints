@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "パッケージ ビブランシーがpubクエリをスキップしたため、pubspec.lockは再構築されません。{reason}",
     "sdkMismatch": "プロジェクトは Dart {project} で解決されましたが、選択された SDK は Dart {tool} です。",
     "lockSdkConstraint": "pubspec.lockはDart {constraint}を必要としますが、選択されたSDKはDart {tool}です。",
-    "unknownPathSdk": "PATH上のDart SDKバージョンが特定できず、プロジェクトに記録されたSDKバージョンもありません。",
-    "staleLock": "pubspec.yamlはpubspec.lockより新しいため、pubは依存関係を再解決します。",
-    "staleConfig": "パッケージの構成が不足しているか、pubspec.lockよりも古いので、pubは依存関係を再解決します。"
+    "unknownPathSdk": "PATH 上の dart の Dart SDK バージョンを特定できず、プロジェクトにも読み取れる SDK バージョンがありません。",
+    "staleLock": "pubspec.lock が存在しないか読み取れないため、pub は依存関係を再解決します。",
+    "staleConfig": "パッケージ構成が存在しないか、ロックされたパッケージが記載されていないため、pub は依存関係を再解決します。",
+    "depsNotLocked": "pubspec.yaml に宣言されている依存関係が pubspec.lock に記載されていないため、pub は依存関係を再解決します。",
+    "source": {
+      "dartSdkPath": "設定 dart.sdkPath",
+      "flutterSdkPath": "設定 dart.flutterSdkPath",
+      "fvm": "FVM ピン (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "pubspec.lock の sdks 制約",
+      "none": "プロジェクトの SDK を示す証拠なし"
+    },
+    "statusItem": {
+      "text": "Vibrancy: pub をスキップ",
+      "tooltip": "Package Vibrancy は pubspec.lock を書き換えないよう pub のクエリをスキップしました。クリックで詳細を表示します。"
+    },
+    "explain": {
+      "title": "Package Vibrancy が pub のクエリをスキップしました",
+      "none": "このセッションでは Vibrancy の pub クエリはスキップされていません。",
+      "reason": "理由: {reason}",
+      "rule": "ルール: {rule}",
+      "sdk": "選択された SDK: {path} (取得元: {source})",
+      "toolVersion": "選択された SDK バージョン: {version}",
+      "project": "プロジェクトの SDK: {value} (取得元: {source})",
+      "folder": "プロジェクトフォルダー: {cwd}",
+      "time": "スキップ日時: {time}",
+      "runPubGet": "プロジェクトの SDK で pub get を実行",
+      "pubGetDone": "pub get がプロジェクトの SDK で完了しました。",
+      "pubGetFailed": "pub get に失敗しました: {error}",
+      "pickFolder": "説明するプロジェクトフォルダーを選択",
+      "pathConfirm": "選択された SDK は PATH から取得されています。これは誤った SDK で pubspec.lock が書き換えられた構成です。それでも pub get を実行しますか?",
+      "pathConfirmRun": "それでも pub get を実行"
+    },
+    "constraintNotSatisfied": "{name} は {version} でロックされており、pubspec.yaml の制約 {constraint} を満たさないため、pub は依存関係を再解決します。",
+    "constraintUnverifiable": "pubspec.yaml の依存関係を pubspec.lock と照合できませんでした (git、カスタム、または解析できない制約)。そのため pub が依存関係を再解決する場合があります。",
+    "pathDepNewer": "パス依存関係 {name} が pubspec.lock の書き込み後に変更されたため、pub は依存関係を再解決します。",
+    "rule": {
+      "sdkMismatch": "SDK バージョンの不一致",
+      "lockSdkConstraint": "SDK 制約のロック",
+      "unknownPathSdk": "PATH 上の SDK が不明",
+      "staleLock": "ロックファイルが存在しないか読み取れません",
+      "staleConfig": "パッケージ構成が古い",
+      "depsNotLocked": "依存関係がロックされていません",
+      "constraintNotSatisfied": "ロックされたバージョンが制約の範囲外",
+      "constraintUnverifiable": "制約を検証できません",
+      "pathDepNewer": "パス依存関係が変更されました"
+    }
   },
   "about": {
     "ruleCountStrip": "現在のバージョンで提供されている{total} lintルール（必須{essential} · 推奨{recommended} · 専門家{professional} · 完全{comprehensive} · 厳格{pedantic} · {stylistic} スタイル選択）"

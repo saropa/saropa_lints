@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock にプラグインバージョンを同期する",
   "command.showStatusBarMenu.title": "Saropa Lints: ステータスメニュー",
   "command.scanWithLatestEngine.title": "Saropa Lints: 最新エンジンでスキャン（古いDartプロジェクト）",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDKフォルダ（bin/dartを含む）は「最新エンジンでスキャン」によって使用されます。Dart 3.11以上を使用する必要があります。PATH上のdartを使用する場合は空白にします。"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDKフォルダ（bin/dartを含む）は「最新エンジンでスキャン」によって使用されます。Dart 3.11以上を使用する必要があります。PATH上のdartを使用する場合は空白にします。",
+  "command.packageVibrancy.explainLastSkip.title": "最後の Vibrancy スキップを説明"
 }

@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "প্যাকেজ ভার্ব্রান্সি একটি পাব কুয়েরি ছাড়া গেল তাই pubspec.lock পুনরায় লেখা হয়নি। {reason}",
     "sdkMismatch": "প্রকল্পটি Dart {project} দ্বারা সমাধান করা হয়েছে কিন্তু বাছাই করা SDK হল Dart {tool}।",
     "lockSdkConstraint": "pubspec.lock এ Dart {constraint} প্রয়োজন কিন্তু বাছাই করা SDK হল Dart {tool}।",
-    "unknownPathSdk": "প্যাথ-এ থাকা Dart SDK ভার্সনটি নির্ধারণ করা যায়নি এবং প্রকল্পে কোনও রেকর্ডেড SDK ভার্সন নেই।",
-    "staleLock": "pubspec.yaml এটি pubspec.lock এর চেয়ে নতুন, তাই pub পুনরায় অধীনস্থ কর্মসূচি বিশ্লেষণ করবে।",
-    "staleConfig": "প্যাকেজ কনফিগারেশন অনুপস্থিত বা pubspec.lock এর চেয়ে পুরানো, তাই pub ডেপেন্ডেন্সি পুনরায় সমাধান করবে।"
+    "unknownPathSdk": "PATH-এর dart-এর জন্য Dart SDK সংস্করণ নির্ধারণ করা যায়নি, এবং প্রকল্পে পড়ার মতো কোনো SDK সংস্করণ নেই।",
+    "staleLock": "pubspec.lock নেই বা পড়া যায় না, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
+    "staleConfig": "প্যাকেজ কনফিগারেশন নেই বা তাতে লক করা প্যাকেজগুলো তালিকাভুক্ত নেই, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "none": "প্রকল্পের SDK-এর কোনো প্রমাণ নেই",
+      "lockConstraint": "pubspec.lock-এর sdks সীমাবদ্ধতা"
+    },
+    "constraintUnverifiable": "pubspec.yaml-এর একটি ডিপেন্ডেন্সি pubspec.lock-এর সাথে যাচাই করা যায়নি (git, কাস্টম বা পার্স করা যায় না এমন সীমাবদ্ধতা), তাই pub ডিপেন্ডেন্সি আবার সমাধান করতে পারে।",
+    "explain": {
+      "pickFolder": "ব্যাখ্যা করার জন্য একটি প্রকল্প ফোল্ডার বেছে নিন",
+      "none": "এই সেশনে কোনো Vibrancy pub কোয়েরি এড়িয়ে যাওয়া হয়নি।",
+      "title": "প্যাকেজ ভাইব্র্যান্সি একটি pub কোয়েরি এড়িয়ে গেছে",
+      "project": "প্রকল্পের SDK: {value} ({source} থেকে)",
+      "folder": "প্রকল্প ফোল্ডার: {cwd}",
+      "reason": "কারণ: {reason}",
+      "rule": "নিয়ম: {rule}",
+      "pathConfirmRun": "তবুও pub get চালান",
+      "runPubGet": "প্রকল্পের SDK দিয়ে pub get চালান",
+      "toolVersion": "নির্বাচিত SDK সংস্করণ: {version}",
+      "sdk": "নির্বাচিত SDK: {path} ({source} থেকে)",
+      "time": "এড়িয়ে যাওয়ার সময়: {time}",
+      "pathConfirm": "নির্বাচিত SDK PATH থেকে এসেছে, আর এই সেটআপই ভুল SDK দিয়ে pubspec.lock নতুন করে লিখেছিল। তবুও pub get চালাবেন?",
+      "pubGetFailed": "pub get ব্যর্থ হয়েছে: {error}",
+      "pubGetDone": "প্রকল্পের SDK দিয়ে pub get শেষ হয়েছে।"
+    },
+    "rule": {
+      "constraintUnverifiable": "সীমাবদ্ধতা যাচাই করা যায় না",
+      "depsNotLocked": "ডিপেন্ডেন্সি লক করা নেই",
+      "lockSdkConstraint": "SDK সীমাবদ্ধতা লক করুন",
+      "constraintNotSatisfied": "লক করা সংস্করণ সীমাবদ্ধতার বাইরে",
+      "staleLock": "লক ফাইল নেই বা পড়া যায় না",
+      "pathDepNewer": "পাথ ডিপেন্ডেন্সি বদলেছে",
+      "sdkMismatch": "SDK সংস্করণ মেলেনি",
+      "staleConfig": "পুরোনো প্যাকেজ কনফিগারেশন",
+      "unknownPathSdk": "অজানা PATH SDK"
+    },
+    "source": {
+      "fvm": "FVM পিন (.fvm/flutter_sdk)",
+      "path": "PATH",
+      "flutterSdkPath": "সেটিং dart.flutterSdkPath",
+      "dartSdkPath": "সেটিং dart.sdkPath"
+    },
+    "statusItem": {
+      "tooltip": "pubspec.lock যাতে নতুন করে লেখা না হয়, সেজন্য প্যাকেজ ভাইব্র্যান্সি একটি pub কোয়েরি এড়িয়ে গেছে। বিস্তারিত দেখতে ক্লিক করুন।",
+      "text": "Vibrancy: pub এড়িয়ে যাওয়া হয়েছে"
+    },
+    "pathDepNewer": "pubspec.lock লেখার পরে পাথ ডিপেন্ডেন্সি {name} বদলেছে, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
+    "depsNotLocked": "pubspec.yaml এমন ডিপেন্ডেন্সি ঘোষণা করেছে যা pubspec.lock-এ তালিকাভুক্ত নেই, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
+    "constraintNotSatisfied": "{name} {version}-এ লক করা আছে, যা pubspec.yaml-এর সীমাবদ্ধতা {constraint} পূরণ করে না, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।"
   },
   "about": {
     "ruleCountStrip": "{total} লিংট নিয়মগুলি এই সংস্করণে বর্তমান (অপরিহার্য {essential} · পরামর্শ করা যাক {recommended} · পেশাদার {professional} · সম্পূর্ণ {comprehensive} · শিক্ষামূলক {pedantic} · {stylistic} বিকল্প শৈলীগত)"

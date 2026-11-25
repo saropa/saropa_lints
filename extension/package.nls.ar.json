@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: تزامن إصدار الإضافة مع pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: قائمة الحالة",
   "command.scanWithLatestEngine.title": "Saropa Lints: مسح باستخدام المحرك الأحدث (مشاريع Dart القديمة)",
-  "config.property.externalEngine.dartSdkPath.description": "مجلد Dart SDK (يحتوي على bin/dart) المستخدم بواسطة \"المسح باستخدام المحرك الأحدث\". يجب أن يكون Dart 3.11 أو أحدث. تركه فارغًا لاستخدام dart الموجود في PATH."
+  "config.property.externalEngine.dartSdkPath.description": "مجلد Dart SDK (يحتوي على bin/dart) المستخدم بواسطة \"المسح باستخدام المحرك الأحدث\". يجب أن يكون Dart 3.11 أو أحدث. تركه فارغًا لاستخدام dart الموجود في PATH.",
+  "command.packageVibrancy.explainLastSkip.title": "شرح آخر تخطٍّ في Vibrancy"
 }

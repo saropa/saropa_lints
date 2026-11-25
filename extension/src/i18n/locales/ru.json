@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Пакет Vibrancy пропустил запрос pub, поэтому pubspec.lock не переписан. {reason}",
     "sdkMismatch": "Проект был разрешён с Dart {project}, но выбранный SDK — Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock требует Dart {constraint}, но выбранный SDK — Dart {tool}.",
-    "unknownPathSdk": "Версия Dart SDK на PATH не может быть определена и проект не имеет записанной версии SDK.",
-    "staleLock": "pubspec.yaml новее, чем pubspec.lock, поэтому pub будет повторно разрешать зависимости.",
-    "staleConfig": "Конфигурация пакета отсутствует или устарела раньше, чем pubspec.lock, поэтому pub будет повторно разрешать зависимости."
+    "unknownPathSdk": "Не удалось определить версию Dart SDK для dart из PATH, а у проекта нет читаемой версии SDK.",
+    "staleLock": "Файл pubspec.lock отсутствует или нечитаем, поэтому pub заново разрешил бы зависимости.",
+    "staleConfig": "Конфигурация пакетов отсутствует или не содержит зафиксированные пакеты, поэтому pub заново разрешил бы зависимости.",
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "none": "нет данных о SDK проекта",
+      "lockConstraint": "ограничение sdks в pubspec.lock"
+    },
+    "constraintUnverifiable": "Зависимость в pubspec.yaml не удалось сверить с pubspec.lock (ограничение git, нестандартное или не поддающееся разбору), поэтому pub может заново разрешить зависимости.",
+    "explain": {
+      "pickFolder": "Выберите папку проекта для объяснения",
+      "none": "В этом сеансе ни один запрос pub от Vibrancy не пропускался.",
+      "title": "Package Vibrancy пропустил запрос pub",
+      "project": "SDK проекта: {value} (из {source})",
+      "folder": "Папка проекта: {cwd}",
+      "reason": "Причина: {reason}",
+      "rule": "Правило: {rule}",
+      "pathConfirmRun": "Всё равно выполнить pub get",
+      "runPubGet": "Выполнить pub get с SDK проекта",
+      "toolVersion": "Выбранная версия SDK: {version}",
+      "sdk": "Выбранный SDK: {path} (из {source})",
+      "time": "Пропущено: {time}",
+      "pathConfirm": "Выбранный SDK взят из PATH — именно эта настройка перезаписала pubspec.lock с неверным SDK. Всё равно выполнить pub get?",
+      "pubGetFailed": "Ошибка pub get: {error}",
+      "pubGetDone": "pub get завершён с SDK проекта."
+    },
+    "rule": {
+      "constraintUnverifiable": "Ограничение не поддаётся проверке",
+      "depsNotLocked": "Зависимость не зафиксирована",
+      "lockSdkConstraint": "Ограничение SDK в lock",
+      "constraintNotSatisfied": "Зафиксированная версия вне ограничения",
+      "staleLock": "Файл lock отсутствует или нечитаем",
+      "pathDepNewer": "Зависимость по пути изменена",
+      "sdkMismatch": "Несоответствие версии SDK",
+      "staleConfig": "Устаревшая конфигурация пакетов",
+      "unknownPathSdk": "Неизвестный SDK из PATH"
+    },
+    "source": {
+      "fvm": "Закрепление FVM (.fvm/flutter_sdk)",
+      "path": "PATH",
+      "flutterSdkPath": "настройка dart.flutterSdkPath",
+      "dartSdkPath": "настройка dart.sdkPath"
+    },
+    "statusItem": {
+      "tooltip": "Package Vibrancy пропустил запрос pub, чтобы не перезаписывать pubspec.lock. Нажмите для подробностей.",
+      "text": "Vibrancy: pub пропущен"
+    },
+    "pathDepNewer": "Зависимость по пути {name} изменилась после записи pubspec.lock, поэтому pub заново разрешил бы зависимости.",
+    "depsNotLocked": "pubspec.yaml объявляет зависимости, которых нет в pubspec.lock, поэтому pub заново разрешил бы зависимости.",
+    "constraintNotSatisfied": "{name} зафиксирован на {version}, что не удовлетворяет ограничению {constraint} в pubspec.yaml, поэтому pub заново разрешил бы зависимости."
   },
   "about": {
     "ruleCountStrip": "{total} правил линта в настоящее время поставляется в этой версии (основные {essential} · рекомендуемые {recommended} · профессиональные {professional} · всесторонние {comprehensive} · педантичные {pedantic} · {stylistic} опциональные стилистические)"

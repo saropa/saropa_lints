@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: ซิงค์แพลตฟอร์มเวอร์ชันไปยัง pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: เมนูสถานะ",
   "command.scanWithLatestEngine.title": "Saropa Lints: ตรวจสอบด้วยเครื่องมือล่าสุด (โครงการ Dart เก่า)",
-  "config.property.externalEngine.dartSdkPath.description": "โฟลเดอร์ Dart SDK (ประกอบด้วย bin/dart) ที่ใช้โดย \"Scan with Latest Engine\" ต้องเป็น Dart 3.11 หรือใหม่กว่า ถ้าเว้นว่างจะใช้ dart ที่อยู่ใน PATH"
+  "config.property.externalEngine.dartSdkPath.description": "โฟลเดอร์ Dart SDK (ประกอบด้วย bin/dart) ที่ใช้โดย \"Scan with Latest Engine\" ต้องเป็น Dart 3.11 หรือใหม่กว่า ถ้าเว้นว่างจะใช้ dart ที่อยู่ใน PATH",
+  "command.packageVibrancy.explainLastSkip.title": "อธิบายการข้าม Vibrancy ครั้งล่าสุด"
 }

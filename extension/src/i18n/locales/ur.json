@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "پیکیج وبرنسی نے ایک پب کوئری کا انتظار نہیں کیا تاکہ pubspec.lock تبدیل نہ ہو سکے۔ {reason}",
     "sdkMismatch": "پروجیکٹ Dart {project} سے حل کیا گیا لیکن انتخاب کردہ SDK Dart {tool} ہے۔",
     "lockSdkConstraint": "pubspec.lock Dart {constraint} کی ضرورت ہے لیکن منتخب SDK Dart {tool} ہے۔",
-    "unknownPathSdk": "پھر Dart SDK ورژن پر PATH سے تعین نہیں کیا جا سکا اور پروجیکٹ میں ریکارڈ کی گئی SDK ورژن نہیں ہے۔",
-    "staleLock": "pubspec.yaml نیا ہے pubspec.lock سے، اس لیے pub وابستہ کرداروں کو پھر سے حل کرے گا۔",
-    "staleConfig": "پیکیج کی کان figریشن گم ہے یا pubspec.lock سے پہلے ہے، اس لیے پب وہ پھر سے وابستہ کرے گا۔"
+    "unknownPathSdk": "PATH پر موجود dart کا Dart SDK ورژن معلوم نہیں ہو سکا، اور پروجیکٹ میں پڑھنے کے قابل SDK ورژن بھی موجود نہیں۔",
+    "staleLock": "pubspec.lock غائب ہے یا پڑھی نہیں جا سکتی، اس لیے pub انحصارات کو دوبارہ حل کرے گا۔",
+    "staleConfig": "پیکیج کنفیگریشن غائب ہے یا مقفل پیکیجز کی فہرست میں شامل نہیں، اس لیے pub انحصارات کو دوبارہ حل کرے گا۔",
+    "depsNotLocked": "pubspec.yaml ایسے انحصارات ظاہر کرتی ہے جو pubspec.lock میں درج نہیں، اس لیے pub انحصارات کو دوبارہ حل کرے گا۔",
+    "source": {
+      "dartSdkPath": "ترتیب dart.sdkPath",
+      "flutterSdkPath": "ترتیب dart.flutterSdkPath",
+      "fvm": "FVM پن (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "pubspec.lock میں sdks کی پابندی",
+      "none": "پروجیکٹ SDK کا کوئی ثبوت نہیں"
+    },
+    "statusItem": {
+      "text": "Vibrancy: pub اسکپ ہوئی",
+      "tooltip": "پیکیج Vibrancy نے ایک pub کوئری اسکپ کی تاکہ pubspec.lock دوبارہ نہ لکھی جائے۔ تفصیل کے لیے کلک کریں۔"
+    },
+    "explain": {
+      "title": "پیکیج Vibrancy نے ایک pub کوئری اسکپ کی",
+      "none": "اس سیشن میں Vibrancy کی کوئی pub کوئری اسکپ نہیں ہوئی۔",
+      "reason": "وجہ: {reason}",
+      "rule": "اصول: {rule}",
+      "sdk": "منتخب SDK: {path} ({source} سے)",
+      "toolVersion": "منتخب SDK ورژن: {version}",
+      "project": "پروجیکٹ SDK: {value} ({source} سے)",
+      "folder": "پروجیکٹ فولڈر: {cwd}",
+      "time": "اسکپ کا وقت: {time}",
+      "runPubGet": "پروجیکٹ SDK کے ساتھ pub get چلائیں",
+      "pubGetDone": "pub get پروجیکٹ SDK کے ساتھ مکمل ہوا۔",
+      "pubGetFailed": "pub get ناکام ہوا: {error}",
+      "pickFolder": "وضاحت کے لیے پروجیکٹ فولڈر منتخب کریں",
+      "pathConfirm": "منتخب SDK PATH سے آتا ہے، یہی وہ ترتیب ہے جس نے pubspec.lock کو غلط SDK کے ساتھ دوبارہ لکھا۔ پھر بھی pub get چلائیں؟",
+      "pathConfirmRun": "پھر بھی pub get چلائیں"
+    },
+    "constraintNotSatisfied": "{name} ورژن {version} پر مقفل ہے، جو pubspec.yaml میں پابندی {constraint} پر پورا نہیں اترتا، اس لیے pub انحصارات کو دوبارہ حل کرے گا۔",
+    "constraintUnverifiable": "pubspec.yaml میں ایک انحصار (dependency) کو pubspec.lock کے مقابلے میں جانچا نہیں جا سکا (git، حسبِ ضرورت یا ناقابلِ تجزیہ پابندی)، اس لیے pub انحصارات کو دوبارہ حل کر سکتا ہے۔",
+    "pathDepNewer": "پاتھ انحصار {name} کے pubspec.lock لکھے جانے کے بعد تبدیل ہونے کی وجہ سے pub انحصارات کو دوبارہ حل کرے گا۔",
+    "rule": {
+      "sdkMismatch": "SDK ورژن میں عدم مطابقت",
+      "lockSdkConstraint": "لاک فائل میں SDK کی پابندی",
+      "unknownPathSdk": "PATH پر نامعلوم SDK",
+      "staleLock": "لاک فائل غائب ہے یا پڑھی نہیں جا سکتی",
+      "staleConfig": "پیکیج کنفیگریشن پرانی ہے",
+      "depsNotLocked": "انحصار مقفل نہیں ہے",
+      "constraintNotSatisfied": "مقفل ورژن پابندی سے باہر ہے",
+      "constraintUnverifiable": "پابندی کی تصدیق ممکن نہیں",
+      "pathDepNewer": "پاتھ انحصار تبدیل ہو گیا"
+    }
   },
   "about": {
     "ruleCountStrip": "{total} قاعدات لینٹ کررنتی ہیں اس نسخے میں (ضروری {essential} · موصیح {recommended} · پرو فیشنل {professional} · مکمل {comprehensive} · تکنیکی {pedantic} · {stylistic} استعمال کرنے والے سٹائل )"
@@ -242,7 +288,7 @@
       "ordering_sorting": "ممبرز، پارامیٹرز، فیلڈس اور میپ کی کیس کو ترتیب دیتا ہے جس سے پیشگی پر ترتیب ہوتی ہے۔ موجودہ کوڈ پر بہت زیادہ ہنگامہ اڑاتا ہے — نیا کوڈ یا چھوٹے ریپوزٹوریز پر سب سے بہتر ہے۔",
       "naming_conventions": "فائلوں ، طریقوں ، مستثنیات ، کال بیک اور بلاک ایونٹس اور اسٹیٹ کے لئے نام لینا۔ بڑے کوڈ بیس پر شور مچانا ہوسکتا ہے۔؛ incrementally. enable incrementally اضافہ کے ساتھ فعال کریں",
       "boolean_naming": "بولینز کو is/has/can/should پریفیکس کا استعمال کرنا چاہیے تاکہ کنڈیشنل اور API میں نیت واضح ہو۔",
-      "code_style_preferences": "کس طرح رجوع، شرائط، اور لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپس لپ, for-in, getter vs method, اور مشابہ اختصاری طریقے.",
+      "code_style_preferences": "واپسی، شرطوں اور لوپس لکھنے کا انداز — فوری واپسی، for-in، گیٹر بمقابلہ میتھڈ، اور اسی طرح کے مختصر طریقے۔",
       "function_parameter_style": "جب جامع ، تمام نامزد پیرامیٹرز ، ان لائن کال بیک اور کوئی پیرامیٹرکسٹیشن نہ ہو تو تیر کے افعال۔",
       "widget_style": "Flutter ویجٹ چنہاں — SizedBox.square، مرکزیت کریں اُتے اُلٹ کریں، فاصلہ اُتے SizedBox، اور shrinkWrap کو اُتے اُلٹ کریں۔ Flutter پروجیکٹس ہی۔",
       "class_record_style": "کلاس بمقابلہ ریکارڈ ریٹرن ٹائپس ، نجی انڈر اسکور پریفیکسز ، اور واضح طور پر یہ جہاں وضاحت کرتا ہے۔",

@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Regola Rigida:\n1. Restituisci SOLO l'output della stringa tradotto.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Package Vibrancy ha saltato una query pub quindi pubspec.lock non è riscritto. {reason}",
     "sdkMismatch": "Il progetto è stato risolto con Dart {project} ma l'SDK selezionato è Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock richiede Dart {constraint} ma l'SDK selezionato è Dart {tool}.",
-    "unknownPathSdk": "La versione dell'SDK Dart su PATH non può essere determinata e il progetto non ha una versione SDK registrata.",
-    "staleLock": "pubspec.yaml è più recente di pubspec.lock, quindi pub ripristinerebbe le dipendenze.",
-    "staleConfig": "La configurazione del package è mancante o più vecchia di pubspec.lock, quindi pub ripristinerà la risoluzione delle dipendenze."
+    "unknownPathSdk": "Impossibile determinare la versione dell'SDK Dart per il dart in PATH, e il progetto non ha una versione SDK leggibile.",
+    "staleLock": "pubspec.lock manca o è illeggibile, quindi pub risolverebbe di nuovo le dipendenze.",
+    "staleConfig": "La configurazione dei pacchetti manca o non elenca i pacchetti bloccati, quindi pub risolverebbe di nuovo le dipendenze.",
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "none": "nessuna evidenza dell'SDK del progetto",
+      "lockConstraint": "vincolo sdks di pubspec.lock"
+    },
+    "constraintUnverifiable": "Impossibile verificare una dipendenza di pubspec.yaml rispetto a pubspec.lock (vincolo git, personalizzato o non analizzabile), quindi pub potrebbe risolvere di nuovo le dipendenze.",
+    "explain": {
+      "pickFolder": "Scegli una cartella di progetto da spiegare",
+      "none": "Nessuna query pub di Vibrancy è stata saltata in questa sessione.",
+      "title": "Package Vibrancy ha saltato una query pub",
+      "project": "SDK del progetto: {value} (da {source})",
+      "folder": "Cartella del progetto: {cwd}",
+      "reason": "Motivo: {reason}",
+      "rule": "Regola: {rule}",
+      "pathConfirmRun": "Esegui comunque pub get",
+      "runPubGet": "Esegui pub get con l'SDK del progetto",
+      "toolVersion": "Versione SDK selezionata: {version}",
+      "sdk": "SDK selezionato: {path} (da {source})",
+      "time": "Saltato alle: {time}",
+      "pathConfirm": "L'SDK selezionato proviene da PATH, la configurazione che ha riscritto pubspec.lock con l'SDK sbagliato. Eseguire comunque pub get?",
+      "pubGetFailed": "pub get non riuscito: {error}",
+      "pubGetDone": "pub get completato con l'SDK del progetto."
+    },
+    "rule": {
+      "constraintUnverifiable": "Vincolo non verificabile",
+      "depsNotLocked": "Dipendenza non bloccata",
+      "lockSdkConstraint": "Vincolo SDK del lock",
+      "constraintNotSatisfied": "Versione bloccata fuori dal vincolo",
+      "staleLock": "File di lock mancante o illeggibile",
+      "pathDepNewer": "Dipendenza di percorso modificata",
+      "sdkMismatch": "Versione SDK non corrispondente",
+      "staleConfig": "Configurazione dei pacchetti obsoleta",
+      "unknownPathSdk": "SDK in PATH sconosciuto"
+    },
+    "source": {
+      "fvm": "Pin FVM (.fvm/flutter_sdk)",
+      "path": "PATH",
+      "flutterSdkPath": "impostazione dart.flutterSdkPath",
+      "dartSdkPath": "impostazione dart.sdkPath"
+    },
+    "statusItem": {
+      "tooltip": "Package Vibrancy ha saltato una query pub per non riscrivere pubspec.lock. Clicca per i dettagli.",
+      "text": "Vibrancy: pub saltato"
+    },
+    "pathDepNewer": "La dipendenza di percorso {name} è cambiata dopo la scrittura di pubspec.lock, quindi pub risolverebbe di nuovo le dipendenze.",
+    "depsNotLocked": "pubspec.yaml dichiara dipendenze che pubspec.lock non elenca, quindi pub risolverebbe di nuovo le dipendenze.",
+    "constraintNotSatisfied": "{name} è bloccato a {version}, che non soddisfa il vincolo {constraint} in pubspec.yaml, quindi pub risolverebbe di nuovo le dipendenze."
   },
   "about": {
     "ruleCountStrip": "Regole {total} di lint attualmente presenti in questa versione (essenziali {essential} · consigliate {recommended} · professionali {professional} · complete {comprehensive} · pedanti {pedantic} · {stylistic} stili opt-in)"

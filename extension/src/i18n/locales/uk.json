@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "Пакет Vibrancy пропустив запит pub, тому pubspec.lock не переписується. {reason}",
     "sdkMismatch": "Проект був вирішений з Dart {project}, але вибраний SDK — Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock вимагає Dart {constraint}, але вибраний SDK — це Dart {tool}.",
-    "unknownPathSdk": "Версія Dart SDK на PATH не може бути визначена, а проект не має записаної версії SDK.",
-    "staleLock": "pubspec.yaml набагато новіший, ніж pubspec.lock, тому pub знову вирішить залежності.",
-    "staleConfig": "Конфігурація пакету відсутня або старіша за pubspec.lock, тому pub знову вирішить залежності."
+    "unknownPathSdk": "Не вдалося визначити версію Dart SDK для dart у PATH, а проєкт не має читабельної версії SDK.",
+    "staleLock": "pubspec.lock відсутній або нечитабельний, тому pub повторно розв'яже залежності.",
+    "staleConfig": "Конфігурація пакетів відсутня або не містить зафіксованих пакетів, тому pub повторно розв'яже залежності.",
+    "depsNotLocked": "pubspec.yaml оголошує залежності, яких немає в pubspec.lock, тому pub повторно розв'яже залежності.",
+    "source": {
+      "dartSdkPath": "налаштування dart.sdkPath",
+      "flutterSdkPath": "налаштування dart.flutterSdkPath",
+      "fvm": "Закріплення FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "обмеження sdks у pubspec.lock",
+      "none": "немає свідчень про SDK проєкту"
+    },
+    "statusItem": {
+      "text": "Vibrancy: pub пропущено",
+      "tooltip": "Package Vibrancy пропустив запит pub, щоб не переписувати pubspec.lock. Натисніть, щоб побачити подробиці."
+    },
+    "explain": {
+      "title": "Package Vibrancy пропустив запит pub",
+      "none": "У цьому сеансі жоден запит pub від Vibrancy не пропускався.",
+      "reason": "Причина: {reason}",
+      "rule": "Правило: {rule}",
+      "sdk": "Вибраний SDK: {path} (із джерела: {source})",
+      "toolVersion": "Версія вибраного SDK: {version}",
+      "project": "SDK проєкту: {value} (із джерела: {source})",
+      "folder": "Папка проєкту: {cwd}",
+      "time": "Пропущено о: {time}",
+      "runPubGet": "Виконати pub get з SDK проєкту",
+      "pubGetDone": "pub get завершено з SDK проєкту.",
+      "pubGetFailed": "Помилка pub get: {error}",
+      "pickFolder": "Виберіть папку проєкту для пояснення",
+      "pathConfirm": "Вибраний SDK походить із PATH — саме така конфігурація переписала pubspec.lock з неправильним SDK. Усе одно виконати pub get?",
+      "pathConfirmRun": "Усе одно виконати pub get"
+    },
+    "constraintNotSatisfied": "{name} зафіксовано у версії {version}, яка не відповідає обмеженню {constraint} у pubspec.yaml, тому pub повторно розв'яже залежності.",
+    "constraintUnverifiable": "Залежність у pubspec.yaml не вдалося перевірити за pubspec.lock (git, власне або нерозбірливе обмеження), тому pub може повторно розв'язати залежності.",
+    "pathDepNewer": "Залежність за шляхом {name} змінилася після запису pubspec.lock, тому pub повторно розв'яже залежності.",
+    "rule": {
+      "sdkMismatch": "Невідповідність версії SDK",
+      "lockSdkConstraint": "Обмеження SDK у файлі блокування",
+      "unknownPathSdk": "Невідомий SDK у PATH",
+      "staleLock": "Файл блокування відсутній або нечитабельний",
+      "staleConfig": "Застаріла конфігурація пакетів",
+      "depsNotLocked": "Залежність не зафіксована",
+      "constraintNotSatisfied": "Зафіксована версія поза обмеженням",
+      "constraintUnverifiable": "Обмеження неможливо перевірити",
+      "pathDepNewer": "Залежність за шляхом змінилася"
+    }
   },
   "about": {
     "ruleCountStrip": "{total} правил лінту наразі вбудовано в цю версію (обов'язкові {essential} · рекомендовані {recommended} · професійні {professional} · повністю {comprehensive} · педантичні {pedantic} · {stylistic} опціональні стилістичні)"

@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "الباقة Vibrancy تخطت استعلام pub لذا pubspec.lock غير مُعيدة. {reason}",
     "sdkMismatch": "تم حل المشروع باستخدام Dart {project} ولكن SDK المختار هو Dart {tool}.",
     "lockSdkConstraint": "تتطلب pubspec.lock Dart {constraint} ولكن SDK المختار هو Dart {tool}.",
-    "unknownPathSdk": "النسخة Dart SDK على PATH لم تحدد ويمكن للمشروع لا توجد نسخة SDK المسجلة.",
-    "staleLock": "pubspec.yaml أحدث من pubspec.lock، لذا سيقوم pub بإعادة حل الاعتماديات.",
-    "staleConfig": "التكوين الخاص بالحزمة مفقود أو أقدم من pubspec.lock، لذلك سيقوم pub بإعادة حل الاعتماديات."
+    "unknownPathSdk": "تعذّر تحديد إصدار Dart SDK الخاص بـ dart الموجود في PATH، كما أنه لا يوجد إصدار SDK قابل للقراءة في المشروع.",
+    "staleLock": "pubspec.lock مفقود أو غير قابل للقراءة، لذا سيعيد pub حل التبعيات.",
+    "staleConfig": "إعدادات الحزم مفقودة أو لا تتضمن الحزم المقفلة، لذا سيعيد pub حل التبعيات.",
+    "depsNotLocked": "يعلن pubspec.yaml عن تبعيات غير مدرجة في pubspec.lock، لذا سيعيد pub حل التبعيات.",
+    "source": {
+      "dartSdkPath": "الإعداد dart.sdkPath",
+      "flutterSdkPath": "الإعداد dart.flutterSdkPath",
+      "fvm": "تثبيت FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "قيد sdks في pubspec.lock",
+      "none": "لا يوجد دليل على SDK المشروع"
+    },
+    "statusItem": {
+      "text": "Vibrancy: تم تخطي pub",
+      "tooltip": "تخطّت Vibrancy للحزم استعلام pub حتى لا تتم إعادة كتابة pubspec.lock. انقر لعرض التفاصيل."
+    },
+    "explain": {
+      "title": "تخطّت Vibrancy للحزم استعلام pub",
+      "none": "لم يتم تخطي أي استعلام pub في Vibrancy خلال هذه الجلسة.",
+      "reason": "السبب: {reason}",
+      "rule": "القاعدة: {rule}",
+      "sdk": "SDK المحدد: {path} (من {source})",
+      "toolVersion": "إصدار SDK المحدد: {version}",
+      "project": "SDK المشروع: {value} (من {source})",
+      "folder": "مجلد المشروع: {cwd}",
+      "time": "وقت التخطي: {time}",
+      "runPubGet": "تشغيل pub get باستخدام SDK المشروع",
+      "pubGetDone": "اكتمل pub get باستخدام SDK المشروع.",
+      "pubGetFailed": "فشل pub get: {error}",
+      "pickFolder": "اختر مجلد مشروع لشرحه",
+      "pathConfirm": "يأتي SDK المحدد من PATH، وهو الإعداد الذي أعاد كتابة pubspec.lock باستخدام SDK خاطئ. هل تريد تشغيل pub get على أي حال؟",
+      "pathConfirmRun": "تشغيل pub get على أي حال"
+    },
+    "constraintNotSatisfied": "{name} مقفل على الإصدار {version}، وهو لا يستوفي القيد {constraint} في pubspec.yaml، لذا سيعيد pub حل التبعيات.",
+    "constraintUnverifiable": "تعذّر التحقق من إحدى التبعيات في pubspec.yaml مقابل pubspec.lock (قيد git أو مخصص أو غير قابل للتحليل)، لذا قد يعيد pub حل التبعيات.",
+    "pathDepNewer": "تغيّرت تبعية المسار {name} بعد كتابة pubspec.lock، لذا سيعيد pub حل التبعيات.",
+    "rule": {
+      "sdkMismatch": "عدم تطابق إصدار SDK",
+      "lockSdkConstraint": "قيد SDK في ملف القفل",
+      "unknownPathSdk": "SDK غير معروف في PATH",
+      "staleLock": "ملف القفل مفقود أو غير قابل للقراءة",
+      "staleConfig": "إعدادات الحزم قديمة",
+      "depsNotLocked": "التبعية غير مقفلة",
+      "constraintNotSatisfied": "الإصدار المقفل خارج القيد",
+      "constraintUnverifiable": "تعذّر التحقق من القيد",
+      "pathDepNewer": "تغيّرت تبعية المسار"
+    }
   },
   "about": {
     "ruleCountStrip": "قواعد {total} lint تُوزع حاليًا في هذه الإصدار (الأساسية {essential} · الموصى بها {recommended} · المهنية {professional} · الشاملة {comprehensive} · الصارمة {pedantic} · {stylistic} المُفعَّلة اختياريًا من حيث الأسلوب)"

@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: סינכון גרסה של.Plugin ל-pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: תפריט סטטוס",
   "command.scanWithLatestEngine.title": "Saropa Lints: ס캔 עם מנוע עדכני (פרוייקטים ישנים Dart)",
-  "config.property.externalEngine.dartSdkPath.description": "תיקיית SDK Dart (מכילה bin/dart) המשמשת \"סריקה עם מנוע עדכני\". חייב להיות Dart 3.11 או עדכני יותר. השאירו ריק כדי להשתמש בdart ב-PATH."
+  "config.property.externalEngine.dartSdkPath.description": "תיקיית SDK Dart (מכילה bin/dart) המשמשת \"סריקה עם מנוע עדכני\". חייב להיות Dart 3.11 או עדכני יותר. השאירו ריק כדי להשתמש בdart ב-PATH.",
+  "command.packageVibrancy.explainLastSkip.title": "הסבר על הדילוג האחרון של Vibrancy"
 }

@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: Tafuta Versi ya Plugin kwa pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menu ya Uhusiano",
   "command.scanWithLatestEngine.title": "Saropa Lints: Tafuta na Engine Mpya (Projekto ya Dart ya Mwaka Mwa Kili)",
-  "config.property.externalEngine.dartSdkPath.description": "Jumla ya Dart SDK (inakaribisha bin/dart) inayozalishwa na \"Scan na Engine Mwaka Mwa Kati\". Must be Dart 3.11 au mwingi. Pungua kuu kwa kuzalishwa dart katika PATH."
+  "config.property.externalEngine.dartSdkPath.description": "Jumla ya Dart SDK (inakaribisha bin/dart) inayozalishwa na \"Scan na Engine Mwaka Mwa Kati\". Must be Dart 3.11 au mwingi. Pungua kuu kwa kuzalishwa dart katika PATH.",
+  "command.packageVibrancy.explainLastSkip.title": "Eleza Kuruka Mwisho kwa Vibrancy"
 }

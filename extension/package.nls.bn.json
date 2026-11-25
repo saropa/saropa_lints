@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock এ প্লাগিন ভার্সন সিঙ্ক করুন",
   "command.showStatusBarMenu.title": "Saropa Lints: স্ট্যাটাস মেনু",
   "command.scanWithLatestEngine.title": "Saropa Lints: সর্বশেষ ইঞ্জিন দিয়ে স্ক্যান করুন (পুরানো Dart প্রকল্প)",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK ফোল্ডার (বিন/ডার্ট কনটেইন করে) \"স্ক্যান করুন সর্বশেষ ইঞ্জিন দ্বারা\" ব্যবহার করা হয়। এটি Dart 3.11 বা নতুন হতে হবে। PATH এ ডার্ট ব্যবহার করতে খালি রাখুন।"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK ফোল্ডার (বিন/ডার্ট কনটেইন করে) \"স্ক্যান করুন সর্বশেষ ইঞ্জিন দ্বারা\" ব্যবহার করা হয়। এটি Dart 3.11 বা নতুন হতে হবে। PATH এ ডার্ট ব্যবহার করতে খালি রাখুন।",
+  "command.packageVibrancy.explainLastSkip.title": "সর্বশেষ Vibrancy এড়িয়ে যাওয়ার ব্যাখ্যা দিন"
 }

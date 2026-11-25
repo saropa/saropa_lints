@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: Đồng bộ Bản ghi Plugin với pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menu Trạng Thái",
   "command.scanWithLatestEngine.title": "Saropa Lints: Quét bằng Engine Mới Nhất (Các Dự Án Dart Cũ)",
-  "config.property.externalEngine.dartSdkPath.description": "Thư mục Dart SDK (chứa bin/dart) được sử dụng bởi \"Quét bằng Engine Mới Nhất\". Phải là Dart 3.11 hoặc mới hơn. Để trống để sử dụng dart trên PATH."
+  "config.property.externalEngine.dartSdkPath.description": "Thư mục Dart SDK (chứa bin/dart) được sử dụng bởi \"Quét bằng Engine Mới Nhất\". Phải là Dart 3.11 hoặc mới hơn. Để trống để sử dụng dart trên PATH.",
+  "command.packageVibrancy.explainLastSkip.title": "Giải thích lần Vibrancy bỏ qua gần nhất"
 }

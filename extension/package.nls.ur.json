@@ -379,5 +379,6 @@
   "command.syncPluginVersion.title": "Saropa Lints: سینکس پلاگن ورژن کو pubspec.lock تک سинک کریں",
   "command.showStatusBarMenu.title": "Saropa Lints: ایکسٹنشن کی حالت منو",
   "command.scanWithLatestEngine.title": "Saropa Lints: آخری انجن سے اسکن کریں (قدیم Dart پروجیکٹس)",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK فولڈر (bin/dart کو شامل کرتا ہے) \"Latest Engine سکن کریں\" کے ذریعے استعمال ہوتا ہے۔ Dart 3.11 یا نئی ترکیب کا استعمال کرنا ضروری ہے۔ PATH پر dart استعمال کرنے کے لیے خالی رکھیں۔"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK فولڈر (bin/dart کو شامل کرتا ہے) \"Latest Engine سکن کریں\" کے ذریعے استعمال ہوتا ہے۔ Dart 3.11 یا نئی ترکیب کا استعمال کرنا ضروری ہے۔ PATH پر dart استعمال کرنے کے لیے خالی رکھیں۔",
+  "command.packageVibrancy.explainLastSkip.title": "Vibrancy کے آخری اسکپ کی وضاحت"
 }

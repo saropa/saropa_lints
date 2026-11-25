@@ -1,11 +1,57 @@
 {
   "pubGuard": {
-    "skipped": "包Vibrancy跳过了一个pub查询，因此pubspec.lock未被重写。{reason}",
     "sdkMismatch": "该项目已使用Dart {project}解析，但所选的SDK是Dart {tool}。",
     "lockSdkConstraint": "pubspec.lock 需要 Dart {constraint}，但所选的 SDK 是 Dart {tool}。",
-    "unknownPathSdk": "PATH 上的 Dart SDK 版本无法确定，且项目中未记录 SDK 版本。",
-    "staleLock": "pubspec.yaml 比 pubspec.lock 更新，因此 pub 会重新解析依赖项。",
-    "staleConfig": "包配置缺失或早于 pubspec.lock，因此 pub 会重新解析依赖项。"
+    "unknownPathSdk": "无法确定 PATH 中 dart 的 Dart SDK 版本，且项目没有可读取的 SDK 版本。",
+    "staleLock": "pubspec.lock 缺失或无法读取，因此 pub 将重新解析依赖项。",
+    "staleConfig": "包配置缺失或未列出已锁定的包，因此 pub 将重新解析依赖项。",
+    "depsNotLocked": "pubspec.yaml 中声明的依赖项未在 pubspec.lock 中列出，因此 pub 将重新解析依赖项。",
+    "source": {
+      "dartSdkPath": "设置 dart.sdkPath",
+      "flutterSdkPath": "设置 dart.flutterSdkPath",
+      "fvm": "FVM 固定版本 (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
+    "projectSource": {
+      "dartToolVersion": ".dart_tool/version",
+      "lockConstraint": "pubspec.lock 的 sdks 约束",
+      "none": "没有项目 SDK 依据"
+    },
+    "statusItem": {
+      "text": "Vibrancy：已跳过 pub",
+      "tooltip": "Package Vibrancy 跳过了一次 pub 查询，因此不会重写 pubspec.lock。点击查看详情。"
+    },
+    "explain": {
+      "title": "Package Vibrancy 跳过了一次 pub 查询",
+      "none": "本次会话中没有跳过任何 Vibrancy pub 查询。",
+      "reason": "原因：{reason}",
+      "rule": "规则：{rule}",
+      "sdk": "所选 SDK：{path}（来自 {source}）",
+      "toolVersion": "所选 SDK 版本：{version}",
+      "project": "项目 SDK：{value}（来自 {source}）",
+      "folder": "项目文件夹：{cwd}",
+      "time": "跳过时间：{time}",
+      "runPubGet": "使用项目 SDK 运行 pub get",
+      "pubGetDone": "pub get 已使用项目 SDK 完成。",
+      "pubGetFailed": "pub get 失败：{error}",
+      "pickFolder": "选择要说明的项目文件夹",
+      "pathConfirm": "所选 SDK 来自 PATH，而这正是曾用错误 SDK 重写 pubspec.lock 的配置。仍要运行 pub get 吗？",
+      "pathConfirmRun": "仍然运行 pub get"
+    },
+    "constraintNotSatisfied": "{name} 锁定在 {version}，不满足 pubspec.yaml 中的约束 {constraint}，因此 pub 将重新解析依赖项。",
+    "constraintUnverifiable": "pubspec.yaml 中的某个依赖项无法与 pubspec.lock 核对（git、自定义或无法解析的约束），因此 pub 可能会重新解析依赖项。",
+    "pathDepNewer": "路径依赖 {name} 在 pubspec.lock 写入之后发生了更改，因此 pub 将重新解析依赖项。",
+    "rule": {
+      "sdkMismatch": "SDK 版本不匹配",
+      "lockSdkConstraint": "锁定 SDK 约束",
+      "unknownPathSdk": "未知的 PATH SDK",
+      "staleLock": "锁定文件缺失或无法读取",
+      "staleConfig": "包配置已过期",
+      "depsNotLocked": "依赖项未锁定",
+      "constraintNotSatisfied": "锁定版本超出约束范围",
+      "constraintUnverifiable": "约束无法验证",
+      "pathDepNewer": "路径依赖已更改"
+    }
   },
   "about": {
     "ruleCountStrip": "{total} 条 lint 规则目前包含在此版本中（基础 {essential} · 推荐 {recommended} · 专业 {professional} · 全面 {comprehensive} · 严谨 {pedantic} · {stylistic} 风格化选项）"
