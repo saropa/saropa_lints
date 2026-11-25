@@ -68,6 +68,32 @@ grep -n "scanOnOpen" extension/src/vibrancy/extension-activation.ts
 
 ---
 
+## Update: the settings workaround does not hold. The lock watcher creates a feedback loop.
+
+`scanOnOpen: false` + `watchEnabled: false` did NOT stop it. After a window reload with both set,
+the trace caught the same sequence again:
+
+```
+21:36:1x  pinned `flutter pub get` restores pubspec.lock (Dart 3.8 resolution)
+21:36:50.863 cmd.exe /d /s /c "dart pub outdated --json --transitive"   (ext host of the jupiter window)
+21:36:51.634 cmd.exe /d /s /c "dart pub deps --json"
+21:36:51.634 pubspec.lock WRITTEN  (back to Dart 3.13 resolution)
+```
+
+Cause: `registerFileWatcher` (`extension/src/vibrancy/extension-activation.ts:349`) watches
+`**/pubspec.lock` and calls `runScan(targets)` 30 s after any change (line ~378). It is registered
+unconditionally in activation (line 342) and checks no setting: not `saropaLints.enabled`, not
+`scanOnOpen`, not `watchEnabled` (that one only gates `freshness-watcher.ts`).
+
+Result: every correct pinned `pub get` changes the lock, which triggers a scan 30 s later, and the
+scan's bare `dart pub outdated` / `pub deps` rewrites the lock with the global SDK. The user can't
+recover except by disabling the extension for the workspace. The "byte-identical lock" skip
+(`pubspecLockUnchangedSinceLastScan`) doesn't help, because the pinned and global resolutions differ.
+
+Additional fix required: gate `registerFileWatcher` (and the scan it triggers) on
+`saropaLints.enabled` and on a Vibrancy watch setting. A scan triggered by the lock watcher must
+never itself write the lock (see "Suggested fix" 2).
+
 ## Expected
 
 1. Vibrancy never mutates `pubspec.lock` or `.dart_tool/`. It is a read-only health scan.
