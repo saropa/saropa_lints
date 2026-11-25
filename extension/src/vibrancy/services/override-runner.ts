@@ -33,6 +33,8 @@ export async function runOverrideAnalysis(
     constraints: ConstraintIndex = new Map(),
     // Reason the inputs were incomplete, or null; see analyzeOverrides.
     evidenceGap: string | null = null,
+    // Parents with unreadable pubspecs; see analyzeOverrides.
+    unreadableParents: ReadonlySet<string> = new Set(),
 ): Promise<OverrideAnalysis[]> {
     try {
         const overrideEntries = parseOverrides(yamlContent);
@@ -45,7 +47,7 @@ export async function runOverrideAnalysis(
 
         const analyses = analyzeOverrides(
             overrideEntries, [...deps], [...depGraphPackages], ages, constraints,
-            evidenceGap,
+            evidenceGap, unreadableParents,
         );
         return applyKnownOverrideReasons(analyses);
     } catch (err) {

@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Unverified",
+    "unverifiedTooltip": "Could not verify — {reason}. Keep this override until the scan succeeds.",
+    "unverifiedStatus": "Unverified — {reason}",
+    "incompleteData": "incomplete data",
+    "groupUnverifiedTooltip": "{count} override(s) could not be verified; the scan was incomplete."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Select a package to see details"

@@ -1572,13 +1572,14 @@ async function runScanInner(
             // Missing inputs turn a "no conflict" result into 'unknown' rather
             // than 'stale', so the UI never tells the user to delete an override
             // that may simply have gone unchecked.
-            const evidenceGap = !depGraph.success
-                ? 'dependency graph unavailable'
-                : (unreadableParents.length > 0
-                    ? `constraints unreadable for ${unreadableParents.sort().join(', ')}`
-                    : null);
-            if (evidenceGap) {
-                logger.info(`Override analysis evidence gap: ${evidenceGap}`);
+            // Graph failure is global; unreadable parents are scoped per override
+            // inside the analyzer so unrelated failures do not mask stale ones.
+            const evidenceGap = depGraph.success ? null : 'dependency graph unavailable';
+            if (evidenceGap || unreadableParents.length > 0) {
+                logger.info(
+                    `Override analysis evidence gap: ${evidenceGap ?? 'none'}; ` +
+                    `unreadable parents: ${unreadableParents.sort().join(', ') || 'none'}`,
+                );
             }
             const overrideAnalyses = await runOverrideAnalysis(
                 parsed.yamlContent,
@@ -1588,12 +1589,15 @@ async function runScanInner(
                 logger,
                 overrideConstraints,
                 evidenceGap,
+                new Set(unreadableParents),
             );
             lastOverrideAnalyses = overrideAnalyses;
             if (overrideAnalyses.length > 0) {
                 const staleCount = overrideAnalyses.filter(a => a.status === 'stale').length;
+                const unknownCount = overrideAnalyses.filter(a => a.status === 'unknown').length;
                 logger.info(
-                    `Overrides: ${overrideAnalyses.length} total, ${staleCount} stale`,
+                    `Overrides: ${overrideAnalyses.length} total, ${staleCount} stale, ` +
+                    `${unknownCount} unverified`,
                 );
             }
 

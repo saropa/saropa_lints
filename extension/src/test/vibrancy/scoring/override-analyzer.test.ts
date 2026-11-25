@@ -229,6 +229,30 @@ describe('override-analyzer', () => {
             assert.strictEqual(result[0].evidenceGap, 'dependency graph unavailable');
         });
 
+        it('scopes an unreadable parent to the overrides it depends on', () => {
+            // foo_parent is unreadable and depends on foo; intl has no relation
+            // to it, so intl stays genuinely stale and only foo is unverified.
+            const overrides = [makeOverride('foo', '1.0.0'), makeOverride('intl', '0.18.5')];
+            const deps = [
+                makeDep('foo', '1.0.0', '1.0.0', false),
+                makeDep('intl', '0.18.5', '^0.18.0'),
+                makeDep('foo_parent', '2.0.0', '^2.0.0'),
+            ];
+            const graph = [
+                makeGraphPkg('foo_parent', ['foo']),
+                makeGraphPkg('foo', [], '1.0.0'),
+                makeGraphPkg('intl', [], '0.18.5'),
+            ];
+
+            const result = analyzeOverrides(
+                overrides, deps, graph, new Map(), new Map(), null, new Set(['foo_parent']),
+            );
+
+            assert.strictEqual(result[0].status, 'unknown');
+            assert.strictEqual(result[0].evidenceGap, 'constraints unreadable for foo_parent');
+            assert.strictEqual(result[1].status, 'stale');
+        });
+
         it('keeps a detected conflict active even when an evidence gap is supplied', () => {
             const overrides = [makeOverride('analyzer', '13.0.0')];
             const deps = [

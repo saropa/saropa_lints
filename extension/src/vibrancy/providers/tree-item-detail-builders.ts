@@ -10,6 +10,7 @@
 import { DepGraphSummary, OverrideAnalysis, PackageInsight } from '../types';
 import { formatAge, isOldOverride } from '../scoring/override-analyzer';
 import { DetailItem } from './tree-item-classes';
+import { l10n } from '../../i18n/runtime';
 
 /**
  * Build detail items for DepGraphSummaryItem children.
@@ -62,7 +63,9 @@ export function buildOverrideDetails(analysis: OverrideAnalysis): DetailItem[] {
         // Missing evidence, not a verdict: do not suggest removal.
         items.push(new DetailItem(
             '❓ Status',
-            `Unverified — ${analysis.evidenceGap ?? 'incomplete data'}`,
+            l10n('vibrancyOverride.unverifiedStatus', {
+                reason: analysis.evidenceGap ?? l10n('vibrancyOverride.incompleteData'),
+            }),
         ));
     } else {
         items.push(new DetailItem(

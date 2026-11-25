@@ -15,13 +15,19 @@ Package Vibrancy reported `permission_handler_android: 13.0.1` in `dependency_ov
 - Tests added in `override-analyzer.test.ts` and `pubspec-parser.test.ts`.
 - `CHANGELOG.md`: new `17.10.0 — Unreleased` section with overview and a Fixed (Extension) entry.
 
+### Added after the reflection gate
+- Override status `unknown` (shown as "Unverified") when the dependency graph failed, or when an unreadable parent pubspec depends on the override. The parent gap is scoped per override so an unrelated unreadable package cannot mask a genuinely stale override.
+- Skip reasons distinguish unresolved path, read failure and empty pubspec.
+- Group tooltip/icon and the scan log count unverified overrides; the tree JSON serializer accepts the new context value.
+- Strings routed through `l10n()` with keys under `vibrancyOverride.*` in `en.json`. Translated catalogs are not regenerated; regeneration is a publish-time step.
+- Review of the post-gate diff found five issues (serializer context value, global gap scope, missing unknown count, hardcoded strings, quoted-value consumers). The first four were fixed. Quoted constraint values keep their quotes, as before; `satisfiesConstraint` strips them and other consumers were not audited.
+
 ### Unconfirmed
 - `.dart_tool/package_config.json` of the reporting project was not readable, so hypotheses A (parent path unresolved) and C (parent absent from the dependency graph) remain untested.
-- Stale verdicts are still shown when the dependency graph failed; only a log line was added.
-- `readConstraints` still collapses read errors and empty pubspecs into one skip reason.
 
 ### Test results
 - `npx tsc --noEmit -p .` and `npx tsc -p tsconfig.test.json`: clean.
 - Scoped mocha (override-analyzer, pubspec-parser, pubspec-parser-comments, pubspec-sorter): all pass.
+- `test/i18n` has 31 failing locale-parity tests both with and without these changes (count taken at HEAD via stash).
 - `pubspec-validation.test.js` has one failing test (`prefer_l10n_yaml_config` "does not flag when l10n.yaml exists alongside pubspec") that also fails with these changes stashed.
 - No Extension Development Host run; surface is log output only, no rendered change.

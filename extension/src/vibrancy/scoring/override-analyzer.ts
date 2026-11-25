@@ -33,6 +33,10 @@ export function analyzeOverrides(
     // unreadable). A no-conflict result is then 'unknown', not 'stale': absence
     // of evidence must not tell the user an override is safe to remove.
     evidenceGap: string | null = null,
+    // Parents whose constraints could not be read. Scoped per override below:
+    // only an override that one of these parents depends on has a real gap, so
+    // an unrelated unreadable package cannot hide a genuinely stale override.
+    unreadableParents: ReadonlySet<string> = new Set(),
 ): OverrideAnalysis[] {
     const depMap = new Map(deps.map(d => [d.name, d]));
     const graphMap = new Map(depGraph.map(p => [p.name, p]));
@@ -52,12 +56,22 @@ export function analyzeOverrides(
         }
 
         const conflict = findConflict(entry, depMap, graphMap, constraints);
-        const status = conflict ? 'active' : (evidenceGap ? 'unknown' : 'stale');
+        // Global gap (graph unavailable) applies to every override; the parent
+        // gap applies only to overrides that an unreadable parent depends on.
+        const blindParents = depGraph
+            .filter(p => unreadableParents.has(p.name) && p.dependencies.includes(entry.name))
+            .map(p => p.name)
+            .sort();
+        const gap = evidenceGap
+            ?? (blindParents.length > 0
+                ? `constraints unreadable for ${blindParents.join(', ')}`
+                : null);
+        const status = conflict ? 'active' : (gap ? 'unknown' : 'stale');
         return {
             entry,
             status,
             blocker: conflict,
-            evidenceGap: status === 'unknown' ? evidenceGap : null,
+            evidenceGap: status === 'unknown' ? gap : null,
             addedDate,
             ageDays,
         };

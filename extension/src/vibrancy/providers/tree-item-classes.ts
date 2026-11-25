@@ -8,6 +8,7 @@ import {
 import { categoryIcon, categoryLabel } from '../scoring/status-classifier';
 import { isUpgradeSuppressed } from '../scoring/blast-radius-attacher';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
+import { l10n } from '../../i18n/runtime';
 
 /**
  * Tree item class definitions.
@@ -226,15 +227,19 @@ export class OverridesGroupItem extends vscode.TreeItem {
             vscode.TreeItemCollapsibleState.Expanded,
         );
         const staleCount = analyses.filter(a => a.status === 'stale').length;
+        // An incomplete scan must be visible at group level, not only per row.
+        const unknownCount = analyses.filter(a => a.status === 'unknown').length;
         this.iconPath = new vscode.ThemeIcon(
             'wrench',
-            staleCount > 0
+            staleCount > 0 || unknownCount > 0
                 ? new vscode.ThemeColor('editorWarning.foreground')
                 : new vscode.ThemeColor('editorInfo.foreground'),
         );
         this.tooltip = staleCount > 0
             ? `${staleCount} override(s) with no version conflict detected.`
-            : 'Dependency overrides in pubspec.yaml.';
+            : (unknownCount > 0
+                ? l10n('vibrancyOverride.groupUnverifiedTooltip', { count: String(unknownCount) })
+                : 'Dependency overrides in pubspec.yaml.');
         this.contextValue = 'vibrancyOverridesGroup';
     }
 }
@@ -249,7 +254,7 @@ export class OverrideItem extends vscode.TreeItem {
         const unknown = analysis.status === 'unknown';
         this.description = analysis.status === 'stale'
             ? '⚠️ Stale'
-            : (unknown ? '❓ Unverified' : '');
+            : (unknown ? l10n('vibrancyOverride.unverifiedLabel') : '');
         this.iconPath = new vscode.ThemeIcon(
             analysis.status === 'stale' ? 'warning' : (unknown ? 'question' : 'wrench'),
             analysis.status === 'stale'
@@ -259,7 +264,9 @@ export class OverrideItem extends vscode.TreeItem {
         this.tooltip = analysis.status === 'stale'
             ? 'No version conflict detected — review this override.'
             : unknown
-                ? `Could not verify — ${analysis.evidenceGap ?? 'incomplete data'}. Keep this override until the scan succeeds.`
+                ? l10n('vibrancyOverride.unverifiedTooltip', {
+                    reason: analysis.evidenceGap ?? l10n('vibrancyOverride.incompleteData'),
+                })
                 : `Active override — ${analysis.blocker ?? 'resolves a conflict'}.`;
         this.contextValue = analysis.status === 'stale'
             ? 'vibrancyOverrideStale'

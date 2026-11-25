@@ -348,7 +348,8 @@ function vibrancyAsOverridesGroup(item: VibrancyTreeItem, label: string, cv: str
 }
 
 function vibrancyAsOverride(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
-    if (cv !== 'vibrancyOverrideStale' && cv !== 'vibrancyOverrideActive') return null;
+    // 'vibrancyOverrideUnknown' = unverified override; must serialize like the others.
+    if (cv !== 'vibrancyOverrideStale' && cv !== 'vibrancyOverrideActive' && cv !== 'vibrancyOverrideUnknown') return null;
     return {
         type: 'vibrancyOverride',
         label,
