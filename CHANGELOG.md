@@ -83,6 +83,11 @@ Package Vibrancy no longer rewrites `pubspec.lock` in FVM-pinned projects, now u
 
 - **`prefer_test_find_by_key` is now opt-in**: it moved from the Recommended tier to the stylistic (opt-in) set and left the `testing` rule pack, because it flagged every `find.byType()` and fixing it meant adding Keys to production widgets. Enable it explicitly in `diagnostics:` if the project wants key-based finders.
 
+### Internal
+
+- Vibrancy pub-guard strings are hand-translated in all 24 locales, and the stale `pubGuard.skipped` key (leaked machine-translation prompt text) is removed. No action required.
+- The locale audit (`generate_locales.py --fail-on-missing`, the publish gate) now reads the shipped catalogs: keys absent from a locale, leaked MT prompt text, repeat loops and wrong-script characters fail the gate, and coverage badges count them. About 340 corrupted catalog values across 20+ locales were hand-retranslated so the gate passes; new standalone `extension/scripts/i18n/check_locale_garbage.py`.
+
 ---
 
 ## [17.8.0]
