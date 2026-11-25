@@ -13,7 +13,7 @@ Package Vibrancy reported `permission_handler_android: 13.0.1` in `dependency_ov
 - `shared-dep-constraints.ts`: optional `onSkip` callback reports candidates missing from `package_config.json` or with no readable constraints.
 - `extension-activation.ts`: skip reasons and a failed dependency graph are written to the scan log.
 - Tests added in `override-analyzer.test.ts` and `pubspec-parser.test.ts`.
-- `CHANGELOG.md`: new `17.10.0 — Unreleased` section with overview and a Fixed (Extension) entry.
+- `CHANGELOG.md`: new `17.9.1 — Unreleased` section with overview and a Fixed (Extension) entry.
 
 ### Added after the reflection gate
 - Override status `unknown` (shown as "Unverified") when the dependency graph failed, or when an unreadable parent pubspec depends on the override. The parent gap is scoped per override so an unrelated unreadable package cannot mask a genuinely stale override.
@@ -30,4 +30,4 @@ Package Vibrancy reported `permission_handler_android: 13.0.1` in `dependency_ov
 - Scoped mocha (override-analyzer, pubspec-parser, pubspec-parser-comments, pubspec-sorter): all pass.
 - `test/i18n` has 31 failing locale-parity tests both with and without these changes (count taken at HEAD via stash).
 - `pubspec-validation.test.js` has one failing test (`prefer_l10n_yaml_config` "does not flag when l10n.yaml exists alongside pubspec") that also fails with these changes stashed.
-- No Extension Development Host run; surface is log output only, no rendered change.
+- No Extension Development Host run; the Unverified tree row, group tooltip and detail item are unrendered; check both themes.
