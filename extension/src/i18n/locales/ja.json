@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "パッケージ ビブランシーがpubクエリをスキップしたため、pubspec.lockは再構築されません。{reason}",
+    "sdkMismatch": "プロジェクトは Dart {project} で解決されましたが、選択された SDK は Dart {tool} です。",
+    "lockSdkConstraint": "pubspec.lockはDart {constraint}を必要としますが、選択されたSDKはDart {tool}です。",
+    "unknownPathSdk": "PATH上のDart SDKバージョンが特定できず、プロジェクトに記録されたSDKバージョンもありません。",
+    "staleLock": "pubspec.yamlはpubspec.lockより新しいため、pubは依存関係を再解決します。",
+    "staleConfig": "パッケージの構成が不足しているか、pubspec.lockよりも古いので、pubは依存関係を再解決します。"
+  },
   "about": {
     "ruleCountStrip": "現在のバージョンで提供されている{total} lintルール（必須{essential} · 推奨{recommended} · 専門家{professional} · 完全{comprehensive} · 厳格{pedantic} · {stylistic} スタイル選択）"
   },

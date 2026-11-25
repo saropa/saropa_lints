@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Package Vibrancy sprong een pub query over, dus pubspec.lock wordt niet hergeschreven. {reason}",
+    "sdkMismatch": "Het project is opgelost met Dart {project}, maar het geselecteerde SDK is Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock vereist Dart {constraint}, maar het geselecteerde SDK is Dart {tool}.",
+    "unknownPathSdk": "De Dart SDK versie op PATH kon niet bepaald worden en het project heeft geen opgeslagen SDK versie.",
+    "staleLock": "pubspec.yaml is nieuwer dan pubspec.lock, dus pub zou de afhankelijkheden opnieuw oplossen.",
+    "staleConfig": "De pakketconfiguratie is ontbreekt of ouder dan pubspec.lock, dus pub zou de afhankelijkheden opnieuw oplossen."
+  },
   "about": {
     "ruleCountStrip": "{total} lint regels zijn momenteel beschikbaar in deze versie (essentieel {essential} · aanbevolen {recommended} · professioneel {professional} · comprehensief {comprehensive} · pedant {pedantic} · {stylistic} opt-in stylistisch)"
   },

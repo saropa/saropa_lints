@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "প্যাকেজ ভার্ব্রান্সি একটি পাব কুয়েরি ছাড়া গেল তাই pubspec.lock পুনরায় লেখা হয়নি। {reason}",
+    "sdkMismatch": "প্রকল্পটি Dart {project} দ্বারা সমাধান করা হয়েছে কিন্তু বাছাই করা SDK হল Dart {tool}।",
+    "lockSdkConstraint": "pubspec.lock এ Dart {constraint} প্রয়োজন কিন্তু বাছাই করা SDK হল Dart {tool}।",
+    "unknownPathSdk": "প্যাথ-এ থাকা Dart SDK ভার্সনটি নির্ধারণ করা যায়নি এবং প্রকল্পে কোনও রেকর্ডেড SDK ভার্সন নেই।",
+    "staleLock": "pubspec.yaml এটি pubspec.lock এর চেয়ে নতুন, তাই pub পুনরায় অধীনস্থ কর্মসূচি বিশ্লেষণ করবে।",
+    "staleConfig": "প্যাকেজ কনফিগারেশন অনুপস্থিত বা pubspec.lock এর চেয়ে পুরানো, তাই pub ডেপেন্ডেন্সি পুনরায় সমাধান করবে।"
+  },
   "about": {
     "ruleCountStrip": "{total} লিংট নিয়মগুলি এই সংস্করণে বর্তমান (অপরিহার্য {essential} · পরামর্শ করা যাক {recommended} · পেশাদার {professional} · সম্পূর্ণ {comprehensive} · শিক্ষামূলক {pedantic} · {stylistic} বিকল্প শৈলীগত)"
   },

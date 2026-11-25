@@ -323,7 +323,7 @@
   "walkthrough.gettingStarted.title": "Aan de slag met Saropa Lints",
   "walkthrough.gettingStarted.description": "Gezondheidsscore, dashboard Bevindingen, beveiligingsmatrix, triage en trends: activiteitenbalk plus editortabbladen over de volledige breedte.",
   "walkthrough.step.walkthrough.healthScore.title": "Gezondheidscore (Health Score)",
-  "walkthrough.step.walkthrough.healthScore.description": "Kwaliteit van uw project op een rij: een **0–100 score** in de statusbalk en Overzichtsweergave.\n\nGroen (80+), geel (50–79), rood (<50). Fouten tellen zwaar tegen.",
+  "walkthrough.step.walkthrough.healthScore.description": "Kwaliteit van uw project op een rij: een **0–100 score** in de statusbalk en Overzichtsweergave.\n\nGroen (80+), geel (50–79), rood (<50). Fouten tellen zwaar tegen.\n\n[Analyse uitvoeren](command:saropaLints.runAnalysis) · [Project instellen](command:saropaLints.enable)",
   "walkthrough.step.walkthrough.issues.title": "Overtredingen & Inline Annotaties",
   "walkthrough.step.walkthrough.issues.description": "Vindingen in de **Findings Dashboard** editor tab, gegroepeerd per ernst en bestand. **Error Lens-style** notaties tonen waarschuwingen aan het eind van elke regel.\n\nFilter op tekst, ernst, impact of regel. Klik met de rechtermuisknop om lawines te onderdrukken.\n\n[Analyse uitvoeren](command:saropaLints.runAnalysis)",
   "walkthrough.step.walkthrough.security.title": "Beveiliging Houding van de veiligheid houding.",

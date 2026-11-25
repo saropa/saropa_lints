@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "패키지 빈브런시 스킵된 pub 쿼리이므로 pubspec.lock는 재작성되지 않았습니다. {reason}",
+    "sdkMismatch": "프로젝트는 Dart {project}로 해결되었지만 선택된 SDK는 Dart {tool}입니다.",
+    "lockSdkConstraint": "pubspec.lock는 Dart {constraint}를 필요로 하지만 선택된 SDK는 Dart {tool}입니다.",
+    "unknownPathSdk": "PATH에 있는 Dart SDK 버전이 확인되지 않았고, 프로젝트에 기록된 SDK 버전이 없습니다.",
+    "staleLock": "pubspec.yaml는 pubspec.lock보다 새로워서, pub은 의존성을 다시 해결할 것입니다.",
+    "staleConfig": "패키지 구성은 누락되었거나 pubspec.lock보다 오래되었기 때문에 pub은 의존성을 다시 해결할 것입니다."
+  },
   "about": {
     "ruleCountStrip": "{total} lint 규칙은 현재 버전에 포함되어 있습니다 (필수 {essential} · 권장 {recommended} · 전문 {professional} · 포괄적 {comprehensive} · 철저 {pedantic} · {stylistic} 스타일적 옵인)"
   },

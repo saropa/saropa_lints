@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Regola Rigida:\n1. Restituisci SOLO l'output della stringa tradotto.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Package Vibrancy ha saltato una query pub quindi pubspec.lock non è riscritto. {reason}",
+    "sdkMismatch": "Il progetto è stato risolto con Dart {project} ma l'SDK selezionato è Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock richiede Dart {constraint} ma l'SDK selezionato è Dart {tool}.",
+    "unknownPathSdk": "La versione dell'SDK Dart su PATH non può essere determinata e il progetto non ha una versione SDK registrata.",
+    "staleLock": "pubspec.yaml è più recente di pubspec.lock, quindi pub ripristinerebbe le dipendenze.",
+    "staleConfig": "La configurazione del package è mancante o più vecchia di pubspec.lock, quindi pub ripristinerà la risoluzione delle dipendenze."
+  },
   "about": {
     "ruleCountStrip": "Regole {total} di lint attualmente presenti in questa versione (essenziali {essential} · consigliate {recommended} · professionali {professional} · complete {comprehensive} · pedanti {pedantic} · {stylistic} stili opt-in)"
   },
@@ -259,7 +267,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX e librerie di stato e iniezione delle dipendenze correlate.",
       "networking-apis": "Clienti HTTP, GraphQL, Firebase, Supabase e connettività.",
       "storage-persistence": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotto.",
-      "navigation-deep-links": "Regole rigorose:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo di una frase.\n\nTesto: Routing e gestione dei deep-link — auto_route, go_router, app_links, url_launcher e webview.",
+      "navigation-deep-links": "Regole rigorose:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua durante la frase.",
       "media-graphics": "Immagini, SVG, animazione, audio, mappe, pickers e il motore Flame.",
       "device-platform": "Sensori, posizione, autorizzazioni, biometria, notifiche e lavoro in background.",
       "identity-sharing": "Fornitori di accesso, condivisione e revisione in-app.",
@@ -1959,7 +1967,7 @@
       "progress": "{percent}% — {done}/{total} file"
     },
     "reports": {
-      "intro": "Regole Rigide:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo di una frase.\n\nTesto: Rapporti CLI a un clic che prima richiedevano un terminale. Ogni pulsante Run streaming l'output in tempo reale dell'工具 sotto la sua scheda e salva una copia sotto reports/.saropa_lints/reports-tab/",
+      "intro": "Rapporti CLI a un clic che prima richiedevano un terminale. Ogni pulsante Run streaming l'output in tempo reale dell'工具 sotto la sua scheda e salva una copia sotto reports/.saropa_lints/reports-tab/",
       "runButton": "Esegui",
       "notRunYet": "Non eseguito ancora",
       "running": "In esecuzione…",

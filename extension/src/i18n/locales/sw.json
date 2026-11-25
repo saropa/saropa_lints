@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Sauti ya Paku ya Vibrancy ilifungua kwa pub query kwa sababu hili pubspec.lock inatokana kwa kushusha. {reason}",
+    "sdkMismatch": "Projecti ililifaniki na Dart {project} lakini SDK inayosimamia ni Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock inakwenda Dart {constraint} lakini SDK ya zozungumza lililokwenda ni Dart {tool}.",
+    "unknownPathSdk": "Sauti ya SDK ya Dart katikati ya PATH haikuwa inatoa na project haikuwa inatoa sauti ya SDK ya kihisiano.",
+    "staleLock": "pubspec.yaml inaona kama vile pubspec.lock, kwa hiyo pub inaoneka kwa muda muda kuzalishia kifedha.",
+    "staleConfig": "Mipango ya package inaonekana kwenye kufuta au kama kama pubspec.lock, kwa hiyo pub inaonekana kufuta kipango kwa kipango."
+  },
   "about": {
     "ruleCountStrip": "{total} maelezo ya kusandika kwa sasa inapakia katika versi hii (mazungumzaji {essential} · mazungumzaji ya kuchangia {recommended} · mazungumzaji ya kifalme {professional} · mazungumzaji ya kifalme {comprehensive} · mazungumzaji ya kifalme {pedantic} · {stylistic} mazungumzaji ya kuchangia)"
   },

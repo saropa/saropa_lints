@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Package Vibrancy skipped a pub query so pubspec.lock is not rewritten. {reason}",
+    "sdkMismatch": "Le projet a été résolu avec Dart {project} mais la version SDK sélectionnée est Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock nécessite Dart {constraint} mais la version SDK sélectionnée est Dart {tool}.",
+    "unknownPathSdk": "La version de l'SDK Dart sur PATH ne peut pas être déterminée et le projet n'a pas de version d'SDK enregistrée.",
+    "staleLock": "pubspec.yaml est plus récent que pubspec.lock, donc pub rétablirait les dépendances.",
+    "staleConfig": "La configuration du package est manquante ou plus ancienne que pubspec.lock, donc pub réessayerait de résoudre les dépendances."
+  },
   "about": {
     "ruleCountStrip": "Règles {total} de lint sont actuellement incluses dans cette version (essentiel {essential} · recommandé {recommended} · professionnel {professional} · complet {comprehensive} · pédant {pedantic} · {stylistic} opt-in stylistique)"
   },
@@ -236,7 +244,7 @@
       "boolean_naming": "Les Booléens doivent utiliser les préfixes est/a/peut/devrait afin que l'intention soit claire dans les conditionnels et API.",
       "code_style_preferences": "Comment sont écrits les retours, les conditionnels et les boucles — retour immédiat, for-in, getter vs méthode, et autres raccourcis similaires.",
       "function_parameter_style": "Les fonctions de flèche sont concises, contiennent tous les paramètres nommés, des rappels en ligne et aucune réaffectation de paramètre.",
-      "widget_style": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel qu'écrit, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : Flutter choix de widgets — SizedBox.square, center over align, spacing over SizedBox, et éviter shrinkWrap dans les scrolls. Flutter projets seulement.",
+      "widget_style": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : Flutter choix de widgets — SizedBox.square, centrer sur align, espacement au lieu de SizedBox, et éviter shrinkWrap dans les scrolls. Flutter projets seulement.",
       "class_record_style": "Classes vs types de retour d'enregistrement, préfixes privés sous-titres et explicite ceci là où il clarifie.",
       "formatting": "Placements des lignes vides, virgules en fin de ligne, et style des littéraux et commentaires. Peut être bruyant — beaucoup de fichiers peuvent nécessiter des modifications.",
       "comments_documentation": "Le format TODO et FIXME, cas de phrase, un point après les commentaires du document, /// plus //, et aucun code sans commentaire.",
@@ -2932,7 +2940,7 @@
       "offerNoDart": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. Voulez-vous migrer ?",
       "offerRenames": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. {count} règles ont été renommées depuis {installed}. Migration ?",
       "offerNoDartRenames": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. {count} règles ont été renommées depuis {installed}. Migration ?",
-      "offerRenamesUnknown": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie de la chaîne traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
+      "offerRenamesUnknown": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie de la chaîne traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un d'entre eux dans la traduction EXACTEMENT tel qu'écrit, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
       "offerNoDartRenamesUnknown": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
       "actionMigrate": "Migrer"
     },

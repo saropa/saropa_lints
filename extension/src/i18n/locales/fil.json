@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Package Vibrancy ay nawawala ang pub query kaya pubspec.lock ay hindi binabalangkas. {reason}",
+    "sdkMismatch": "Ang proyekto ay napatunayan na gamit ang Dart {project} ngunit ang napiling SDK ay Dart {tool}.",
+    "lockSdkConstraint": "Ang pubspec.lock ay nangangailangan ng Dart {constraint} ngunit ang napiling SDK ay Dart {tool}.",
+    "unknownPathSdk": "Ang bersyon ng Dart SDK sa PATH ay hindi maitakda at ang proyekto ay walang narekord na bersyon ng SDK.",
+    "staleLock": "Ang pubspec.yaml ay mas bagong bersyon kaysa sa pubspec.lock, kaya ang pub ay magsisimula muli sa pag-resolve ng mga dependency.",
+    "staleConfig": "Ang configuration ng package ay nawawala o mas matandang pubspec.lock, kaya ang pub ay magsisimula ulit sa pag-resolve ng mga dependency."
+  },
   "about": {
     "ruleCountStrip": "Mga tala ng {total} na mga tala ng lint ay kasama na sa bersyon na ito (essensial {essential} · inirerekomenda {recommended} · profesional {professional} · komprehensibo {comprehensive} · pedantiko {pedantic} · {stylistic} opt-in stylistic)"
   },

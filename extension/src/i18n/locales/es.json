@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Regla estricta: La consulta pub se omitió, por lo tanto pubspec.lock no se reescribe. {reason}",
+    "sdkMismatch": "El proyecto se resolvió con Dart {project} pero la SDK seleccionada es Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock requiere Dart {constraint} pero la SDK seleccionada es Dart {tool}.",
+    "unknownPathSdk": "La versión del SDK Dart en PATH no pudo determinarse y el proyecto no tiene versión del SDK registrada.",
+    "staleLock": "pubspec.yaml es más nuevo que pubspec.lock, por lo tanto pub volvería a resolver las dependencias.",
+    "staleConfig": "La configuración del paquete está ausente o es más antigua que pubspec.lock, por lo tanto pub volvería a resolver las dependencias."
+  },
   "about": {
     "ruleCountStrip": "Reglas de lint {total} actualmente incluidas en esta versión (esenciales {essential} · recomendadas {recommended} · profesionales {professional} · completas {comprehensive} · pedantes {pedantic} · {stylistic} de estilo opt-in)"
   },
@@ -236,7 +244,7 @@
       "boolean_naming": "Los booleanos deben usar los prefijos es/tiene/puede/debe para que la intención sea clara en las condiciones y API.",
       "code_style_preferences": "Cómo se escriben los retornos, condicionales y bucles — retorno inmediato, for-in, getter vs método, y otros atajos similares.",
       "function_parameter_style": "Las funciones de flecha cuando son concisas, todos los parámetros nombrados, devoluciones en línea y no hay reasignación de parámetro.",
-      "widget_style": "Reglas estrictas:\n1. Devolver ÚNICAMENTE la salida traducida.\n2. NO incluir explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de lugar: tokens de lugar. Copiar cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca traducir, eliminar o reformatear un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambiar a otro idioma en medio de una oración.\n\nTexto: Flutter opciones de widget — SizedBox.square, centrar sobre alinear, espaciado sobre SizedBox, y evitar shrinkWrap en scrolls. Flutter proyectos solo.",
+      "widget_style": "Reglas estrictas:\n1. Devolver ÚNICAMENTE la salida traducida.\n2. NO incluir explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copiar cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca traducir, eliminar o reformatear un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambiar a otro idioma en medio de una oración.\n\nTexto: Flutter opciones de widget — SizedBox.square, centrar sobre alinear, espaciado sobre SizedBox, y evitar shrinkWrap en scrolls. Flutter proyectos solo.",
       "class_record_style": "Clase vs. tipos de devolución de registros, prefijos privados para subrayar y explícito esto donde se aclara.",
       "formatting": "Ubicación de líneas en blanco, comas al final, y estilo de literales y comentarios. Puede ser ruidoso — muchos archivos pueden necesitar ediciones.",
       "comments_documentation": "TODO y FIXME formato, caso de oración, un período después de comentarios doc, /// más //, y no comentó-fuera del código.",
@@ -259,7 +267,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX y las bibliotecas de estado e inyección de dependencias relacionadas.",
       "networking-apis": "Clientes HTTP, GraphQL, Firebase, Supabase y conectividad.",
       "storage-persistence": "Bases de datos locales y almacenes clave-valor — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Reglas estrictas:\n1. Devuelve ÚNICAMENTE la salida de la cadena traducida.\n2. NO incluyas explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copia cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca lo traduzcas, elimines o reformates un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambies a otro idioma en medio de una oración.\n\nTexto: Routing y manejo de deep-link — auto_route, go_router, app_links, url_launcher, y webview.",
+      "navigation-deep-links": "Reglas estrictas:\n1. Devuelve ÚNICAMENTE la salida de la cadena traducida.\n2. NO incluyas explicaciones, introducción, notación markdown o comillas circundantes.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copia cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca lo traduzcas, elimines o reformates un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambies a otro idioma en medio de una oración.\n\nTexto: Ruteo y manejo de enlaces profundos — auto_route, go_router, app_links, url_launcher, y webview.",
       "media-graphics": "Imágenes, SVG, animación, audio, mapas, recolectores y el motor Flame.",
       "device-platform": "Sensores, ubicación, permisos, biometría, notificaciones y trabajo en segundo plano.",
       "identity-sharing": "Proveedores de inicio de sesión, intercambio y revisión en la aplicación.",

@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "पैकेज विब्रेंसी पब क्वेरी के लिए छोड़ दिया गया है इसलिए pubspec.lock बदला नहीं गया। {reason}",
+    "sdkMismatch": "प्रोजेक्ट जोड़े गए हैं Dart {project} लेकिन चयनित SDK है Dart {tool}",
+    "lockSdkConstraint": "pubspec.lock {constraint} के लिए Dart आवश्यक है लेकिन चयनित SDK Dart {tool} है।",
+    "unknownPathSdk": "The Dart SDK version on PATH could not be determined and the project has no recorded SDK version.",
+    "staleLock": "pubspec.yaml, pubspec.lock से नए है, इसलिए pub आवश्यकताओं को पुनः निर्धारित करेगा।",
+    "staleConfig": "पैकेज विन्यास अनुपस्थित है या pubspec.lock से पुराना है, इसलिए पब आवश्यकताओं को पुनः निर्धारित करेगा।"
+  },
   "about": {
     "ruleCountStrip": "{total} लिंट नियम वर्तमान में इस संस्करण में शामिल हैं (आवश्यक {essential} · अनुशंसित {recommended} · पेशेवर {professional} · व्यापक {comprehensive} · सूक्ष्म {pedantic} · {stylistic} ऐच्छिक शैलीगत)"
   },

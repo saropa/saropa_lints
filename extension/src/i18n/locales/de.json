@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Package Vibrancy überspringt eine pub Abfrage, daher wird pubspec.lock nicht umgeschrieben. {reason}",
+    "sdkMismatch": "Das Projekt wurde mit Dart {project} aufgelöst, aber der ausgewählte SDK ist Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock benötigt Dart {constraint}, aber das ausgewählte SDK ist Dart {tool}.",
+    "unknownPathSdk": "Die Dart SDK-Version auf PATH konnte nicht ermittelt werden und das Projekt hat keine aufgezeichnete SDK-Version.",
+    "staleLock": "pubspec.yaml ist neuer als pubspec.lock, daher würde pub die Abhängigkeiten erneut auflösen.",
+    "staleConfig": "Die Paketkonfiguration fehlt oder ist älter als pubspec.lock, daher würde pub die Abhängigkeiten erneut auflösen."
+  },
   "about": {
     "ruleCountStrip": "{total} Lint-Regeln sind in dieser Version enthalten (essentiell {essential} · empfohlen {recommended} · professionell {professional} · umfassend {comprehensive} · pedantisch {pedantic} · {stylistic} opt-in stylistisch)"
   },
@@ -50,7 +58,7 @@
       },
       "rules": {
         "label": "Regeln & Ebenen",
-        "description": "Strict Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebenden Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: placeholder tokens. Kopieren Sie jeden Token genau so, wie er geschrieben ist, in die grammatikalisch korrekte Position. Übersetzen, entfernen oder umbenennen Sie niemals einen Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache."
+        "description": "Strict Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebenden Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch korrekte Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Konfigurieren Sie, welche der über 2.350 Regeln laufen und unter welcher Schweregrad."
       },
       "catalog": {
         "label": "Befehlskatalog, der Katalog für die Kommandoführung.",
@@ -1323,7 +1331,7 @@
     "hintNoPerRule": "Diese Ausfuhr hat keine pro-Regel Ausgabe zählt. Wieder analysieren mit einem aktuellen Saropa Lints Plugin.",
     "hintBuildFailed": "konnte keine Triage aus dieser Export-Datenbank erstellen. Führen Sie eine neue Analyse durch.",
     "summaryVolume": "Regeln Triage (Volumen / müssen fixieren / stilistisch)",
-    "hintSameAsTree": "Strengere Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Gleiche Gruppierung wie im Triage-Aktivitätsleiste-Baum: filtern Sie Issues oder deaktivieren/aktivieren Sie Regeln in `analysis_options_custom.yaml`. Große Gruppen können eine Bestätigung erfordern."
+    "hintSameAsTree": "Strengere Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das richtige Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Gleiche Gruppierung wie im Triage-Aktivitätsleiste-Baum: filtern Sie Issues oder deaktivieren/aktivieren Sie Regeln in `analysis_options_custom.yaml`. Große Gruppen können eine Bestätigung erfordern."
   },
   "kbdOverlay": {
     "toggleTitle": "Zeigen Sie Tastatur-Verknüpfungen (?) an.",

@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Regra Estrita:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramaticalmente correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Package Vibrancy pulou uma consulta pub, então pubspec.lock não é reescrito. {reason}",
+    "sdkMismatch": "O projeto foi resolvido com Dart {project}, mas o SDK selecionado é Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock requer Dart {constraint}, mas o SDK selecionado é Dart {tool}.",
+    "unknownPathSdk": "A versão do SDK Dart no PATH não pode ser determinada e o projeto não possui versão do SDK registrada.",
+    "staleLock": "pubspec.yaml é mais novo que pubspec.lock, então pub re-resolveria as dependências.",
+    "staleConfig": "A configuração do pacote está faltando ou é mais antiga que pubspec.lock, então pub re-resolveria as dependências."
+  },
   "about": {
     "ruleCountStrip": "Regras {total} de lint estão incluídas nessa versão (essencial {essential} · recomendado {recommended} · profissional {professional} · abrangente {comprehensive} · pedante {pedantic} · {stylistic} opt-in estilístico)"
   },
@@ -259,7 +267,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX e bibliotecas de injeção de dependência e estado relacionadas.",
       "networking-apis": "Clientes HTTP, GraphQL, Firebase, Supabase e conectividade.",
       "storage-persistence": "Bancos de dados locais e armazenamentos chave-valor — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Regras Estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramatical correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Roteamento e manipulação de links profundos — auto_route, go_router, app_links, url_launcher e webview.",
+      "navigation-deep-links": "Regras estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramatical correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua de destino; não mude para outra língua no meio da frase.\n\nTexto: Roteamento e manipulação de links profundos — auto_route, go_router, app_links, url_launcher e webview.",
       "media-graphics": "Imagens, SVG, animação, áudio, mapas, pickers e o motor Flame.",
       "device-platform": "Sensores, localização, permissões, biometria, notificações e trabalho de fundo.",
       "identity-sharing": "Fornecedores de login, compartilhamento e revisão no aplicativo.",
@@ -1323,7 +1331,7 @@
     "hintNoPerRule": "Esta exportação não tem contagens de emissão por regra. Reanalisar com um plug-in Saropa Lints atual.",
     "hintBuildFailed": "Não foi possível construir triagem a partir desta exportação. Faça uma nova análise.",
     "summaryVolume": "Regra triagem (volume / deve-fixar / estilística)",
-    "hintSameAsTree": "Regras Estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramatical correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Mesma agrupamento da atividade barra de triagem: filtrar Issues, ou desativar/ativar regras em `analysis_options_custom.yaml`. Grupos grandes podem pedir confirmação."
+    "hintSameAsTree": "Regras Estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramatical correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Mesma agrupamento da atividade Triage barra de ferramentas: filtrar Issues, ou desativar/ativar regras em `analysis_options_custom.yaml`. Grupos grandes podem pedir confirmação."
   },
   "kbdOverlay": {
     "toggleTitle": "Mostrar atalhos de teclado (?)",

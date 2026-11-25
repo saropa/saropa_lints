@@ -66,6 +66,25 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.9.0] — Unreleased
+
+Package Vibrancy no longer rewrites `pubspec.lock` in FVM-pinned projects, now uses the project's pinned SDK and respects `saropaLints.enabled`; `avoid_screenshot_sensitive` reports fewer false positives and catches more real authentication and verification screens; and `prefer_test_find_by_key` is now opt-in. [log](https://github.com/saropa/saropa_lints/blob/v17.9.0/CHANGELOG.md)
+
+### Added
+
+- **Explain Last Vibrancy Skip**: when Package Vibrancy skips a pub query to protect `pubspec.lock`, a status-bar item now appears; clicking it (or running the command) shows which SDK was selected, where it came from, the project SDK version, and the rule that caused the skip, with a button to run `pub get` using the project SDK (`dart pub get` for pure-Dart projects, `flutter pub get` for Flutter projects, with an extra confirmation when the SDK would come from PATH). Multi-root workspaces list each skipped folder.
+
+### Fixed
+
+- Package Vibrancy no longer rewrites `pubspec.lock` with the wrong SDK. Its `dart pub outdated` / `dart pub deps` / `flutter` calls now use the workspace SDK (`dart.sdkPath`, `dart.flutterSdkPath`, or the FVM pin) instead of whatever is first on PATH, and a pub query is skipped when the SDK differs from the one that last resolved the project. The startup scan and the new-version watcher also respect `saropaLints.enabled: false`.
+- `avoid_screenshot_sensitive` matched sensitive words as substrings of class names (`pin` inside "mapping" or "shipping"); it now matches whole camelCase words, so only classes that name a screen, page, view or widget for payment, login, PIN and similar flows are reported. The debug/tooling exclusion is also whole-word now, so `viewer` no longer hides `ReviewerPaymentScreen`. State, ViewModel and controller classes are skipped, and a StatefulWidget is cleared when its `State` class applies `FLAG_SECURE`. It also now catches authentication, authorization, verification and passcode screens (for example `AuthenticationScreen`, `VerificationScreen`), which were missed before; no action required.
+
+### Changed
+
+- **`prefer_test_find_by_key` is now opt-in**: it moved from the Recommended tier to the stylistic (opt-in) set and left the `testing` rule pack, because it flagged every `find.byType()` and fixing it meant adding Keys to production widgets. Enable it explicitly in `diagnostics:` if the project wants key-based finders.
+
+---
+
 ## [17.8.0]
 
 Fewer false positives: over 20 rules no longer flag code that was already correct (cached notifiers, loop-disposed controllers, `InkWell` hover/focus, button busy spinners, projects without an `ios/` folder and more), the VS Code LSP server stops rewriting `pubspec.lock` in FVM-pinned projects, and published rule counts and the Vietnamese comparison label are fixed. [log](https://github.com/saropa/saropa_lints/blob/v17.8.0/CHANGELOG.md)
@@ -483,112 +502,6 @@ The latest release, `17.0.1-beta.2`, focuses entirely on refining existing rules
 - **`require_ios_face_id_usage_description`:** no longer reports when the project root cannot be found or when Info.plist is missing, and the plist lookup now works for relative file paths.
 - **`require_null_safe_json_access`:** no longer reports casts guarded by an `is` test in a conditional, or after the key was assigned earlier in the same block.
 - **`require_unique_iv_per_encryption`:** no longer reports IV size constants (`ivLength`, `ivSize`, and similar) or whose initializer is an integer literal.
-
----
-
-## [17.0.1-beta.1]
-
-This beta focuses heavily on optimizing the VS Code extension's performance and improving the reliability of its Language Server Protocol (LSP) controls. Key updates include a smarter workspace hazard scan that automatically flags massive files or crowded directories for `watcherExclude`—now with built-in coverage for heavy Android and iOS build outputs—to protect extension host memory. It also overhauls the Health Panel's LSP management so server toggles work predictably without infinite spawn loops, and ensures critical upgrade prompts and detailed status tooltips remain visible even when lint integration is temporarily disabled. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.1/CHANGELOG.md)
-
-### Added
-
-- **Extension:** the Health Panel "Diagnostic Engines" section now states the recommended setup (LSP Server ON, Scan on Save ON, Live Analysis OFF, CI ON only if you want PRs gated, and the fallback if a rule stops firing under LSP) above the cards and as a short note on each card.
-- **Extension:** new settings `saropaLints.watcherExclude.maxFileKb` (default 5120) and `saropaLints.watcherExclude.maxFolderFiles` (default 1000). The workspace hazard scan now flags any file above the size bar and any folder with more direct files than the limit, and offers to add them to `files.watcherExclude`. Rules & Tiers > Automation has a new "Watcher excludes" block with both settings, the count of files, folders and missing recommended excludes affected, and a List control for each.
-- **Extension:** the recommended watcher excludes now cover Android/iOS build output (`.gradle`, `android/build`, `android/app/build`, `ios/build`, `ios/Pods`, `ios/.symlinks`, `DerivedData`); the hazard scan no longer descends into `.gradle`, `Pods` and `DerivedData`, and files under `.gradle` are excluded with `**/.gradle/**`.
-
-### Changed
-
-- **Extension:** dev dependencies `serialize-javascript` 7.1.0 → 7.1.4 and `undici` bumped (Dependabot, PR #360). No action required.
-
-### Fixed
-
-- **Extension:** the start-up upgrade offer (for example `^16.x` to 17.0.0) now also runs when Lint integration is Off (`saropaLints.enabled` false); it was skipped exactly in the projects that most needed it. The status bar item and upgrade prompt now also appear when Lint integration is Off.
-- **Extension:** the status bar "N workspace issue(s)" item now lists each issue in its tooltip (large unexcluded files, missing watcher exclusions, extension host memory). Before, the tooltip showed only process stats, so the red dot gave no hint of the cause.
-- **Extension:** the Health Panel "LSP Server" ON toggle no longer does nothing. The setting defaults to true, so clicking ON while the server was stopped (failed start, or after Kill All) rewrote the same value, fired no change event, and started nothing. The toggle now starts or stops the server directly, and the Health Panel refreshes. A failed start now shows an error message with the reason instead of only logging to the output channel.
-- **Extension:** Health Panel "Kill All" and "Restart All" buttons now name their target ("Kill All LSP Server", "Restart LSP Server").
-- **Extension:** the `saropaLints.lspServer.start` command and Health Panel "Restart All" no longer start the LSP server when `saropaLints.lspServer.enabled` is off; the start command now offers an Enable button. No action required.
-- **Extension:** the LSP client no longer spawns `dart run saropa_lints:lsp_server` when `saropa_lints` is missing from `.dart_tool/package_config.json`; it shows one warning ("run `dart pub get`") instead of restarting 5 times with stacked error toasts.
-- **Extension:** the "zero rules enabled" modal no longer reopens in a loop after clicking "Set Up Project". If setup does not fix the config, a single non-modal warning is shown instead.
-- **Extension:** the "zero rules enabled" modal no longer appears after Enable when `violations.json` was written by the extension itself (live-diagnostics snapshot with no `enabledRuleCount`), e.g. while Lint integration is Off. A missing count is now treated as unknown, not zero.
-- **Tests:** the unwritable-location test in `init_emit_ci_test.dart` no longer uses `skip:` (flagged by `avoid_skipped_tests`). It returns early on Windows instead.
-
----
-
-## [17.0.0] - published as stable by mistake
-
-Published to pub.dev as a stable release by mistake: it was meant to be a beta. It is not retracted. Use 17.0.1-beta.1 or later, or the next stable release.
-
-Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 projects on the frozen 16.x line. [log](https://github.com/saropa/saropa_lints/blob/v17.0.0/CHANGELOG.md)
-
-### Changed
-
-- **Breaking:** saropa_lints now requires Dart `>=3.11.0` (analyzer 13.0.0 depends on `_fe_analyzer_shared` 100, which needs 3.11) and `analyzer >=13.0.0 <15.0.0`, and pub picks the newest allowed by your Dart version (3.11 and 3.12 up to 14.5.0, 3.13 14.6.0); projects held on analyzer 12 stay on `saropa_lints: ^16.7.0`, which is frozen with no back-ports.
-- `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended`; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.
-- Reports on named arguments now highlight only the argument name instead of the whole `name: value` text, so editor squiggles and `// ignore:` placement for those reports shift to the name; no action required.
-- Widget rules that match by name no longer match record fields that share a widget's name, which removes false positives; no action required.
-- The extension now detects at start-up whether a project uses the pubspec route, the plugin route or both, and shows one prompt offering Migrate when a newer saropa_lints works with the project's Dart. Plugin-only projects (saropa_lints only in `analysis_options.yaml`) get the same offer as pubspec projects.
-
-### Internal
-
-- Extension version now keeps the package's major.minor and maps only the patch (10 x package patch + slot; stable uses slot 9, prerelease N uses slot N-1), so every publish is strictly higher; a 10th prerelease of one patch is refused.
-
----
-
-## [16.10.0]
-
-Restores installation on Flutter 3.44 and older, and renames one rule whose name matched a core analyzer diagnostic. [log](https://github.com/saropa/saropa_lints/blob/v16.10.0/CHANGELOG.md)
-
-### Fixed
-
-- Projects on Flutter 3.44 and older could not add saropa_lints as a dev dependency from 14.0.3 onward: the `meta ^1.18.3` floor conflicted with the `meta 1.18.0` that those Flutter versions pin. The floor is back to `meta ^1.18.0`. No other dependency changed.
-
-### Changed
-
-- `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended` because the old name matched a core analyzer diagnostic that the analyzer is removing; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.
-
----
-
-## [16.9.0]
-
-A false-positive fix for `avoid_async_in_build`. [log](https://github.com/saropa/saropa_lints/blob/v16.9.0/CHANGELOG.md)
-
-### Fixed
-
-- `avoid_async_in_build` no longer flags an async `build` method in a class that is not a Flutter widget or State (for example a Serverpod `WidgetRoute`). Fixes [#359](https://github.com/saropa/saropa_lints/issues/359).
-
----
-
-## [16.8.0]
-
-Test-suite repair, dependency security updates, and a linting fix. No change to rule behavior or shipped output. [log](https://github.com/saropa/saropa_lints/blob/v16.8.0/CHANGELOG.md)
-
-### Security (Extension)
-
-- Dependency bumps: undici 8.10.0 → 8.11.2 (clears 8 Dependabot alerts); brace-expansion 5.0.9 → 5.0.12 and source-map-js 1.2.1 → 1.2.2 (clears 4 alerts).
-- Dependency bump: shell-quote 1.10.0 → 1.12.0 (clears critical command-injection Dependabot alert 33, fixed in 1.11.0; dev-tooling only via npm-run-all2).
-
-### Fixed
-
-- `audit --baseline` now exits 1 only when a finding is new. It used to exit 1 for every finding, baselined or not, so the action's `baseline` input could never let a gate accept a known backlog. Same contract as `cross_file --baseline` and `project_health --baseline`. With no baseline file, every finding still counts.
-- `audit --since` works for a project in a subdirectory of its repository (a monorepo package). The changed-file paths were joined onto the project path twice and matched nothing, so the audit covered no files. An unknown ref now also returns an empty list on git versions that report it as a "bad revision", instead of crashing.
-- `init --emit-ci` writes the workflow at the repository root, where GitHub runs workflows from, and adds `working-directory` when the project is in a subdirectory. It honors an explicit `--tier`, and reports a write failure instead of printing a stack trace.
-- The composite action trims glob patterns (`lib/gen/**, test/**` no longer yields a pattern with a leading space that matches nothing), accepts one pattern per line, and no longer aborts on an empty pattern. It fetches `since` given as a bare branch name, a branch with slashes or a commit SHA, and names the problem when it is on a remote other than origin. It removes a stale SARIF file before the run, creates the SARIF directory, handles an absolute `sarif-file`, and rejects `resolve` values other than true/false and a `fail-on-count` without its `fail-on`.
-- Releases no longer start a second publish run for the moving `v16` tag, which matched the publish workflow's `v*` trigger. Pre-releases leave `v16` on the last stable release, the tag points at the release commit rather than whatever is checked out, and re-running the tag step repairs a `v16` push that failed.
-- `extension/scripts/check_l10n_keys.py` key-union regex rewritten to eliminate exponential backtracking (ReDoS vulnerability, code-scanning alert 23).
-- `avoid_string_substring` now documents that it cannot prove bounds established inside a helper function it would have to inline; suppress with `// ignore:` at the call site when the helper is bounds-safe.
-
-### Fixed (Extension)
-
-- The CI card writes the workflow at the repository root with `working-directory` for a project in a subdirectory. It was written under the project, where GitHub never runs it.
-- Publishing the CI change no longer freezes VS Code while git pushes, and pressing the button again after a failure resumes on the same branch instead of failing at `git checkout -b`. It refuses to publish when `pubspec.yaml` already had uncommitted edits of yours (a commit takes whole files, so they would have been pushed too), when there is nothing to publish, and when a branch of the same name already exists on the remote. Opening the pull request gives up after 15 seconds on a connection that never answers and offers the compare page.
-- Adding `saropa_lints` to `pubspec.yaml` keeps valid YAML for a `dev_dependencies:` with a trailing comment, four-space indentation, an existing entry at any indentation, and an empty `{}`. It also adds `^16.2.1` instead of the long-stale `^9.1.0`.
-- Turning CI off a second time also suspends a job added since the first time, and toggling to the state the file is already in no longer offers an empty pull request.
-- Package Vibrancy's "Generate CI Pipeline" counts only direct and dev dependencies that have a newer version, the same measure its suggested threshold now uses. Transitive packages the project cannot upgrade no longer fail a fresh pipeline. `failOnVulnerability` is enforced from the security advisories `pub outdated` reports, where it used to claim there was no data and pass. The pull request comment shows pass or fail against the threshold, the shell script uses a private temporary directory, and the GitLab job uses the maintained Flutter image.
-
-### Internal
-
-- Restored the scripts package markers and the cross-file, structure and example fixture sources that an earlier bulk commit deleted, which had made the CI `test` job fail.
-- Health history no longer labels a point with the wrong tag when two tags (such as `v16` and `v16.6.0`) share a commit.
 
 ---
 

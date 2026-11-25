@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "الباقة Vibrancy تخطت استعلام pub لذا pubspec.lock غير مُعيدة. {reason}",
+    "sdkMismatch": "تم حل المشروع باستخدام Dart {project} ولكن SDK المختار هو Dart {tool}.",
+    "lockSdkConstraint": "تتطلب pubspec.lock Dart {constraint} ولكن SDK المختار هو Dart {tool}.",
+    "unknownPathSdk": "النسخة Dart SDK على PATH لم تحدد ويمكن للمشروع لا توجد نسخة SDK المسجلة.",
+    "staleLock": "pubspec.yaml أحدث من pubspec.lock، لذا سيقوم pub بإعادة حل الاعتماديات.",
+    "staleConfig": "التكوين الخاص بالحزمة مفقود أو أقدم من pubspec.lock، لذلك سيقوم pub بإعادة حل الاعتماديات."
+  },
   "about": {
     "ruleCountStrip": "قواعد {total} lint تُوزع حاليًا في هذه الإصدار (الأساسية {essential} · الموصى بها {recommended} · المهنية {professional} · الشاملة {comprehensive} · الصارمة {pedantic} · {stylistic} المُفعَّلة اختياريًا من حيث الأسلوب)"
   },

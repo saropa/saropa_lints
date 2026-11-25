@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "پکیج ویبرنسی اطلاعات پب جویی را اغما کرد و بنابراین pubspec.lock تغییر نداده شد. {reason}",
+    "sdkMismatch": "پروژه با Dart {project} حل شد اما SDK انتخاب شده Dart {tool} است.",
+    "lockSdkConstraint": "pubspec.lock نیاز به Dart {constraint} دارد اما SDK انتخاب شده Dart {tool} است.",
+    "unknownPathSdk": "نسخه Dart SDK در PATH تعیین نشد و پروژه نسخه SDK ثبت نشده ای دارد.",
+    "staleLock": "pubspec.yaml جدتر از pubspec.lock است، بنابراین pub وابستگی ها را مجدد حل می کند.",
+    "staleConfig": "پکیج کانفیگوراسیون کم یا قدیمی تر از pubspec.lock است، بنابراین pub وابستگی ها را مجدد حل می کند."
+  },
   "about": {
     "ruleCountStrip": "قوانین پرز {total} در حال حاضر در این نسخه ارسال می شود (ضروری {essential} · {recommended} پیشنهادی · {professional} حرفه ای · {comprehensive} جامع · {pedantic} pedantic · سبک انتخابی {stylistic})"
   },
@@ -682,7 +690,7 @@
       },
       "fix": {
         "turnOn": "javab: don't both on",
-        "setUp": "javab: inqilab va akhlat kardan",
+        "setUp": "javab: inqilab va akhri",
         "title": "نگه دارنده تنظیم saropaLints.enabled و پلاگین تحلیل کننده را به طور همزمان فعال می کند."
       },
       "pill": {

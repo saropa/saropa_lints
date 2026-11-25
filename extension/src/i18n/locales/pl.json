@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Reguły ścisłe:\n1. Zwróć TYLKO przetłumaczony ciąg znaków.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zamienne: tokeny zamienne. Skopiuj każdy z nich do przekładu WŁAŚNIE tak, jak został napisany, w poprawnie gramatycznej pozycji. Nigdy nie przekładasz, usuwasz ani zmieniasz format tokena.\n4. Wyjście MUSI używać poprawnego systemu zapisu dla języka docelowego; nie zmieniaj się do innego języka w środku zdania.\n\nTekst: Pakiet Vibrancy pominięto zapytanie pub, więc pubspec.lock nie zostanie przepisany. {reason}",
+    "sdkMismatch": "Projekt został rozpoznany z Dart {project}, ale wybrany SDK to Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock wymaga Dart {constraint}, ale wybrany SDK to Dart {tool}.",
+    "unknownPathSdk": "Wersja SDK Dart na PATH nie może być określona i projekt nie ma zapisanej wersji SDK.",
+    "staleLock": "pubspec.yaml jest nowsze niż pubspec.lock, więc pub ponownie rozwiąże zależności.",
+    "staleConfig": "Konfiguracja pakietu jest brakująca lub starsza niż pubspec.lock, więc pub ponownie rozwiąże zależności."
+  },
   "about": {
     "ruleCountStrip": "Zasady {total} lint w tej wersji (podstawowe {essential} · zalecane {recommended} · profesjonalne {professional} · kompleksowe {comprehensive} · pedantyczne {pedantic} · {stylistic} opcjonalne stylowe)"
   },
@@ -259,7 +267,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX i powiązane biblioteki stanu i wstrzykiwania zależności.",
       "networking-apis": "Klienci HTTP, GraphQL, Firebase, Supabase i łączność.",
       "storage-persistence": "Bazy danych lokalne i magazyny klucz-wartość — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Zasady ścisłe:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia IDEWOWO tak, jak został napisany, w poprawnej gramatycznej pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Routing i obsługa głębokiego linkowania — auto_route, go_router, app_links, url_launcher, i webview.",
+      "navigation-deep-links": "Zasady ścisłe:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zamiennikowe: tokeny zamiennikowe. Skopiuj każdy z nich do tłumaczenia IDEALNIE jak napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumacza, usuwaj ani zmienia format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisania dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Routing i obsługa głębokiego linkowania — auto_route, go_router, app_links, url_launcher, oraz webview.",
       "media-graphics": "Obrazy, SVG, animacje, dźwięk, mapy, zbieracze i silnik Flame.",
       "device-platform": "Czujniki, lokalizacja, uprawnienia, dane biometryczne, powiadomienia i prace w tle.",
       "identity-sharing": "Dostawcy usług logowania, udostępnianie i przegląd aplikacji.",
@@ -1959,7 +1967,7 @@
       "progress": "{percent}% — {done}/{total} pliki"
     },
     "reports": {
-      "intro": "Zasady ścisłe:\n1. Zwróć TŁYMOŚĆ przetłumaczonych ciągów.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie przekładasz, usuwasz ani zmieniasz format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie zmieniaj się do innego języka w środku zdania.\n\nTekst: Raport CLI w jednym kliknięciu, który wcześniej wymagał terminala. Każdy przycisk „Uruchom” przesyła w czasie rzeczywistym wyjście narzędzia poniżej jego karty i zapisuje kopię pod folderem reports/.saropa_lints/reports-tab/",
+      "intro": "Zasady ścisłe:\n1. Zwróć TŁYMOŚĆ przetłumaczonych ciągów.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumaczy, usuwaj ani zmienia format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Raport CLI w jednym kliknięciu, który wcześniej wymagał terminala. Każdy przycisk „Uruchom” przesyła w czasie rzeczywistym wyjście narzędzia poniżej jego karty i zapisuje kopię pod reports/.saropa_lints/reports-tab/",
       "runButton": "Uruchom",
       "notRunYet": "Nie uruchomiono jeszcze",
       "running": "Uruchamianie…",

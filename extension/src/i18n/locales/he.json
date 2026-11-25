@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "חוקי קפדנות:\n1. החזיר רק את התוצאה המתרגמת.\n2. אל תוסיף הסברים, הפתיחה, סימני מardown, או ציטוטים מסביב.\n3. הטקסט עשוי להכיל תокני תחזיות: תוקני תחזיות. העתק כל אחד מהם לתרגום בדיוק כפי שנכתב, במקומו הgrammatically הנכון. אל תתרגם, תמחק או תפורמט תוקן תחזיה.\n4. קריטי: כל אות בתוצאה חייבת להיות אות עברית. תרגל כל מילה לעברית — אל ת deix או תחליף כל מילה בlatin, thai, ערבית, קירילית, קוריאנית, יפנית או כל שפה אחרת. רווחים, מספרים, תבליטים ותוקני תחזיות הם היחסיים היחידיים.\n\nטקסט: חבילת ויברנס עצרה שאילתה פוב, אז pubspec.lock אינה מתחזקת. {reason}",
+    "sdkMismatch": "הפרויקט נפתר עם Dart {project} אך הSDK שנבחר הוא Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock דורש Dart {constraint} אך הSDK שנבחר הוא Dart {tool}.",
+    "unknownPathSdk": "הגרסה של Dart SDK שבעת PATH לא יכולה להיבדוק והפרויקט לא מכיל גרסה רשומה של SDK.",
+    "staleLock": "pubspec.yaml הוא עדכני יותר מ-pubspec.lock, ולכן pub יתאים מחדש את התלות.",
+    "staleConfig": "התצורת החבילה חסרה או ישנה יותר מpubspec.lock, ולכן pub ית.resolve מחדש את התלות."
+  },
   "about": {
     "ruleCountStrip": "חוקי לינט {total} נמצאים כרגע בגרסה זו (חובה {essential} · מומלץ {recommended} · מקצועית {professional} · מפורט {comprehensive} · פדנטי {pedantic} · {stylistic} בחירה חופשית סגנון)"
   },
