@@ -2925,6 +2925,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Suppress (intentional old SDK)"
+    },
+    "staleOverride": {
+      "suppress": "Suppress (override is intentional)"
     }
   },
   "blastRadius": {

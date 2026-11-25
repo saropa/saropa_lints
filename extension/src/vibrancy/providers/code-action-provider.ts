@@ -85,6 +85,12 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
                     document, packageName, diag,
                 );
                 if (removeAction) { actions.push(removeAction); }
+                // In-file dismissal for a deliberate override the analyzer
+                // cannot justify; the comment travels with the repo.
+                actions.push(this._createIgnoreAction(
+                    document, diag, 'stale-override',
+                    l10n('vibrancy.staleOverride.suppress'),
+                ));
             }
 
             seen.add(packageName);
@@ -142,17 +148,31 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
         return actions;
     }
 
-    /**
-     * "Suppress (intentional old SDK)": appends `# saropa_lints:ignore sdk-constraint`
-     * to the constraint line, extending an existing directive if one is present
-     * (a second directive on the same line would not be parsed).
-     */
+    /** "Suppress (intentional old SDK)": see _createIgnoreAction. */
     private _createSdkSuppressAction(
         document: vscode.TextDocument,
         diag: vscode.Diagnostic,
     ): vscode.CodeAction {
-        const action = new vscode.CodeAction(
+        return this._createIgnoreAction(
+            document, diag, 'sdk-constraint',
             l10n('vibrancy.sdkConstraint.suppressOldSdk'),
+        );
+    }
+
+    /**
+     * Appends `# saropa_lints:ignore <code>` to the diagnostic's line,
+     * extending an existing directive if one is present (a second directive
+     * on the same line would not be parsed). Shared by every diagnostic that
+     * supports in-file dismissal so the editing grammar stays in one place.
+     */
+    private _createIgnoreAction(
+        document: vscode.TextDocument,
+        diag: vscode.Diagnostic,
+        code: string,
+        label: string,
+    ): vscode.CodeAction {
+        const action = new vscode.CodeAction(
+            label,
             vscode.CodeActionKind.QuickFix,
         );
         action.diagnostics = [diag];
@@ -163,7 +183,7 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
         // Shared grammar with the parser: pure comma-separated code list only.
         if (endsWithIgnoreCodeList(text)) {
             // Existing directive that ends in a pure code list: extend it.
-            action.edit.insert(document.uri, end, ', sdk-constraint');
+            action.edit.insert(document.uri, end, `, ${code}`);
         } else if (text.includes('saropa_lints:ignore')) {
             // Directive followed by free text: appending would put the code
             // after the prose where the parser reads it as part of a code
@@ -176,7 +196,7 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
             );
         } else {
             action.edit.insert(
-                document.uri, end, '  # saropa_lints:ignore sdk-constraint',
+                document.uri, end, `  # saropa_lints:ignore ${code}`,
             );
         }
         return action;

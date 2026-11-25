@@ -73,6 +73,7 @@ Package Vibrancy is more accurate about which `dependency_overrides` entries are
 ### Fixed (Extension)
 
 - Package Vibrancy no longer flags a needed override as stale when the parent package's constraint line carries a trailing comment; skipped constraint reads are now logged. No action required.
+- The Package Vibrancy stale-override warning can now be dismissed for a deliberate override with a quick fix, "Suppress (override is intentional)", which adds `# saropa_lints:ignore stale-override` to the line. No action required.
 - Overrides whose check could not complete (dependency graph failed, or a parent package's pubspec was unreadable) now show as "Unverified" instead of "Stale", so they are never presented as safe to remove. Re-run the scan once the cause (named in the tooltip and log) is fixed.
 
 ---

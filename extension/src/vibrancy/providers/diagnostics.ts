@@ -14,6 +14,7 @@ import { filterBySeverity } from '../scoring/vuln-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 import { isHostedUpgradeable } from '../scoring/blocker-analyzer';
 import { isUpgradeSuppressed } from '../scoring/blast-radius-attacher';
+import { isSuppressed } from '../../pubspec-validation';
 import { getEnabledSeverities } from '../../config/severityConfig';
 
 // Maps scan results to VS Code diagnostics (budget, vulns, EOL, known issues).
@@ -200,6 +201,11 @@ export class VibrancyDiagnostics {
             const line = lines[lineNum];
             const match = line.match(/^\s{2}(\w[\w_]*)/);
             if (!match) { continue; }
+
+            // Honor `# saropa_lints:ignore stale-override` on this line or the
+            // one above: a deliberate override the analyzer cannot justify must
+            // be dismissable in the file, where the reason is documented.
+            if (isSuppressed(lines, lineNum, 'stale-override')) { continue; }
 
             const startChar = line.indexOf(match[1]);
             const endChar = startChar + match[1].length;
