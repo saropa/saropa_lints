@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.9.1] — Unreleased
+## [17.9.1]
 
 Package Vibrancy is more accurate about which `dependency_overrides` entries are still needed, and now records in its log why a check was skipped instead of failing silently. [log](https://github.com/saropa/saropa_lints/blob/v17.9.1/CHANGELOG.md)
 
