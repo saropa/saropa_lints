@@ -1,6 +1,6 @@
 # BUG: Package Vibrancy scan runs bare `dart pub outdated` / `dart pub deps` from PATH and rewrites pubspec.lock with the wrong SDK
 
-**Status: Fix implemented — awaiting F5 verification**
+**Status: Fixed**
 
 Created: 2026-11-24
 Component: extension-native (`extension/src/vibrancy/`)
