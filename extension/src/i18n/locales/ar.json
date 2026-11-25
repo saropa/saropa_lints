@@ -24,6 +24,7 @@
     "explain": {
       "title": "تخطّت Vibrancy للحزم استعلام pub",
       "none": "لم يتم تخطي أي استعلام pub في Vibrancy خلال هذه الجلسة.",
+      "unknown": "غير معروف",
       "reason": "السبب: {reason}",
       "rule": "القاعدة: {rule}",
       "sdk": "SDK المحدد: {path} (من {source})",
@@ -183,7 +184,7 @@
       "doneTooltip": "نتيجة(s) {total}، {shown} مُعرضة بعد التصفية",
       "dropped": "Saropa: تم تجاوز المسح ({count} ملفات)",
       "droppedTooltip": "Saropa Lints تم تجاوز {count} ملفات تم فتحها بواسطة أداة أخرى بدلًا منك. احفظ ملفًا لمسحه.",
-      "droppedSuffix": "(+{count} تمت الإскаك)",
+      "droppedSuffix": " (+{count} تم تخطيها)",
       "droppedSuffixTooltip": "تم تخطي أيضًا ملفات {count} التي تم فتحها بواسطة أداة أخرى بدلًا منك. احفظ ملفًا لمسحه."
     },
     "baseline": {
@@ -199,7 +200,7 @@
       "progress": "بناء تقرير الفرص الكامل...",
       "noFolder": "لا يمكن إنشاء مجلد التقارير، لذلك لم يتم كتابة التقرير.",
       "failed": "لم يتم إنشاء تقرير الفرص: {error}",
-      "large": "ال报告显示 {megabytes} ميغا بايت وربما يكون بطيئًا في التصفح. ملف JSON المرفق به يحتوي على نفس البيانات للاستخدام.",
+      "large": "حجم التقرير {megabytes} ميغابايت وقد يكون التصفح فيه بطيئًا. يحتوي ملف JSON المرفق معه على البيانات نفسها لاستخدامها في الأدوات.",
       "done": "تقرير الفرص مكتوب إلى {path}"
     },
     "documentTitle": "معرض ميزات الحزمة",
@@ -285,7 +286,7 @@
     "disableAll": "تعطيل كل شيء",
     "noMatch": "لا يوجد قواعد أسلوب مطابقة.",
     "desc": {
-      "ordering_sorting": "يُرتِّب العناصر، والمُعلَّمات، والحقول، وключа التصنيف لترتيب قابل للتنبؤ. يُنتج الكثير من الأخطاء في الكود الحالي — أفضل في الكود الجديد أو المستودعات الصغيرة.",
+      "ordering_sorting": "يُرتِّب الأعضاء والمُعلَّمات والحقول ومفاتيح الخرائط للحصول على تخطيط قابل للتنبؤ. كثير الضجيج على الكود الحالي — الأنسب للكود الجديد أو المستودعات الصغيرة.",
       "naming_conventions": "تسمية الملفات والأساليب والاستثناءات والإعادة للنداء وحوادث ووحدات الحالة. يمكن أن تكون صاخبة على قواعد الكود الكبيرة ؛ تمكين تدريجيا.",
       "boolean_naming": "يجب على البولية استخدام هو / لديه / يمكن / ينبغي أن تكون مقدمات حتى يكون النية واضحة في الشروط والآف آي.",
       "code_style_preferences": "كيفية كتابة العودة، والشروط، والحلقات — العودة الفورية، for-in، getter مقابل طريقة، وغيرها من الاختصارات المماثلة.",
@@ -332,7 +333,7 @@
       "disableButton": "تعطيل تعطيّل",
       "disableTitle": "الغاء تفعيل هذه القاعدة للمشروع بأكمله — يكتب analysis_options_custom.yaml ويُعيد تشغيل التحليل",
       "enableButton": "تم تفعيله",
-      "enableTitle": "إعادة تفعيل هذه القاعدة — تزيل الت覆盖 في analysis_options_custom.yaml وتُعيد تشغيل التحليل"
+      "enableTitle": "إعادة تفعيل هذه القاعدة — تزيل التجاوز في analysis_options_custom.yaml وتعيد تشغيل التحليل"
     },
     "tab": {
       "tier": "مستوى",
@@ -1348,7 +1349,7 @@
       "disableButton": "إيقاف هذا القاعدة",
       "disableTitle": "الغاء تفعيل هذه القاعدة للمشروع بأكمله — يكتب analysis_options_custom.yaml. قم بتشغيل تحليل الكود مرة أخرى لرؤية التغيير الذي تم تطبيقه.",
       "enableButton": "Reactivate هذا القاعدة",
-      "enableTitle": "استعادة تفعيل هذه القاعدة — تزيل الت覆盖 في analysis_options_custom.yaml. قم بتشغيل تحليل الأكواد مرة أخرى لرؤية التغيير الذي سيؤثر."
+      "enableTitle": "إعادة تفعيل هذه القاعدة — تزيل التجاوز في analysis_options_custom.yaml. شغّل التحليل مرة أخرى لرؤية التغيير."
     },
     "noData": {
       "heading": "لم تُفعَّل بعد",
@@ -1415,7 +1416,7 @@
       "knownIssues": "القضايا المعروفة",
       "knownIssuesDesc": "تصفح الثغرات المعروفة والإعلانات المقدمة ضد اعتمادياتك",
       "compare": "مقارنة المقارنة.",
-      "compareDesc": "قارن بين حزمة أو أكثر بشكل جانبي على основе النقاط، الحجم، والنشاط.",
+      "compareDesc": "قارن بين حزمتين أو أكثر جنبًا إلى جنب من حيث النقاط والحجم والنشاط.",
       "settings": "تحديدات التسويات",
       "openButton": "فتح {tab}"
     },
@@ -2007,7 +2008,7 @@
       "elapsed": "مرت فترة من الزمن.",
       "cancel": "إلغاء الإلغاء",
       "restart": "إعادة تشغيل: إعادة التشغيل.",
-      "stopped": "остان",
+      "stopped": "متوقف",
       "logHeading": "النشاط النشطة.",
       "logEmpty": "لا يوجد إخراج بعد — هذا السجل يملأ فقط إذا أصدر المسح رسالة تشخيصية.",
       "progress": "{percent}% — {done}/{total} ملفات"
@@ -2219,7 +2220,7 @@
         "active": "النشاط الفاعل active نشط فعال.",
         "idle": "غير نشط",
         "running": "التشغيل",
-        "stopped": "остودت",
+        "stopped": "متوقف",
         "suspended": "متوقفة",
         "starting": "بدء",
         "scanning": "المسح",
@@ -2463,7 +2464,7 @@
       "noWorkspace": "لا يوجد مجلد مساحة عمل مفتوح يفتح",
       "ciOverwriteConfirm": "{path} موجود بالفعل. إعادة الكتابة؟",
       "actionOverwrite": "إزالة الكتابة فوقها",
-      "ciGenerated": "流水线 توليد: {path}",
+      "ciGenerated": "تم إنشاء مسار CI: {path}",
       "compareSelectCount": "حدد 2-3 حزم للمقارنة.",
       "compareMax": "أقصى 3 حزم للمقارنة.",
       "compareFetchFailed": "لم يتمكن من استلام بيانات حزمة كافية."
@@ -2748,7 +2749,7 @@
       "pattern": "نمط",
       "files": "ملفات الملفات.",
       "cost": "التكاليف المقدرة",
-      "priority": "ال우선순위"
+      "priority": "الأولوية"
     },
     "status": {
       "applied": "التطبيق",
@@ -2940,7 +2941,7 @@
       "breaksOne": "{pkg} {to} سيؤدي إلى تكسير {count} تعتمد عليه: {names}",
       "breaksOther": "{pkg} {to} سيؤدي إلى تكسير {count} الاعتماد: {names}",
       "safe": "{pkg} {from} -> {to} يبدو آمنًا",
-      "newestCompatible": "أحدث إصدار совместим: {pkg} {version}"
+      "newestCompatible": "أحدث إصدار متوافق: {pkg} {version}"
     }
   },
   "lifecycle": {
@@ -2999,7 +3000,7 @@
       "neither": "saropa_lints: غير مُconfigured",
       "localSource": "saropa_lints: المصدر المحلي",
       "dartTooOld": "saropa_lints: يحتاج المُضاف إليه إلى إصدار أحدث من Dart",
-      "tipPubspec": "هذا المشروع يستخدم المسار pubspec: saropa_lints هو اعتماد في pubspec.yaml. تحصل على التشخيصات المحررية وال명령 السطرية (dart run saropa_lints:init, scan, baseline).",
+      "tipPubspec": "يستخدم هذا المشروع مسار pubspec: saropa_lints تبعية في pubspec.yaml. تحصل على تشخيصات المحرر وأوامر سطر الأوامر (dart run saropa_lints:init، وscan، وbaseline).",
       "tipPlugin": "هذا المشروع يستخدم المُضاف الإضافي route: saropa_lints هو المُضاف المُحدد في analysis_options.yaml. تحصل فقط على التشخيصات الخاصة بالمحرر. أوامر سطر الأوامر (dart run saropa_lints:init، scan، baseline) تحتاج saropa_lints في pubspec.yaml.",
       "tipBoth": "هذا المشروع يستخدم مسارات كلاهما وهم يتفقون. تحصل على تشخيصات المحرر وأوامر سطر الأوامر.",
       "tipDisagree": "الاسماء pubspec.yaml و analysis_options.yaml مختلفة saropa_lints الإصدارات. يستخدم المحرر إصدار البرنامج المساعد ({plugin})؛ واستخدام أوامر سطر الأوامر إصدار pubspec.yaml ({pubspec}).",
@@ -3013,7 +3014,7 @@
       "needsNewerDart": "يحتاج saropa_lints {newest} إلى Dart SDK أحدث مما يملكه هذا المشروع ({dart}). أبقِ على ^{chosen}، أو حدّث Flutter لاستخدام {newest}.",
       "metaExcludesPin": "saropa_lints {newest} يحتاج إلى حزمة ميتا أحدث من إصدار Flutter SDK الخاص بك ({pin}). احتفظ بـ ^{chosen}، أو قم بتحديث Flutter لاستخدام {newest}.",
       "packageHoldsAnalyzer": "الحزمة {package} تمنع تحليل المُحلِّل، لذا لا يمكن تثبيت saropa_lints {newest}. استخدم ^{chosen}، أو تحديث {package} لاستخدام {newest}.",
-      "noVersionResolves": "لا يمكن تثبيت أي نسخة من saropa_lints كاعتماد لأن {package} يتطلب مُحلِّلًا أقدم. لا يزال маршрут الإضافة يعمل.",
+      "noVersionResolves": "لا يمكن تثبيت أي إصدار من saropa_lints كاعتماد لأن {package} يتطلب مُحلِّلًا أقدم. لا يزال مسار الإضافة يعمل.",
       "noPluginResolves": "لا يمكن تثبيت أي نسخة من saropa_lints كاعتماد، و{version} لم يمر عبر حل مُحلّل pub كملحق أيضًا ({package} يتطلب مُحلّلًا أقدم). لم يتم أي تغيير.",
       "blockedUsePlugin": "{package} يمنع تحليل المُحلِّل، لذلك لا يمكن تثبيت saropa_lints كاعتماد. لا تتأثر مسار الإضافة: ضع إصدار الإضافة في analysis_options.yaml إلى {version}.",
       "editorVsCli": "سيستخدم المحرر إصدار البرنامج المساعد {plugin}. تظل الأوامر في سطر الأوامر (dart run saropa_lints:init، scan، baseline) تستخدم إصدار pubspec.yaml {pubspec}.",
@@ -3027,14 +3028,14 @@
       "probeFailed": "لم يتم التحقق من إصدار saropa_lints الذي يمكن استخدامه لهذا المشروع لأن أداة Dart لم تُنفذ ({detail}). تأكد من أن dart أو flutter موجودة في مسارك (PATH) وأنك متصل بالإنترنت، ثم قم بالتحقق مرة أخرى.",
       "staleVersions": "قائمة الإصدارات لا يمكن تحديثها (غير متصلة بالإنترنت)، لذا قد تكون هذه النصيحة قديمة.",
       "blockerSdk": "تتطلب saropa_lints {version} إصدارًا أحدث من Dart SDK من {dart}",
-      "blockerMeta": "saropa_lints {version} غير совместим с версией meta {pin}, которая зафиксирована вашим Flutter SDK.",
+      "blockerMeta": "saropa_lints {version} غير متوافق مع إصدار meta {pin} المثبَّت بواسطة Flutter SDK الخاص بك.",
       "blockerPackage": "{package} يمنع التثبيت من خلال طلب إصدار مختلف من مُحلل الأكواد.",
       "fixFlutterUpgrade": "أعد تشغيل flutter upgrade.",
       "fixUpgradeFlutterMeta": "تحديث Flutter إلى إصدار يحدد ميتا أحدث.",
       "fixKeepVersion": "احفظ saropa_lints في ^{version}.",
       "fixUpdateHolder": "تحديث {package} إلى إصدار يدعم مُحلِّلًا أحدث.",
       "fixUsePluginRoute": "استخدم مسار الإضافة: ضع إصدار الإضافة في analysis_options.yaml إلى {version}.",
-      "fixPubspecFallback": "أو بقِ على مسار pubspec: استخدم saropa_lints ^{version}، أو قم بتحديث {package} إلى إصدار يدعم تحليلщикًا أحدث.",
+      "fixPubspecFallback": "أو ابقَ على مسار pubspec: استخدم saropa_lints ^{version}، أو حدِّث {package} إلى إصدار يدعم مُحلِّلًا أحدث.",
       "fixAlignPlugin": "حدد إصدار الإضافة في analysis_options.yaml إلى {version}."
     },
     "card": {
@@ -3043,8 +3044,8 @@
       "notDetected": "غير مكتشف",
       "dart": "Dart SDK",
       "flutter": "Flutter SDK",
-      "lockedSaropa": "مق闭 saropa_lints",
-      "lockedAnalyzer": "مغلق تحليلатор",
+      "lockedSaropa": "saropa_lints مقفل",
+      "lockedAnalyzer": "المُحلِّل مقفل",
       "plugin": "نسخة الإضافة (analysis_options.yaml)",
       "blockers": "ما الذي يمنع إصدارًا أحدث",
       "fixes": "كيفية إصلاح",
@@ -3170,7 +3171,7 @@
     "sdkTooOld": "تحتاج المحرك الأحدث Saropa Lints إلى Dart {required} أو أحدث، ولكن المحرك Dart المستخدم هنا هو {found}. تثبيت إصدار أحدث من SDK Dart وتعيين \"saropaLints.externalEngine.dartSdkPath\" إلى مجلد هذا الإصدار.",
     "sdkUnknown": "غير معروف",
     "install": {
-      "prompt": "يقوم هذا بتثبيت المحرك الأحدث Saropa Lints عالميًا (dart pub global activate saropa_lints) باستخدام SDK أحدث Dart، ثم يفحص هذا المشروع به. لا يتم تغيير pubspec.yaml لهذا المشروع وピン SDK.",
+      "prompt": "يثبّت هذا أحدث محرك Saropa Lints على مستوى النظام (dart pub global activate saropa_lints) باستخدام Dart SDK أحدث، ثم يفحص هذا المشروع به. لا يتغير pubspec.yaml الخاص بهذا المشروع ولا تثبيت SDK.",
       "confirm": "تثبيت وفحص"
     },
     "progress": "Saropa Lints: تحليل باستخدام المحرك الأحدث...",

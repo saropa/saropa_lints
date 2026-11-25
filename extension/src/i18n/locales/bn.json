@@ -1,7 +1,7 @@
 {
   "pubGuard": {
-    "sdkMismatch": "প্রকল্পটি Dart {project} দ্বারা সমাধান করা হয়েছে কিন্তু বাছাই করা SDK হল Dart {tool}।",
-    "lockSdkConstraint": "pubspec.lock এ Dart {constraint} প্রয়োজন কিন্তু বাছাই করা SDK হল Dart {tool}।",
+    "sdkMismatch": "প্রকল্পটি Dart {project} দ্বারা সমাধান করা হয়েছে কিন্তু নির্বাচিত SDK হল Dart {tool}।",
+    "lockSdkConstraint": "pubspec.lock এ Dart {constraint} প্রয়োজন কিন্তু নির্বাচিত SDK হল Dart {tool}।",
     "unknownPathSdk": "PATH-এর dart-এর জন্য Dart SDK সংস্করণ নির্ধারণ করা যায়নি, এবং প্রকল্পে পড়ার মতো কোনো SDK সংস্করণ নেই।",
     "staleLock": "pubspec.lock নেই বা পড়া যায় না, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
     "staleConfig": "প্যাকেজ কনফিগারেশন নেই বা তাতে লক করা প্যাকেজগুলো তালিকাভুক্ত নেই, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
@@ -14,7 +14,8 @@
     "explain": {
       "pickFolder": "ব্যাখ্যা করার জন্য একটি প্রকল্প ফোল্ডার বেছে নিন",
       "none": "এই সেশনে কোনো Vibrancy pub কোয়েরি এড়িয়ে যাওয়া হয়নি।",
-      "title": "প্যাকেজ ভাইব্র্যান্সি একটি pub কোয়েরি এড়িয়ে গেছে",
+      "unknown": "অজানা",
+      "title": "Package Vibrancy একটি pub কোয়েরি এড়িয়ে গেছে",
       "project": "প্রকল্পের SDK: {value} ({source} থেকে)",
       "folder": "প্রকল্প ফোল্ডার: {cwd}",
       "reason": "কারণ: {reason}",
@@ -31,7 +32,7 @@
     "rule": {
       "constraintUnverifiable": "সীমাবদ্ধতা যাচাই করা যায় না",
       "depsNotLocked": "ডিপেন্ডেন্সি লক করা নেই",
-      "lockSdkConstraint": "SDK সীমাবদ্ধতা লক করুন",
+      "lockSdkConstraint": "লক ফাইলে SDK সীমাবদ্ধতা",
       "constraintNotSatisfied": "লক করা সংস্করণ সীমাবদ্ধতার বাইরে",
       "staleLock": "লক ফাইল নেই বা পড়া যায় না",
       "pathDepNewer": "পাথ ডিপেন্ডেন্সি বদলেছে",
@@ -46,7 +47,7 @@
       "dartSdkPath": "সেটিং dart.sdkPath"
     },
     "statusItem": {
-      "tooltip": "pubspec.lock যাতে নতুন করে লেখা না হয়, সেজন্য প্যাকেজ ভাইব্র্যান্সি একটি pub কোয়েরি এড়িয়ে গেছে। বিস্তারিত দেখতে ক্লিক করুন।",
+      "tooltip": "pubspec.lock যাতে নতুন করে লেখা না হয়, সেজন্য Package Vibrancy একটি pub কোয়েরি এড়িয়ে গেছে। বিস্তারিত দেখতে ক্লিক করুন।",
       "text": "Vibrancy: pub এড়িয়ে যাওয়া হয়েছে"
     },
     "pathDepNewer": "pubspec.lock লেখার পরে পাথ ডিপেন্ডেন্সি {name} বদলেছে, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
@@ -2298,7 +2299,7 @@
         "createPr": "শাখা তৈরি করুন, কমিট করুন, পাঠান এবং পুল রিকুয়েস্ট খুলুন",
         "notNow": "না এখন",
         "noGitHubRemote": "এই রিপোজিটরির উৎস রিমোট আছে না GitHub, তাই আপনার জন্য পুল রিকুইস্ট খোলা যাবে না। উপরের কমান্ডগুলো চালান এবং আপনার হোস্ট করে খুলুন।",
-        "running": "শা�技 তৈরি করা এবং পাঠানো হচ্ছে...",
+        "running": "শাখা তৈরি করা এবং পুশ করা হচ্ছে…",
         "failed": "{command} কাজ করেনি, তাই কিছু পাঠানো হয়নি। {details}",
         "pushedNoPr": "পাঠানো হয়েছে {branch}। পুল রিকুয়েস্টটি আটাকে খুলতে পারেনি — তুলনা পৃষ্ঠা থেকে খুলুন।",
         "openCompare": "তুলনা পৃষ্ঠা খুলুন",

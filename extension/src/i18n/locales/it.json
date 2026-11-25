@@ -2,7 +2,7 @@
   "pubGuard": {
     "sdkMismatch": "Il progetto è stato risolto con Dart {project} ma l'SDK selezionato è Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock richiede Dart {constraint} ma l'SDK selezionato è Dart {tool}.",
-    "unknownPathSdk": "Impossibile determinare la versione dell'SDK Dart per il dart in PATH, e il progetto non ha una versione SDK leggibile.",
+    "unknownPathSdk": "Impossibile determinare la versione di Dart SDK per il dart in PATH, e il progetto non ha una versione SDK leggibile.",
     "staleLock": "pubspec.lock manca o è illeggibile, quindi pub risolverebbe di nuovo le dipendenze.",
     "staleConfig": "La configurazione dei pacchetti manca o non elenca i pacchetti bloccati, quindi pub risolverebbe di nuovo le dipendenze.",
     "projectSource": {
@@ -14,6 +14,7 @@
     "explain": {
       "pickFolder": "Scegli una cartella di progetto da spiegare",
       "none": "Nessuna query pub di Vibrancy è stata saltata in questa sessione.",
+      "unknown": "sconosciuto",
       "title": "Package Vibrancy ha saltato una query pub",
       "project": "SDK del progetto: {value} (da {source})",
       "folder": "Cartella del progetto: {cwd}",
@@ -2013,7 +2014,7 @@
       "progress": "{percent}% — {done}/{total} file"
     },
     "reports": {
-      "intro": "Rapporti CLI a un clic che prima richiedevano un terminale. Ogni pulsante Run streaming l'output in tempo reale dell'工具 sotto la sua scheda e salva una copia sotto reports/.saropa_lints/reports-tab/",
+      "intro": "Report CLI con un clic che prima richiedevano un terminale. Ogni pulsante Run trasmette in streaming l'output in tempo reale dello strumento sotto la sua scheda e salva una copia in reports/.saropa_lints/reports-tab/.",
       "runButton": "Esegui",
       "notRunYet": "Non eseguito ancora",
       "running": "In esecuzione…",
@@ -2298,7 +2299,7 @@
         "createPr": "Crea ramo, commit, push e apri richiesta di pull",
         "notNow": "Non adesso",
         "noGitHubRemote": "Questo repository non ha come origine remota GitHub, quindi non è possibile aprire la richiesta di pull per te. Esegui i comandi sopra e apri la richiesta come fai normalmente con il tuo host.",
-        "running": "Creazione del ramo e推送…",
+        "running": "Creazione del ramo e push…",
         "failed": "{command} è fallito, quindi nulla è stato spinto. {details}",
         "pushedNoPr": "Spinto {branch}. La richiesta di pull non è stata aperta automaticamente — aprila dalla pagina di confronto.",
         "openCompare": "Apri pagina confronta",

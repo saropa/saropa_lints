@@ -1,7 +1,7 @@
 {
   "pubGuard": {
-    "sdkMismatch": "Projecti ililifaniki na Dart {project} lakini SDK inayosimamia ni Dart {tool}.",
-    "lockSdkConstraint": "pubspec.lock inakwenda Dart {constraint} lakini SDK ya zozungumza lililokwenda ni Dart {tool}.",
+    "sdkMismatch": "Mradi ulitatuliwa kwa Dart {project} lakini SDK iliyochaguliwa ni Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock inahitaji Dart {constraint} lakini SDK iliyochaguliwa ni Dart {tool}.",
     "unknownPathSdk": "Toleo la Dart SDK halikuweza kubainishwa kwa dart iliyo kwenye PATH, na mradi hauna toleo la SDK linalosomeka.",
     "staleLock": "pubspec.lock haipo au haisomeki, kwa hivyo pub itatatua tegemezi upya.",
     "staleConfig": "Usanidi wa kifurushi haupo au hauorodheshi vifurushi vilivyofungwa, kwa hivyo pub itatatua tegemezi upya.",
@@ -14,6 +14,7 @@
     "explain": {
       "pickFolder": "Chagua folda ya mradi ya kuelezea",
       "none": "Hakuna ombi la pub la Vibrancy lililorukwa katika kipindi hiki.",
+      "unknown": "haijulikani",
       "title": "Package Vibrancy iliruka ombi la pub",
       "project": "SDK ya mradi: {value} (kutoka {source})",
       "folder": "Folda ya mradi: {cwd}",
@@ -31,7 +32,7 @@
     "rule": {
       "constraintUnverifiable": "Kikwazo hakiwezi kuthibitishwa",
       "depsNotLocked": "Tegemezi halijafungwa",
-      "lockSdkConstraint": "Funga kikwazo cha SDK",
+      "lockSdkConstraint": "Kikwazo cha SDK katika faili ya kufunga",
       "constraintNotSatisfied": "Toleo lililofungwa liko nje ya kikwazo",
       "staleLock": "Faili ya kufunga haipo au haisomeki",
       "pathDepNewer": "Tegemezi la njia limebadilika",
@@ -879,7 +880,7 @@
     },
     "watcherExclude": {
       "prompt": "Vipengezeko vya kuzalishia kipengele ya faili ({count}) vilianzishwa kwenye kipengele hiki: {patterns}. Kuzalishia wao wakifanyike kushughulisha VS Code kutenganisha kipengele mbalimbali ya uharibifu na kipengele ya kipengele kizungumzwa kote kwenye kipengele.",
-      "addAll": "Ona Wanda全部",
+      "addAll": "Ongeza Zote",
       "dismiss": "Fungua kazi.",
       "added": "Zilizongezwa {count} file-watcher exclusions kwenye mstika ya workspace."
     },
@@ -890,7 +891,7 @@
       "fixed": "Zizungumza {folders} ya analysis na file watching."
     },
     "hazardScan": {
-      "warning": "Tulionekana faili ya kubwa ({count}) kati ya mapu ya kozalishwa \"{folder}\" (jina ya pуть ya kozalishwa kati ya mapu): {files}. VS Code inaondoa kila faili kati ya mapu kwa kuzalisha, na faili ya kubwa inaweza kuzalisha au kuzalisha kwa kuzalisha.",
+      "warning": "Faili kubwa {count} zimepatikana ndani ya folda iliyofunguliwa \"{folder}\" (njia ni za kulinganisha na folda hiyo): {files}. VS Code hufuatilia mabadiliko ya kila faili kwenye folda, na faili kubwa zinaweza kuipunguza kasi au kuifanya ikwame.",
       "andMore": "na {count} zaidi",
       "unnamedFolder": "(ujumbe wa kipengele)",
       "addExclusions": "Ondoa kutokana na Watcher",

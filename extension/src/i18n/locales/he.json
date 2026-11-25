@@ -1,7 +1,7 @@
 {
   "pubGuard": {
-    "sdkMismatch": "הפרויקט נפתר עם Dart {project} אך הSDK שנבחר הוא Dart {tool}.",
-    "lockSdkConstraint": "pubspec.lock דורש Dart {constraint} אך הSDK שנבחר הוא Dart {tool}.",
+    "sdkMismatch": "הפרויקט נפתר עם Dart {project} אך ה-SDK שנבחר הוא Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock דורש Dart {constraint} אך ה-SDK שנבחר הוא Dart {tool}.",
     "unknownPathSdk": "לא ניתן היה לקבוע את גרסת Dart SDK של dart ב-PATH, ולפרויקט אין גרסת SDK קריאה.",
     "staleLock": "pubspec.lock חסר או שאינו קריא, ולכן pub יפתור מחדש את התלויות.",
     "staleConfig": "תצורת החבילות חסרה או שאינה מפרטת את החבילות הנעולות, ולכן pub יפתור מחדש את התלויות.",
@@ -24,6 +24,7 @@
     "explain": {
       "title": "Vibrancy של החבילות דילג על שאילתת pub",
       "none": "לא דולגה אף שאילתת pub של Vibrancy בהפעלה הנוכחית.",
+      "unknown": "לא ידוע",
       "reason": "סיבה: {reason}",
       "rule": "כלל: {rule}",
       "sdk": "ה-SDK שנבחר: {path} (מתוך {source})",
@@ -61,7 +62,7 @@
       "title": "מה חדש"
     },
     "hero": {
-      "subtitle": "הגרסה הזו משנה את המנוע הافتراضי לניהול אזהרות. קראו את זה לפני שמשתמשים בתכונות — זה משפיע על מה תראו בלוח האזהרות."
+      "subtitle": "הגרסה הזו משנה את מנוע האבחון המוגדר כברירת מחדל. קרא זאת לפני שתמשיך לעבוד — זה משפיע על מה שתראה בחלונית הבעיות."
     },
     "checkbox": {
       "label": "הצג את זה בפעם הבאה",
@@ -79,7 +80,7 @@
       },
       "monitoring": {
         "header": "חדש: תצפית בבריאות המכונה",
-        "body": "ה확장ית עתה מודיעה על זיכרון ראמ, כל שרת ניתוח Dart, Flutter דאימון, ותהליך רקע — לא רק את עצמו. مؤشر תקציב כלים разработка מודיע כאשר כלים разработка מتجاوزים חלק configurable של זיכרון ראמ, ותהליכים מבודדים מפגיעים בجلسות שקרעו נצפים ב시작.",
+        "body": "ההרחבה מנטרת כעת את זיכרון ה-RAM של המערכת, כל שרת ניתוח של Dart, כל דימון של Flutter וכל תהליך רקע — לא רק את שלה. מחוון Dev Tool Budget מתריע כשכלי הפיתוח חורגים מחלק מוגדר של ה-RAM, ותהליכים יתומים מהפעלות שקרסו מזוהים בעת ההפעלה.",
         "why": "פרויקט גדול יוצר בדרך כלל שגיאות בשרת ניתוח. עכשיו תראו את זה לפני שהמחשב יאיטי.",
         "actionDashboard": "פתיחה של מצב המכונה",
         "actionThresholds": "הגדרת שgrenות"
@@ -121,7 +122,7 @@
       "message": "{pct}% · {scanned}/{total} קבצים · {issues} בעיות · {file}"
     },
     "error": {
-      "spawnFailed": "לא ניתן להתחיל את CLI המراجعة: {message}",
+      "spawnFailed": "לא ניתן להפעיל את ה-CLI של הביקורת: {message}",
       "invalidProject": "האודיט לא יכול לרוץ על פרויקט זה. {details}",
       "parseFailed": "האודיט הסתיים אך הפלט שלו לא ניתן לקרוא. נסה לרוץ אותו שוב.",
       "canceled": "הביקורת בוטלה."
@@ -140,7 +141,7 @@
       "filterBaselineStatus": "בסיסי",
       "baselineNew": "חדש",
       "baselineUnchanged": "לא השתנה",
-      "saveBaseline": "שמור כבסיס מرجع",
+      "saveBaseline": "שמירה כקו בסיס",
       "copyJson": "העתק את JSON.",
       "toggleGroup": "החלפת קבוצת קבצים",
       "colFile": "קובץ קבצים File File",
@@ -153,10 +154,10 @@
       "filteredEmpty": "אין תוצאות התאימות למסננים הנוכחיים.",
       "loadMore": "הצג יותר",
       "keyboardHint": "מקשי החץ כדי לנוע · לחיצה על Enter כדי לפתוח קובץ · לחיצה על Esc כדי לנקות חיפוש",
-      "copiedJson": "האודיט JSON הועתק ללוח ה메모יריה.",
+      "copiedJson": "ה-JSON של הביקורת הועתק ללוח.",
       "exportJson": "יצוא JSON",
       "exportJsonTitle": "יצוא תוצאות ביקורת כJSON",
-      "exportJsonSaved": "مراجعة JSON שנ출ופת.",
+      "exportJsonSaved": "ה-JSON של הביקורת יוצא.",
       "exportJsonFailed": "לא ניתן לייצא את JSON האudit: {message}",
       "clearRuleFilter": "ברור, ברור, נכון.",
       "paginationNote": "הגבלה על עמודים תקיפה על תוצאות מסוננות.",
@@ -172,7 +173,7 @@
   },
   "scanOnSave": {
     "statusBar": {
-      "name": "Saropa Lints: ס캔 בעת שמירה",
+      "name": "Saropa Lints: סריקה בעת שמירה",
       "scanning": "Saropa: סקרון {count} קבצים...",
       "done": "Saropa: {count} תקלה(ות), {elapsed}s",
       "failed": "Saropa: שגיאה בסריקה",
@@ -181,7 +182,7 @@
       "disabled": "Saropa: מוטוע",
       "noProject": "Saropa: אין Dart פרויקט",
       "doneTooltip": "ממצאים {total}, {shown} מוצגים לאחר מסנן",
-      "dropped": "Saropa: ס캔 נופל ({count} קבצים)",
+      "dropped": "Saropa: הסריקה דולגה ({count} קבצים)",
       "droppedTooltip": "Saropa Lints שוחרר {count} קבצים שנפתחו על ידי כלי אחר ולא על ידיך. שמור קובץ כדי לסרוק אותו.",
       "droppedSuffix": "(+{count} מוסק)",
       "droppedSuffixTooltip": "גם קובצי {count} שנפתחו על ידי כלי אחר ולא על ידיך נדדו. שמור קובץ כדי לסרוק אותו."
@@ -194,7 +195,7 @@
   },
   "featureInventory": {
     "export": {
-      "noScan": "החלף ס캔 של פאקדג'ה תחילה — דוח האפשרויות נבנה מהنتائج של הס캔.",
+      "noScan": "הרץ תחילה סריקת חבילות — דוח ההזדמנויות נבנה מתוצאות הסריקה.",
       "noWorkspace": "פתח תיקון פרויקט קודם — דוח האפשרויות כתוב לצדו של pubspec שלו.",
       "progress": "בניה של דוח האפשרויות המלא...",
       "noFolder": "לא ניתן היה ליצור תיקיית דוחות, ולכן הדוח לא נכתב.",
@@ -206,8 +207,8 @@
     "heroTitle": "רשימת תכונות חבילת הפקט",
     "meta": "נוצר {timestamp} · הרחבת v{version} · {packages} חבילות",
     "caveats": {
-      "title": "حدود מדידה",
-      "intro": "קראו את אלו לפני שמסיקים מסקנה מה считаים שמתחת.",
+      "title": "מגבלות מדידה",
+      "intro": "קרא זאת לפני שאתה מסיק מסקנות מהספירות שלמטה.",
       "none": "לא נרשמו הגבלות עבור הריצה הזו."
     },
     "controls": {
@@ -218,7 +219,7 @@
       "deprecatedOnly": "הערה: מומלץ רק",
       "expandAll": "הרחיב את כל הכל",
       "collapseAll": "כולם מתמוטטים.",
-      "indexLabel": "índекс פאקטה"
+      "indexLabel": "אינדקס חבילות"
     },
     "summary": {
       "title": "סיכום חבילות",
@@ -285,18 +286,18 @@
     "disableAll": "כבה את כל הכל.",
     "noMatch": "אין סטייל כללי התאמה.",
     "desc": {
-      "ordering_sorting": "מיון אعضاء, פרמטרים, שדות וключи מפה לAYOUT מובנה. מאוד רועש על קוד קיים — עדיף על קוד חדש או רכיבים קטנים.",
+      "ordering_sorting": "ממיין חברי מחלקה, פרמטרים, שדות ומפתחות מפה לפריסה צפויה. רועש מאוד על קוד קיים — מתאים יותר לקוד חדש או למאגרים קטנים.",
       "naming_conventions": "שם קבצים, שיטות, יוצאים מן הכלל, קריאות חוזרות ואירועים ומצב בלוק. יכול להיות רועש על בסיסי קוד גדולים; אפשרות זו נעשית בהדרגה.",
       "boolean_naming": "בוליאנים חייבים להשתמש בתגובות is/has/can/should כך שהכוונה תהיה ברורה במונחים וב-API.",
-      "code_style_preferences": "איךписываются החזרות, תנאי, וحلقات — החזרה מיידית, for-in, גטטור מול מתודה, ועוד דוגמאות קצרות.",
+      "code_style_preferences": "אופן הכתיבה של החזרות, תנאים ולולאות — החזרה מיידית, for-in, getter מול מתודה, וקיצורים דומים.",
       "function_parameter_style": "פונקציות חץ כאשר הן קצרות, כל הפרמטרים בעלי שמות, שיחות חוזר בשורה פנימית ואין מינוי מחדש של פרמטר.",
       "widget_style": "בחירה של ויזואלים Flutter — SizedBox.square, מרכז על התאמה, מרחק על SizedBox, ותחביר shrinkWrap ב scrolls. Flutter פרויקטים בלבד.",
       "class_record_style": "סוגים של החזרת שיא נגד כיתה, קישורים פרטיים תחתונים ובהיר את זה היכן שהוא מברר.",
-      "formatting": "העתקת שורות ריקות, פסיקים בסוף, וстиילים של ערכים וتعليقات. יכול להיות רועש — הרבה קבצים עלולים לדרוש עריכות.",
+      "formatting": "מיקום שורות ריקות, פסיקים סופיים וסגנון ליטרלים והערות. עלול להיות רועש — ייתכן שקבצים רבים ידרשו עריכה.",
       "comments_documentation": "פורמט TODO ו- FIXME, מקרה משפטים, נקודה אחרי הערות doc, /// מעל //, ואין קוד ללא תגובה.",
       "testing_style": "בדיקות Prefer expect over assert, כך כישלון מראה צפוי מול בפועל.",
       "debug_test_utility": "עוזרי מבחן כגון prefer_fail_test_case כי נכשל בקול רם כאשר בדיקה פוגעת במסלול בלתי צפוי.",
-      "opinionated_rules": "בחירות סגנון שונות — שמות מכווצים, אינסומרים מוחלטים, Clausules של הגנה, תנאים חיוביים, ועוד. הרבה правила; יכולים להיות רועשים."
+      "opinionated_rules": "מגוון בחירות סגנון — שמות תמציתיים, enums ממצים, משפטי שמירה, תנאים חיוביים ועוד. כללים רבים; עלול להיות רועש."
     }
   },
   "packs": {
@@ -312,7 +313,7 @@
     "domainDesc": {
       "state-management": "בלאק, ריברפוד, פרויידר, גטX וספריות של מצב וזרקת תלותיות קשורות.",
       "networking-apis": "לקוחות HTTP, GraphQL, Firebase, Supabase וחיבור.",
-      "storage-persistence": "מסד נתונים מקומי ו хрמים ערך-ערך — Drift, Hive, Isar, sqflite, shared_preferences.",
+      "storage-persistence": "מסדי נתונים מקומיים ומאגרי מפתח-ערך — Drift, Hive, Isar, sqflite, shared_preferences.",
       "navigation-deep-links": "ניהול ניתוח ועומק-קישור — auto_route, go_router, app_links, url_launcher, ו-webview.",
       "media-graphics": "תמונות, SVG, אנימציה, אודיו, מפות, קונים ומנוע Flame.",
       "device-platform": "חיישנים, מיקום, הרשאות, ביומטריה, הודעות ועבודת רקע.",
@@ -330,7 +331,7 @@
     },
     "ruleFinder": {
       "disableButton": "Disable disable - כבלי את היכולת",
-      "disableTitle": "השבית כלל这条规则对于整个项目 — כותב analysis_options_custom.yaml ומבצע מחדש ניתוח",
+      "disableTitle": "השבת כלל זה לכל הפרויקט — כותב את analysis_options_custom.yaml ומריץ את הניתוח מחדש",
       "enableButton": "הופעל",
       "enableTitle": "הפעלה מחדש של כלל זה — מוחקת את ההרחבה ב analysis_options_custom.yaml ומבצעת ניתוח מחדש"
     },
@@ -351,7 +352,7 @@
     "sdk": {
       "summary": "חבילות מעבר ל-{total} SDK תקפות לפרויקט זה — {breaking} קלקולות, {deprecation} ביטול.",
       "noneApplicable": "אין חבילות מעבר ל-SDK מתאימות לסביבת ה-pubspec של הפרויקט עדיין.",
-      "enableAllTitle": "הפעל כל חزمة מיגרציה של SDK ש whose Dart/Flutter גייט הגרסה של הפרויקט כבר מותאמת.",
+      "enableAllTitle": "הפעל כל חבילת מעבר של SDK שתנאי גרסת Dart/Flutter שלה כבר מתקיים בפרויקט הזה.",
       "enableAll": "הפעלה של כל הוראות התאמה ({count})",
       "enableBreakingTitle": "הפעל רק את החבילות SDK שסימנו APIs שנסגרו כבר בגרסה המטרה שלך.",
       "enableBreaking": "הפעלה של קבוצת כללי רק ({count})",
@@ -366,7 +367,7 @@
       },
       "maxIssues": {
         "label": "מקסימום בעיות",
-        "desc": "מונע את מספר הבעיות שאינן שגיאות שמוצגות ב zakładת Issues. 0 פירושו痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰痰"
+        "desc": "מגביל את מספר הבעיות שאינן שגיאות המוצגות בלשונית Problems. 0 פירושו ללא הגבלה. החריגה עדיין מופיעה בקובץ הדוח המלא."
       },
       "output": {
         "label": "פלט",
@@ -374,7 +375,7 @@
       },
       "tierCap": {
         "title": "מגבלת רמה",
-        "hint": "שיטות קפס שמתבצעות בזמן ניתוח, ללא תלות באיזה правила מופעלים באופן מפורש. השאירו כ-None כדי להשתמש בהגדרת השיטה של הרחבת התוכנה.",
+        "hint": "מגביל אילו רמות פועלות בזמן הניתוח, ללא תלות באילו כללים מופעלים במפורש. השאר כ-None כדי להשתמש בהגדרת Tier של ההרחבה.",
         "none": "ללא (השתמש בהגדרות הכרטיסייה Tier)"
       },
       "saropaTier": {
@@ -385,7 +386,7 @@
       },
       "lane": {
         "title": "מסלול ניתוח",
-        "hint": "אילו כללי האנליטיקס של.Plugin שמרוץ בפועל במתכונת העריכה לעומת רק בעת שמירת הקובץ (באמצעות Daemon של ס캔)"
+        "hint": "אילו כללים תוסף המנתח שפועל בתוך התהליך מריץ בזמן אמת בעורך, ואילו רק בעת שמירה (דרך דימון הסריקה)."
       },
       "platforms": {
         "title": "פלטפורמות מטרה",
@@ -393,14 +394,14 @@
       },
       "severities": {
         "title": "דרגות עדכון",
-        "hint": "מעיף את הרמה של כלל מסוים, או מключа אותו לגמרי, באופן עצמאי מהתור והאגרופים של הכללים.",
-        "level": "مستوى",
+        "hint": "עוקף את החומרה של כלל מסוים, או מכבה אותו לחלוטין, ללא תלות ברמה ובחבילות הכללים.",
+        "level": "רמה",
         "empty": "אין הגדרות של חלופות רמות איום.",
         "rulePlaceholder": "rule_name",
         "newLevelAria": "דרוג חדש של חומרה"
       },
       "bannedUsage": {
-        "title": "שימוש מمنوع",
+        "title": "שימוש אסור",
         "hint": "מציין זיהוי ספציפי (פונקציה, מחלקה או שם חבר) בכל מקום שבו הוא מופיע בפרויקט, עם סיבה מותאמת שמוצגת בדיאגנוסטיקה.",
         "identifier": "מזהה",
         "identifierPlaceholder": "לדוגמה: מדפסת",
@@ -422,8 +423,8 @@
         "createButton": "צור/רענן בסיס תקן",
         "createTitle": "מבצע dart run saropa_lints:baseline — כותב saropa_baseline.json ומאיץ אותו ב-config.",
         "openButton": "פתח קובץ בסיס",
-        "openTitle": "פתח saropa_baseline.json במערכתتحرير",
-        "summary": "파일 {files}, {violations} באזהרה מותאמת — נוצר {generated}.",
+        "openTitle": "פתח את saropa_baseline.json בעורך.",
+        "summary": "{files} קבצים, {violations} הפרות נכללו בקו הבסיס — נוצר ב-{generated}.",
         "unknownDate": "בזמן לא ידוע",
         "count": "ספור ספרה סופר",
         "diff": {
@@ -444,7 +445,7 @@
       }
     },
     "automation": {
-      "hint": "הגדרות הרחבת שיטה שتحكم באיזו תקופה ניתוח הולך ובעיקר איך תוצאות מוצגות. אלו שותפות להגדרות המבוססות על אותו סטודיו בקובץ > תצוגה > הגדרות תחת Saropa Lints."
+      "hint": "הגדרות ההרחבה ששולטות מתי הניתוח רץ וכיצד הממצאים מוצגים. הן משקפות את אותן הגדרות ב-File > Preferences > Settings תחת Saropa Lints."
     },
     "watcher": {
       "title": "מונחור",
@@ -456,11 +457,11 @@
     },
     "extension": {
       "hint": "העדפות הצגת הרחבת ההרחבה",
-      "linkNote": "הס캔 בעת שמירת קובץ על/בלי פעולות מופיע בשורה של הסטטוס בצד הימני; רמת האנליזה מופיעה ב zakładת הרמה — שניהם עושים יותר מרק כתיבה של ערך, ולכן אינם מופיעים כאן כפומבי."
+      "linkNote": "הפעלה וכיבוי של סריקה בעת שמירה נמצאים בשורת הסטטוס בסרגל הצד; רמת הניתוח נמצאת בלשונית Tier — שתיהן עושות יותר מכתיבת הגדרה רגילה, ולכן אינן משוכפלות כאן."
     },
     "shortcuts": {
-      "jumpToTab": "העתק ל탭 1-7 (שכבת, חבילות правила, הוספות, גרסה SDK, קובץ תצורה, אוטומציה, הרחבת)",
-      "prevNextTab": "탭 קודם /탭 הבא",
+      "jumpToTab": "מעבר ללשונית 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "הלשונית הקודמת / הבאה",
       "showOverlay": "להראות את התוספת של קיצור דרך זה."
     }
   },
@@ -473,7 +474,7 @@
       "laneLight": "הבהירות — ~200 כללי בunting, שארית בשמירת הקובץ",
       "laneFull": "מלא — כל כלל מופעל בתוך המודעה",
       "migrateLegacyKeys": "המרידת של מפתחות תצורה ישנות {count}",
-      "migrateLegacyKeysDesc": "העתקключи-plugin-block ישנות ל-analysis_options_custom.yaml"
+      "migrateLegacyKeysDesc": "העברת מפתחות ישנים של בלוק התוסף אל analysis_options_custom.yaml"
     },
     "refreshPending": {
       "label": "● עדכון במתנה",
@@ -486,7 +487,7 @@
   },
   "startupNudge": {
     "message": "Saropa Lints: - פטריוטיביות {count} הצעת חבילת כללים (s) חל על הפרויקט הזה.",
-    "review": "مراجعة",
+    "review": "סקירה",
     "dismiss": "פיטורים.",
     "reviewFailed": "לא ניתן היה לפתוח את סקירת חבילת החוקים של Saropa Lints. {error}"
   },
@@ -511,7 +512,7 @@
     },
     "report": {
       "noContent": "אין חבילות עם תוכן של תוברים AI לכתוב.",
-      "written": "ה보고 נכתב — מסלול העתק ללוח ה메모: {path}",
+      "written": "הדוח נכתב — הנתיב הועתק ללוח: {path}",
       "failed": "התקלקלה לכתוב דוח הזדמנויות: {error}"
     },
     "empty": {
@@ -645,7 +646,7 @@
       "colType": "סוג של טיפוס סוג סוג",
       "colTitle": "שם הכותרת כותרת הכותרה",
       "colAuthor": "סופר מחבר המחבר",
-      "colReview": "مراجعة",
+      "colReview": "סקירה",
       "summaryFooter": "{triaged} של {total} ניסויים | {applicable} רלוונטי | {notApplicable} לא זמין | {unreviewed} נותרו",
       "truncated": "התוצאות קוצצו לפריטי {limit}."
     },
@@ -710,7 +711,7 @@
   "statusBar": {
     "error": {
       "label": "Saropa Lints: שגיאה",
-      "tooltip": "تحديثแถת الحالة נכשל — לחץ כדי לראות פרטים. הרחבת התוכנה עדיין יכולה לעבוד; נסה להריץ פקודה מהסרגל של הפקודות."
+      "tooltip": "עדכון שורת המצב נכשל — לחץ לפרטים. ההרחבה עשויה להמשיך לפעול; נסה להריץ פקודה מ-Command Palette."
     },
     "menu": {
       "openViolations": "הצגת סיכום הפגיעות",
@@ -732,7 +733,7 @@
         "off": "ניתוח כרגע לא פעיל: הגדרה והאנליזר-plugin שניהם לא פעילים.",
         "partialSetting": "חלקי אופ: הגדרת saropaLints.enabled אופנתה בעוד שמודול האנליטיקס פעיל.",
         "partialPlugin": "חלקי אופ: האנליטיקס_plugin אופ ב analysis_options.yaml בעוד שההגדרה היא אופ.",
-        "notSetUp": "saropa_lints לא מוגדר在这个פרויקט: הוא לא תלות ב pubspec.yaml ו analysis_options.yaml לא מכיל הכנסה לפלוגין."
+        "notSetUp": "saropa_lints אינו מוגדר בפרויקט זה: הוא אינו תלות ב-pubspec.yaml ול-analysis_options.yaml אין רשומת תוסף."
       },
       "fix": {
         "turnOn": "תקן: הפעל את שניהם",
@@ -760,7 +761,7 @@
       "findings": {
         "allErrors": "ממצאים {count} (כל השגיאות)",
         "allErrorsOne": "1 ממצא (שגיאה)",
-        "mixed": "שגיאות {errors} · 경고ים {warnings}",
+        "mixed": "{errors} שגיאות · {warnings} אזהרות",
         "noErrors": "ממצאים {total}"
       },
       "problem": {
@@ -778,15 +779,15 @@
         "other": "אחרי Dart",
         "extHost": "הרחבה מארח",
         "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
-        "ram": "メモリ RAM",
+        "ram": "זיכרון RAM של המחשב",
         "ramValue": "{free} חפשי {total}",
-        "trend": "RSS ת趋 (אחרי ~30 דק')"
+        "trend": "מגמת RSS (~30 הדקות האחרונות)"
       },
       "action": {
         "turnOff": "השבית את הLintים",
         "turnOn": "הפעל לינטים",
         "turnBothOn": "הפעל את שניהם",
-        "versionCompat": "совместимость версий"
+        "versionCompat": "תאימות גרסאות"
       }
     },
     "quickPick": {
@@ -796,7 +797,7 @@
   },
   "systemHealth": {
     "heapCap": {
-      "noneMessage": "המחשב שלך מחזיק {totalGb} של זיכרון. שרת האנליזה Dart לא имеет גבול זיכרון, ולכן הוא יכול לצטוף עד שהמחשב יאיטי או יתחיל להחלף. גבול מומלץ: {recommendedGb}.",
+      "noneMessage": "במחשב שלך יש {totalGb} של זיכרון. לשרת הניתוח של Dart אין תקרת זיכרון, ולכן הוא יכול לגדול עד שהמחשב יאט או יתחיל להשתמש ב-swap. תקרה מומלצת: {recommendedGb}.",
       "tooHighMessage": "המחשב שלך מחזיק {totalGb} של זיכרון. שרת האנליזה Dart מอนע למשתמש עד {capGb} (הגדר ב {location}), מה שמשאיר כ {freeGb} ל hệ אופרטיבי, VS Code ותools אחרים Dart, לכן המחשב עלול להאט או להחלף. מומלץ לשלוח: {recommendedGb}.",
       "locationGlobal": "הגדרות המשתמש שלך",
       "locationWorkspace": "הגדרות העבודה הזו",
@@ -812,7 +813,7 @@
       "criticalOrphans": "🔴 {count}daemon(s) מוסתרים",
       "openHint": "לחץ כדי לפתוח מצב בריאות תהליך",
       "systemLow": "⚠ מערכת: {free} מתוך {total} חופשיים",
-      "extensionHostWarning": "⚠ מארח הרחבת אקס텐שן: {size}"
+      "extensionHostWarning": "⚠ מארח ההרחבות: {size}"
     },
     "tooltip": {
       "otherHint": "שרת ניתוח {count} détected — סגור חלונות VS Code לא בשימוש",
@@ -825,7 +826,7 @@
       "result": "הרגתי {count} דמונים אבויים, שחררתי ~{size}",
       "systemLowMemory": "המחשב שלך יש לו רק {free} של {total} זיכרון ריק. חשב על סגירת חלונות או אפליקציות לא בשימוש.",
       "analysisServerLarge": "שרת ניתוח Dart נמצא בשימוש ב-{size}. יש להפסיק את הפעולה כדי לחרוג זיכרון?",
-      "sessionStartLow": "המחשב שלך יש לו {free} של {total} זיכרון פנימי פנוי. יש ל Ferm ל Ferm חלונות VS Code לא בשימוש או מודלים Ollama לפני הبدء לעבודה."
+      "sessionStartLow": "במחשב שלך פנויים {free} מתוך {total} של RAM. שקול לסגור חלונות VS Code או מודלי Ollama שאינם בשימוש לפני תחילת העבודה."
     },
     "action": {
       "cleanUp": "נקה",
@@ -843,31 +844,31 @@
       "cancelButton": "ביטול לבטל"
     },
     "orphanPreflight": {
-      "found": "{count} תהליך(ים) מארח מודל שונ들 מהסשן הקודם הם מחזיקים {size} של זיכרון מitted.",
+      "found": "{count} תהליכי מארח מודל יתומים מהפעלה קודמת מחזיקים {size} מהזיכרון המוקצה.",
       "reclaimAction": "שחזר זיכרון",
       "detailsAction": "הצגת פרטים",
       "none": "לא נמצאו תהליכי מארח מודלים מיותרים.",
       "confirmTitle": "סיום תהליך(ים) אבויים {count} עם {size}?",
-      "confirmDetail": "ה процססס האלה יסתיימו מיידית ולא ניתן לשחזר:",
+      "confirmDetail": "התהליכים האלה יסתיימו מיד ולא ניתן יהיה לשחזר אותם:",
       "confirmKill": "סיום תהליכים",
       "listEntry": "{name} (PID {pid}) — {size}",
-      "reclaimed": "הסתיים טיפול בпроцесс(ים) אבוי(ים) {count}, ונקבעו כ {size}.",
+      "reclaimed": "הסתיימו {count} תהליכים יתומים, ושוחררו כ-{size}.",
       "reclaimFailed": "לא ניתן לסיים את תהליך {count} (ותהליך). הם עלולים להזדקק ל הרשאות מוגזמות.",
       "bannerTitle": "{count} תהליך(ים) מארח(ים) מודל(ים) מוזרים שמכילים {size}",
       "bannerReclaim": "שחזר"
     },
     "panel": {
-      "title": "健全 מעבדה",
+      "title": "תקינות תהליכים",
       "empty": "אין תהליכי Dart פעילים.",
       "processes": "תהליכי תהליך",
       "totalRss": "סה\"כ RSS",
       "orphaned": "מְיוּתָם",
       "refresh": "מרענן ומקפיא",
       "colPid": "PID",
-      "colParent": "والد",
+      "colParent": "הורה",
       "colRss": "RSS",
       "colType": "סוג של טיפוס סוג סוג",
-      "colCommand": "명령",
+      "colCommand": "פקודה",
       "colAction": "פעולה",
       "typeOrphan": "יָתוֹם",
       "typeSaropa": "Saropa",
@@ -884,7 +885,7 @@
       "added": "הוספו סנאי שגיאה {count} למסגרת העבודה."
     },
     "nestedRoots": {
-      "prompt": "{folders} מכיל {count} תיקונים מותנים Dart שורשים של חבילות ש-git מتجاهل. כל אחד מהם נalyzed כמקרה נפרד ויכולים להכפיל את הזיכרון של שרת האנליזה.",
+      "prompt": "{folders} מכיל {count} שורשי חבילות Dart מקוננים ש-git מתעלם מהם. כל אחד מהם מנותח כהקשר נפרד ועלול לנפח את זיכרון שרת האנליזה.",
       "fix": "הסר מהניתוח",
       "dismiss": "פיטורים.",
       "fixed": "הסרת {folders} מהניתוח והמעקב אחר קבצים"
@@ -893,9 +894,9 @@
       "warning": "מצאתי {count} קבצים גדולים בתוך הקובץ הפתוח \"{folder}\" (הנתונים הם יחסית לקובץ הזה): {files}. VS Code מתריע על כל שינוי בקבצים, וקבצים גדולים יכולים לשהות או לשבש את התהליך.",
       "andMore": "וגם {count} נוספים",
       "unnamedFolder": "תיקייה (לא מזוהה)",
-      "addExclusions": "הסר מהמר察ור",
+      "addExclusions": "החרג ממעקב הקבצים",
       "dismiss": "פיטורים.",
-      "added": "הוספו {count} mẫu תצפית חסימה ל설וגות העבודה."
+      "added": "נוספו {count} תבניות החרגה של מעקב קבצים להגדרות סביבת העבודה."
     }
   },
   "workspaceReadiness": {
@@ -908,9 +909,9 @@
     },
     "issue": {
       "hazardFiles": "$(אזהרה) {count} קבצים גדולים לא מ-excluded",
-      "hazardFilesDetail": "הערכים הגדולים שנראים על ידי מונה הערכים יכולים לאיים את הזיכרון ול戛ר VS Code. רץ על סקר סיכון כדי לשלוח אותם.",
+      "hazardFilesDetail": "קבצים גדולים שמעקב הקבצים עוקב אחריהם עלולים לדלדל את הזיכרון ולהקריס את VS Code. הרץ את סריקת הסיכונים כדי להחריג אותם.",
       "missingExcludes": "$(info) {count} חסר/ים מוניטור שיקול היעדרים",
-      "missingExcludesDetail": "השכלות הניתוק של קבצים לא מותאמות. הוספתן מונעת שימוש לא הדרוש ב메モרי.",
+      "missingExcludesDetail": "תבניות ההחרגה המומלצות של מעקב הקבצים אינן מוגדרות. הוספתן מונעת שימוש מיותר בזיכרון.",
       "hostMemory": "$(alert) מארח הרחבת ה-${size}",
       "hostMemoryDetail": "תהליך מארח ההרחבה RSS חורג מסף האזהרה. פתח את Process Health לפרטים."
     }
@@ -918,13 +919,13 @@
   "machineDashboard": {
     "title": "בריאות המחשב",
     "refresh": "מרענן ומקפיא",
-    "systemUnknown": "הメモリ של النظام לא ניתן לקרוא בפלטפורמה זו.",
-    "platformUnsupported": "健全性 בדיקה אינה זמינה בפלטפורמה זו — תומכים בquets של תהליך ב-Windows, macOS ו-Linux",
+    "systemUnknown": "לא ניתן לקרוא את זיכרון המערכת בפלטפורמה זו.",
+    "platformUnsupported": "בדיקת תקינות המחשב אינה זמינה בפלטפורמה זו — שאילתות תהליכים נתמכות ב-Windows, ב-macOS וב-Linux.",
     "freeOf": "ללא תשלום",
     "used": "נעשה",
     "recommendationsTitle": "המלצות",
     "recommendationsNone": "אין בעיות נמצאו.",
-    "noProcesses": "אין תהליכי Dart, Flutter או מודל-הост פעילים.",
+    "noProcesses": "אין תהליכי Dart, Flutter או מארח מודלים שרצים.",
     "orphanCount": "{count} חסר אב/אם",
     "kill": "הכבה",
     "group": {
@@ -938,12 +939,12 @@
       "heapCapTooHigh": "השורה של שרת האנליזה ({capMb} MB) משאיר פחות ממחצית זיכרון הRAM של המחשב לכל דבר אחר. מומלץ להגדיר גבול: {recommendedMb} MB.",
       "noHeapCapWithSuggestion": "השרת לניתוח Dart לא מוגדר גבול זיכרון. גבול מומלץ למחשב זה: {mb} MB.",
       "systemLowMemory": "רק {free} מתוך {total} של RAM פנויים למשותף. סגורו יישומים לא בשימוש או VS Code חלונות.",
-      "orphansFound": "תהליך(ים) מבודד(ים) {count} מחזיק(ים) {size} של זיכרון מ세션 קודם.",
+      "orphansFound": "{count} תהליכים יתומים מחזיקים {size} מהזיכרון מהפעלה קודמת.",
       "analysisServerLarge": "השרת (ים) של ניתוח {count} Dart משתמשים עד {size}. עצירה מחדש פורחת את הזיכרון.",
       "multipleAnalysisServers": "מתקנים {count} Dart ניתוח שרתים בפעולה — ככל הנראה אחד לכל חלון פתוח VS Code על פרויקטים חופפים.",
-      "noHeapCap": "השרת לניתוח Dart לא מוגדר לו גבול זיכרון. הגדרת גבול זיכרון מונעת את הצטברות המרחב בحالות רעות ביותר.",
+      "noHeapCap": "לשרת הניתוח של Dart לא הוגדר תקרת זיכרון. הגדרת תקרה מגבילה את הצמיחה במקרה הגרוע ביותר.",
       "modelLoaded": "מודל \"{model}\" נטען במנוע ההתרגם, תוך שימוש ב-{size}.",
-      "budgetOverspend": "أدوات التطوير משתמשות ב-{used}% מהرام של النظام ({size}), והן מتجاوزות الحد المسموح {budget}%. أغلق النوافذ VS Code غير المستخدمة أو أزيل النماذج الترجمية."
+      "budgetOverspend": "כלי הפיתוח משתמשים ב-{used}% מה-RAM של המערכת ({size}), מעל התקציב של {budget}%. סגור חלונות VS Code שאינם בשימוש או פרוק מודלי תרגום."
     },
     "action": {
       "reclaim": "שחזר",
@@ -962,30 +963,30 @@
       "failed": "לא ניתן להוריד את המודל \"{model}\" — ייתכן שהollama CLI אינו נמצא בPATH."
     },
     "budget": {
-      "title": "כלי разработка התקציב",
+      "title": "תקציב כלי פיתוח",
       "value": "{used}% מ {budget}% מטרה ({size})"
     }
   },
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 הכללים עוצרים ({rssMb} מ\"ב)",
-      "shedCritical": "🔴 {count} правила שודדים (קריטי)",
+      "shedCritical": "🔴 {count} כללים הושבתו (קריטי)",
       "shedWarning": "⚠ סלילים {count} שמים",
-      "shedInfo": "⚡ {count} правила יקרות shed",
+      "shedInfo": "⚡ {count} כללים יקרים הושבתו",
       "pressureNoShed": "⚠ לחץ זיכרון ({rssMb} MB)"
     },
     "tooltip": {
-      "shedLevel1": "לחץ זיכרון: {count} правила יקרות שורדו (שיפוד סוג + עלות גבוהה) כדי להפחית RSS",
-      "shedLevel2": "לחץ זיכרון: {count} правила שורש (יקר + רמת אינפורמציה)",
-      "shedLevel3": "לחץ זיכרון: {count} правила שורש (כל לא חובה לא-ERROR)",
-      "hardTripped": "лимיט זיכרון מוגזם — כל כללי לא חובה נעצרו",
+      "shedLevel1": "לחץ זיכרון: {count} כללים יקרים הושבתו (פותרי טיפוסים + עלות גבוהה) כדי להפחית RSS",
+      "shedLevel2": "לחץ זיכרון: {count} כללים הושבתו (יקרים + חומרת INFO)",
+      "shedLevel3": "לחץ זיכרון: {count} כללים הושבתו (כל הכללים שאינם חיוניים ואינם ERROR)",
+      "hardTripped": "חריגה ממגבלת הזיכרון — כל הכללים שאינם חיוניים הושהו",
       "pressureNoShed": "לחץ זיכרון détected — הפעל כלל הזרימה ב analysis_options_custom.yaml כדי לזרום אוטומטית את הכללים המבוקרים תחילה"
     },
     "notification": {
-      "shedDisabled": "הפרשנות זיכרון נצפתה (RSS {rssMb} MB, גבול רך {softLimitMb} MB). הפעל שיקול תקציבים כדי להשבית אוטומטית правила יקרות תחת לחץ.",
+      "shedDisabled": "זוהה לחץ זיכרון על ה-analyzer (RSS {rssMb} MB, מגבלה רכה {softLimitMb} MB). הפעל הפחתת כללים כדי להשבית אוטומטית כללים יקרים בזמן לחץ.",
       "enableButton": "Enable enable אפשר את הפעלת",
       "learnMoreButton": "למד עוד לומד יותר",
-      "runInit": "הרץ \"dart run saropa_lints:init\" כדי ליצור analysis_options_custom.yaml, ואז установите shed_rules: true.",
+      "runInit": "הרץ 'dart run saropa_lints:init' כדי ליצור את analysis_options_custom.yaml, ואז הגדר shed_rules: true.",
       "enabledConfirmation": "חוקי הזרימה הופעלו ב-analysis_options_custom.yaml. האנליטיקס יקלוט את השינוי בטעינתו הבאה."
     },
     "dashboard": {
@@ -996,9 +997,9 @@
       "categoryTypeResolving": "ניתוח סוגים (יקר)",
       "categoryHighCost": "הIGH-cost",
       "categoryInfoSeverity": "INFO אינטנסיביות",
-      "categoryWarningSeverity": "경고 중량",
+      "categoryWarningSeverity": "חומרת אזהרה",
       "moreRules": "יותר לא רשומים",
-      "restartButton": "إعادة تشغيل המ phân석",
+      "restartButton": "הפעל מחדש את המנתח",
       "restartTooltip": "הפעל מחדש את שרת ניתוח Dart כדי לנקות את לחץ הזיכרון ולשחזר את כללי השידור."
     }
   },
@@ -1030,7 +1031,7 @@
       "driftOnPill": "\"הדריף על · {count}\"",
       "driftOfflineTitle": "Drift Advisor מופעל אך לא נמצא שרת.",
       "driftOfflinePill": "דריפט לא מקוון",
-      "driftAuthRequiredTitle": "שרת Drift Advisor נמצא אך דורש טוקן אימות — установите saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredTitle": "שרת Drift Advisor נמצא אך דורש אסימון אימות — הגדר את saropaLints.driftAdvisor.authToken",
       "driftAuthRequiredPill": "דריפט צריך טוקן",
       "driftAuthFailedTitle": "Drift Advisor דוחה את הטוקן האוטוריזציה שהוגדר — לחץ כדי לעדכן אותו",
       "driftAuthFailedPill": "Drift אוט' אינ' פאילד",
@@ -1110,19 +1111,19 @@
       "saveEverythingReport": "שמור על כל הדוחות",
       "saveEverythingReportTitle": "שמור על כל תוצאות האudit כJSON ל-raports/ – ללא מסננים, כולל מונעים",
       "suppressAll": "השתלט על כל מה שמוצג",
-      "suppressAllTitle": "הכנס // זניחה:تعليقات מעל כל מציאת נראות",
-      "suppressAllConfirm": "הנהל זה יתאים {count} // זנתר:تعليقات על קבצי המקור שלך. זה לא ניתן לשחזור מהלוח — השתמש ב.undo של המחבר או בניהול גרסאות כדי לשחזר. המשך?",
+      "suppressAllTitle": "הוסף הערות // ignore: מעל כל ממצא גלוי",
+      "suppressAllConfirm": "הפעולה תוסיף {count} הערות // ignore: בקובצי המקור שלך. לא ניתן לבטל זאת מהלוח — השתמש בביטול (undo) של העורך או בבקרת גרסאות כדי לשחזר. להמשיך?",
       "suppressAllProceed": "השתלט על כל",
-      "suppressAllDone": "הוספה {count} // זנתר:تعليقات.",
+      "suppressAllDone": "נוספו {count} הערות // ignore:.",
       "suppressAllFailed": "לא ניתן להפעלת בדיקה מונעת בדרכים רבות — חלק מהקבצים עשויים להיות קרואים בלבד."
     },
     "audit": {
-      "scopeFieldTitle": "اختر מהแหล่งที่ผลลัพธ์ด้านล่างมาจาก",
+      "scopeFieldTitle": "בחר מהיכן מגיעים הממצאים שלמטה",
       "scopeLabel": "מקור",
       "scopeLive": "דיאגנוסטיקה לוחית",
-      "scopeFull": "مراجعة מלאה של הפרויקט",
+      "scopeFull": "ביקורת פרויקט מלאה",
       "scopeChangedMain": "שונה מ-main",
-      "scopeChangedBranch": "שינה את ה-vs ל一支…",
+      "scopeChangedBranch": "השינויים לעומת ענף…",
       "branchPlaceholder": "שם ענף",
       "branchAria": "שעלה להשוואה",
       "includeSuppressedLabel": "הכנס שגשוגים",
@@ -1130,11 +1131,11 @@
       "runButton": "הריץ אודיט",
       "runButtonTitle": "הפעלה של CLI לניתוח פרויקט מלא והעלאה של תוצאותיו כאן",
       "cancelButton": "ביטול לבטל",
-      "runningLabel": "مراجعة...",
+      "runningLabel": "מבצע ביקורת…",
       "runningMeta": "התחלת בדיקה CLI...",
       "statusFull": "הצגת ניתוח פרויקט מלא מ {time}",
       "statusChangedRef": "מציג קבצים שונו ביחס ל-{ref}, נבדק {time}",
-      "notRunYet": "اختر טווח מעלה, ואז הפעל ביקורת"
+      "notRunYet": "בחר טווח למעלה, ואז הפעל ביקורת"
     },
     "chip": {
       "contains": "מכיל \"{q}\"",
@@ -1194,7 +1195,7 @@
       "owaspMobileLabel": "מובייל",
       "owaspWebLabel": "Web",
       "relatedRulesHeading": "חוקי קשורים",
-      "sameTagHeading": "اكتشاف תגיות זהות",
+      "sameTagHeading": "גילוי לפי אותה תגית",
       "migrationHeading": "הגירה",
       "supersedesLabel": "החלפת:"
     },
@@ -1279,7 +1280,7 @@
       "kindBaseline": "קו בסיס",
       "unsuppressButton": "לא להצמצם",
       "unsuppressTitle": "הסר את ההיעדרות כדי שהמצאה זו תופיע בסריקות רגילות",
-      "unsuppressHint": "כדי לא להצמצם {rule} ב-{file}:{line}, הסר את הערה // ignore: מעל 줄 זו.",
+      "unsuppressHint": "כדי לבטל את ההשתקה של {rule} ב-{file}:{line}, הסר את ההערה // ignore: שמעל שורה זו.",
       "columnFile": "קובץ קבצים File File",
       "columnLine": "קו קו שורה שורה",
       "columnRule": "חוקי בית סעיף",
@@ -1346,14 +1347,14 @@
   "ruleExplain": {
     "toggle": {
       "disableButton": "השבית כלל זה",
-      "disableTitle": "השבית כלל הוראות זו עבור כל הפרויקט — כתוב analysis_options_custom.yaml. הפעל ניתוח מחדש כדי לראות את השינוי生效.",
+      "disableTitle": "השבת כלל זה לכל הפרויקט — כותב את analysis_options_custom.yaml. הרץ את הניתוח שוב כדי לראות את השינוי נכנס לתוקף.",
       "enableButton": "הפעלה מחדש של הכלל",
-      "enableTitle": "הפעלה מחדש של כלל זה — מוחקת את ההרחבה ב analysis_options_custom.yaml. הפעל ניתוח מחדש כדי לראות את השינוי生效."
+      "enableTitle": "הפעל מחדש כלל זה — מסיר את העקיפה ב-analysis_options_custom.yaml. הרץ את הניתוח שוב כדי לראות את השינוי נכנס לתוקף."
     },
     "noData": {
       "heading": "לא ניגרעה עדיין",
-      "body": "חוק זה עדיין לא התריע באף מקום במרחב העבודה שלך, אז אין בעיה ספציפית או תיקון להצגת. רץ ניתוח כדי לראות אותו ב맥락, או בדוק את חבילת החוקים שלו למטה כדי לראות מה הוא מחפש.",
-      "bodyDisabled": "החוק הזה כרגע מושתק, ולכן לא יופיע בنتائج האנליזה. הפעל אותו לעיל ורץ על האנליזה כדי לראות מה הוא מוצא.",
+      "body": "כלל זה עדיין לא הופעל באף מקום בסביבת העבודה שלך, ולכן אין בעיה או תיקון ספציפיים להצגה. הרץ ניתוח כדי לראות אותו בהקשר, או עיין בחבילת הכללים שלו למטה כדי לראות מה הוא מחפש.",
+      "bodyDisabled": "הכלל הזה מושבת כרגע, ולכן לא יופיע בתוצאות הניתוח. הפעל אותו מחדש למעלה והרץ ניתוח כדי לראות מה הוא מזהה.",
       "tierLine": "מכלול מדרגה: {tier}",
       "packsLine": "חוקי קבוצה: {packs}",
       "packsOverflow": "חוקי בדיקה: {packs} (+{count} נוספים)"
@@ -1404,14 +1405,14 @@
     "documentTitle": "Saropa לוח המחוונים של החבילה",
     "heroTitle": "Saropa לוח המחוונים של החבילה",
     "tabs": {
-      "aria": "섹ציות של דשבורד פאקרג'",
+      "aria": "מקטעי לוח הבקרה של החבילות",
       "overview": "סקירת תיאור",
       "upgrades": "שדרוגים",
       "upgradesDesc": "סקירת העדכון של חבילות זמינות, מסודר לפי סיכון, עם הפעלה בלחיצת כפתור",
-      "upgradesGenerating": "סריקה של פרויקטך לחיפוש תכונות שלא נאמצו וفرص לעדכון. זה מתבצע פעם אחת לכל סריקה ונותן נשמרת עד שתסרוק שוב.",
+      "upgradesGenerating": "סורק את הפרויקט שלך לאיתור תכונות שלא אומצו והזדמנויות שדרוג. הפעולה רצה פעם אחת בכל סריקה ונשמרת במטמון עד לסריקה הבאה.",
       "fullReport": "דוח מלא",
       "fullReportDesc": "הצג דוח שימוש במאפיינים של כל החבילות שנבדקו, כל מאפיין שנמשך מהchanglog כקובץ HTML/Markdown/JSON ופתח אותו.",
-      "fullReportGenerating": "הפקת דוח מלא — כל חבילת תיעוד scanned, כל תכונה מוצאת בchanglog. זה הולך בפעם אחת לכל ס캔 ונותן תצוגה מוחזקת עד שתס캔 מחדש.",
+      "fullReportGenerating": "יוצר את הדוח המלא — כל חבילה שנסרקה, כל תכונה שנכרתה מיומן השינויים. פעולה זו רצה פעם אחת לכל סריקה ונשמרת במטמון עד לסריקה הבאה.",
       "knownIssues": "בעיות ידועות",
       "knownIssuesDesc": "צפו בתקלות ידועות ותובנות שורשיות שהוגשו נגד התלות שלך.",
       "compare": "השוו את השוואה.",
@@ -1625,7 +1626,7 @@
       },
       "opportunities": {
         "label": "הזדמנויות, אפשרויות.",
-        "tooltip": "תכונות בדוח השינויים של החבילה הזו שלא נستخدمו עדיין בקוד שלך — סודר כדי למצוא את החבילות הכי פחות מופעלות"
+        "tooltip": "תכונות ביומן השינויים של החבילה הזו שעדיין אינן בשימוש בקוד שלך — מיין כדי למצוא את החבילות שמנוצלות הכי פחות"
       },
       "status": {
         "label": "מצב סטטוס Status",
@@ -1666,7 +1667,7 @@
       "escapeSearch": "חיפוש ממוקד ברור; Esc שני קורס כל השורות המורחבות.",
       "historyBack": "חזור דרך ההיסטוריה של ניווט החבילה.",
       "showOverlay": "להראות את התוספת של קיצור דרך זה.",
-      "jumpToTab": "העתק ל탭 1-6 (סקירת כללית, עדכונות, דוח מלא, בעיות ידועות, השוואה, הגדרות)"
+      "jumpToTab": "מעבר ללשונית 1-6 (סקירה, שדרוגים, דוח מלא, בעיות ידועות, השוואה, הגדרות)"
     },
     "versionTooltip": {
       "installed": "מותקן: {version} ({date})",
@@ -1695,7 +1696,7 @@
     "references": {
       "noImports": "לא נמצאו תיק מקורות של יבוא.",
       "reExportLine": "{location} (הייצוא מחדש)",
-      "publicApiSurface": "פונקציונליות פומבי — לפחות שימוש אחד הוא إعادة ייבוא.",
+      "publicApiSurface": "משטח ה-API הציבורי — לפחות שימוש אחד הוא ייצוא מחדש.",
       "reExportedBadge": "יצוא מחדש - נשלח בחזרה.",
       "openFileReferences": "פתח הפניות לקובץ פתוח."
     },
@@ -1999,7 +2000,7 @@
     "panelTitle": "מפת פרויקט Saropa",
     "tabs": {
       "map": "מפה",
-      "reports": "تقارير",
+      "reports": "דוחות",
       "aria": "חלקים של מפה של הפרויקט"
     },
     "scan": {
@@ -2007,7 +2008,7 @@
       "elapsed": "עבר זמן רב.",
       "cancel": "ביטול לבטל",
       "restart": "התחל מחדש - Restart",
-      "stopped": "остановлен",
+      "stopped": "נעצר",
       "logHeading": "פעילות - פעילות.",
       "logEmpty": "אין פלט עדיין — לוג זה מילא רק אם הסריקה מדפיסה מסר אבחון.",
       "progress": "{percent}% — {done}/{total} קבצים"
@@ -2018,12 +2019,12 @@
       "notRunYet": "לא רץ עדיין",
       "running": "מתבצע...",
       "exitOk": "יציאה 0 — מעבר",
-      "exitFail": "יציאה לא אפס — ראה 출력",
+      "exitFail": "קוד יציאה שאינו אפס — ראה את הפלט",
       "colLine": "#",
       "colText": "פלט",
       "severity": {
         "title": "דוח רמות חומרה",
-        "desc": "מתבצע dart analyze ומייצר קבוצת כל בעיה לפי רמת הקושי (שגיאות, 경고ים, מידע) — הפקודה בקונסולה dart run saropa_lints:severity_report, ללא קונסולה."
+        "desc": "מריץ dart analyze ומקבץ כל בעיה לפי חומרה (שגיאות, אזהרות, מידע) — זו פקודת הטרמינל dart run saropa_lints:severity_report, בלי הטרמינל."
       },
       "impact": {
         "title": "דוח השפעה (שם חלופי ישן)",
@@ -2031,11 +2032,11 @@
       },
       "qualityGate": {
         "title": "שורת איכות",
-        "desc": "מבחין את ה-violations.json העדכני ביחס לしきい値 ב-saropa_quality_gate.yaml ומדפיס PASS, WARN, או FAIL. ערוך את הしきい値 למטה, ואז רץ."
+        "desc": "מעריך את ה-violations.json העדכני מול הספים ב-saropa_quality_gate.yaml ומדפיס PASS, WARN או FAIL. ערוך את הספים למטה ואז הרץ."
       },
       "stubTest": {
         "title": "דוח בדיקה של סטאב",
-        "desc": "דמ\"ט טסט/*.dart עבור אסרציות מיקוריות (אקספект(אמת, איזtru), אקספект('ליטרל', איזנוט)null)) שמעדיף לא מבחנים כלום."
+        "desc": "סורק את test/*.dart לאיתור הצהרות מציין מקום (expect(true, isTrue), expect('literal', isNotNull)) שלא בודקות דבר בפועל."
       },
       "accuracy": {
         "title": "דוח דיוק",
@@ -2047,7 +2048,7 @@
       },
       "doctor": {
         "title": "דוקטור",
-        "desc": "בודקים analysis_options.yaml ו-analysis_options_custom.yaml לחוסר תצורה נכונה נפוצה:ключи בקובץ שגוי, קובץ מותאם חסר, או חסרים מובטחים גבול גרסה."
+        "desc": "בודק את analysis_options.yaml ואת analysis_options_custom.yaml לאיתור הגדרות שגויות נפוצות: מפתחות בקובץ הלא נכון, קובץ מותאם חסר או אילוץ גרסה חסר."
       },
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml thresholds",
@@ -2061,10 +2062,10 @@
       "colRule": "חוקי בית סעיף",
       "colSeverity": "חומרת החמורות",
       "colMessage": "הודעה מסר הודעת",
-      "colKey": "ключ"
+      "colKey": "מפתח"
     },
     "shortcuts": {
-      "jumpToTab": "העתק ל탭 1-2 (מפה, דוחות)",
+      "jumpToTab": "מעבר ללשונית 1-2 (מפה, דוחות)",
       "showOverlay": "להראות את התוספת של קיצור דרך זה."
     },
     "hero": {
@@ -2203,13 +2204,13 @@
   "debug": {
     "section": {
       "engines": "מנועי אבחון",
-      "enginesRecommendation": "מומלץ: שרת LSP פעיל (ברירת המחדל, בטא), ס캔 בעת שמירה פעיל, ניתוח חי OFF (שרת LSP כבר מכסה ניתוח דינמי חי; שניים פעילים עלולים להציג כפילויות), GitHub פעולות CI פעיל רק אם אתה רוצה בדיקות גייט. אם כלל לא פועל תחת LSP, הפעל ניתוח חי ושב לשרת LSP.",
+      "enginesRecommendation": "מומלץ: LSP Server פעיל (ברירת מחדל, בטא), Scan on Save פעיל, Live Analysis כבוי (LSP כבר מכסה אבחונים חיים; הפעלת שניהם עלולה להציג כפילויות), GitHub Actions CI פעיל רק אם ברצונך לחסום בקשות משיכה. אם כלל מפסיק לפעול תחת LSP, הפעל את Live Analysis וכבה את LSP Server.",
       "log": "לוג"
     },
     "engine": {
       "master": "Saropa Lints",
       "analyzerPlugin": "ניתוח אקטיבי",
-      "scanDaemon": "סריקה בעת שמירת 파일",
+      "scanDaemon": "סריקה בעת שמירה",
       "lspServer": "שרת LSP",
       "pid": "PID:",
       "rules": "חוקי שיווק:",
@@ -2219,7 +2220,7 @@
         "active": "פעילות אקטיבית פעילה.",
         "idle": "השהייה",
         "running": "מתבצעת",
-        "stopped": "остопед",
+        "stopped": "נעצר",
         "suspended": "מושתקע",
         "starting": "התחלת",
         "scanning": "סריקה",
@@ -2234,12 +2235,12 @@
       "description": {
         "master": "החלפה כללית ל-extension (ayaropaLints.enabled setting for workspace). כאשר מופסק, הסקן בעת שמירת קובץ עוצר והסרגה מדווחת את ההרחבה כמבוטלת. ניתוח לוחות תקשורת ושרת LSP יש להם את ההחלפות שלהם.",
         "analyzerPlugin": "מתבצע בתוך שרת האנליזה Dart — סקוויגלס חיים באדיטורขณะ שכתבת, אין צורך בסריקה. לחיצה על התoggle מחליפה את ההרחבות: בלוק ב analysis_options.yaml",
-        "scanDaemon": "תהליך фонאי שמבצע סקרוי מחדש של כל הפרויקט בעת שמירה וכתוב דוחות/.saropa_lints/violations.json. כיבוי מסיר אותו; שמירה הבאה מ возращает אותו.",
-        "lspServer": "חוקי קפדניים:\n1. החזיר רק את הגרסה המתרגמת של המחרוזת.\n2. אל תוסיף הסברים, הפתיחה, סימני מardown, או כיתובים מסביב.\n3. הטקסט עשוי להכיל תокני תחזיות: תוקני תחזיות. העתק כל אחד מהם לתרגום בדיוק כפי שנכתב, במקומו הgrammatically הנכון. אל תתרגם, תמחק או תפורמט תוקן.\n4. קריטי: כל אות של הפלט חייב להיות אות עברית. תרגל כל מילה לעברית — אל ת deix או תחליף כל מילה בlatin, תאי, ערבית, קירילית, קוריאנית, יפנית או כל שפה אחרת. רווחים, מספרים, תווים פיסוק ותוקני תחזיות הם היחסיים היחידים.\n\nטקסט: שרת שפה נפרד — מפרסם אבחנות ללוח בעיות עבור קבצים פתוחים וקבצים במרחב העבודה. לחיצה על כפתור מעדכנת את ההגדרה saropaLints.lspServer.enabled.",
+        "scanDaemon": "תהליך רקע שסורק מחדש את כל הפרויקט בעת שמירה וכותב את reports/.saropa_lints/violations.json. כיבוי משהה אותו; השמירה הבאה מחדשת אותו.",
+        "lspServer": "שרת שפה נפרד — מפרסם אבחנות לחלונית הבעיות עבור קבצים פתוחים וקבצים בסביבת העבודה. הפעלה או כיבוי כותבים את ההגדרה saropaLints.lspServer.enabled.",
         "ci": "קורא וכותב את .github/workflows/saropa-lints.yml בעץ העבודה שלך כדי להפעיל או לכבות את תהליך העבודה המצורף של GitHub Actions. זה משקף את הקובץ בענף הנוכחי שלך — העותק בענף ברירת המחדל הוא זה שבפועל חוסם בקשות משיכה, ושניהם עשויים להיפרד. החלפת המצב אף פעם לא מריצה או מוחקת את תהליך העבודה; עדיין עליך לבדוק ולבצע commit לשינוי בעצמך."
       },
       "recommended": {
-        "analyzerPlugin": "מומלץ: OFFขณะ ששרת LSP פעיל. הפעל ON (עם LSP OFF) אם כלל 규ל עוצר את הפעלה תחת LSP.",
+        "analyzerPlugin": "מומלץ: כבוי כל עוד LSP Server פעיל. הפעל (כאשר LSP כבוי) אם כלל מפסיק לפעול תחת LSP.",
         "scanDaemon": "מומלץ: ON.",
         "lspServer": "מומלץ: ON (ברירת המחדל, בטא). מכסה אבחנות בזמן הריצה.",
         "ci": "מומלץ: ON רק אם אתה רוצה לשלוח בקשות לשלב עם גייט."
@@ -2254,19 +2255,19 @@
     "action": {
       "killAll": "הרג כל {name}",
       "restartAll": "הפעל מחדש {name}",
-      "killAllDescription": "הפסקת כוחות ה-SLPS רק. מודול האנליזה וס캔 Daemon לא יכולים להישלך באופן עצמאי עדיין — השתמש בכל מנוע של תחלופת הדילוג/הפעלה.",
-      "restartAllDescription": "остות ומריצים מחדש את שרת LSP (או מפעילים אותו אם הוא לא רץ). מודülü האנליטיק וסרן Daemon אינם מושפעים — השתמש בכל מנוע's משלו כפתור ON/OFF."
+      "killAllDescription": "עוצר בכוח את LSP Server בלבד. את Analyzer Plugin ואת Scan Daemon עדיין אי אפשר לעצור בנפרד — השתמש במקום זאת במתג ההפעלה/כיבוי של כל מנוע.",
+      "restartAllDescription": "עוצר ומפעיל מחדש את שרת ה-LSP (או מפעיל אותו אם אינו רץ). תוסף ה-Analyzer ו-Scan Daemon אינם מושפעים — השתמש במתג ON/OFF של כל מנוע במקום זאת."
     },
     "log": {
       "empty": "אין רשומות לוג עדיין.",
       "masterToggleOn": "מצב מנהל: הפעלה...",
       "masterToggleOff": "מצב מנהל: כיבוי...",
       "killAll": "הכבה הכל: עצמה כל מנועים שוטפים.",
-      "restartAll": "إعادة تشغيل جميع: تم إعادة تشغيل جميع المحركات القابلة للتحكم.",
+      "restartAll": "הפעלה מחדש של הכול: כל המנועים הניתנים לשליטה הופעלו מחדש.",
       "lspToggleOn": "שרת LSP: הפעלה...",
       "lspToggleOff": "שרת LSP: אכיפה...",
       "lspStarted": "שרת LSP: התחיל.",
-      "lspDisabledPrompt": "השרת LSP מושבת בהגדרות (saropaLints.lspServer.enabled). הפעל אותו וابדוק?",
+      "lspDisabledPrompt": "שרת ה-LSP מושבת בהגדרות (saropaLints.lspServer.enabled). להפעיל אותו ולהתחיל?",
       "lspEnableButton": "Enable enable אפשר את הפעלת",
       "lspStopped": "שרת LSP: עצם.",
       "lspStartFailed": "שרת LSP: נכשל להתחיל (ראה את מסר השגיאה ואת ערוץ הפלט Saropa Lints של LSP).",
@@ -2285,27 +2286,27 @@
       "enginesLabel": "מנועים: {count} בפעולה"
     },
     "ci": {
-      "disableFailed": "לא ניתן להשבית את CI: {path} חסר או יש לו מבנה Saropa Lints לא יתוקן אוטומטית. CI עדיין מתבצע. פתח את הקובץ והשבית את הワークפלואו ידנית.",
+      "disableFailed": "לא ניתן לכבות את CI: הקובץ {path} חסר או שמבנהו אינו כזה ש-Saropa Lints יערוך אוטומטית. CI עדיין רץ. פתח את הקובץ והשבת את תהליך העבודה ידנית.",
       "openWorkflow": "פתיחה של תהליך עבודה",
       "openWorkflowFailed": "לא ניתן לפתוח {path}.",
       "publish": {
         "heading": "העלו את השינוי הזה",
-        "introEnable": "{path} נכתב בעץ העבודה שלך. כלום לא רץ ב-CI עד שהוא נמצא ב-{base}. הפקודות האלה מכניסות אותו一支 ענף חדש שנקרא {branch} ופותחות בקשה לסיוע לסקירת קוד — ריצה אותם בעצמך, או לחץ על הכפתור ו-Saropa Lints יריץ בדיוק אותם.",
-        "introDisable": "{path} נערך בפונקציונליות העבודה שלך כדי להשהות כל משימה. CI ממשיכת לרוץ עד שזה מגיע ל {base}. הפקודות האלה מוצבות את השינוי על一支 שנקראת {branch} ופותחות בקשה לשליפה — ריצה אותם בעצמך, או לחץ על הכפתור ו Saropa Lints יריץ בדיוק אותם. כדי להפסיק את CI מיידית, תבטל את ה_workflow מה zakładת Actions.",
+        "introEnable": "הקובץ {path} נכתב בעץ העבודה שלך. שום דבר לא רץ ב-CI עד שהוא נמצא ב-{base}. הפקודות הבאות מניחות אותו בענף חדש בשם {branch} ופותחות בקשת משיכה לבדיקה — הרץ אותן בעצמך, או לחץ על הכפתור ו-Saropa Lints תריץ בדיוק אותן.",
+        "introDisable": "הקובץ {path} נערך בעץ העבודה שלך כדי להשהות כל משימה. CI ממשיך לרוץ עד שהשינוי מגיע ל-{base}. הפקודות הבאות מניחות את השינוי בענף חדש בשם {branch} ופותחות בקשת משיכה — הרץ אותן בעצמך, או לחץ על הכפתור ו-Saropa Lints תריץ בדיוק אותן. כדי לעצור את CI מיד, השבת את תהליך העבודה בלשונית Actions של המאגר.",
         "commandsLabel": "פקודות מפקדיות",
         "copy": "העתק, עותק, העתקה.",
-        "copied": "명령어 복사됨.",
+        "copied": "הפקודות הועתקו ללוח.",
         "createPr": "צור ענף, קובע, מושך ופתוח בקשה להשלמה",
         "notNow": "לא עכשיו",
-        "noGitHubRemote": "המקור של הפרויקט הזה אינו GitHub, לכן לא ניתן לפתוח בקשה לשליפה עבורך. פעל בคำיורים לעיל ופתח אותו לפי הדרך שמערכת הホスト שלך עושה.",
-        "running": "יצירת一支 ותפזר...",
+        "noGitHubRemote": "המאגר המרוחק origin של מאגר זה אינו GitHub, ולכן לא ניתן לפתוח עבורך את בקשת המשיכה. הרץ את הפקודות שלמעלה ופתח אותה בדרך שהמארח שלך מציע.",
+        "running": "יוצר את הענף ודוחף…",
         "failed": "{command} נכשל, לכן לא נשלחה שום פעולה. {details}",
-        "pushedNoPr": "הושם {branch}. לא ניתן היה לפתוח את הבקשה לשליפה אוטומטית — פתח אותה מהصفحة השוואה.",
+        "pushedNoPr": "{branch} נדחף. לא ניתן היה לפתוח את ה-pull request אוטומטית — פתח אותו מדף ההשוואה.",
         "openCompare": "פתוח דף השוואה",
         "created": "בקשה לשלב פתוחה עבור {branch}.",
         "openPr": "פתוח בקשה לשליפה",
         "notARepository": "{path} נוצר, אך הכתובת הזו אינה מאגר Git, ולכן אין מה לפרסם.",
-        "pubspecHasOtherEdits": "הunting שגרתי:\n1. החזר רק את הגרסה המתרגמת.\n2. אל תוסיף הסברים, הפתיחה, סימני מardown, או ציטוטים.\n3. הטקסט עשוי להכיל ת标记ים: ת标记ים. העתק כל אחד מהם לתרגום בדיוק כפי שנכתב, במקומו הgrammatically הנכון. אל תתרגם, תבטל, או תפורמט ת标记ים.\n4. קריטי: כל אות בתוצאה חייבת להיות אות עברית. תרגל כל מילה לעברית — אל תשמור או תחליף כל מילה בlatin, תאי, ערבית, קירילית, קוריאנית, יפנית, או כל סקריפט אחר. רווחים, מספרים, תווים פיסוק ות标记ים הם היחסיים היחידיים.\n\nטקסט: pubspec.yaml כבר היה עותקים לא שמורים שלך. קומיט מושך קבצים שלמים, אז פלטפורמה מכאן תשלח גם את העותקים האלה. קומיט או שמור אותם, ואז הפעל את הפקודות לעיל."
+        "pubspecHasOtherEdits": "ב-pubspec.yaml כבר היו עריכות שלך שלא נשמרו ב-commit. commit לוקח קבצים שלמים, ולכן פרסום מכאן ידחוף גם את העריכות האלה. בצע להן commit או stash, ואז הרץ בעצמך את הפקודות שלמעלה."
       }
     }
   },
@@ -2475,7 +2476,7 @@
       "actionViewViolations": "הפרות הצפייה View Violations",
       "noErrors": "Saropa Lints: זה היה חרא. בלי שגיאות!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: זה היה חרא. אין תיקיית workspace פתוחה. פתח את הפרויקט שלך Dart/Flutter קודם.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ס캔 בעת שמירה כבוי. הפעל אותו לפני הרצת ניתוח.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: הסריקה בעת שמירה כבויה. הפעל אותה לפני הרצת ניתוח.",
       "pluginAlive": "Saropa Lints חי: {rules} כללים מופעלים, קבצי {files} ניתחו.",
       "openPubspecFailed": "התקלה בפתיחה של pubspec.yaml: {message}",
       "toggleSidebarSectionFailed": "Saropa Lints: נכשל בלחיצה על חלון התצוגה — {message}",
@@ -2495,14 +2496,14 @@
       "actionDisable": "Disable disable - כבלי את היכולת",
       "actionEnable": "Enable enable אפשר את הפעלת",
       "bulkRuleToggleConfirm": "{verb} {count} כללים? זה מעדכן את analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints גילה פרויקט Dart ללא saropa_lints מוגדר. תורם עכשיו ל-2350+ правила לינט.",
+      "setupPrompt": "Saropa Lints זיהה פרויקט Dart ללא saropa_lints מוגדר. הגדר עכשיו וקבל 2350+ כללי lint.",
       "actionSetUpProject": "הקמת פרויקט, הגדרת פרוייקט.",
       "actionNotNow": "לא עכשיו, לא עכשיו."
     },
     "lsp": {
       "noWorkspaceFolder": "Saropa Lints: לא ניתן להתחיל את שרת LSP מכיוון שאין תיקייה של פרויקט פתוחה.",
       "startFailed": "Saropa Lints: לא הצלח להתחיל שרת LSP. {reason}",
-      "settingWriteFailed": "Saropa Lints: לא ניתן לשמור את 설정 LSP Server. {reason}"
+      "settingWriteFailed": "Saropa Lints: לא ניתן לשמור את הגדרת LSP Server. {reason}"
     },
     "setup": {
       "requiresDartProject": "Saropa Lints דורש פרויקט Dart או Flutter (לא נמצא pubspec.yaml).",
@@ -2516,7 +2517,7 @@
       "pubGetNotResolved": "Saropa Lints: pub get הושלם אך saropa_lints לא נפתר. בדוק את תצורת pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: - פטריוטיביות כתיבת התצורה נכשלה. {details}",
       "disabled": "Saropa Lints הוא מופעל. קבצי הפרויקט לא הוחלפו.",
-      "disabledAnalyzer": "האינטגרציה Saropa Lints נכבשה. תוצאות ניתוח התרשים יתאפסו всoon; לחץ על ס캔 בעת שמירה כדי לשחזר.",
+      "disabledAnalyzer": "השילוב של Saropa Lints כובה. אבחוני המנתח יתנקו בקרוב; הפעל את הסריקה בעת שמירה כדי לשחזר.",
       "reenabledPlugin": "המוצר Saropa Lints של ההרחבה בפועל הופעל מחדש. אתחול מחדש את שרת ניתוח Dart כדי לטעון אותו.",
       "reenableNothingToRestore": "Saropa Lints: אין מה לשחזר. הרחבת הפלוגין בתהליך אינה מושבתת כרגע.",
       "noOpenDartFiles": "Saropa Lints: זה היה חרא. לא נמצאו קבצי Dart פתוחים. פתח מחדש קובץ Dart או לכבות את ההגדרה \"פתוח עורך בלבד\".",
@@ -2524,7 +2525,7 @@
       "configUpdated": "Saropa Lints config עדכון (שכבה: {tier}).היא הייתה בתפקיד.",
       "configWriteFailed": "כתיבת התצורה נכשלה. {details}",
       "scaffoldGateTitle": "מנותק מורכב plugin scaffold ניתוחי.",
-      "scaffoldGateDetail": "הנהריך חבילת Dart חדשה תחת תחנת העבודה שלך (pubspec.yaml, lib/main.dart, README):plugin מותאם אישית אחד שמקיים Saropa ומשאיר תצטברות לתקנות שלך.\n\nהשתמש בזה רק כאשר אתה מפרסם תקנות נית널יזה מותאמות אישית יחד עם Saropa. פרויקטים עם Saropa בלבד יכולים לפסול את זה—the analyzer מאפשר קלטplugin אחד לכל הקשר.\n\nהבא: בחר תיקייה יחסית לתחנת העבודה. אם התיקייה כבר קיימת, תשאל אותך לפני שמשהו ייחלף.",
+      "scaffoldGateDetail": "פעולה זו כותבת חבילת Dart חדשה בתוך סביבת העבודה שלך (pubspec.yaml, lib/main.dart, README): תוסף custom_lint אחד שרושם את Saropa ומשאיר נקודות חיבור לכללים שלך.\n\nהשתמש בזה רק כשאתה מספק כללי מנתח מותאמים יחד עם Saropa. פרויקטים רגילים עם Saropa בלבד יכולים לדלג — המנתח מאפשר רשומת תוסף אחת בלבד לכל הקשר.\n\nהשלב הבא: בחר תיקייה יחסית לסביבת העבודה. אם התיקייה כבר קיימת, תתבקש לאשר לפני שמשהו יידרס.",
       "actionContinue": "ממשיכים, ממשיכות, ממשיך.",
       "actionOpenGuide": "פתח מדריך פתיחה.",
       "scaffoldPathOutsideWorkspace": "נתיב המסלול חייב להיות בתוך תיקיית workspace.",
@@ -2544,22 +2545,22 @@
       "pickerTitle": "Saropa Lints: הגדרת ניתוח מסלול",
       "pickerPlaceholder": "הווה: {lane}",
       "lightLabel": "הבהירות (ברירת המחדל)",
-      "lightDescription": "רק ~200 правила שגיאה/אזהרה 작동 בתוך המודעה",
+      "lightDescription": "רק כ-200 כללי שגיאה/אזהרה רצים בעורך",
       "lightDetail": "כל מה שנותר מגיע כמה שניות לאחר מכן, בשמירת הקובץ, דרךDaemon של הסקן. זיכרון קרובה לבסיס: +0.6% RSS נמדדת בפרויקט גדול. מומלץ לרוב הprojects.",
       "fullLabel": "מלא",
       "fullDescription": "כל כלל מופעל מופעל בתוך המודעה",
       "fullDetail": "הנהירות התנהגות. עלות זיכרון גבוהה יותר: +77% RSS נמדדת על אותו פרויקט. בחר בזה רק אם בדקת שפרויקט שלך יכול לה bearing את הרגל.",
       "alreadyOnLane": "כבר על ה-{lane}.",
-      "updated": "ניתוח רכבת מותאמת ל{lane}. إعادة تشغيل שרת ניתוח Dart כדי לה적ון.",
+      "updated": "נתיב הניתוח הוגדר ל-{lane}. שרת הניתוח של Dart מופעל מחדש כדי להחיל אותו.",
       "noPluginBlock": "Saropa Lints: לא ניתן לקבוע את מסלול האנליזה — לא נמצא analysis_options_custom.yaml. רץ על 'dart run saropa_lints init' כדי ליצור אותו.",
       "writeFailed": "Saropa Lints: לא ניתן לכתוב את הניתוח הרציף. {message}"
     },
     "divergence": {
-      "enabledButPluginOff": "Saropa Lints הוא פעיל, אך אזהרות בתוך העריכה אינן פעילות: מודול האנליזה הושתק מהשורה הזו והלא נחזר, ולכן בעיות מופיעות רק לאחר ס캔. חזור לבעלות אזהרות בתוך העריכה, או לשמור על ס캔 בעת שמירה?",
+      "enabledButPluginOff": "Saropa Lints פעיל, אך האבחונים בעורך כבויים: תוסף המנתח כובה מתוך הרחבה זו ולא שוחזר, ולכן בעיות מופיעות רק לאחר סריקה. לשחזר את האבחונים החיים בעורך, או להשאיר רק סריקה בעת שמירה?",
       "actionRestorePlugin": "שחזר תצוגת אזהרות בתוך המודעה",
       "actionKeepScanOnly": "המריץ רק בשמירת קובץ",
-      "disabledButPluginOn": "Saropa Lints מופסק, אך מודול האנליזה עדיין מוגדר ב analysis_options.yaml, ולכן הוא יטען ויגדיל מספר ג'יגהבייטים בפעם הבאה שсер버 האנליזה של Dart יתחיל. תסגר גם את המודול, או תשמור עליו?",
-      "actionTurnOffPlugin": "השבית את 플러그-אין האנליזר",
+      "disabledButPluginOn": "Saropa Lints כבוי, אך תוסף המנתח עדיין מוצהר ב-analysis_options.yaml, ולכן הוא ייטען ויחזיק כמה GB בהפעלה הבאה של שרת הניתוח של Dart. לכבות גם את התוסף, או להשאיר אותו פעיל?",
+      "actionTurnOffPlugin": "כבה את תוסף המנתח",
       "actionKeepPluginOn": "המריץ את הרשומה"
     },
     "commands": {
@@ -2661,7 +2662,7 @@
       "saveTaskFailed": "האחסון של משימה נכשל: {message}",
       "openFolderBeforeCopyConfig": "Saropa Lints: זה היה חרא. פתח תיקיית workspace לפני שתעתע את config.",
       "copiedConfigSnippet": "Saropa Lints: קובץ Yapılandırma שנשכפל (tier: {tier}, {packsLine})",
-      "couldNotCopyClipboard": "Saropa Lints: לא ניתן לنسخ ללוח העריכה — {message}.",
+      "couldNotCopyClipboard": "Saropa Lints: לא ניתן להעתיק ללוח — {message}.",
       "couldNotWriteRulePacks": "Saropa Lints: - פטריוטיביות לא ניתן היה לכתוב analysis_options.yaml (rule_packs).",
       "couldNotReadPubspec": "Saropa Lints: - פטריוטיביות לא ניתן היה לקרוא pubspec.yaml.",
       "noAdditionalSdkPacks": "Saropa Lints: זה היה חרא. אין חבילות SDK נוספות רלוונטיות כדי לאפשר.",
@@ -2678,7 +2679,7 @@
     "misc": {
       "actionDontAskForVersion": "אל תבקש גרסה זו",
       "actionLater": "מאוחר יותר אחר כך",
-      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. זהו גרסה מרכזית ויכולה לדרוש שינויי yapı��置 — עיין בדוח השינויים.",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. זוהי גרסה ראשית ועשויה לדרוש שינויי תצורה — עיין ביומן השינויים.",
       "upgradeCheckerMajorUpdate": "עדכון גדול לעדכונים",
       "upgradeCheckerMinorUpdate": "עדכון קטן של עדכונים קטנים",
       "upgradeCheckerPatchUpdate": "עדכון פטץ'",
@@ -2692,7 +2693,7 @@
       "actionViewChangelog": "הצפייה בלוג שינויים",
       "healthCodeLensEnabled": "Saropa מפת פרויקט חום CodeLens מופעל.",
       "healthCodeLensDisabled": "Saropa מפת הפרויקט חום CodeLens נטרל.",
-      "reportViewCopiedPath": "مسלול דוח עותק: {path}",
+      "reportViewCopiedPath": "נתיב הדוח הועתק: {path}",
       "reportViewCouldNotOpen": "לא ניתן לפתוח קובץ דוח: {path}",
       "reportViewCopiedRowOne": "העתקתי שורה {count} לצינור.",
       "reportViewCopiedRowOther": "העתקתי שורות {count} לצינור.",
@@ -2765,7 +2766,7 @@
       "title": "איך זה עובד",
       "body": "כלי האופטימיזציה סורק כל קובץ Dart בסביבת העבודה שלך ומעריך את עלות הניתוח על סמך מורכבות הקובץ (ספירת שורות, מחלקות, פונקציות, ייבוא). לאחר מכן, הוא ממליץ על דפוסי אי הכללה כדי להפחית את מספר הקבצים שמנתח Dart טוען לזיכרון.",
       "generated": "קוד שנוצר אוטומטית (*.g.dart, *.freezed.dart וכו') ניתן לשלוח אותו — הוא תמיד נוצר מחדש מהקוד המקור.",
-      "build": "הפלט של הבנייה (build/, .dart_tool/) מכיל אрטייקטים עת过ים שאינם נדרשים לניתוח בזמן אמת.",
+      "build": "פלט הבנייה (build/, .dart_tool/) מכיל תוצרי ביניים שאינם נחוצים לניתוח חי.",
       "inactive": "תיקיות ללא פעילות git עדכנית עשויות להכיל קוד מת או מאrchיב.",
       "protected": "תיקיות המקור הראשיות (lib/, lib/src/, bin/) אינן מומלצות להשממה.",
       "backup": "העתקה של analysis_options.yaml נשמרת כ analysis_options.yaml.bak לפני כל שינוי שנעשה כאן."
@@ -2774,8 +2775,8 @@
       "applied": "התבנית (ות) של {count} של איסור הופקה ל analysis_options.yaml",
       "removed": "הוסר דפוס אי הכללה מ-analysis_options.yaml",
       "writeFailed": "לא ניתן לכתוב ל-analysis_options.yaml — הקובץ עשוי להיות חסר",
-      "syntaxFixed": "תקן תחביר YAML לא חוקי ב-analysis_options.yaml איסключения",
-      "syntaxFixedWithDuplicates": "תקן שגיאת סינטаксיס YAML לא חוקית וסיפק דפוסי הימנעות כפולים {count}"
+      "syntaxFixed": "תחביר YAML לא חוקי בהחרגות של analysis_options.yaml תוקן",
+      "syntaxFixedWithDuplicates": "תחביר YAML לא חוקי תוקן ו-{count} תבניות החרגה כפולות הוסרו"
     },
     "syntaxWarning": {
       "message": "הקובץ מכיל mẫu שגיאה שכתובת בצורה ששבירת את האנליטיקס Dart (מuster ללא ציטוט שמתחיל ב-* אינו חוקי YAML).",
@@ -2785,7 +2786,7 @@
       "prompt": "החלף {count} mẫuות חסימה על analysis_options.yaml?",
       "detail": "תבניות: {preview}"
     },
-    "diffTitle": "מotify תحليل: הצעות היעדרויות"
+    "diffTitle": "מיטוב ניתוח: החרגות מוצעות"
   },
   "sidebarShell": {
     "dashboardsViewTitle": "לוחיות שלט Dashboards"
@@ -2802,24 +2803,24 @@
   },
   "staleIgnores": {
     "progress": {
-      "finding": "סריקה לחיבורים זרים שלتعليות 忽略…",
-      "fixing": "הסרתتعليמות זכירות מיותרים..."
+      "finding": "סורק הערות ignore מיושנות…",
+      "fixing": "מסיר הערות התעלמות מיושנות…"
     },
     "error": {
       "findFailed": "מצא שגיאות בדמויות שנשכחו: {message}",
       "fixFailed": "תקן איסורים ישנים נכשל: {message}",
       "noWorkspace": "לא נמצאו תחומים עבודה Dart/Flutter. פתח פרויקט עם pubspec.yaml תחילה.",
-      "missingDep": "הוסף saropa_lints ל pubspec.yaml לפני ס캔 לחיבורים ישנים."
+      "missingDep": "הוסף את saropa_lints ל-pubspec.yaml לפני סריקה של הערות ignore מיושנות."
     },
     "info": {
-      "noneFound": "לא נמצאוتعليقات זכירות להתעלמות.",
+      "noneFound": "לא נמצאו הערות התעלמות מיושנות.",
       "found": "{count} זיהויים ישנים של איסור ({fileCount} קבצים). ראה את painel הבעיות לפרטים.",
       "fixed": "הערות זכירות שנמחקו. ראה את painel הפלט לפרטים.",
-      "fixedInFile": "Saropa Lints: איזורים ישנים שונו在这个文件中",
+      "fixedInFile": "Saropa Lints: הערות ignore מיושנות תוקנו בקובץ זה",
       "alreadyRunning": "סריקה של stale-ignore כבר בפעולה."
     },
     "confirm": {
-      "fixMessage": "הפעולה תמחקتعليים ישנים מהתיעודים בקבצי המקור שלך. השינויים יכולים להיות מוחקים באמצעות git. המשך?",
+      "fixMessage": "הפעולה תסיר הערות התעלמות מיושנות מקובצי המקור שלך. ניתן לבטל את השינויים באמצעות git. להמשיך?",
       "fixMessageWithCount": "הפעולה תמחק את הערות ההתעלמות הלא מודרכים {count} מהקבצים המקוריים שלך. השינויים יכולים להיות מוחקים באמצעות git. המשך?",
       "fixAction": "הסרת איסורים ישנים"
     },
@@ -2828,10 +2829,10 @@
     },
     "sidebar": {
       "fixLabel": "הסרת עץ עצי עץ",
-      "fixDescription": "מצא ותגלה אוטומטיתتعليות // игнор: שמתו"
+      "fixDescription": "מצא והסר אוטומטית הערות // ignore: מתות"
     },
     "quickFix": {
-      "title": "תקן איסורים ישנים在这个文件中"
+      "title": "תקן הערות ignore מיושנות בקובץ זה"
     }
   },
   "bugArchival": {
@@ -2864,7 +2865,7 @@
       "title": "העתק ל {openIssuesDir}"
     },
     "error": {
-      "noWorkspaceFolder": "לא ניתן למקם קובץ זה — הוא לא נמצא בתוך תיקייה פתוחה של 작업.",
+      "noWorkspaceFolder": "לא ניתן להעביר קובץ זה — הוא אינו נמצא בתיקיית סביבת עבודה פתוחה.",
       "targetExists": "לא ניתן להזיז — קובץ קיים כבר ב {targetPath}."
     }
   },
@@ -2893,7 +2894,7 @@
       "findingsCleanFresh": "אין סכרים · ציון {score} · עודכן {ago}",
       "findingsWithViolations": "הפרות {count} · ציון {score}",
       "findingsWithViolationsFresh": "הפרות {count} · סכום {score} · עודכן {ago}",
-      "packagesNeverScanned": "הרץ ס캔 כדי לבדוק תלותות",
+      "packagesNeverScanned": "הרץ סריקה כדי לבדוק תלויות",
       "packagesAllAdopted": "כל הפקודות שהושגו",
       "packagesNeedlesCount": "{count} חבילות לאמץ",
       "codeHealthDescription": "{grade} · {score}/100",
@@ -2908,11 +2909,11 @@
     }
   },
   "driftAdvisor": {
-    "authRequired": "השרת דורש אימות. установите токен в Настройки → Saropa Lints → Drift Advisor → Auth Token, затем нажмите Обновить.",
+    "authRequired": "השרת דורש אימות. הגדר אסימון ב-Settings → Saropa Lints → Drift Advisor → Auth Token, ואז לחץ על Refresh.",
     "authFailed": "האימות נכשל — שרת הרשם את הכרטיסייה שנוגשת. לחץ כדי לעדכן אותה בהגדרות.",
     "discovering": "גילוי שרת וקבלת בעיות...",
     "noServerFound": "לא נמצאו שרת Drift Advisor. התחילו את האפליקציה עם השרת פעיל, ואז לחצו על עדכון.",
-    "integrationOff": "האינטגרציה Drift Advisor מוטה. הפעל אותה ב설比利ות (saropaLints.driftAdvisor.integration), ואז לחץ על עדכון."
+    "integrationOff": "השילוב עם Drift Advisor כבוי. הפעל אותו בהגדרות (saropaLints.driftAdvisor.integration) ואז לחץ על Refresh."
   },
   "vibrancy": {
     "sdkConstraint": {
@@ -2940,7 +2941,7 @@
       "breaksOne": "{pkg} {to} יתבשל {count} תלוי: {names}",
       "breaksOther": "{pkg} {to} יקרוס ל {count} תלויים: {names}",
       "safe": "{pkg} {from} -> {to} נראה בטוח",
-      "newestCompatible": "הсовместимость העדכנית: {pkg} {version}"
+      "newestCompatible": "הגרסה התואמת החדשה ביותר: {pkg} {version}"
     }
   },
   "lifecycle": {
@@ -2948,7 +2949,7 @@
       "statusMayBeOutdated": "המצב עשוי להיות מופרע: רשום כסיום חיים, אך pub.dev מציג שהוא לא נצבר ופורסם תוך 12 החודשים האחרונים.",
       "maintenanceMode": "מצב תחזוקה: צפויים רק תיקונים קריטיים.",
       "caution": "אזהרה: בדוק את ה-issue הידוע לפני שימוש בפונקציה זו.",
-      "unlisted": "לא רשום בpub.dev: מוסתר מהنتائج; משתמשים קיימים עדיין יכולים לה полtc על זה."
+      "unlisted": "לא רשום ב-pub.dev: מוסתר מתוצאות החיפוש; משתמשים קיימים עדיין יכולים להסתמך עליו."
     },
     "upgradeRequired": {
       "diagnostic": "שדרוג {name} — גרסה מותקנת ידועה כבוגרת",
@@ -2957,17 +2958,17 @@
     }
   },
   "ruleMigration": {
-    "none": "אין צורך לשלוח правила שוננים.",
-    "noWorkspace": "פתח תיקיית פרויקט Dart כדי לשלוח שמות של правила",
-    "pickTitle": "העתק правила שנקראו מחדש",
-    "pickPlaceholder": "اختر הקבצים לעדכון",
+    "none": "אין כללים ששמם שונה שדורשים מעבר.",
+    "noWorkspace": "פתח תיקיית פרויקט Dart כדי להעביר שמות כללים.",
+    "pickTitle": "העברת כללים ששמם שונה",
+    "pickPlaceholder": "בחר את הקבצים לעדכון",
     "fileHits": "{hits} שינוי(ים)",
     "diffTitle": "חוק ש_rename: {file}",
-    "confirm": "האם להפעלת שינוי שמות של כלל ה-regles עבור קבצים {count}? ההבדלים פתוחים לסקירת מراجعة.",
+    "confirm": "להחיל שינויי שמות כללים על {count} קבצים? ההבדלים פתוחים לסקירה.",
     "apply": "הפעלה",
-    "progress": "העתקת правила שונתה",
-    "applied": "השכפלתי את סведения על כלל {hits} בקובץ {count}: {files}.",
-    "bareNames": "לא נשמר (התעלם מتعليמות ללא הпрефикс saropa_lints): {items}.",
+    "progress": "מעביר כללים ששמם שונה",
+    "applied": "עודכנו {hits} הפניות לכללים ב-{count} קבצים: {files}.",
+    "bareNames": "לא שונו (הערות התעלמות ללא הקידומת saropa_lints/): {items}.",
     "clashes": "שמות both the old ו-new של הכלל הם מוגדרים, אנא איחוד ידנית: {items}",
     "skipped": "הוחלף: {items}.",
     "failedRestored": "חוק המעבר נכשל: {detail} כל הקבצים שוחזרו לתוכן הקודם שלהם.",
@@ -2980,14 +2981,14 @@
     "startup": {
       "routeDependency": "ה�ובסיקס רוט (pubspec.yaml)",
       "routePlugin": "ה�לינגל רוט (analysis_options.yaml)",
-      "routeBoth": "שתי הطرق (pubspec.yaml ו-analysis_options.yaml)",
+      "routeBoth": "שני המסלולים (pubspec.yaml ו-analysis_options.yaml)",
       "installedDisagree": "{pubspec} ב-pubspec.yaml ו-{plugin} ב-analysis_options.yaml",
       "offer": "saropa_lints: פרויקטך משתמש ב {route} ב {installed}. {offered} זמין ועובד עם Dart שלך {dart}. לדוגמה?",
       "offerNoDart": "saropa_lints: פרויקטך משתמש ב {route} ב {installed}. {offered} זמין. לדוגמה?",
       "offerRenames": "saropa_lints: פרויקטך משתמש ב {route} ב {installed}. {offered} זמין ועובד עם ה Dart שלך {dart}. {count} כללי הוסרו מאז {installed}. לדוגמה?",
       "offerNoDartRenames": "saropa_lints: פרויקטך משתמש ב {route} ב {installed}. {offered} זמין. {count} כללי הוחלפו מאז {installed}. לדוגמה?",
-      "offerRenamesUnknown": "saropa_lints: פרויקטך משתמש ב {route} ב {installed}. {offered} זמין ועובד עם Dart שלך {dart}. правила שנקראו מחדש ייבדקו לאחר העדכון. לדוגמה?",
-      "offerNoDartRenamesUnknown": "saropa_lints: פרויקטך משתמש ב {route} ב {installed}. {offered} זמין. правила שנקראו מחדש יתReviewed לאחר העדכון. לדוגמה?",
+      "offerRenamesUnknown": "saropa_lints: הפרויקט שלך משתמש ב-{route} בגרסה {installed}. {offered} זמינה ופועלת עם Dart {dart} שלך. כללים ששמם שונה ייבדקו לאחר השדרוג. לבצע מעבר?",
+      "offerNoDartRenamesUnknown": "saropa_lints: הפרויקט שלך משתמש ב-{route} בגרסה {installed}. {offered} זמינה. כללים ששמם שונה ייבדקו לאחר השדרוג. לבצע מעבר?",
       "actionMigrate": "העתק"
     },
     "status": {
@@ -2999,11 +3000,11 @@
       "neither": "saropa_lints: לא מוגדר",
       "localSource": "saropa_lints: מקורות מקומיים",
       "dartTooOld": "saropa_lints: התוסף דורש Dart חדש יותר",
-      "tipPubspec": "הפרויקט משתמש בנתיב pubspec: saropa_lints הוא תלות ב pubspec.yaml. אתם מקבלים אזהרות מודעות ו명령ות שורת הפקודה (dart run saropa_lints:init, scan, baseline)",
+      "tipPubspec": "פרויקט זה משתמש במסלול pubspec: saropa_lints הוא תלות ב-pubspec.yaml. אתה מקבל אבחונים בעורך ואת פקודות שורת הפקודה (dart run saropa_lints:init, scan, baseline).",
       "tipPlugin": "הפרויקט משתמש בפלוגין מסלול: saropa_lints מוגדר כפלוגין ב analysis_options.yaml. אתם מקבלים אזהרות מודעה רק בתוך המודעה. הפקודות בשורת הפקודה (dart run saropa_lints:init, scan, baseline) דורשות saropa_lints ב pubspec.yaml.",
-      "tipBoth": "הפרויקט משתמש בשתי דרכים והן מסכימות. אתה מקבל אזהרות מעריכה ו명령ים מהשורת הפקודות.",
+      "tipBoth": "פרויקט זה משתמש בשני המסלולים והם תואמים. אתה מקבל אבחונים בעורך ואת פקודות שורת הפקודה.",
       "tipDisagree": "השמות pubspec.yaml ו-analysis_options.yaml שונים ל-versions של saropa_lints. המודעה משתמשת ב-versions של ה-plugin ({plugin}); הפקודות בשורת הפקודה משתמשות ב-versions של pubspec.yaml ({pubspec}).",
-      "tipNeither": "saropa_lints אינו מוגדר在这个פרויקט: הוא既不是 pubspec.yaml 의 종속성也不是 analysis_options.yaml 의 플러그인.",
+      "tipNeither": "saropa_lints אינו מוגדר בפרויקט זה: הוא אינו תלות ב-pubspec.yaml וגם לא תוסף ב-analysis_options.yaml.",
       "tipLocalSource": "saropa_lints באופק מסלול מקומי או מקורות Git, אז הרחבת הפקודה מציגה עובדות בלבד ולא משנה דבר.",
       "tipDartTooOld": "הplugin route ב analysis_options.yaml צריך SDK עדכני יותר מ Dart מה שפרויקט זה יש, אז העורך לא יכול לטעון את הplugin."
     },
@@ -3012,22 +3013,22 @@
       "alreadyCorrect": "הפרויקט כבר משתמש בkonfigurasi המומלץ saropa_lints. אין צורך בפעולה.",
       "needsNewerDart": "saropa_lints {newest} דורש Dart SDK חדש יותר ממה שיש לפרויקט הזה ({dart}). השאירו ^{chosen}, או שדרגו את Flutter כדי להשתמש ב-{newest}.",
       "metaExcludesPin": "saropa_lints {newest} דורש חבילת מטא חדשה יותר מהשגרת Flutter שלך ({pin}). שמר על ^{chosen}, או העדכן Flutter כדי להשתמש ב-{newest}.",
-      "packageHoldsAnalyzer": "החבילה {package} מונעת את האנליטיקס, ולכן saropa_lints {newest} לא יכולה להות установленת. השתמש ב-^{chosen}, או עדכן {package} כדי להשתמש ב-{newest}.",
+      "packageHoldsAnalyzer": "החבילה {package} מחזיקה את ה-analyzer בגרסה ישנה, ולכן לא ניתן להתקין את saropa_lints {newest}. השתמש ב-^{chosen}, או עדכן את {package} כדי להשתמש ב-{newest}.",
       "noVersionResolves": "לא ניתן להתקין אף גרסה של saropa_lints כתלות כי {package} דורשת analyzer ישן יותר. מסלול התוסף (plugin) עדיין עובד.",
-      "noPluginResolves": "אף גרסה של saropa_lints לא יכולה להות установленת כתלות, וגם {version} לא עבר את הפותר של pub כמודול ({package} דרישה לאנליזר ישן). כלום לא השתנה.",
+      "noPluginResolves": "לא ניתן להתקין אף גרסה של saropa_lints כתלות, וגם {version} לא עברה את הפותר של pub כתוסף ניתוח ({package} דורשת analyzer ישן יותר). דבר לא שונה.",
       "blockedUsePlugin": "{package} מונע את האנליטיקס, ולכן saropa_lints לא יכול להיות מותקן כתלות. מסלול הריפוס לא נפגע: קבע את גרסה הריפוס ב analysis_options.yaml ל {version}.",
       "editorVsCli": "העורך ישתמש בגרסה של התוסף {plugin}. שורת הפקודה (dart run saropa_lints:init, scan, baseline) ממשיכה להשתמש בגרסה pubspec.yaml של {pubspec}.",
-      "cliNeedsPubspec": "dart ריצה saropa_lints:init, ס캔 ובסיס ליניארי צריכים saropa_lints ב pubspec.yaml.",
+      "cliNeedsPubspec": "dart run saropa_lints:init, scan ו-baseline דורשים את saropa_lints ב-pubspec.yaml.",
       "pluginUnverified": "הגרסה של התוסף {version} לא יכולה להיות בדvida עם הפתרון של pub. מומלץ רק על ידי הסוגריים של Dart SDK",
-      "pluginOnly": "הגדר את גרסה הـ saropa_lints של הפלוגין ב analysis_options.yaml ל {version}.",
+      "pluginOnly": "הגדר את גרסת התוסף saropa_lints ב-analysis_options.yaml ל-{version}.",
       "alignPlugin": "הגרסה של הפלוגין בanalysis_options.yaml ({plugin}) שונה מהגרסה המנוגדת saropa_lints ({locked}). קבע את גרסה הפלוגין ל{locked}.",
       "localSource": "saropa_lints באมาจาก מקור מקומי {source}, ולכן הרחבת הפקודה מציגה עובדות בלבד ולא משנה דבר.",
       "noCompatible": "אין גרסה פומצ'ה saropa_lints שמתאימה לSDK של הפרויקט Dart.",
       "noVersions": "אין גרסאות saropa_lints זמינות להמלצה.",
-      "probeFailed": "לא ניתן לבדוק אילו גרסה של saropa_lints ניתן להשתמש בויקטוריה פרויקט כי לא רצה את כלים Dart ({detail}). ה確信 dart או flutter נמצאים ב-PATH שלך ואתה מחובר לרשת, ואז בדוק שוב.",
+      "probeFailed": "לא ניתן לבדוק באיזו גרסה של saropa_lints הפרויקט יכול להשתמש כי כלי Dart לא רצו ({detail}). ודא ש-dart או flutter נמצאים ב-PATH ושאתה מחובר לרשת, ואז בדוק שוב.",
       "staleVersions": "רשימת הגרסאות לא יכולה להיות מודכנת (במצב לא מקוון), ולכן המלצות אלו עשויות להיות מיותרות.",
       "blockerSdk": "saropa_lints {version} דורש Dart SDK חדש יותר מ-{dart}.",
-      "blockerMeta": "saropa_lints {version} אינו совместим с версией meta {pin}, которая установлена вашим Flutter SDK.",
+      "blockerMeta": "saropa_lints {version} אינו תואם לגרסת meta {pin} שננעלה על ידי ה-Flutter SDK שלך.",
       "blockerPackage": "{package} מונע התקנה על ידי דרישה לגרסה שונה של המפענח.",
       "fixFlutterUpgrade": "הפעלה flutter upgrade.",
       "fixUpgradeFlutterMeta": "שדרוג Flutter לגרסה שמכשירה מטא חדשה יותר",
@@ -3052,7 +3053,7 @@
       "applying": "העתקה...",
       "preview": "הצגת הבדלים",
       "refresh": "העתק מחדש",
-      "diffTitle": "{file}: שינוי גרסהمقترحة",
+      "diffTitle": "{file}: שינוי גרסה מוצע",
       "staleReloaded": "הפרויקט השתנה בזמן שצפית בקרד זה, אז כלום לא הופעל. בדוק את המלצות העדכון והקליק על הפעלה שוב.",
       "loadFailed": "לא ניתן לבדוק תואםות גרסה: {detail}",
       "routeLabel": "התקנה של מסלול",
@@ -3066,7 +3067,7 @@
     "apply": {
       "progress": "החלפת גרסה saropa_lints",
       "applied": "saropa_lints {version} הוא מותקן ו.CONFIGURED.",
-      "noChange": "אין צורך בإجراء שינויים בקבצים.",
+      "noChange": "אין צורך בשינויים בקבצים.",
       "failedRestored": "השינויersion נכשל: {detail} pubspec.yaml ו analysis_options.yaml הוחזקו לתוכן הקודם שלהם.",
       "failedNotRestored": "השינויersion נכשל: {detail} הקבצים לא יכולים להיות שוננים אוטומטית; בדוק pubspec.yaml ו analysis_options.yaml.",
       "cancelledRestored": "השינויersion נדחה. pubspec.yaml ו analysis_options.yaml נחזרו לתוכן הקודם שלהם.",
@@ -3077,10 +3078,10 @@
     "statusOn": "Saropa Lints: על",
     "statusOff": "Saropa Lints: כיבוי",
     "statusPartial": "Saropa Lints: חלקית לא פעילה",
-    "tooltipOn": "Saropa Lints הוא פעיל (הגדרות ו플וגין לניתוח). לחץ כדי להשבית.",
-    "tooltipOff": "Saropa Lints הואכב (הגדרות ו플וגין לניתוח). לחץ כדי להפעיל.",
-    "tooltipPartialSetting": "חלקי אופ: הגדרת saropaLints.enabled אופנתה בעוד שפרוג램 האנליזה פעיל. לחץ כדי לתקן (מפעיל את שניהם).",
-    "tooltipPartialPlugin": "חלקי כבוי: האנליטיקס_plugin כבוי ב analysis_options.yaml בעוד שההגדרה היא開啟. לחץ כדי לתקן (מפעיל את שניהם).",
+    "tooltipOn": "Saropa Lints פעיל (הגדרה ותוסף מנתח). לחץ כדי לכבות.",
+    "tooltipOff": "Saropa Lints כבוי (הגדרה ותוסף מנתח). לחץ כדי להפעיל.",
+    "tooltipPartialSetting": "כבוי חלקית: ההגדרה saropaLints.enabled כבויה בעוד תוסף המנתח פעיל. לחץ כדי לתקן (מפעיל את שניהם).",
+    "tooltipPartialPlugin": "כבוי חלקית: תוסף המנתח כבוי ב-analysis_options.yaml בעוד ההגדרה פעילה. לחץ כדי לתקן (מפעיל את שניהם).",
     "dashboardOff": "ה linting כבוי.",
     "dashboardPartialSetting": "התנאים חלקית מופסקים: הגדרת saropaLints.enabled מופסקת.",
     "dashboardPartialPlugin": "התנאים חלקית מופסקים: מודול האנליזר מופסק ב analysis_options.yaml.",
@@ -3120,7 +3121,7 @@
     "throttled": "הסריקה עצרה עצמה מהרמת {from} ל {to} עוברים כדי לשמור על המחשב שלך רגיש ({reason}).",
     "aborted": "הסריקה נעצמה מוקדם כדי להגן על המחשב שלך ({reason}). תוצאות חלקיות.",
     "deepNotEnoughMemory": "סריקה מודעת לסוג צריך כמות של {needed}, אך רק {free} היא פנימית (מקיימת {reserve} לכל מה שנותר). סריקה מהירה מסתיימת הרבה מהר ומשתמשת בפחות זיכרון.",
-    "deepPaused": "הסריקה נעצה: זיכרון פנוי הוא {free}, מתחת ל-{reserve} שמוחזק פנוי עבור המחשב שלך. היא מ возращת אוטומטית כאשר זיכרון פנוי.",
+    "deepPaused": "הסריקה הושהתה: הזיכרון הפנוי הוא {free}, פחות מה-{reserve} שנשמרים פנויים עבור המחשב שלך. היא תתחדש אוטומטית כשיתפנה זיכרון.",
     "fastDone": "סריקה מהירה הושלמה: {files} קבצים, {issues} בעיה(ות) ב-{seconds}.",
     "fastDoneOfferDeep": "סריקה מהירה הושלמה: {files} קבצים, {issues} בעיה(ות) ב-{seconds}. סריקה מודעת לסוגים יכולה למצא יותר, אך דורשת כ {minutes} דקות ו-{memory} של זיכרון.",
     "fastDoneDeepUnavailable": "סריקה מהירה הושלמה: {files} קבצים, {issues} בעיה(ות) ב-{seconds}. סריקה מודעת לסוגים דורשת כ {needed}, אך רק {free} זמין כרגע.",
@@ -3128,18 +3129,18 @@
     "action": {
       "gentleProfile": "השתמש בפרופיל עדין",
       "openSettings": "פתח הגדרות",
-      "runFast": "הרץ ס캔 מהיר",
-      "runDeep": "ריצה של ס캔 עמוק",
+      "runFast": "הרץ סריקה מהירה",
+      "runDeep": "הרץ סריקה עמוקה",
       "runDeepAnyway": "הפעל סקר עמוק בכל מקרה",
-      "resume": "استمر עכשיו",
-      "cancelScan": "הפסק ס캔",
+      "resume": "המשך עכשיו",
+      "cancelScan": "בטל סריקה",
       "turnOffTypeResolution": "השבית שיקוב סוגים",
       "startAnyway": "התחל בכל מקרה",
       "notNow": "לא עכשיו, לא עכשיו.",
       "neverAskDeep": "אל תשאל שוב",
       "applyPlugin": "הפעלה",
       "noThanks": "לא תודה /no_thanks",
-      "restartAnalysisServer": "إعادة تشغيل خادم האנליזה"
+      "restartAnalysisServer": "הפעל מחדש את שרת האנליזה"
     },
     "picker": {
       "title": "איסוף ביצועים",
@@ -3154,13 +3155,13 @@
       },
       "profileDetail": {
         "gentle": "מונע מהסיבוב: עד 2 עוברים ורבע מזכרון פנוי. מתאים טוב למחשבים ניידים.",
-        "balanced": "מ解放ת גרעין אחד ומשתמש במחצית של הזיכרון החופשי. מתאים לרוב המכונות.",
+        "balanced": "משאיר ליבה אחת פנויה ומשתמש בעד מחצית מהזיכרון הפנוי. מתאים לרוב המחשבים.",
         "fast": "משתמש בכל המרכזים ועד 70% מהזכרון החופשי. מסתיים מהר יותר אך יכול לזרוק את שארית המחשב שלך."
       }
     },
     "plugin": {
       "offerAfterProfile": "הגביל גם ניתוח אינטראקטיבי (המוצר Dart של האנליטיקס) לבערך {limit} ותודה לתקנות נחותות בדידות כאשר הזיכרון מתמלא? ללא הגבלת זיכרון, פרויקט גדול יכול להגדיל את שרת האנליטיקס לאלפים של ג'יגה bait.",
-      "offerSmallMachine": "המחשב הזה יש {total} של זיכרון. הגבלת ניתוח פעיל לבערך {limit}, והסרת правила עם דרגת חומרה נמוכה בצורה חלקה כש Zodiac זיכרון נמוך, מונעת את התגובה. להחיל את זה?",
+      "offerSmallMachine": "למחשב הזה יש {total} של זיכרון. הגבלת הניתוח החי לכ-{limit} והשבתה הדרגתית של כללים בחומרה נמוכה כשהזיכרון אוזל שומרות על תגובתיות. להחיל זאת?",
       "applied": "נשמר: ניתוח לוחץ הוא מוגבל לבערך {limit}. עצור את שרת האנליזה כדי להפעיל אותו.",
       "writeFailed": "לא ניתן לעדכן את analysis_options_custom.yaml. בדוק שהקובץ ניתן לכתיבה."
     }

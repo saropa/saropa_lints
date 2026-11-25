@@ -346,7 +346,7 @@
   "command.configureCompatibility.title": "Saropa Lints: Versiyon Uyumluluğu Ayarla",
   "command.showProcessHealth.title": "Saropa Lints: İşlem Sağlığı",
   "command.showMachineDashboard.title": "Saropa Lints: Makine Sağlığı",
-  "command.showWorkspaceReadiness.title": "Saropa Lints: Workspace Hazırлыğı",
+  "command.showWorkspaceReadiness.title": "Saropa Lints: Çalışma Alanı Hazırlığı",
   "command.setAnalysisServerHeapCap.title": "Saropa Lints: Analiz Sunucusu Heap Kapasitesini Ayarla",
   "command.unloadOllamaModel.title": "Saropa Lints: Ollama Modelini Çıkart",
   "command.checkOrphanedProcesses.title": "Saropa Lints: Orphaned Processes'i Kontrol Et",

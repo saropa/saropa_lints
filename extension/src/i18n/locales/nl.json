@@ -1,7 +1,7 @@
 {
   "pubGuard": {
-    "sdkMismatch": "Het project is opgelost met Dart {project}, maar het geselecteerde SDK is Dart {tool}.",
-    "lockSdkConstraint": "pubspec.lock vereist Dart {constraint}, maar het geselecteerde SDK is Dart {tool}.",
+    "sdkMismatch": "Het project is opgelost met Dart {project}, maar de geselecteerde SDK is Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock vereist Dart {constraint}, maar de geselecteerde SDK is Dart {tool}.",
     "unknownPathSdk": "De Dart SDK-versie van de dart op PATH kon niet worden bepaald en het project heeft geen leesbare SDK-versie.",
     "staleLock": "pubspec.lock ontbreekt of is onleesbaar, dus pub zou de afhankelijkheden opnieuw oplossen.",
     "staleConfig": "De pakketconfiguratie ontbreekt of vermeldt de vergrendelde pakketten niet, dus pub zou de afhankelijkheden opnieuw oplossen.",
@@ -14,6 +14,7 @@
     "explain": {
       "pickFolder": "Kies een projectmap om uit te leggen",
       "none": "In deze sessie is geen Vibrancy pub-query overgeslagen.",
+      "unknown": "onbekend",
       "title": "Package Vibrancy heeft een pub-query overgeslagen",
       "project": "Project-SDK: {value} (van {source})",
       "folder": "Projectmap: {cwd}",

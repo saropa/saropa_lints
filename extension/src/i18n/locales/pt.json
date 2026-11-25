@@ -14,6 +14,7 @@
     "explain": {
       "pickFolder": "Escolha uma pasta de projeto para explicar",
       "none": "Nenhuma consulta pub do Vibrancy foi ignorada nesta sessão.",
+      "unknown": "desconhecido",
       "title": "Package Vibrancy ignorou uma consulta pub",
       "project": "SDK do projeto: {value} (de {source})",
       "folder": "Pasta do projeto: {cwd}",
@@ -2013,7 +2014,7 @@
       "progress": "{percent}% — {done}/{total} arquivos"
     },
     "reports": {
-      "intro": "Relatórios CLI em um clique que anteriormente exigiam um terminal. Cada botão Run transmite a saída em tempo real do工具 abaixo da sua carta e salva uma cópia sob reports/.saropa_lints/reports-tab/",
+      "intro": "Relatórios de CLI com um clique que antes exigiam um terminal. Cada botão Run transmite a saída em tempo real da ferramenta abaixo do seu cartão e salva uma cópia em reports/.saropa_lints/reports-tab/.",
       "runButton": "Executar",
       "notRunYet": "Ainda não foi executado",
       "running": "Executando…",
@@ -2235,7 +2236,7 @@
         "master": "Alternativa global para a extensão (configuração do workspace saropaLints.enabled). Quando desativada, a análise ao salvar para para e o painel lateral relata a extensão como desativada. Análise em Tempo Real e Servidor LSP possuem seus próprios comandos de ativação.",
         "analyzerPlugin": "Executa dentro do servidor de análise Dart — riscos em tempo real no editor enquanto você digita, sem necessidade de varredura. Alternar reescreve os plugins: bloco em analysis_options.yaml.",
         "scanDaemon": "Processo em segundo plano que rescaneia todo o projeto ao salvar e escreve relatórios/.saropa_lints/violations.json. Desativar suspende-o; o próximo salvamento retoma-o.",
-        "lspServer": "Regra estrita: Separar servidor de linguagem — publica diagnósticos para o painel Problems para arquivos abertos e do workspace. Alternar grava a configuração saropaLints.lspServer.enabled.",
+        "lspServer": "Servidor de linguagem separado — publica diagnósticos no painel Problems para arquivos abertos e do workspace. Alternar grava a configuração saropaLints.lspServer.enabled.",
         "ci": "Lê e grava .github/workflows/saropa-lints.yml na sua árvore de trabalho para ativar ou desativar o fluxo de trabalho dos GitHub Actions embalados. Isso reflete o arquivo na sua branch atual — a cópia da branch padrão é o que realmente controla as solicitações de pull, e as duas podem divergir. Alternar nunca executa ou exclui o fluxo de trabalho; você ainda revisa e commita a alteração manualmente."
       },
       "recommended": {

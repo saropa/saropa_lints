@@ -1,7 +1,7 @@
 {
   "pubGuard": {
     "sdkMismatch": "プロジェクトは Dart {project} で解決されましたが、選択された SDK は Dart {tool} です。",
-    "lockSdkConstraint": "pubspec.lockはDart {constraint}を必要としますが、選択されたSDKはDart {tool}です。",
+    "lockSdkConstraint": "pubspec.lock は Dart {constraint} を必要としますが、選択された SDK は Dart {tool} です。",
     "unknownPathSdk": "PATH 上の dart の Dart SDK バージョンを特定できず、プロジェクトにも読み取れる SDK バージョンがありません。",
     "staleLock": "pubspec.lock が存在しないか読み取れないため、pub は依存関係を再解決します。",
     "staleConfig": "パッケージ構成が存在しないか、ロックされたパッケージが記載されていないため、pub は依存関係を再解決します。",
@@ -24,6 +24,7 @@
     "explain": {
       "title": "Package Vibrancy が pub のクエリをスキップしました",
       "none": "このセッションでは Vibrancy の pub クエリはスキップされていません。",
+      "unknown": "不明",
       "reason": "理由: {reason}",
       "rule": "ルール: {rule}",
       "sdk": "選択された SDK: {path} (取得元: {source})",
@@ -43,7 +44,7 @@
     "pathDepNewer": "パス依存関係 {name} が pubspec.lock の書き込み後に変更されたため、pub は依存関係を再解決します。",
     "rule": {
       "sdkMismatch": "SDK バージョンの不一致",
-      "lockSdkConstraint": "SDK 制約のロック",
+      "lockSdkConstraint": "ロックファイルの SDK 制約",
       "unknownPathSdk": "PATH 上の SDK が不明",
       "staleLock": "ロックファイルが存在しないか読み取れません",
       "staleConfig": "パッケージ構成が古い",
@@ -350,14 +351,14 @@
     },
     "sdk": {
       "summary": "{total} SDK マイグレーションパック（ス）はこのプロジェクトに適用されます — {breaking} ブレイキング、{deprecation} デプロケーション。",
-      "noneApplicable": "このプロジェクトのpubspec環境にはまだSDKマиграーションパックが適用されていません。",
-      "enableAllTitle": "すべてのSDKマиграーションパックを有効にしてください。このプロジェクトがすでに満たしているDart/Flutterバージョンゲートを持つものを。",
+      "noneApplicable": "このプロジェクトのpubspec環境に適用できるSDKマイグレーションパックはまだありません。",
+      "enableAllTitle": "このプロジェクトがすでに満たしているDart/Flutterバージョン条件を持つ、すべてのSDKマイグレーションパックを有効にします。",
       "enableAll": "すべての適用可能なルールを有効にする ({count})",
       "enableBreakingTitle": "ターゲットバージョンで既に削除されたAPIを警告するSDKパックのみを有効にしてください",
       "enableBreaking": "有効にするだけ ({count})",
       "enableDeprecationTitle": "ターゲットバージョンで非推奨（ただし動作は可能）なAPIを警告するSDKパックのみを有効にしてください",
       "enableDeprecation": "非推奨のみ有効化（{count}）",
-      "noPacksInCatalogue": "SDKマиграーションパックが登録されていません。"
+      "noPacksInCatalogue": "SDKマイグレーションパックが登録されていません。"
     },
     "configFile": {
       "analysisSettings": {
@@ -1533,7 +1534,7 @@
       "footprintGroupAria": "サイズ コラム フットプリント モード",
       "footprintGroupTitle": "サイズ列が表示する内容:独自のコードの大きさのみ,さらにユニークなトランジティブ (削除された場合のコスト),またはすべてのトランジティヴ (理論上の最大値) を加える. コードサイズが利用できない場合,アーカイブ サイズに戻ります.",
       "footprintLabel": "足跡: フットプリント",
-      "footprintOwnTitle": "独自のコードサイズのみ (lib + デклаアされた資産);利用できない場合, pub.dev アーカイブサイズに戻ります.",
+      "footprintOwnTitle": "自身のコードサイズのみ (lib + 宣言されたアセット)。利用できない場合は pub.dev アーカイブのサイズに切り替わります",
       "footprintOwn": "独自の,自分のもの.",
       "footprintUniqueTitle": "独自のサイズ + このデパートでしか使用されていないトランジティブ (削除すると節約)",
       "footprintUnique": "+ ユニークで",

@@ -1,7 +1,7 @@
 {
   "pubGuard": {
-    "sdkMismatch": "پروجیکٹ Dart {project} سے حل کیا گیا لیکن انتخاب کردہ SDK Dart {tool} ہے۔",
-    "lockSdkConstraint": "pubspec.lock Dart {constraint} کی ضرورت ہے لیکن منتخب SDK Dart {tool} ہے۔",
+    "sdkMismatch": "پروجیکٹ Dart {project} سے حل کیا گیا لیکن منتخب SDK Dart {tool} ہے۔",
+    "lockSdkConstraint": "pubspec.lock کو Dart {constraint} درکار ہے لیکن منتخب SDK Dart {tool} ہے۔",
     "unknownPathSdk": "PATH پر موجود dart کا Dart SDK ورژن معلوم نہیں ہو سکا، اور پروجیکٹ میں پڑھنے کے قابل SDK ورژن بھی موجود نہیں۔",
     "staleLock": "pubspec.lock غائب ہے یا پڑھی نہیں جا سکتی، اس لیے pub انحصارات کو دوبارہ حل کرے گا۔",
     "staleConfig": "پیکیج کنفیگریشن غائب ہے یا مقفل پیکیجز کی فہرست میں شامل نہیں، اس لیے pub انحصارات کو دوبارہ حل کرے گا۔",
@@ -18,19 +18,20 @@
       "none": "پروجیکٹ SDK کا کوئی ثبوت نہیں"
     },
     "statusItem": {
-      "text": "Vibrancy: pub اسکپ ہوئی",
-      "tooltip": "پیکیج Vibrancy نے ایک pub کوئری اسکپ کی تاکہ pubspec.lock دوبارہ نہ لکھی جائے۔ تفصیل کے لیے کلک کریں۔"
+      "text": "Vibrancy: pub چھوڑ دی گئی",
+      "tooltip": "پیکیج Vibrancy نے ایک pub کوئری چھوڑ دی تاکہ pubspec.lock دوبارہ نہ لکھی جائے۔ تفصیل کے لیے کلک کریں۔"
     },
     "explain": {
-      "title": "پیکیج Vibrancy نے ایک pub کوئری اسکپ کی",
-      "none": "اس سیشن میں Vibrancy کی کوئی pub کوئری اسکپ نہیں ہوئی۔",
+      "title": "پیکیج Vibrancy نے ایک pub کوئری چھوڑ دی",
+      "none": "اس سیشن میں Vibrancy کی کوئی pub کوئری چھوڑی نہیں گئی۔",
+      "unknown": "نامعلوم",
       "reason": "وجہ: {reason}",
       "rule": "اصول: {rule}",
       "sdk": "منتخب SDK: {path} ({source} سے)",
       "toolVersion": "منتخب SDK ورژن: {version}",
       "project": "پروجیکٹ SDK: {value} ({source} سے)",
       "folder": "پروجیکٹ فولڈر: {cwd}",
-      "time": "اسکپ کا وقت: {time}",
+      "time": "چھوڑنے کا وقت: {time}",
       "runPubGet": "پروجیکٹ SDK کے ساتھ pub get چلائیں",
       "pubGetDone": "pub get پروجیکٹ SDK کے ساتھ مکمل ہوا۔",
       "pubGetFailed": "pub get ناکام ہوا: {error}",
@@ -117,11 +118,11 @@
     "noProject": "Dart پروجیکٹ نہیں ملا۔ ایک pubspec.yaml کے ساتھ فولڈر کھولیں۔",
     "missingDep": "یہ پروجیکٹ saropa_lints پر منحصر نہیں ہے۔ اسے پہلے dev_dependencies میں شامل کریں۔",
     "progress": {
-      "title": "ٹریکنگ Saropa Lints ا审计...",
+      "title": "Saropa Lints آڈٹ چل رہا ہے…",
       "message": "{pct}% · {scanned}/{total} فائلز · {issues} مسائل · {file}"
     },
     "error": {
-      "spawnFailed": "ٹسٹ کیا جانا تھا ا审计 CLI: {message}",
+      "spawnFailed": "آڈٹ CLI شروع نہیں ہو سکا: {message}",
       "invalidProject": "پراجیکٹ کے خلاف آڈٹ نہیں چلا جا سکتا۔ {details}",
       "parseFailed": "ٹیسٹ کی گزارش مکمل ہو گئی لیکن اس کا نتیجہ پڑھنا ممکن نہیں رہا۔ اسے دوبارہ چلا کر کوشش کریں۔",
       "canceled": "آڈٹ منسوخ کر دیا گیا۔"
@@ -332,7 +333,7 @@
       "disableButton": "غیر فعال کریں Disable",
       "disableTitle": "یہ قاعدہ پورے پروجیکٹ کے لیے غیر فعال کریں — analysis_options_custom.yaml لکھیں اور تحلیل کو دوبارہ چالو کریں",
       "enableButton": "فعال کریں",
-      "enableTitle": "اس قاعدہ کو دوبارہ فعال کریں — analysis_options_custom.yaml میں ا覆盖 حذف کر دیا جائے گا اور تحلیل دوبارہ شروع کر دیا جائے گا"
+      "enableTitle": "اس قاعدے کو دوبارہ فعال کریں — analysis_options_custom.yaml میں اووررائیڈ ہٹا دیا جائے گا اور تجزیہ دوبارہ چلے گا"
     },
     "tab": {
       "tier": "ٹیئر",
@@ -510,7 +511,7 @@
       "writeReport": "رپورٹ لکھیں"
     },
     "report": {
-      "noContent": "کوئی پیکیج ای 1111111111111111111111111111111",
+      "noContent": "کسی بھی پیکیج میں لکھنے کے لیے AI پرامپٹ کا مواد موجود نہیں ہے۔",
       "written": "رپورٹ تیار کر دی گئی — پہچان کی جانچ کا راستہ کلیپ بورڈ میں کپی کر دیا گیا: {path}",
       "failed": "کامیابی سے مواقع ڈاکument لکھنا ناممکن ہو گیا: {error}"
     },
@@ -732,7 +733,7 @@
         "off": "تحلیل بند ہے: تنظیم اور تحلیل کنندہ پلاگ ان دونوں بند ہیں۔",
         "partialSetting": "ہلکی طرح بند: ساروپا لینٹس.اینabled سیٹنگ بند ہے جبکہ اینالائزر پلگ ان کھولے ہوئے ہیں.",
         "partialPlugin": "حصصی طور پر بند: تحلیل کنندہ پلاگ ان بند ہے analysis_options.yaml میں جبکہ سیٹنگ تھیک ہے۔",
-        "notSetUp": "saropa_lints یہ پروجیکٹ میں تیار نہیں ہے: یہ pubspec.yaml کی ت依賴 نہیں ہے اور analysis_options.yaml میں کوئی پلاگن وار چھوٹا نہیں ہے۔"
+        "notSetUp": "saropa_lints اس پروجیکٹ میں سیٹ اپ نہیں ہے: یہ pubspec.yaml میں انحصار نہیں ہے اور analysis_options.yaml میں کوئی پلگ اِن اندراج نہیں ہے۔"
       },
       "fix": {
         "turnOn": "ٹھیک کریں: دونوں کو چھوڑ دیں",
@@ -861,7 +862,7 @@
       "empty": "کوئی Dart پروسس چل رہا ہے۔",
       "processes": "پروسیسز",
       "totalRss": "کل RSS",
-      "orphaned": "孤儿",
+      "orphaned": "چھوڑا ہوا",
       "refresh": "ريفريش",
       "colPid": "PID",
       "colParent": "والد",
@@ -869,7 +870,7 @@
       "colType": "قسم کی قسم ٹائپ کریں",
       "colCommand": "کمینڈ",
       "colAction": "کارروائی",
-      "typeOrphan": "孤儿",
+      "typeOrphan": "چھوڑا ہوا",
       "typeSaropa": "Saropa",
       "typeDaemon": "ڈیمن",
       "typeProcess": "پروسس",
@@ -1348,7 +1349,7 @@
       "disableButton": "اس قاعدہ کو غیر فعال کریں",
       "disableTitle": "اس قاعدہ کو پورے پروجیکٹ کے لیے غیر فعال کریں — analysis_options_custom.yaml لکھیں۔ تحلیل کر کے دوبارہ چلائیں تاکہ تبدیلی کا اثر دکھایا جا سکے۔",
       "enableButton": "اس قاعدہ کو دوبارہ فعال کریں",
-      "enableTitle": "اس قاعدہ کو دوبارہ فعال کریں — analysis_options_custom.yaml میں ا覆盖 کو حذف کردیا جائے گا۔ تحلیل کو دوبارہ چلائیں تاکہ تبدیلی کا اثر دکھایا جائے۔"
+      "enableTitle": "اس قاعدے کو دوبارہ فعال کریں — analysis_options_custom.yaml میں اووررائیڈ ہٹا دیا جائے گا۔ تبدیلی کا اثر دیکھنے کے لیے تجزیہ دوبارہ چلائیں۔"
     },
     "noData": {
       "heading": "نہیں ابھی تک تحریک نہیں ہوئی",
@@ -2240,7 +2241,7 @@
       },
       "recommended": {
         "analyzerPlugin": "اگر ایک قاعدہ ایکسپیکٹ کیا جاتا ہے تو LSP سرور آف ہونے پر چھوڑ دیں۔ LSP آف ہونے کے ساتھ چھوڑ دیں۔",
-        "scanDaemon": "اُ荐: اُن.",
+        "scanDaemon": "تجویز کردہ: ON۔",
         "lspServer": "اگرچہ: اُن (پیش نظر، بیتا)۔ زندگی کے ڈیاگنوسٹکس کو ڈھانچا دیتا ہے۔",
         "ci": "اگر آپ پرل کریس کی گیٹ کرنا چاہتے ہیں تو سفارش کی گئی: اکیلی اکیلی ہیں۔"
       },
@@ -2656,7 +2657,7 @@
       "annotatedSummary": "{basename} میں تشریح شدہ {parts}",
       "upgradeInProgress": "ایک اپ گریڈ پہلے ہی جاری ہے.",
       "couldNotReadConstraint": "{name} کے لئے پابندی کو نہیں پڑھ سکا.",
-      "upgradeSuccess": "{name} تک升级 کر دیا گیا ہے {constraint} — تمام ٹیسٹس ٹھیک ہیں",
+      "upgradeSuccess": "{name} کو {constraint} پر اپ گریڈ کر دیا گیا — تمام ٹیسٹ کامیاب",
       "upgradeRolledBack": "{name} اپگریڈ کریک ہو گیا — {phase} ناکام ہو گیا۔ تفصیلات کے لیے اخراجات دیکھیں۔",
       "saveTaskFailed": "کام کو محفوظ کرنا ناکام ہو گیا: {message}",
       "openFolderBeforeCopyConfig": "Saropa Lints:۔ تشکیل کی کاپی کرنے سے پہلے ورک اسپیس فولڈر کھولیں۔",
@@ -2752,7 +2753,7 @@
     },
     "status": {
       "applied": "آپلائیڈ",
-      "recommended": "اُ荐ہ"
+      "recommended": "تجویز کردہ"
     },
     "priority": {
       "high": "ہائی /نومتھنک",
@@ -2785,7 +2786,7 @@
       "prompt": "{count} اکسچیوزن پٹرن کو analysis_options.yaml پر لاگو کریں؟",
       "detail": "القواعد صارف: {preview}"
     },
-    "diffTitle": "تحلیل اپٹیمайزر: پیش کی گئی استثنیات"
+    "diffTitle": "تحلیل آپٹیمائزر: مجوزہ استثنیات"
   },
   "sidebarShell": {
     "dashboardsViewTitle": "ڈیش بورڈز"
@@ -2849,11 +2850,11 @@
       "largeNoRam": "{count} Dart فائلیں تحلیل کی گئیں۔ تحلیل کی ضرورت نہ رکھنے والے فولڈر کو اُخّار کریں تاکہ یادگیری کا استعمال کم ہو اور تیزی سے ترمیم کی تاخیر کم ہو۔"
     },
     "quickFix": {
-      "title": "دарт.انالیزسExcludedFolders میں شامل کریں",
+      "title": "dart.analysisExcludedFolders میں شامل کریں",
       "pickPlaceholder": "تحلیل سے معاف کردہ فولڈر کو انتخاب کریں"
     },
     "error": {
-      "writeFailed": "دарт.انالیزس اکسپلود فولڈرز کو اپڈیٹ کرنا ممکن نہیں رہا: {error}"
+      "writeFailed": "dart.analysisExcludedFolders کو اپڈیٹ نہیں کیا جا سکا: {error}"
     }
   },
   "docPlacement": {
@@ -2948,7 +2949,7 @@
       "statusMayBeOutdated": "حالت ممکنہ طور پر قديم ہے: ریکارڈ کیا گیا ہے کہ انتہائی حالت ہے، لیکن pub.dev اس کو ختم نہ ہونے والی چیز قرار دیتا ہے اور اس کا ایڈیشن آخری 12 مہینوں میں ہے۔",
       "maintenanceMode": "نگہبانی میڈیا: صرف اہم تصحیحات متوقع ہیں",
       "caution": "حذاری: اس پیکیج پر اعتماد کرنے سے پہلے جانے والی مسئلہ کو جائزہ لیں۔",
-      "unlisted": "pub.dev پر درج نہیں کیا گیا: تلاش نتائج سے چھپا ہوا؛ موجودہ صارفین اس پر ا依ستمآل کر سکتے ہیں۔"
+      "unlisted": "pub.dev پر غیر فہرست شدہ: تلاش کے نتائج سے پوشیدہ؛ موجودہ صارفین اب بھی اس پر انحصار کر سکتے ہیں۔"
     },
     "upgradeRequired": {
       "diagnostic": "اپگریڈ {name} — انسٹال کی گئی ورژن جانا ہے ٹکراؤں",
@@ -3003,7 +3004,7 @@
       "tipPlugin": "اس پروجیکٹ نے پلاگن روت اپنایا ہے: saropa_lints پلاگن کے طور پر analysis_options.yaml میں سیٹ کیا گیا ہے۔ آپ کیویڈیٹر ڈیاگنوسٹکس کی تنہا حاصل کرتے ہیں۔ کمینڈ لائن کمینڈز (dart run saropa_lints:init, scan, baseline) کے لیے saropa_lints کی ضرورت ہے pubspec.yaml میں۔",
       "tipBoth": "یہ پروجیکٹ دونوں روتھ کا استعمال کرتا ہے اور وہ معاہدہ کرتے ہیں۔ آپ ایڈیٹر ڈیاگنوسٹکس اور کمینڈ لائن کمینڈز حاصل کرتے ہیں۔",
       "tipDisagree": "pubspec.yaml اور analysis_options.yaml نام مختلف saropa_lints ورژن ہیں۔ ایڈیٹر پلاگن ورژن ({plugin}) کا استعمال کرتا ہے؛ کمینڈ لائن کمینڈز pubspec.yaml ورژن ({pubspec}) کا استعمال کرتے ہیں۔",
-      "tipNeither": "saropa_lints اس پروجیکٹ میں سیٹ اپ نہیں ہے: اس کو pubspec.yaml کی ت依賴 نہیں ہے اور analysis_options.yaml میں ایک پلگ ان نہیں ہے۔",
+      "tipNeither": "saropa_lints اس پروجیکٹ میں سیٹ اپ نہیں ہے: یہ نہ pubspec.yaml میں انحصار ہے اور نہ analysis_options.yaml میں پلگ اِن۔",
       "tipLocalSource": "saropa_lints محلی پٹھی یا گٹ سourse سے آتا ہے، اس لیے ایکسٹینشن صرف حقائق دکھاتا ہے اور کچھ نہیں تبدیل کرتا۔",
       "tipDartTooOld": "analysis_options.yaml میں پلگ اِن روٹ کو اس پروجیکٹ کے مقابلے میں نئے Dart SDK کی ضرورت ہے، اس لیے ایڈیٹر پلگ اِن لوڈ نہیں کر سکتا۔"
     },
@@ -3123,7 +3124,7 @@
     "deepPaused": "سکن ٹھہر گیا: خالی یادگیری {free} ہے، {reserve} کے نیچے آپ کے کمپیوٹر کے لیے خالی رکھا گیا ہے۔ یادگیری ہر وقت یادگیری آزاد ہونے پر خود بخود جاری ہو جائے گی۔",
     "fastDone": "فیسٹ سکن کمپلیٹ ہو گیا: {files} فائلیں، {issues} مسئلہ(ے) {seconds} میں۔",
     "fastDoneOfferDeep": "فیسٹ سکن مکمل: {files} فائلیں، {issues} مسئلہ(ات) {seconds} میں۔ ایک نوعیت کے آگاہ سکن زیادہ پایا جا سکتا ہے، لیکن تقریبا {minutes} منٹ اور {memory} یادگیری لے گا۔",
-    "fastDoneDeepUnavailable": "فیسٹ سکن مکمل: {files} فائلیں، {issues} مسئلہ(ات) {seconds} میں۔ ایک ٹائپ اوریئنٹڈ سکن کے لیے تقریبا {needed} ہے، لیکن اب تک只要 {free} فری ہے۔",
+    "fastDoneDeepUnavailable": "تیز اسکین مکمل: {files} فائلیں، {issues} مسئلہ(مسائل) {seconds} سیکنڈ میں۔ ٹائپ سے آگاہ اسکین کو تقریباً {needed} درکار ہے، لیکن ابھی صرف {free} خالی ہے۔",
     "daemonLowMemory": "ٹائپ کے ساتھ اسکننگ {needed} کے بارے میں ہے لیکن صرف {free} یاد رکھنے کے لیے ممکن ہے ({reserve} کے لیے ہر چیز کے لیے)۔ اب ٹائپ کے بغیر اسکننگ کر رہے ہیں تاکہ آپ کی گھریلو چیزیں پھر بھی پیچیدہ نہ رہیں۔",
     "action": {
       "gentleProfile": "کم سخت پروفائل استعمال کریں",

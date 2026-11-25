@@ -1,6 +1,6 @@
 {
   "pubGuard": {
-    "sdkMismatch": "该项目已使用Dart {project}解析，但所选的SDK是Dart {tool}。",
+    "sdkMismatch": "该项目已使用 Dart {project} 解析，但所选 SDK 是 Dart {tool}。",
     "lockSdkConstraint": "pubspec.lock 需要 Dart {constraint}，但所选的 SDK 是 Dart {tool}。",
     "unknownPathSdk": "无法确定 PATH 中 dart 的 Dart SDK 版本，且项目没有可读取的 SDK 版本。",
     "staleLock": "pubspec.lock 缺失或无法读取，因此 pub 将重新解析依赖项。",
@@ -24,6 +24,7 @@
     "explain": {
       "title": "Package Vibrancy 跳过了一次 pub 查询",
       "none": "本次会话中没有跳过任何 Vibrancy pub 查询。",
+      "unknown": "未知",
       "reason": "原因：{reason}",
       "rule": "规则：{rule}",
       "sdk": "所选 SDK：{path}（来自 {source}）",
@@ -43,7 +44,7 @@
     "pathDepNewer": "路径依赖 {name} 在 pubspec.lock 写入之后发生了更改，因此 pub 将重新解析依赖项。",
     "rule": {
       "sdkMismatch": "SDK 版本不匹配",
-      "lockSdkConstraint": "锁定 SDK 约束",
+      "lockSdkConstraint": "锁定文件中的 SDK 约束",
       "unknownPathSdk": "未知的 PATH SDK",
       "staleLock": "锁定文件缺失或无法读取",
       "staleConfig": "包配置已过期",

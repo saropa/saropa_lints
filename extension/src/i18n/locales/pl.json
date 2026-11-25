@@ -14,6 +14,7 @@
     "explain": {
       "pickFolder": "Wybierz folder projektu do wyjaśnienia",
       "none": "W tej sesji nie pominięto żadnego zapytania pub Vibrancy.",
+      "unknown": "nieznane",
       "title": "Package Vibrancy pominął zapytanie pub",
       "project": "SDK projektu: {value} (z {source})",
       "folder": "Folder projektu: {cwd}",
@@ -1353,7 +1354,7 @@
     "noData": {
       "heading": "Nie wyzwolono jeszcze",
       "body": "Ta reguła jeszcze nie wywołała się w żadnym miejscu Twojego przestrzeni roboczej, więc nie ma konkretnego problemu ani poprawki do pokazania. Uruchom analizę, aby zobaczyć ją w kontekście, lub sprawdź poniżej jej pakiet reguł, aby zobaczyć, co szuka.",
-      "bodyDisabled": "Ta reguła jest obecnie wyłączona, więc nie pojawi się w wynikach analizy. Włącz ją powyżej i uruchom analizę, aby zobaczyć, co捕捉.",
+      "bodyDisabled": "Ta reguła jest obecnie wyłączona, więc nie pojawi się w wynikach analizy. Włącz ją powyżej i uruchom analizę, aby zobaczyć, co wykrywa.",
       "tierLine": "Zawarte z poziomu: {tier}",
       "packsLine": "Reguła pakietu: {packs}",
       "packsOverflow": "Zestaw reguł: {packs} (+{count} więcej)"
@@ -1458,7 +1459,7 @@
     },
     "scanning": {
       "heading": "Pakiety skanowania pakietów skanujących.",
-      "body1": "Saropa pobiera metadane pub.dev, aktywność GitHub i wykresy zależności dla każdej bezpośredniej zależности w tym projekcie.",
+      "body1": "Saropa pobiera metadane pub.dev, aktywność na GitHubie i wykresy zależności dla każdej bezpośredniej zależności w tym projekcie.",
       "body2": "Ta strona zostanie automatycznie odświeżona po zakończeniu skanowania. Możesz anulować z powiadomienia o postępie w prawym dolnym rogu.",
       "versionStamp": "Saropa Panel pakietów v{version}"
     },

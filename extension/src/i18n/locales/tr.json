@@ -24,6 +24,7 @@
     "explain": {
       "title": "Package Vibrancy bir pub sorgusunu atladı",
       "none": "Bu oturumda hiçbir Vibrancy pub sorgusu atlanmadı.",
+      "unknown": "bilinmiyor",
       "reason": "Neden: {reason}",
       "rule": "Kural: {rule}",
       "sdk": "Seçilen SDK: {path} (kaynak: {source})",
@@ -43,7 +44,7 @@
     "pathDepNewer": "{name} yol bağımlılığı pubspec.lock yazıldıktan sonra değişti, bu nedenle pub bağımlılıkları yeniden çözecek.",
     "rule": {
       "sdkMismatch": "SDK sürümü uyuşmazlığı",
-      "lockSdkConstraint": "SDK kısıtlamasını kilitle",
+      "lockSdkConstraint": "Kilit dosyasındaki SDK kısıtlaması",
       "unknownPathSdk": "Bilinmeyen PATH SDK'sı",
       "staleLock": "Kilit dosyası eksik veya okunamıyor",
       "staleConfig": "Eski paket yapılandırması",
@@ -2299,8 +2300,8 @@
         "notNow": "Şimdi değil",
         "noGitHubRemote": "Bu repo'nun origin uzaklığı GitHub değil, bu yüzden siz için bir pull request açılamıyor. Yukarıdaki komutları çalıştırın ve host'unuzun nasıl açtığını o şekilde açın.",
         "running": "Şube oluşturuyor ve gönderiyor...",
-        "failed": "{command} başarısız oldu, bu yüzden hiçbir şey推送 edilmedi. {details}",
-        "pushedNoPr": "{branch}推送landı. Pull request otomatik olarak açılamadı — karşılaştır sayfasından açın.",
+        "failed": "{command} başarısız oldu, bu yüzden hiçbir şey gönderilmedi. {details}",
+        "pushedNoPr": "{branch} gönderildi. Pull request otomatik olarak açılamadı — karşılaştırma sayfasından açın.",
         "openCompare": "Karşılaştır karşılaştır sayfasını aç",
         "created": "Pull request açıldı için {branch}.",
         "openPr": "Pull request açın",
@@ -2463,7 +2464,7 @@
       "noWorkspace": "İş alanı klasörü yok açılan çalışma alanı dosyası bulunamadı.",
       "ciOverwriteConfirm": "{path} zaten var. Üzerine yazmak mı?",
       "actionOverwrite": "Üzerine yazma üzerine yazma",
-      "ciGenerated": "CI流水線生成: {path}",
+      "ciGenerated": "CI işlem hattı oluşturuldu: {path}",
       "compareSelectCount": "Karşılaştırmak için 2-3 paket seçin.",
       "compareMax": "Karşılaştırma için en fazla 3 paket.",
       "compareFetchFailed": "Yeterli sayıda paket verisi alıkonamadı."

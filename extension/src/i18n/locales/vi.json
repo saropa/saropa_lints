@@ -24,6 +24,7 @@
     "explain": {
       "title": "Package Vibrancy đã bỏ qua một truy vấn pub",
       "none": "Chưa có truy vấn pub nào của Vibrancy bị bỏ qua trong phiên này.",
+      "unknown": "không rõ",
       "reason": "Lý do: {reason}",
       "rule": "Quy tắc: {rule}",
       "sdk": "SDK đã chọn: {path} (từ {source})",
@@ -43,7 +44,7 @@
     "pathDepNewer": "Phụ thuộc đường dẫn {name} đã thay đổi sau khi pubspec.lock được ghi, vì vậy pub sẽ giải quyết lại các phụ thuộc.",
     "rule": {
       "sdkMismatch": "Phiên bản SDK không khớp",
-      "lockSdkConstraint": "Khóa ràng buộc SDK",
+      "lockSdkConstraint": "Ràng buộc SDK trong tệp khóa",
       "unknownPathSdk": "SDK trên PATH không xác định",
       "staleLock": "Tệp khóa bị thiếu hoặc không đọc được",
       "staleConfig": "Cấu hình gói đã cũ",
@@ -165,7 +166,7 @@
       "sevBarInfo": "{count} thông tin ({pct}%)",
       "baselineSaved": "Đã lưu baseline. Các cuộc kiểm tra sau có thể so sánh với bản chụp màn hình này.",
       "baselineSaveFailed": "Không thể lưu trữ baseline: {message}",
-      "deferredLoading": "Đang tải toàn bộ tập kết quả (đ这次 audit khá lớn)…",
+      "deferredLoading": "Đang tải toàn bộ tập kết quả (bản audit này khá lớn)…",
       "deferredLoadFailed": "Không thể tải đầy đủ tập kết quả — chỉ hiển thị các phát hiện đầu tiên {pageSize}.",
       "deferredWriteFailed": "Không thể ghi tập hợp kết quả lớn vào tệp tạm thời ({message}) — báo cáo có thể mở chậm."
     }

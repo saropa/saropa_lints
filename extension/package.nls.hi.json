@@ -240,7 +240,7 @@
   "config.property.driftAdvisor.portRange.description": "पोर्ट रेंज [मिन, मैक्स] Drift Advisor सर्वर (समावेशी) के लिए स्कैन करने के लिए।",
   "config.property.driftAdvisor.pollIntervalMs.description": "कितनी बार मुद्दों के लिए Drift Advisor सर्वर पर पोल करना है (मिलिसेकंड) । स्वचालित मतदान को अक्षम करने के लिए 0 पर सेट करें (मैन्युअल रूप से ताज़ा करें) ।",
   "config.property.driftAdvisor.showInProblems.description": "समस्या दृश्य में निदान के रूप में ड्रिफ्ट सलाहकार मुद्दों को प्रकाशित करें (स्रोतः Saropa Drift Advisor) ।",
-  "config.property.driftAdvisor.authToken.description": "Drift Advisor सर버 के साथ सत्यापन के लिए बेरर टोकन। सर버 एक नॉन-लूपबैक पते पर बंधे होने पर आवश्यक है (दस्तावेजित डिफ़ॉल्ट)। अनुमति नहीं देने वाले लोकलहोस्ट सरवर के लिए खाली छोड़ दें।",
+  "config.property.driftAdvisor.authToken.description": "Drift Advisor सर्वर के साथ प्रमाणीकरण के लिए बेयरर टोकन। जब सर्वर नॉन-लूपबैक पते से बंधा हो (दस्तावेज़ में वर्णित डिफ़ॉल्ट) तब आवश्यक है। बिना प्रमाणीकरण वाले लोकलहोस्ट सर्वर के लिए खाली छोड़ें।",
   "config.section.Package.Vibrancy.title": "पैकेज जीवंतता",
   "config.property.packageVibrancy.githubToken.description": "GitHub व्यक्तिगत पहुंच टोकन के लिए बढ़ाए गए एपीआई दर सीमा (60 / घंटा बिना, 5000 / घंटे के साथ) ।",
   "config.property.packageVibrancy.scanOnOpen.description": "जब कोई Flutter प्रोजेक्ट खोला जाता है तो स्वचालित रूप से स्कैन करें।",
@@ -380,5 +380,5 @@
   "command.showStatusBarMenu.title": "Saropa Lints: स्टेटस मेनू",
   "command.scanWithLatestEngine.title": "Saropa Lints: सबसे नया इंजन स्कैन करें (पुराने Dart प्रोजेक्ट)",
   "config.property.externalEngine.dartSdkPath.description": "Dart SDK फोल्डर (bin/dart को समावेश करता है) \"Scan with Latest Engine\" द्वारा उपयोग किया जाता है। Dart 3.11 या नई वर्जन के साथ उपलब्ध होना आवश्यक है। PATH पर dart का उपयोग करने के लिए खाली छोड़ दें।",
-  "command.packageVibrancy.explainLastSkip.title": "पिछला Vibrancy स्किप समझाएँ"
+  "command.packageVibrancy.explainLastSkip.title": "पिछला Vibrancy छोड़ना समझाएँ"
 }

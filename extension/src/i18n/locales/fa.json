@@ -1,7 +1,7 @@
 {
   "pubGuard": {
-    "sdkMismatch": "پروژه با Dart {project} حل شد اما SDK انتخاب شده Dart {tool} است.",
-    "lockSdkConstraint": "pubspec.lock نیاز به Dart {constraint} دارد اما SDK انتخاب شده Dart {tool} است.",
+    "sdkMismatch": "پروژه با Dart {project} حل شد اما SDK انتخاب‌شده Dart {tool} است.",
+    "lockSdkConstraint": "pubspec.lock نیاز به Dart {constraint} دارد اما SDK انتخاب‌شده Dart {tool} است.",
     "unknownPathSdk": "نسخه Dart SDK مربوط به dart در PATH قابل تشخیص نبود و پروژه نیز نسخه SDK قابل خواندنی ندارد.",
     "staleLock": "pubspec.lock وجود ندارد یا قابل خواندن نیست، بنابراین pub وابستگی‌ها را دوباره حل می‌کند.",
     "staleConfig": "پیکربندی بسته‌ها وجود ندارد یا بسته‌های قفل‌شده را فهرست نمی‌کند، بنابراین pub وابستگی‌ها را دوباره حل می‌کند.",
@@ -18,19 +18,20 @@
       "none": "هیچ شواهدی از SDK پروژه وجود ندارد"
     },
     "statusItem": {
-      "text": "Vibrancy: pub ردشد",
-      "tooltip": "Vibrancy بسته‌ها یک پرس‌وجوی pub را رد کرد تا pubspec.lock بازنویسی نشود. برای جزئیات کلیک کنید."
+      "text": "Vibrancy: pub نادیده گرفته شد",
+      "tooltip": "Vibrancy بسته‌ها یک پرس‌وجوی pub را نادیده گرفت تا pubspec.lock بازنویسی نشود. برای جزئیات کلیک کنید."
     },
     "explain": {
-      "title": "Vibrancy بسته‌ها یک پرس‌وجوی pub را رد کرد",
-      "none": "در این نشست هیچ پرس‌وجوی pub در Vibrancy رد نشده است.",
+      "title": "Vibrancy بسته‌ها یک پرس‌وجوی pub را نادیده گرفت",
+      "none": "در این نشست هیچ پرس‌وجوی pub در Vibrancy نادیده گرفته نشده است.",
+      "unknown": "نامشخص",
       "reason": "دلیل: {reason}",
       "rule": "قانون: {rule}",
       "sdk": "SDK انتخاب‌شده: {path} (از {source})",
       "toolVersion": "نسخه SDK انتخاب‌شده: {version}",
       "project": "SDK پروژه: {value} (از {source})",
       "folder": "پوشه پروژه: {cwd}",
-      "time": "زمان ردشدن: {time}",
+      "time": "زمان نادیده گرفتن: {time}",
       "runPubGet": "اجرای pub get با SDK پروژه",
       "pubGetDone": "pub get با SDK پروژه به پایان رسید.",
       "pubGetFailed": "pub get ناموفق بود: {error}",
@@ -113,7 +114,7 @@
     }
   },
   "audit": {
-    "alreadyRunning": "یک ا审计 در حال اجرا است — منتظر پایان آن باشید.",
+    "alreadyRunning": "یک ممیزی در حال اجرا است — منتظر پایان آن باشید.",
     "noProject": "هیچ پروژه Dart یافت نشد. یک پوشه که حاوی pubspec.yaml باشد را باز کنید.",
     "missingDep": "این پروژه به saropa_lints وابسته نمی باشد. ابتدا به dev_dependencies اضافه کنید.",
     "progress": {
@@ -156,7 +157,7 @@
       "copiedJson": "بررسی JSON به پیش‌نویس کپی شد.",
       "exportJson": "خروج JSON",
       "exportJsonTitle": "نتیجه گزارش ارزیابی را به صورت JSON صادر کنید",
-      "exportJsonSaved": "گزارش ا审计 JSON صادر شد.",
+      "exportJsonSaved": "JSON ممیزی صادر شد.",
       "exportJsonFailed": "نمی توانید فایل JSON گزارش امنیتی را صادر کنید: {message}",
       "clearRuleFilter": "صاف شفاف روشن",
       "paginationNote": "محدودیت صفحه بر روی نتایج فیلتر شده اعمال می‌شود.",
@@ -165,7 +166,7 @@
       "sevBarInfo": "{count} اطلاعات ({pct}%)",
       "baselineSaved": "نمونه‌ی پایه ذخیره شد. تحلیل‌های آتی می‌توانند این نسخه را به عنوان یک مقایسه استفاده کنند.",
       "baselineSaveFailed": "نمی توان پایه ی اصلی را ذخیره کرد: {message}",
-      "deferredLoading": "بارگذاری مجموعه نتایج کامل (این آ审计 بزرگ است)…",
+      "deferredLoading": "در حال بارگذاری مجموعه کامل نتایج (این ممیزی بزرگ است)…",
       "deferredLoadFailed": "نتیجه کامل بارگذاری نشد — فقط یافته های اولیه {pageSize} نمایش داده می شود.",
       "deferredWriteFailed": "نمی‌توان نتیجه بزرگ را روی یک فایل موقت ({message}) نوشت - ممکن است گزارش کند باز شود."
     }
@@ -340,7 +341,7 @@
       "overrides": "Overrides را نادیده می گیرد.",
       "sdk": "SDK رولآوت",
       "configFile": "فایل تنظیم",
-      "automation": "ان 자تو میشن",
+      "automation": "اتوماسیون",
       "extension": "افزونه"
     },
     "common": {
@@ -459,7 +460,7 @@
       "linkNote": "سکن در زمان ذخیره روشن/خاموش در ردیف وضعیت پنجره جانبی قرار دارد؛ تیر تحلیل در تب تیر قرار دارد — هر دو بیشتر از یک نوشتن ساده تنظیم است، بنابراین در اینجا تکرار نشده اند."
     },
     "shortcuts": {
-      "jumpToTab": "به تب ۱-۷ (لایه، پکیج قوانین، جایگزینی، رول آ웃 SDK، فایل پیکربندی، اتوماسیون، افزونه) بروید",
+      "jumpToTab": "به تب ۱-۷ (لایه، پکیج قوانین، جایگزینی، عرضه SDK، فایل پیکربندی، اتوماسیون، افزونه) بروید",
       "prevNextTab": "قبلی / بعدی تب",
       "showOverlay": "این shortcut overlay را نشان دهید."
     }
@@ -715,7 +716,7 @@
     "menu": {
       "openViolations": "گزارش خطاها را باز کنید",
       "openPackageDashboard": "داشبورد بسته را باز کنید",
-      "openProcessHealth": "процیس هالث را باز کنید",
+      "openProcessHealth": "سلامت فرآیندها را باز کنید",
       "commandCatalog": "فهرست فرماندهی کاتالوگ",
       "about": "درباره"
     },
@@ -851,8 +852,8 @@
       "confirmDetail": "این فرآیندها به طور فوری پایان خواهند یافت و قابل بازیابی نیست:",
       "confirmKill": "پروسه ها را پایان بدهید",
       "listEntry": "{name} (PID {pid}) — {size}",
-      "reclaimed": "процیس(های) تکلیف داده شده {count} پایان یافت، تعداد {size} بازگردانی شد.",
-      "reclaimFailed": "процیس(ها) {count} را نتوانست پایان داد. ممکن است نیاز به اجازه‌های بالاتر داشته باشند.",
+      "reclaimed": "{count} فرآیند یتیم پایان یافت و حدود {size} آزاد شد.",
+      "reclaimFailed": "پایان دادن به {count} فرآیند ممکن نشد. ممکن است به مجوزهای بالاتر نیاز داشته باشند.",
       "bannerTitle": "{count} فرآیند میزبان مدل ترکیبی که ایجاد شده است (ها) {size}",
       "bannerReclaim": "بازگرداندن"
     },
@@ -861,7 +862,7 @@
       "empty": "هیچ فرآیند Dartی در حال اجرا نیست.",
       "processes": "پروسیس‌ها",
       "totalRss": "کل RSS",
-      "orphaned": "孤儿",
+      "orphaned": "رهاشده",
       "refresh": "به راحتی و با آرامش استراحت کنید.",
       "colPid": "PID",
       "colParent": "والد",
@@ -869,7 +870,7 @@
       "colType": "نوع: نوع نوع نوع",
       "colCommand": "کامند",
       "colAction": "عملیات",
-      "typeOrphan": "孤儿",
+      "typeOrphan": "رهاشده",
       "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "پردازش",
@@ -932,7 +933,7 @@
       "flutterDaemon": "Flutter دیمونز",
       "saropa": "Saropa Lints",
       "otherDart": "دیگر فرآیندهای Dart",
-      "modelHost": "ماشین翻译 (Ollama)"
+      "modelHost": "موتور ترجمه (Ollama)"
     },
     "recommendation": {
       "heapCapTooHigh": "محدوده حافظه پردازش سرور تحلیل ({capMb} مگابایت) به کمتر از نیمی از حافظه RAM این ماشین برای هر چیز دیگر اجازه می‌دهد. محدوده پیشنهادی: {recommendedMb} مگابایت.",
@@ -1106,7 +1107,7 @@
       "copyJsonTitle": "کپی کردن نقض های فیلتر شده به عنوان JSON ({count})",
       "saveReportTitle": "ذخیره نقض فیلتر شده به عنوان JSON در گزارش ها / YYYYMMDD/",
       "copyEverythingJson": "همه چیز را به عنوان JSON کپی کنید",
-      "copyEverythingJsonTitle": "همه ی یافته های ا审计 را به صورت JSON کپی کنید — بدون فیلتر، شامل مهار شده",
+      "copyEverythingJsonTitle": "کپی همه یافته‌های ممیزی به صورت JSON — بدون فیلتر، شامل موارد مهار شده",
       "saveEverythingReport": "گزارش چیز همه را ذخیره کنید",
       "saveEverythingReportTitle": "تمام یافته‌های آudit را به JSON ذخیره کنید به reports/ — بدون فیلتر، شامل مهار شده",
       "suppressAll": "همهٔ قابل مشاهده را غیر فعال کن",
@@ -1127,11 +1128,11 @@
       "branchAria": "فرعی که مقایسه می‌شود",
       "includeSuppressedLabel": "دستورالعمل های صریح:",
       "includeSuppressedTitle": "همچنین پیدا کردن یافته‌هایی که معمولاً توسط // ignore:، // ignore_for_file: یا ورودی پایه مخفی می‌شوند — هر کدام با نحوهٔ غیرفعال‌سازی آن‌ها مشخص شده‌اند. تنظیمات پروژه شما تغییر نمی‌کند.",
-      "runButton": "اجرای آ审计",
-      "runButtonTitle": "تمام پروژه را با CLI ا审计 اجرا کنید و نتایج آن را اینجا بارگذاری کنید",
+      "runButton": "اجرای ممیزی",
+      "runButtonTitle": "CLI ممیزی را روی کل پروژه اجرا کنید و نتایج را اینجا بارگذاری کنید",
       "cancelButton": "لغو کن لغو کنید",
       "runningLabel": "بررسی...",
-      "runningMeta": "برنامه ا审计 CLI را شروع می کنیم...",
+      "runningMeta": "در حال شروع CLI ممیزی…",
       "statusFull": "نمایش بررسی پروژه کامل از {time}",
       "statusChangedRef": "فایل های تغییر یافته نسبت به {ref} نمایش داده می شود، {time} بررسی شده است",
       "notRunYet": "یک محدوده بالا را انتخاب کنید، سپس اجرا کنید"
@@ -1931,7 +1932,7 @@
       "detailHeading": "چرا این تابع {score} امتیاز داده است؟",
       "detailNoIssues": "هیچ پرچمی در این ردیف وجود ندارد - امتیاز توسط مقادیر ستون بالا (استفاده، پوشش، پیچیدگی، سن، مستندات) تعیین می‌شود.",
       "suppressLabel": "Suppress در فایل suppress را سرکوب کنید.",
-      "suppressTooltip": "این فایل را با `// ignore_for_file: code_health:<flag>` بنویس تا اسکن‌های آینده این فлаг را برای تمام فایل نادیده بگیرند."
+      "suppressTooltip": "عبارت `// ignore_for_file: code_health:<flag>` را در این فایل می‌نویسد تا اسکن‌های آینده این پرچم را برای کل فایل نادیده بگیرند."
     },
     "flag": {
       "unused": {
@@ -2234,7 +2235,7 @@
       "description": {
         "master": ".switch (saropaLints.enabled workspace setting) . وقتی اف، اسکن در حین ذخیره متوقف شده و پنجره کناری گزارش می‌دهد که افزونه غیر فعال است. تحلیل زنده و سرور LSP خودشان تیغه دارند.",
         "analyzerPlugin": "در داخل سرور تحلیل Dart اجرا می‌شود — خطاهای زنده در ویرایشگر هنگام تایپ، نیازی به اسکن نیست. فعال کردن/غیرفعال کردن پلاگین‌ها را بازنویسی می‌کند: بلوک در analysis_options.yaml",
-        "scanDaemon": "процیس پسزمینه ای که پروژه کامل را در هر ذخیره مجدد اسکن مجدد و گزارشات را نوشته می‌کند/.saropa_lints/violations.json. خاموش کردن آن آن را متوقف می‌کند؛ ذخیره مجدد بعدی آن را مجدد فعال می‌کند.",
+        "scanDaemon": "فرآیند پس‌زمینه‌ای که با هر ذخیره، کل پروژه را دوباره اسکن می‌کند و گزارش‌ها را در reports/.saropa_lints/violations.json می‌نویسد. خاموش کردن آن را متوقف می‌کند؛ ذخیره بعدی آن را از سر می‌گیرد.",
         "lspServer": "کنترل سرور زبان — اطلاعات تشخیصی را به پنل مشکلات برای فایل‌های باز و فضای کاری انتشار می‌دهد. فعال کردن یا غیر فعال کردن تنظیم saropaLints.lspServer.enabled را نوشته می‌کند.",
         "ci": "فایل .github/workflows/saropa-lints.yml در درخت کاری شما را خوانده و نوشته تا عملیات GitHub پکیج شده را فعال یا غیر فعال کند. این فایل در شاخه جاری شما را بازتاب می دهد — کپی پیش فرض شاخه پیشنهادی است که واقعاً درخواست های پULL را محدود می کند، و دو تن می توانند از هم دور شوند. فعال کردن هرگز عملیات را اجرا یا حذف نمی کند؛ شما همچنان تغییر را بررسی و ویرایش می کنید."
       },
@@ -2253,7 +2254,7 @@
     },
     "action": {
       "killAll": "کیل All {name}",
-      "restartAll": "重启 {name}",
+      "restartAll": "راه اندازی مجدد {name}",
       "killAllDescription": "فقط سرویس LSP را متوقف می‌کند. پلاگین تحلیلگر و اسکن Daemon هنوز نمی‌توانند به طور مستقل متوقف شوند — از وصل/قطع خود موتورهای هر یک استفاده کنید.",
       "restartAllDescription": "سرویس LSP را متوقف و مجدد راه اندازی می کند (یا در صورت عدم فعال بودن آن را شروع می کند). پلاگین تحلیل کننده و اسکن Daemon تأثیری ندارند — از کلیدهای خودینگین هر یک برای روشن / خاموش کردن استفاده کنید."
     },
@@ -2272,8 +2273,8 @@
       "lspStartFailed": "سرویس LSP: شروع نشد (لطفا پیام خطا و کانال خروجی LSP Saropa Lints را ببینید).",
       "analyzerToggleOn": "پلاگین تحلیلگر: فعال سازی...",
       "analyzerToggleOff": "پلاگین تحلیلگر: غیر فعال کردن…",
-      "daemonToggleOn": "اسкан Daemon: ادامه دادن…",
-      "daemonToggleOff": "اسкан Daemon: متوقف شدن…",
+      "daemonToggleOn": "اسکن Daemon: در حال از سر گرفتن…",
+      "daemonToggleOff": "اسکن Daemon: در حال توقف…",
       "ciToggleOn": "CI: فعال‌سازی…",
       "ciToggleOff": "CI: غیر فعال سازی..."
     },
@@ -2518,7 +2519,7 @@
       "disabled": "Saropa Lints غیرفعال است. فایل های پروژه تغییر نکرده اند.",
       "disabledAnalyzer": "نتیجه ی انتگریسیون Saropa Lints غیر فعال شده است. تشخیصات تحلیل کننده به سرعت پاک خواهند شد؛ برای بازگردانی، گزینه اسکن در زمان ذخیره را به روشن کنید.",
       "reenabledPlugin": "Saropa Lints پلاگین درون پروسه دوباره فعال شد. بازگردانی سرور تحلیل Dart را برای بارگذاری مجدد آن انجام می‌دهیم.",
-      "reenableNothingToRestore": "Saropa Lints: چیزی برای بازیابی نیست. پلاگین در процه نیست که اکنون از طریق افزونه غیرفعال شده است.",
+      "reenableNothingToRestore": "Saropa Lints: چیزی برای بازیابی وجود ندارد. پلاگین درون‌فرآیندی در حال حاضر از طریق افزونه غیرفعال نشده است.",
       "noOpenDartFiles": "Saropa Lints: فایلی باز Dart پیدا نشد. یک فایل Dart را مجدد باز کنید یا تنظیم \"فقط ویرایشگرها\" را خاموش کنید.",
       "analysisScanning": "در حال پویش فضای کاری… {percent}٪ ({count} مشکل تا اینجا)",
       "configUpdated": "Saropa Lints config به روز شده است (سطح: سطح: {tier}).به طور کلی، این یک",
@@ -2601,7 +2602,7 @@
       "issuesBulkFixResultSkipped": "{fixed} را اصلاح کردم، {skipped} را حذف کردم (اصلاح در دسترس نیست). برای به روز رسانی امتیاز، تجزیه و تحلیل را اجرا کنید.",
       "scanOnSaveStartFailed": "اسکن در حین ذخیره شدن شروع نشد. لطفا Dart SDK را نصب کنید.",
       "scanOnSaveFailed": "اسکن در حین ذخیره شدن ناموفق بود.",
-      "scanOnSaveFailedDetails": "اسкан در ذخیره شکست: {details}",
+      "scanOnSaveFailedDetails": "اسکن هنگام ذخیره ناموفق بود: {details}",
       "scanOnSaveInvalidJson": "خروجی JSON نامعتبر در زمان اسکن پس از ذخیره بازگردانده شد.",
       "scanOnSaveDaemonBadResponse": "فراوردن فرآیند اسکن پاسخی ناشناخته را بازگرداند.",
       "scanOnSaveDaemonDown": "فراوردن فرآیند انجام نمی‌شود. در نگهداری بعدی مجدد شروع خواهد شد.",
@@ -3020,7 +3021,7 @@
       "cliNeedsPubspec": "dart ران saropa_lints:init، اسکن و بیز لاین نیاز saropa_lints در pubspec.yaml است.",
       "pluginUnverified": "پلاگین نسخه {version} می تواند توسط پوبل سولوور بررسی نشود. فقط از محدودیت SDK Dart پیشنهاد می شود.",
       "pluginOnly": "نسخه افزونه saropa_lints را در analysis_options.yaml به {version} تنظیم کنید.",
-      "alignPlugin": "نسخه افزونه در analysis_options.yaml ({plugin}) با نسخه ق加 saropa_lints ({locked}) متفاوت است. نسخه افزونه را به {locked} تنظیم کنید.",
+      "alignPlugin": "نسخه افزونه در analysis_options.yaml ({plugin}) با نسخه قفل شده saropa_lints ({locked}) متفاوت است. نسخه افزونه را روی {locked} تنظیم کنید.",
       "localSource": "saropa_lints از منبع محلی {source} گرفته شده است، بنابراین افزونه فقط حقائق را نمایش می‌دهد و چیزی تغییر نمی‌کند.",
       "noCompatible": "هیچ نسخه ای از saropa_lints منتشر شده که با این پروژه Dart SDK سازگار است.",
       "noVersions": "هیچ نسخه ای از saropa_lints در دسترس نیست.",

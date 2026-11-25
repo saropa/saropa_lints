@@ -1,8 +1,8 @@
 {
   "pubGuard": {
-    "sdkMismatch": "Das Projekt wurde mit Dart {project} aufgelöst, aber der ausgewählte SDK ist Dart {tool}.",
+    "sdkMismatch": "Das Projekt wurde mit Dart {project} aufgelöst, aber das ausgewählte SDK ist Dart {tool}.",
     "lockSdkConstraint": "pubspec.lock benötigt Dart {constraint}, aber das ausgewählte SDK ist Dart {tool}.",
-    "unknownPathSdk": "Die Dart-SDK-Version konnte für das dart auf PATH nicht ermittelt werden, und das Projekt hat keine lesbare SDK-Version.",
+    "unknownPathSdk": "Die Dart SDK-Version konnte für das dart auf PATH nicht ermittelt werden, und das Projekt hat keine lesbare SDK-Version.",
     "staleLock": "pubspec.lock fehlt oder ist nicht lesbar, daher würde pub die Abhängigkeiten erneut auflösen.",
     "staleConfig": "Die Paketkonfiguration fehlt oder listet die gesperrten Pakete nicht auf, daher würde pub die Abhängigkeiten erneut auflösen.",
     "projectSource": {
@@ -14,6 +14,7 @@
     "explain": {
       "pickFolder": "Projektordner zum Erklären auswählen",
       "none": "In dieser Sitzung wurde keine Vibrancy-pub-Abfrage übersprungen.",
+      "unknown": "unbekannt",
       "title": "Package Vibrancy hat eine pub-Abfrage übersprungen",
       "project": "Projekt-SDK: {value} (aus {source})",
       "folder": "Projektordner: {cwd}",
@@ -429,7 +430,7 @@
         "diff": {
           "title": "Diff vs. aktuell",
           "counts": "{resolved} seit Baseline gelöst · {new} neu seit Baseline.",
-          "empty": "Kein Drift — die live Verletzungs集合 entspricht der Baseline genau.",
+          "empty": "Keine Abweichung — die aktuelle Verstoßmenge stimmt exakt mit der Baseline überein.",
           "resolvedSection": "Aufgelöst ({count})",
           "newSection": "Neu seit Baseline ({count})",
           "moreRows": "+{count} mehr nicht angezeigt.",
@@ -776,7 +777,7 @@
         "scanDaemons": "Verwaiste Scan-Deamon",
         "scanDaemonsValue": "{count}, verwenden Sie Clean Up, um zu beenden",
         "other": "Andere Dart",
-        "extHost": "Erweiterungs主机",
+        "extHost": "Erweiterungshost",
         "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
         "ram": "Maschinen RAM",
         "ramValue": "{free} frei von {total}",
@@ -2232,7 +2233,7 @@
       },
       "masterOffHint": "Zuerst den Hauptschalter aktivieren",
       "description": {
-        "master": "Globale Schaltfläche (saropaLints.enabled workspace Einstellung). Wenn deaktiviert, stoppt Scan on Save und die Seitenleiste meldet die Erweiterung als deaktiviert. Live Analysis und LSP Server haben各自的 Schalter.",
+        "master": "Erweiterungsweiter Schalter (Workspace-Einstellung saropaLints.enabled). Wenn deaktiviert, stoppt Scan on Save und die Seitenleiste meldet die Erweiterung als deaktiviert. Live Analysis und LSP Server haben jeweils eigene Schalter.",
         "analyzerPlugin": "Läuft innerhalb des Dart Analyse-Servers — live squiggles im Editor beim Tippen, keine Scan notwendig. Das Schalten ändert die Plugins: block in analysis_options.yaml.",
         "scanDaemon": "Hintergrundprozess, der das gesamte Projekt beim Speichern erneut scannt und Berichte in /saropa_lints/violations.json schreibt. Deaktivieren unterbricht ihn; das nächste Speichern setzt ihn fort.",
         "lspServer": "Separater Sprachserver — veröffentlicht Diagnoseinformationen im Problems-Panel für geöffnete und Arbeitsbereichsdateien. Das Aktivieren/Deaktivieren schreibt die Einstellung saropaLints.lspServer.enabled.",

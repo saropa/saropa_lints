@@ -1,7 +1,7 @@
 {
   "pubGuard": {
-    "sdkMismatch": "प्रोजेक्ट जोड़े गए हैं Dart {project} लेकिन चयनित SDK है Dart {tool}",
-    "lockSdkConstraint": "pubspec.lock {constraint} के लिए Dart आवश्यक है लेकिन चयनित SDK Dart {tool} है।",
+    "sdkMismatch": "प्रोजेक्ट को Dart {project} से रिज़ॉल्व किया गया था, लेकिन चयनित SDK Dart {tool} है।",
+    "lockSdkConstraint": "pubspec.lock को Dart {constraint} चाहिए, लेकिन चयनित SDK Dart {tool} है।",
     "unknownPathSdk": "PATH पर मौजूद dart के लिए Dart SDK संस्करण निर्धारित नहीं किया जा सका, और प्रोजेक्ट में कोई पठनीय SDK संस्करण नहीं है।",
     "staleLock": "pubspec.lock अनुपस्थित या अपठनीय है, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
     "staleConfig": "पैकेज कॉन्फ़िगरेशन अनुपस्थित है या उसमें लॉक किए गए पैकेज सूचीबद्ध नहीं हैं, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
@@ -13,8 +13,9 @@
     "constraintUnverifiable": "pubspec.yaml की किसी निर्भरता की जाँच pubspec.lock के विरुद्ध नहीं की जा सकी (git, कस्टम या पार्स न होने वाली बाधा), इसलिए pub निर्भरताओं को फिर से हल कर सकता है।",
     "explain": {
       "pickFolder": "समझाने के लिए प्रोजेक्ट फ़ोल्डर चुनें",
-      "none": "इस सत्र में किसी Vibrancy pub क्वेरी को स्किप नहीं किया गया है।",
-      "title": "पैकेज वाइब्रेंसी ने एक pub क्वेरी स्किप की",
+      "none": "इस सत्र में किसी Vibrancy pub क्वेरी को छोड़ा नहीं गया है।",
+      "unknown": "अज्ञात",
+      "title": "Package Vibrancy ने एक pub क्वेरी छोड़ दी",
       "project": "प्रोजेक्ट SDK: {value} ({source} से)",
       "folder": "प्रोजेक्ट फ़ोल्डर: {cwd}",
       "reason": "कारण: {reason}",
@@ -23,7 +24,7 @@
       "runPubGet": "प्रोजेक्ट SDK के साथ pub get चलाएँ",
       "toolVersion": "चयनित SDK संस्करण: {version}",
       "sdk": "चयनित SDK: {path} ({source} से)",
-      "time": "स्किप करने का समय: {time}",
+      "time": "छोड़ने का समय: {time}",
       "pathConfirm": "चयनित SDK PATH से आता है, और इसी सेटअप ने गलत SDK के साथ pubspec.lock को दोबारा लिखा था। फिर भी pub get चलाएँ?",
       "pubGetFailed": "pub get विफल रहा: {error}",
       "pubGetDone": "pub get प्रोजेक्ट SDK के साथ पूरा हुआ।"
@@ -31,7 +32,7 @@
     "rule": {
       "constraintUnverifiable": "बाधा सत्यापित नहीं की जा सकती",
       "depsNotLocked": "निर्भरता लॉक नहीं है",
-      "lockSdkConstraint": "लॉक SDK बाधा",
+      "lockSdkConstraint": "लॉक फ़ाइल में SDK बाधा",
       "constraintNotSatisfied": "लॉक किया गया संस्करण बाधा से बाहर है",
       "staleLock": "लॉक फ़ाइल अनुपस्थित या अपठनीय है",
       "pathDepNewer": "पाथ निर्भरता बदल गई",
@@ -46,8 +47,8 @@
       "dartSdkPath": "सेटिंग dart.sdkPath"
     },
     "statusItem": {
-      "tooltip": "पैकेज वाइब्रेंसी ने एक pub क्वेरी स्किप की ताकि pubspec.lock दोबारा न लिखा जाए। विवरण के लिए क्लिक करें।",
-      "text": "Vibrancy: pub स्किप हुआ"
+      "tooltip": "Package Vibrancy ने एक pub क्वेरी छोड़ दी ताकि pubspec.lock दोबारा न लिखा जाए। विवरण के लिए क्लिक करें।",
+      "text": "Vibrancy: pub छोड़ा गया"
     },
     "pathDepNewer": "pubspec.lock लिखे जाने के बाद पाथ निर्भरता {name} बदल गई, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
     "depsNotLocked": "pubspec.yaml ऐसी निर्भरताएँ घोषित करती है जो pubspec.lock में सूचीबद्ध नहीं हैं, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
@@ -1165,7 +1166,7 @@
       "reEnableQuickPickTitle": "अक्षम नियमों को फिर से सक्षम करें।",
       "reEnableQuickPickPlaceholder": "पुनः सक्षम करने के लिए एक या अधिक नियमों का चयन करें।",
       "menuGroupExport": "निर्यात निर्यात करें।",
-      "menuGroupBulk": "बूल्क कार्य操作",
+      "menuGroupBulk": "बल्क कार्रवाइयां",
       "menuGroupFilter": "फ़िल्टर और फोकस करें।",
       "menuGroupOpen": "डैशबोर्ड खोलें।",
       "menuGroupSystem": "सिस्टम सिस्टम सिस्टम।"
@@ -2285,7 +2286,7 @@
       "enginesLabel": "मोटर: {count} चल रहे"
     },
     "ci": {
-      "disableFailed": "सी आई को बंद करना संभव नहीं है: {path} अपсут है या संरचना Saropa Lints के अनुसार स्वचालित रूप से संपादित नहीं किया जा सकता। सी आई अभी भी चल रहा है। फ़ाइल को खोलें और हाथ से वर्कफ़्लो को अक्षम करें।",
+      "disableFailed": "सी आई को बंद नहीं किया जा सका: {path} मौजूद नहीं है या उसकी संरचना ऐसी है जिसे Saropa Lints स्वचालित रूप से संपादित नहीं करेगा। सी आई अभी भी चल रहा है। फ़ाइल खोलें और वर्कफ़्लो को हाथ से अक्षम करें।",
       "openWorkflow": "अपना कार्यप्रवाह खोलें",
       "openWorkflowFailed": "{path} को खोल नहीं सका।",
       "publish": {

@@ -24,6 +24,7 @@
     "explain": {
       "title": "Nilaktawan ng Package Vibrancy ang isang pub query",
       "none": "Walang pub query ng Vibrancy na nilaktawan sa session na ito.",
+      "unknown": "hindi alam",
       "reason": "Dahilan: {reason}",
       "rule": "Panuntunan: {rule}",
       "sdk": "Napiling SDK: {path} (mula sa {source})",
@@ -43,7 +44,7 @@
     "pathDepNewer": "Nagbago ang path dependency na {name} matapos masulat ang pubspec.lock, kaya ire-resolve muli ng pub ang mga dependency.",
     "rule": {
       "sdkMismatch": "Hindi tugma ang bersyon ng SDK",
-      "lockSdkConstraint": "I-lock ang SDK constraint",
+      "lockSdkConstraint": "SDK constraint sa lock file",
       "unknownPathSdk": "Hindi kilalang PATH SDK",
       "staleLock": "Nawawala o hindi mabasa ang lock file",
       "staleConfig": "Luma na ang package configuration",
@@ -2828,7 +2829,7 @@
     },
     "sidebar": {
       "fixLabel": "Hindi pinapansin ni Prune",
-      "fixDescription": "Hanapin at auto-removе ang mga // ignore: komento"
+      "fixDescription": "Hanapin at awtomatikong alisin ang mga patay na // ignore: komento"
     },
     "quickFix": {
       "title": "Iayos ang mga hindi kinakailangang ignores dito"

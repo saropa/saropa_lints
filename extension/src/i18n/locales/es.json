@@ -1,8 +1,8 @@
 {
   "pubGuard": {
-    "sdkMismatch": "El proyecto se resolvió con Dart {project} pero la SDK seleccionada es Dart {tool}.",
-    "lockSdkConstraint": "pubspec.lock requiere Dart {constraint} pero la SDK seleccionada es Dart {tool}.",
-    "unknownPathSdk": "No se pudo determinar la versión del SDK de Dart del dart en PATH, y el proyecto no tiene una versión de SDK legible.",
+    "sdkMismatch": "El proyecto se resolvió con Dart {project} pero el SDK seleccionado es Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock requiere Dart {constraint} pero el SDK seleccionado es Dart {tool}.",
+    "unknownPathSdk": "No se pudo determinar la versión de Dart SDK del dart en PATH, y el proyecto no tiene una versión de SDK legible.",
     "staleLock": "pubspec.lock falta o es ilegible, por lo que pub volvería a resolver las dependencias.",
     "staleConfig": "La configuración de paquetes falta o no incluye los paquetes bloqueados, por lo que pub volvería a resolver las dependencias.",
     "projectSource": {
@@ -14,6 +14,7 @@
     "explain": {
       "pickFolder": "Elija una carpeta de proyecto para explicar",
       "none": "No se ha omitido ninguna consulta pub de Vibrancy en esta sesión.",
+      "unknown": "desconocido",
       "title": "Package Vibrancy omitió una consulta pub",
       "project": "SDK del proyecto: {value} (desde {source})",
       "folder": "Carpeta del proyecto: {cwd}",
@@ -290,7 +291,7 @@
       "boolean_naming": "Los booleanos deben usar los prefijos es/tiene/puede/debe para que la intención sea clara en las condiciones y API.",
       "code_style_preferences": "Cómo se escriben los retornos, condicionales y bucles — retorno inmediato, for-in, getter vs método, y otros atajos similares.",
       "function_parameter_style": "Las funciones de flecha cuando son concisas, todos los parámetros nombrados, devoluciones en línea y no hay reasignación de parámetro.",
-      "widget_style": "Reglas estrictas:\n1. Devolver ÚNICAMENTE la salida traducida.\n2. NO incluir explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copiar cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca traducir, eliminar o reformatear un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambiar a otro idioma en medio de una oración.\n\nTexto: Flutter opciones de widget — SizedBox.square, centrar sobre alinear, espaciado sobre SizedBox, y evitar shrinkWrap en scrolls. Flutter proyectos solo.",
+      "widget_style": "Opciones de widgets de Flutter — SizedBox.square, center en lugar de align, spacing en lugar de SizedBox y evitar shrinkWrap en scrolls. Solo proyectos Flutter.",
       "class_record_style": "Clase vs. tipos de devolución de registros, prefijos privados para subrayar y explícito esto donde se aclara.",
       "formatting": "Ubicación de líneas en blanco, comas al final, y estilo de literales y comentarios. Puede ser ruidoso — muchos archivos pueden necesitar ediciones.",
       "comments_documentation": "TODO y FIXME formato, caso de oración, un período después de comentarios doc, /// más //, y no comentó-fuera del código.",
@@ -313,7 +314,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX y las bibliotecas de estado e inyección de dependencias relacionadas.",
       "networking-apis": "Clientes HTTP, GraphQL, Firebase, Supabase y conectividad.",
       "storage-persistence": "Bases de datos locales y almacenes clave-valor — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Reglas estrictas:\n1. Devuelve ÚNICAMENTE la salida de la cadena traducida.\n2. NO incluyas explicaciones, introducción, notación markdown o comillas circundantes.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copia cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca lo traduzcas, elimines o reformates un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambies a otro idioma en medio de una oración.\n\nTexto: Ruteo y manejo de enlaces profundos — auto_route, go_router, app_links, url_launcher, y webview.",
+      "navigation-deep-links": "Enrutamiento y manejo de enlaces profundos — auto_route, go_router, app_links, url_launcher y webview.",
       "media-graphics": "Imágenes, SVG, animación, audio, mapas, recolectores y el motor Flame.",
       "device-platform": "Sensores, ubicación, permisos, biometría, notificaciones y trabajo en segundo plano.",
       "identity-sharing": "Proveedores de inicio de sesión, intercambio y revisión en la aplicación.",
@@ -2013,7 +2014,7 @@
       "progress": "{percent}% — {done}/{total} archivos"
     },
     "reports": {
-      "intro": "Informes CLI de un solo clic que anteriormente requerían un terminal. Cada botón Run transmite la salida en vivo del工具 debajo de su tarjeta y guarda una copia bajo reports/.saropa_lints/reports-tab/",
+      "intro": "Informes de CLI con un clic que antes requerían una terminal. Cada botón Run transmite la salida en vivo de la herramienta debajo de su tarjeta y guarda una copia en reports/.saropa_lints/reports-tab/.",
       "runButton": "Ejecutar",
       "notRunYet": "No se ha ejecutado aún",
       "running": "Ejecutando…",
@@ -2767,7 +2768,7 @@
       "generated": "Código generado (*.g.dart, *.freezed.dart, etc.) es seguro de excluir — siempre se vuelve a generar a partir de la fuente.",
       "build": "El resultado de la compilación (build/, .dart_tool/) contiene artefactos intermedios que no son necesarios para el análisis en tiempo real.",
       "inactive": "Carpetas sin actividad git reciente pueden contener código muerto o archivado.",
-      "protected": "Reglas estrictas:\n1. Los directorios principales de código fuente (lib/, lib/src/, bin/) nunca se recomienda excluirlos.",
+      "protected": "Nunca se recomienda excluir las carpetas de código fuente principales (lib/, lib/src/, bin/).",
       "backup": "Una copia de analysis_options.yaml se guarda como analysis_options.yaml.bak antes de cada cambio realizado aquí."
     },
     "notify": {

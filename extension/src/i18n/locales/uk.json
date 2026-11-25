@@ -24,6 +24,7 @@
     "explain": {
       "title": "Package Vibrancy пропустив запит pub",
       "none": "У цьому сеансі жоден запит pub від Vibrancy не пропускався.",
+      "unknown": "невідомо",
       "reason": "Причина: {reason}",
       "rule": "Правило: {rule}",
       "sdk": "Вибраний SDK: {path} (із джерела: {source})",
