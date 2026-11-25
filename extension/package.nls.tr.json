@@ -331,7 +331,7 @@
   "walkthrough.step.walkthrough.triage.title": "Triyaj",
   "walkthrough.step.walkthrough.triage.description": "Kural grupları önceliklere göre — hatalar, hacim bandları ve stillik. Her grup **tahmini puan etkisini** gösterir.\n\n**Kural Paketlerini Yönet** kullanarak kural ve kural paketlerini etkinleştirin veya devre dışı bırakın; değişiklikler YAML'a yazılır ve analiz yeniden çalıştırılır.\n\n[Manage Rule Packs aç](command:saropaLints.openConfigDashboard)",
   "walkthrough.step.walkthrough.trends.title": "Dosya Riskleri ve Eğilimleri",
-  "walkthrough.step.walkthrough.trends.description": "**Dosya Riski** dosyaları ihlal yoğunluğuna göre sıralar — en riskli olanlar önce.",
+  "walkthrough.step.walkthrough.trends.description": "**Dosya Riski** dosyaları ihlal yoğunluğuna göre sıralar — en riskli olan önce.",
   "walkthrough.step.walkthrough.packageVibrancy.title": "Paket Sağlık paketi",
   "walkthrough.step.walkthrough.packageVibrancy.description": "Bağımlılıkları sürüm açıklarını, bakım sinyallerini ve bilinen sorunları tarayın. **CycloneDX SBOM** dosyasını ihraç edin ve tedarik zinciri auditlerini yapın.\n\nSonuçlar CodeLens etiketleri olarak ve **Paket Dashboard** editör sekmesinde görünür.\n\n[Package Vibrancy Tarayıcısı](command:saropaLints.packageVibrancy.scan)",
   "walkthrough.step.walkthrough.todosAndHacks.description": "Herhangi bir `TODO`, `HACK` ve `FIXME` yorumunu çalışma alanında bulun. Etiket türüne veya klasöre göre gruplandırın ve kaynak koduna atlamak için tıklayın.\n\n[TODO'lar & Hacks'ı Yenile](command:saropaLints.todosAndHacks.refresh)",

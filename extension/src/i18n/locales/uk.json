@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Пакет Vibrancy пропустив запит pub, тому pubspec.lock не переписується. {reason}",
+    "sdkMismatch": "Проект був вирішений з Dart {project}, але вибраний SDK — Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock вимагає Dart {constraint}, але вибраний SDK — це Dart {tool}.",
+    "unknownPathSdk": "Версія Dart SDK на PATH не може бути визначена, а проект не має записаної версії SDK.",
+    "staleLock": "pubspec.yaml набагато новіший, ніж pubspec.lock, тому pub знову вирішить залежності.",
+    "staleConfig": "Конфігурація пакету відсутня або старіша за pubspec.lock, тому pub знову вирішить залежності."
+  },
   "about": {
     "ruleCountStrip": "{total} правил лінту наразі вбудовано в цю версію (обов'язкові {essential} · рекомендовані {recommended} · професійні {professional} · повністю {comprehensive} · педантичні {pedantic} · {stylistic} опціональні стилістичні)"
   },

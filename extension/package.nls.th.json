@@ -331,7 +331,7 @@
   "walkthrough.step.walkthrough.triage.title": "การคัดเลือก Triage",
   "walkthrough.step.walkthrough.triage.description": "กฎที่จัดกลุ่มตามลำดับความสำคัญ — ข้อผิดพลาด, ระดับเสียง, และสไตล์. แต่ละกลุ่มแสดง **ผลกระทบต่อคะแนนที่ประมาณ** \n\nใช้ **Manage Rule Packs** เพื่อเปิดหรือปิดกฎและชุดกฎ; การเปลี่ยนแปลงจะเขียนลงใน YAML และรันการวิเคราะห์อีกครั้ง\n\n[เปิด Manage Rule Packs](command:saropaLints.openConfigDashboard)",
   "walkthrough.step.walkthrough.trends.title": "File Risk & Trends ความเสี่ยงและแนวโน้มของไฟล์",
-  "walkthrough.step.walkthrough.trends.description": "**การประเมินความเสี่ยงของไฟล์** จัดลำดับไฟล์ตามความหนาแน่นของการละเมิด — เริ่มจากไฟล์ที่เสี่ยงที่สุด.",
+  "walkthrough.step.walkthrough.trends.description": "**การประเมินความเสี่ยงของไฟล์** จัดลำดับไฟล์ตามความหนาแน่นของการละเมิด — ไฟล์ที่เสี่ยงที่สุดอยู่ด้านหน้าก่อน\n\nแผงสถานะแสดงการพัฒนาของคะแนนตามเวลา แจ้งเตือนการถดถอยและเฉลิมฉลองความสำเร็จในขั้นตอนสำคัญเพื่อให้คุณอยู่ในเส้นทางที่ถูกต้อง\n\n[แสดงแผงสถานะ](command:saropaLints.status.focus)",
   "walkthrough.step.walkthrough.packageVibrancy.title": "แพ็คเกจสุขภาพ สุขภาพ",
   "walkthrough.step.walkthrough.packageVibrancy.description": "สแกนขึ้นทะเบียนการพึ่งพาเพื่อหาช่องว่างของเวอร์ชัน สัญญาณการบำรุงรักษา และปัญหาที่รู้จัก นำออก **SBOM CycloneDX** เพื่อการตรวจสอบห่วงโซ่อุปทาน\n\nผลลัพธ์จะปรากฏเป็นป้ายชื่อ CodeLens และในแท็บ **Package Dashboard** ของตัวแก้ไข\n\n[สแกนความสดของแพ็กเกจ](command:saropaLints.packageVibrancy.scan)",
   "walkthrough.step.walkthrough.todosAndHacks.description": "ค้นหาความคิดเห็น `TODO`, `HACK` และ `FIXME` ทั้งหมดในพื้นที่ทำงาน จัดกลุ่มตามประเภทแท็กหรือโฟลเดอร์ แล้วคลิกเพื่อข้ามไปยังแหล่งที่มา\n\n[รีเฟรชสิ่งที่ต้องทำและแฮ็ก](command:saropaLints.todosAndHacks.refresh)",

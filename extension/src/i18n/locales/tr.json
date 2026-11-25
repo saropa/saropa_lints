@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Paket Vibrancy bir pub sorgusunu atladı, bu yüzden pubspec.lock yeniden yazılmadı. {reason}",
+    "sdkMismatch": "Proje Dart {project} ile çözüldü ancak seçilen SDK Dart {tool}'dır.",
+    "lockSdkConstraint": "pubspec.lock, Dart {constraint} gerektirir ancak seçilen SDK Dart {tool}'dır.",
+    "unknownPathSdk": "PATH üzerindeki Dart SDK sürümü belirlenemedi ve proje kaydedilmiş bir SDK sürümüne sahip değil.",
+    "staleLock": "pubspec.yaml, pubspec.lock'dan daha yeni olduğu için pub bağımlılıkları tekrar çözülecektir.",
+    "staleConfig": "Paket yapılandırması eksik veya pubspec.lock'dan eski, bu yüzden pub bağımlılıkları yeniden çözüyordu."
+  },
   "about": {
     "ruleCountStrip": "Kurulumdaki şu anda mevcut {total} lint kuralları (temel {essential} · önerilen {recommended} · profesyonel {professional} · kapsamlı {comprehensive} · pedantik {pedantic} · {stylistic} seçeneğiyle stil)"
   },

@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "包Vibrancy跳过了一个pub查询，因此pubspec.lock未被重写。{reason}",
+    "sdkMismatch": "该项目已使用Dart {project}解析，但所选的SDK是Dart {tool}。",
+    "lockSdkConstraint": "pubspec.lock 需要 Dart {constraint}，但所选的 SDK 是 Dart {tool}。",
+    "unknownPathSdk": "PATH 上的 Dart SDK 版本无法确定，且项目中未记录 SDK 版本。",
+    "staleLock": "pubspec.yaml 比 pubspec.lock 更新，因此 pub 会重新解析依赖项。",
+    "staleConfig": "包配置缺失或早于 pubspec.lock，因此 pub 会重新解析依赖项。"
+  },
   "about": {
     "ruleCountStrip": "{total} 条 lint 规则目前包含在此版本中（基础 {essential} · 推荐 {recommended} · 专业 {professional} · 全面 {comprehensive} · 严谨 {pedantic} · {stylistic} 风格化选项）"
   },

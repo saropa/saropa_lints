@@ -1,4 +1,12 @@
 {
+  "pubGuard": {
+    "skipped": "Package Vibrancy skipped a pub query so pubspec.lock is not rewritten. {reason}",
+    "sdkMismatch": "Dự án đã được giải quyết với Dart {project} nhưng SDK được chọn là Dart {tool}.",
+    "lockSdkConstraint": "pubspec.lock yêu cầu Dart {constraint} nhưng SDK được chọn là Dart {tool}.",
+    "unknownPathSdk": "Phiên bản SDK Dart trên PATH không thể được xác định và dự án không có phiên bản SDK được ghi nhận.",
+    "staleLock": "pubspec.yaml mới hơn pubspec.lock, vì vậy pub sẽ tái giải quyết các phụ thuộc.",
+    "staleConfig": "Bộ cấu hình gói bị thiếu hoặc cũ hơn pubspec.lock, do đó pub sẽ tái giải quyết các phụ thuộc."
+  },
   "about": {
     "ruleCountStrip": "Quy tắc lint {total} hiện đang được cung cấp trong phiên bản này (cơ bản {essential} · khuyến nghị {recommended} · chuyên nghiệp {professional} · toàn diện {comprehensive} · cầu kỳ {pedantic} · {stylistic} tùy chọn phong cách)"
   },
