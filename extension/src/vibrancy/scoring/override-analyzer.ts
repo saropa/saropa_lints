@@ -29,6 +29,10 @@ export function analyzeOverrides(
     // when supplied it lets findConflict name the real transitive constrainer
     // instead of falling through to the SDK heuristic.
     constraints: ConstraintIndex = new Map(),
+    // Non-null when the inputs were incomplete (graph failed, parent pubspec
+    // unreadable). A no-conflict result is then 'unknown', not 'stale': absence
+    // of evidence must not tell the user an override is safe to remove.
+    evidenceGap: string | null = null,
 ): OverrideAnalysis[] {
     const depMap = new Map(deps.map(d => [d.name, d]));
     const graphMap = new Map(depGraph.map(p => [p.name, p]));
@@ -48,10 +52,12 @@ export function analyzeOverrides(
         }
 
         const conflict = findConflict(entry, depMap, graphMap, constraints);
+        const status = conflict ? 'active' : (evidenceGap ? 'unknown' : 'stale');
         return {
             entry,
-            status: conflict ? 'active' : 'stale',
+            status,
             blocker: conflict,
+            evidenceGap: status === 'unknown' ? evidenceGap : null,
             addedDate,
             ageDays,
         };
@@ -203,17 +209,20 @@ export function isOldOverride(
  */
 export function groupByStatus(
     analyses: readonly OverrideAnalysis[],
-): { active: OverrideAnalysis[]; stale: OverrideAnalysis[] } {
+): { active: OverrideAnalysis[]; stale: OverrideAnalysis[]; unknown: OverrideAnalysis[] } {
     const active: OverrideAnalysis[] = [];
     const stale: OverrideAnalysis[] = [];
+    const unknown: OverrideAnalysis[] = [];
 
     for (const a of analyses) {
         if (a.status === 'active') {
             active.push(a);
+        } else if (a.status === 'unknown') {
+            unknown.push(a);
         } else {
             stale.push(a);
         }
     }
 
-    return { active, stale };
+    return { active, stale, unknown };
 }

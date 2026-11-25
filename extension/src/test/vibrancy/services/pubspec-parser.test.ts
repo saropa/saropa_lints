@@ -45,6 +45,25 @@ describe('pubspec-parser', () => {
             assert.ok(!all.includes('sdk'));
         });
 
+        it('strips a trailing YAML comment from a constraint', () => {
+            // A comment left in the value makes the range invalid, which the
+            // override analyzer reads as "satisfied" (false stale override).
+            const { constraints } = parsePubspecYaml(
+                'dependencies:\n  foo_android: ^14.1.0 # needs compileSdk 37\n',
+            );
+            assert.strictEqual(constraints['foo_android'], '^14.1.0');
+        });
+
+        it('drops a comment-only value and keeps quoted ranges intact', () => {
+            const { constraints } = parsePubspecYaml(
+                'dependencies:\n  a: # note\n    sdk: flutter\n' +
+                '  b: ">=1.0.0 <2.0.0" # note\n  c: \'^1.0.0#x\'\n',
+            );
+            assert.strictEqual(constraints['a'], undefined);
+            assert.strictEqual(constraints['b'], '">=1.0.0 <2.0.0"');
+            assert.strictEqual(constraints['c'], "'^1.0.0#x'");
+        });
+
         it('should extract version constraints', () => {
             const { constraints } = parsePubspecYaml(yamlContent);
             assert.strictEqual(constraints['http'], '^1.6.0');

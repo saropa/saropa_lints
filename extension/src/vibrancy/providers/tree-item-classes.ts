@@ -245,19 +245,25 @@ export class OverrideItem extends vscode.TreeItem {
             `${analysis.entry.name}: ${analysis.entry.version}`,
             vscode.TreeItemCollapsibleState.Collapsed,
         );
-        this.description = analysis.status === 'stale' ? '⚠️ Stale' : '';
+        // 'unknown' gets its own look: it must never read as "removable".
+        const unknown = analysis.status === 'unknown';
+        this.description = analysis.status === 'stale'
+            ? '⚠️ Stale'
+            : (unknown ? '❓ Unverified' : '');
         this.iconPath = new vscode.ThemeIcon(
-            analysis.status === 'stale' ? 'warning' : 'wrench',
+            analysis.status === 'stale' ? 'warning' : (unknown ? 'question' : 'wrench'),
             analysis.status === 'stale'
                 ? new vscode.ThemeColor('editorWarning.foreground')
                 : new vscode.ThemeColor('editorInfo.foreground'),
         );
         this.tooltip = analysis.status === 'stale'
             ? 'No version conflict detected — review this override.'
-            : `Active override — ${analysis.blocker ?? 'resolves a conflict'}.`;
+            : unknown
+                ? `Could not verify — ${analysis.evidenceGap ?? 'incomplete data'}. Keep this override until the scan succeeds.`
+                : `Active override — ${analysis.blocker ?? 'resolves a conflict'}.`;
         this.contextValue = analysis.status === 'stale'
             ? 'vibrancyOverrideStale'
-            : 'vibrancyOverrideActive';
+            : (unknown ? 'vibrancyOverrideUnknown' : 'vibrancyOverrideActive');
         this.command = {
             command: 'saropaLints.packageVibrancy.goToOverride',
             title: 'Go to override in pubspec.yaml',

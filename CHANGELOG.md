@@ -66,6 +66,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.9.1] — Unreleased
+
+Package Vibrancy is more accurate about which `dependency_overrides` entries are still needed, and now records in its log why a check was skipped instead of failing silently. [log](https://github.com/saropa/saropa_lints/blob/v17.9.1/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- Package Vibrancy no longer flags a needed override as stale when the parent package's constraint line carries a trailing comment; skipped constraint reads are now logged. No action required.
+- Overrides whose check could not complete (dependency graph failed, or a parent package's pubspec was unreadable) now show as "Unverified" instead of "Stale", so they are never presented as safe to remove. Re-run the scan once the cause (named in the tooltip and log) is fixed.
+
+---
+
 ## [17.9.0]
 
 Package Vibrancy no longer rewrites `pubspec.lock` in FVM-pinned projects, now uses the project's pinned SDK and respects `saropaLints.enabled`; `avoid_screenshot_sensitive` reports fewer false positives and catches more real authentication and verification screens; and `prefer_test_find_by_key` is now opt-in. [log](https://github.com/saropa/saropa_lints/blob/v17.9.0/CHANGELOG.md)

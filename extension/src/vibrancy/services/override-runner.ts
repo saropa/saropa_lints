@@ -31,6 +31,8 @@ export async function runOverrideAnalysis(
     // module deliberately avoids so it stays unit-testable). Empty default keeps
     // the SDK-heuristic-only behavior when no index is supplied.
     constraints: ConstraintIndex = new Map(),
+    // Reason the inputs were incomplete, or null; see analyzeOverrides.
+    evidenceGap: string | null = null,
 ): Promise<OverrideAnalysis[]> {
     try {
         const overrideEntries = parseOverrides(yamlContent);
@@ -43,6 +45,7 @@ export async function runOverrideAnalysis(
 
         const analyses = analyzeOverrides(
             overrideEntries, [...deps], [...depGraphPackages], ages, constraints,
+            evidenceGap,
         );
         return applyKnownOverrideReasons(analyses);
     } catch (err) {
@@ -75,9 +78,11 @@ export function applyKnownOverrideReasons(
     analyses: OverrideAnalysis[],
 ): OverrideAnalysis[] {
     return analyses.map(a => {
-        if (a.status !== 'stale') { return a; }
+        // 'unknown' is also promoted: a curated known-issue reason is positive
+        // evidence that outweighs the missing inputs.
+        if (a.status === 'active') { return a; }
         const reason = findKnownIssue(a.entry.name, a.entry.version)?.overrideReason;
         if (!reason) { return a; }
-        return { ...a, status: 'active' as const, blocker: reason };
+        return { ...a, status: 'active' as const, blocker: reason, evidenceGap: null };
     });
 }

@@ -14,6 +14,7 @@ import {
 import { applyKnownOverrideReasons } from '../../../vibrancy/services/override-runner';
 import { OverrideEntry, PackageDependency, OverrideAnalysis } from '../../../vibrancy/types';
 import { DepGraphPackage } from '../../../vibrancy/services/dep-graph';
+import { parsePubspecYaml } from '../../../vibrancy/services/pubspec-parser';
 import { ConstraintIndex } from '../../../vibrancy/scoring/shared-dep-conflict-detector';
 
 describe('override-analyzer', () => {
@@ -164,6 +165,90 @@ describe('override-analyzer', () => {
             assert.strictEqual(result.length, 1);
             assert.strictEqual(result[0].status, 'active');
             assert.strictEqual(result[0].blocker, 'dart_style');
+        });
+
+        it('marks a pinned federated-plugin override active when the parent caret range excludes it', () => {
+            // permission_handler ^14.1.0 on permission_handler_android; the
+            // override pins 13.0.1, which the parent range rejects, so the
+            // override is needed (regression: reported stale).
+            const overrides = [makeOverride('permission_handler_android', '13.0.1')];
+            const deps = [
+                makeDep('permission_handler', '13.0.2', '^13.0.1', true),
+                makeDep('permission_handler_android', '13.0.1', '13.0.1', false),
+            ];
+            const graph = [
+                makeGraphPkg('permission_handler', ['permission_handler_android']),
+                makeGraphPkg('permission_handler_android', [], '13.0.1'),
+            ];
+            const constraints: ConstraintIndex = new Map([
+                ['permission_handler', new Map([['permission_handler_android', '^14.1.0']])],
+            ]);
+
+            const result = analyzeOverrides(overrides, deps, graph, new Map(), constraints);
+
+            assert.strictEqual(result[0].status, 'active');
+            assert.strictEqual(result[0].blocker, 'permission_handler');
+        });
+
+        it('stays active when the parent pubspec constraint carries a trailing comment', () => {
+            // Index built through the real parser so the comment-stripping fix is
+            // on the tested path; reverting it makes the range invalid and the
+            // override read as stale.
+            const parent = parsePubspecYaml(
+                'dependencies:\n  permission_handler_android: ^14.1.0 # compileSdk 37\n',
+            );
+            const constraints: ConstraintIndex = new Map([
+                ['permission_handler', new Map(Object.entries(parent.constraints))],
+            ]);
+            const overrides = [makeOverride('permission_handler_android', '13.0.1')];
+            const deps = [
+                makeDep('permission_handler', '13.0.2', '^13.0.1', true),
+                makeDep('permission_handler_android', '13.0.1', '13.0.1', false),
+            ];
+            const graph = [
+                makeGraphPkg('permission_handler', ['permission_handler_android']),
+                makeGraphPkg('permission_handler_android', [], '13.0.1'),
+            ];
+
+            const result = analyzeOverrides(overrides, deps, graph, new Map(), constraints);
+
+            assert.strictEqual(result[0].status, 'active');
+            assert.strictEqual(result[0].blocker, 'permission_handler');
+        });
+
+        it('reports unknown (not stale) when no conflict is found but evidence is missing', () => {
+            const overrides = [makeOverride('intl', '0.18.5')];
+            const deps = [makeDep('intl', '0.18.5', '^0.18.0')];
+            const graph = [makeGraphPkg('intl', [], '0.18.5')];
+
+            const result = analyzeOverrides(
+                overrides, deps, graph, new Map(), new Map(), 'dependency graph unavailable',
+            );
+
+            assert.strictEqual(result[0].status, 'unknown');
+            assert.strictEqual(result[0].evidenceGap, 'dependency graph unavailable');
+        });
+
+        it('keeps a detected conflict active even when an evidence gap is supplied', () => {
+            const overrides = [makeOverride('analyzer', '13.0.0')];
+            const deps = [
+                makeDep('analyzer', '13.0.0', '^13.0.0', false),
+                makeDep('dart_style', '3.1.8', '^3.1.8', true),
+            ];
+            const graph = [
+                makeGraphPkg('dart_style', ['analyzer']),
+                makeGraphPkg('analyzer', [], '13.0.0'),
+            ];
+            const constraints: ConstraintIndex = new Map([
+                ['dart_style', new Map([['analyzer', '^12.0.0']])],
+            ]);
+
+            const result = analyzeOverrides(
+                overrides, deps, graph, new Map(), constraints, 'something unreadable',
+            );
+
+            assert.strictEqual(result[0].status, 'active');
+            assert.strictEqual(result[0].evidenceGap, null);
         });
 
         it('stays stale when no constraint index is supplied (index is the enabling input)', () => {

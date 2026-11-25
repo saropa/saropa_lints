@@ -44,7 +44,17 @@ export function parsePubspecYaml(content: string): {
         if (match) {
             const name = match[1];
             (section === 'deps' ? directDeps : devDeps).push(name);
-            const value = match[2].trim();
+            // Strip a trailing YAML comment (`^14.1.0 # note`). Left in place, the
+            // value is not a valid semver range, so satisfiesConstraint treats it
+            // as "satisfied" and a needed override is misreported as stale.
+            // A quoted value keeps its quotes (satisfiesConstraint strips them) but
+            // a '#' inside the quotes is data, not a comment. For unquoted values
+            // the comment may start the value itself (`foo: # note`) because the
+            // line regex already consumed the leading whitespace, hence `(^|\s)`.
+            const quoted = match[2].trim().match(/^("[^"]*"|'[^']*')\s*(#.*)?$/);
+            const value = quoted
+                ? quoted[1]
+                : match[2].replace(/(^|\s)#.*$/, '').trim();
             if (value) { constraints[name] = value; }
         }
     }

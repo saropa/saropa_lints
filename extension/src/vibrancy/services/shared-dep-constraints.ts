@@ -14,20 +14,24 @@ import { resolvePackagePaths } from './package-code-analyzer';
 import { parsePubspecYaml } from './pubspec-parser';
 import { ConstraintIndex } from '../scoring/shared-dep-conflict-detector';
 
-/** Read one package's declared constraints (name -> constraint range). */
+/**
+ * Read one package's declared constraints (name -> constraint range).
+ * `error` is set when the read/parse threw, so callers can tell a failure
+ * from a pubspec that genuinely declares no constraints.
+ */
 async function readConstraints(
     pubspecUri: vscode.Uri,
-): Promise<Map<string, string>> {
+): Promise<{ constraints: Map<string, string>; error: string | null }> {
     try {
         const bytes = await vscode.workspace.fs.readFile(pubspecUri);
         const content = Buffer.from(bytes).toString('utf8');
         const parsed = parsePubspecYaml(content);
-        return new Map(Object.entries(parsed.constraints));
-    } catch {
+        return { constraints: new Map(Object.entries(parsed.constraints)), error: null };
+    } catch (err) {
         // A package without a readable pubspec (SDK, unusual source) simply
         // contributes no constraints; the detector falls back to other
         // candidates rather than failing the whole scan.
-        return new Map();
+        return { constraints: new Map(), error: String(err) };
     }
 }
 
@@ -38,6 +42,9 @@ async function readConstraints(
 export async function buildConstraintIndex(
     workspaceRoot: vscode.Uri,
     candidateNames: ReadonlySet<string>,
+    // Optional sink for skipped candidates. A silent skip made a needed override
+    // read as stale with no trace of why (unresolved path vs. empty pubspec).
+    onSkip?: (name: string, reason: string, isEvidenceGap: boolean) => void,
 ): Promise<ConstraintIndex> {
     const index = new Map<string, ReadonlyMap<string, string>>();
     if (candidateNames.size === 0) { return index; }
@@ -45,10 +52,21 @@ export async function buildConstraintIndex(
     const paths = await resolvePackagePaths(workspaceRoot);
     const reads = [...candidateNames].map(async name => {
         const info = paths.get(name);
-        if (!info) { return; }
+        if (!info) {
+            onSkip?.(name, 'not found in .dart_tool/package_config.json', true);
+            return;
+        }
         const pubspecUri = vscode.Uri.joinPath(info.rootUri, 'pubspec.yaml');
-        const constraints = await readConstraints(pubspecUri);
-        if (constraints.size > 0) { index.set(name, constraints); }
+        const { constraints, error } = await readConstraints(pubspecUri);
+        if (constraints.size > 0) {
+            index.set(name, constraints);
+        } else if (error) {
+            onSkip?.(name, `read failed for ${pubspecUri.fsPath}: ${error}`, true);
+        } else {
+            // Legitimately empty (only SDK/path deps); not an evidence gap for
+            // callers that distinguish, but still logged for traceability.
+            onSkip?.(name, `no constraints declared in ${pubspecUri.fsPath}`, false);
+        }
     });
     await Promise.all(reads);
     return index;

@@ -1556,12 +1556,30 @@ async function runScanInner(
             // the SDK heuristic. Built here (not in the runner) because the index
             // read needs vscode I/O the runner deliberately stays free of.
             const overrideDepGraph = depGraph.success ? depGraph.packages : [];
+            // Parents whose constraints could not be obtained; they make a
+            // no-conflict verdict unreliable.
+            const unreadableParents: string[] = [];
             const overrideConstraints = await buildConstraintIndex(
                 workspaceRoot,
                 overrideConstrainerCandidates(
                     parseDependencyOverrides(parsed.yamlContent), overrideDepGraph,
                 ),
+                (name, reason, isEvidenceGap) => {
+                    logger.info(`Override constraint index skipped ${name}: ${reason}`);
+                    if (isEvidenceGap) { unreadableParents.push(name); }
+                },
             );
+            // Missing inputs turn a "no conflict" result into 'unknown' rather
+            // than 'stale', so the UI never tells the user to delete an override
+            // that may simply have gone unchecked.
+            const evidenceGap = !depGraph.success
+                ? 'dependency graph unavailable'
+                : (unreadableParents.length > 0
+                    ? `constraints unreadable for ${unreadableParents.sort().join(', ')}`
+                    : null);
+            if (evidenceGap) {
+                logger.info(`Override analysis evidence gap: ${evidenceGap}`);
+            }
             const overrideAnalyses = await runOverrideAnalysis(
                 parsed.yamlContent,
                 deps,
@@ -1569,6 +1587,7 @@ async function runScanInner(
                 workspaceRoot.fsPath,
                 logger,
                 overrideConstraints,
+                evidenceGap,
             );
             lastOverrideAnalyses = overrideAnalyses;
             if (overrideAnalyses.length > 0) {

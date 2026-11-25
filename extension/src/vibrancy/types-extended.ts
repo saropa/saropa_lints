@@ -94,8 +94,15 @@ export interface OverrideEntry {
 /** Analysis result for a single override. */
 export interface OverrideAnalysis {
     readonly entry: OverrideEntry;
-    readonly status: 'active' | 'stale';
+    /**
+     * 'unknown' = no conflict was found but the evidence needed to decide was
+     * missing (dependency graph failed, or a parent pubspec was unreadable).
+     * Distinct from 'stale' so the UI never implies the override is removable.
+     */
+    readonly status: 'active' | 'stale' | 'unknown';
     readonly blocker: string | null;
+    /** Why the verdict is 'unknown'; null for active/stale. */
+    readonly evidenceGap?: string | null;
     readonly addedDate: Date | null;
     readonly ageDays: number | null;
 }

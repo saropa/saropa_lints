@@ -58,6 +58,12 @@ export function buildOverrideDetails(analysis: OverrideAnalysis): DetailItem[] {
             '✓ Status',
             `Active — ${analysis.blocker ?? 'resolves constraint'}`,
         ));
+    } else if (analysis.status === 'unknown') {
+        // Missing evidence, not a verdict: do not suggest removal.
+        items.push(new DetailItem(
+            '❓ Status',
+            `Unverified — ${analysis.evidenceGap ?? 'incomplete data'}`,
+        ));
     } else {
         items.push(new DetailItem(
             '⚠️ Status',
