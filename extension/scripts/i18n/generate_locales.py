@@ -26,6 +26,14 @@ if sys.stderr.encoding != "utf-8":
 
 from dictionaries import COGNATES, DO_NOT_TRANSLATE, TRANSLATIONS
 from json_io import read_json, write_json
+from check_locale_garbage import scan_catalog
+from locale_catalog_check import (
+    catalog_paths,
+    find_extra_keys,
+    find_missing_keys,
+    find_stale_dictionary_entries,
+    find_unbacked_values,
+)
 from bad_translations import prune_bad_cache_entries
 from mt_fallback import (
     active_engine_name,
@@ -349,6 +357,16 @@ def parse_args() -> argparse.Namespace:
             "no longer matches an English source string. Catches stale keys "
             "that silently stop working after en.json renames. Pair with "
             "--fail-on-missing in the publish pipeline."
+        ),
+    )
+    parser.add_argument(
+        "--fail-on-stale",
+        action="store_true",
+        help=(
+            "Exit non-zero if any dictionaries.py entry's English source text "
+            "no longer exists in en.json / package.nls.json (a reworded string "
+            "that would silently fall back to MT). Off by default: the audit "
+            "only warns."
         ),
     )
     parser.add_argument(
@@ -858,6 +876,153 @@ def _run_key_command(args: argparse.Namespace, root: Path) -> int:
     return 0
 
 
+@dataclass
+class CatalogReport:
+    """Findings from reading the shipped locale catalogs.
+
+    Kept separate from LocaleStats.missing (dictionary/cache gaps) because each
+    class needs a different remedy and counting them together double-counted a
+    key that was both absent and untranslated.
+    """
+
+    absent: dict[str, int]    # locale -> keys absent from its catalogs
+    garbage: dict[str, int]   # locale -> corrupted strings (leaks, loops, scripts)
+    stale: int                # dictionaries.py entries with no English source
+    extra: int                # keys in a catalog that English no longer has
+
+
+# Cap on per-locale / stale lines printed so a mass failure stays readable.
+_GATE_LIST_LIMIT = 20
+
+
+def _catalog_gate(
+    locales: list[str],
+    sorted_unique: list[str],
+    root: Path,
+    translations: dict[str, dict[str, str]] | None = None,
+) -> CatalogReport:
+    """Inspect the shipped locale catalogs themselves and return a CatalogReport.
+
+    The dictionary/cache-based stats never open the catalogs, so a key absent
+    from a locale JSON (or a leaked prompt / decoder loop inside one) passed
+    the gate. Absent keys and garbage are gate-relevant; stale dictionary
+    entries are gated only by --fail-on-stale; extra keys and hand text with no
+    dictionary backing are warnings. *translations* is injectable for tests.
+    Prints nothing when there are no findings.
+    """
+    table = TRANSLATIONS if translations is None else translations
+    absent: dict[str, int] = {}
+    garbage: dict[str, int] = {}
+    extra_total = 0
+    unbacked: dict[str, list[str]] = {}
+    for locale in locales:
+        for en_path, loc_path in catalog_paths(root, locale):
+            if not loc_path.exists():
+                # An absent catalog file means every key is missing.
+                print(c("yellow", f"  catalog file missing: {loc_path.name}"))
+                n = len(find_missing_keys(read_json(en_path), {}))
+                absent[locale] = absent.get(locale, 0) + n
+                continue
+            en_tree, loc_tree = read_json(en_path), read_json(loc_path)
+            keys = find_missing_keys(en_tree, loc_tree)
+            if keys:
+                absent[locale] = absent.get(locale, 0) + len(keys)
+                print(c("yellow", f"  {loc_path.name}: {len(keys)} key(s) absent, e.g. {keys[:3]}"))
+            for key, reason, value in scan_catalog(locale, loc_tree, en_tree):
+                garbage[locale] = garbage.get(locale, 0) + 1
+                print(c("yellow", f"  {loc_path.name}: {key}: {reason}: {value[:60]!r}"))
+            extras = find_extra_keys(en_tree, loc_tree)
+            extra_total += len(extras)
+            if extras:
+                print(c("gray", f"  warning: {loc_path.name}: {len(extras)} key(s) not in English, e.g. {extras[:3]}"))
+            unbacked.setdefault(locale, []).extend(
+                f"{loc_path.name}:{k}"
+                for k in find_unbacked_values(en_tree, loc_tree, table.get(locale, {}))
+            )
+    stale = find_stale_dictionary_entries(table, sorted_unique)
+    for locale, en_key in stale[:_GATE_LIST_LIMIT]:
+        print(c("yellow", f"  stale dictionary entry [{locale}]: {en_key!r}"))
+    if len(stale) > _GATE_LIST_LIMIT:
+        print(c("yellow", f"  ... and {len(stale) - _GATE_LIST_LIMIT} more stale dictionary entries"))
+    for locale, keys in unbacked.items():
+        if not keys:
+            continue
+        print(c("gray", f"  warning [{locale}]: {len(keys)} catalog value(s) differ from English but "
+                        "have no dictionaries.py entry (a regeneration could overwrite them):"))
+        for k in keys[:_GATE_LIST_LIMIT]:
+            print(c("gray", f"    {k}"))
+        if len(keys) > _GATE_LIST_LIMIT:
+            print(c("gray", f"    ... and {len(keys) - _GATE_LIST_LIMIT} more"))
+    return CatalogReport(absent, garbage, len(stale), extra_total)
+
+
+def _fold_catalog_into_stats(
+    stats_by_locale: dict[str, LocaleStats], report: CatalogReport
+) -> dict[str, LocaleStats]:
+    """Coverage-only view of the stats that also charges catalog defects.
+
+    write_coverage_json feeds the picker badges and README table; without this
+    a locale with absent keys or garbage in its catalog still read 100%. The
+    gate keeps the raw counters separate (see _gate_exit); this adjusted copy is
+    only for coverage. Catalog defects are counted per key while stats count
+    unique strings, so the fold is a conservative approximation (never raises
+    translated above its original value).
+    """
+    out: dict[str, LocaleStats] = {}
+    for locale, s in stats_by_locale.items():
+        bad = report.absent.get(locale, 0) + report.garbage.get(locale, 0)
+        out[locale] = LocaleStats(
+            total=s.total,
+            translated=max(0, s.translated - bad),
+            skipped=s.skipped,
+            missing=s.missing + bad,
+        )
+    return out
+
+
+def _gate_exit(
+    stats_by_locale: dict[str, LocaleStats],
+    report: CatalogReport,
+    *,
+    fail_on_missing: bool,
+    fail_on_stale: bool,
+) -> int:
+    """Shared publish-gate decision for audit and normal modes (same order in both).
+
+    Three independent counters, each with its own remedy, so nothing is counted
+    twice and the operator knows which fix applies:
+      1. dictionary gaps (stats.missing)  -> add dictionaries.py entries
+      2. absent catalog keys              -> regenerate / restore the catalog
+      3. garbage catalog strings          -> fix or retranslate the value
+    Stale-dictionary failure is checked after them, in both modes.
+    """
+    gaps = sum(s.missing for s in stats_by_locale.values())
+    absent = sum(report.absent.values())
+    garbage = sum(report.garbage.values())
+    if fail_on_missing and (gaps or absent or garbage):
+        print()
+        if gaps:
+            print(c("red", f"  Coverage gate FAILED: {gaps} missing translation(s). Add curated "
+                           "entries to dictionaries.py (COGNATES for words identical in specific "
+                           "languages, DO_NOT_TRANSLATE for technical keywords) and re-audit."),
+                  file=sys.stderr)
+        if absent:
+            print(c("red", f"  Catalog gate FAILED: {absent} key(s) absent from locale catalogs. "
+                           "Regenerate the catalogs (or restore the keys) and commit them."),
+                  file=sys.stderr)
+        if garbage:
+            print(c("red", f"  Garbage gate FAILED: {garbage} corrupted catalog string(s) (leaked "
+                           "prompt, repeated loop or wrong script). Fix or retranslate those "
+                           "values; dictionaries.py entries do not repair them."),
+                  file=sys.stderr)
+        return 1
+    if fail_on_stale and report.stale > 0:
+        print(c("red", f"  Stale gate FAILED: {report.stale} dictionary entr(ies) with no "
+                       "matching English source."), file=sys.stderr)
+        return 1
+    return 0
+
+
 def _run_audit(
     locales: list[str],
     sorted_unique: list[str],
@@ -865,6 +1030,8 @@ def _run_audit(
     root: Path,
     *,
     fail_on_missing: bool = False,
+    fail_on_stale: bool = False,
+    translations: dict[str, dict[str, str]] | None = None,
 ) -> int:
     """Audit-only path: report translation gaps and low-quality (upgrade) entries
     WITHOUT translating, pruning, or writing any locale file. Reads the curated
@@ -884,7 +1051,7 @@ def _run_audit(
     missing_by_locale: dict[str, list[str]] = {}
     low_quality_by_locale: dict[str, list[str]] = {}
     for locale in locales:
-        dict_table = TRANSLATIONS.get(locale, {})
+        dict_table = (TRANSLATIONS if translations is None else translations).get(locale, {})
         # Build the mapping from dictionary + cache ONLY (never machine_translate),
         # so the audit makes no network calls. compute_stats then reads a gap as
         # "output still equals the English source".
@@ -916,30 +1083,23 @@ def _run_audit(
     print_missing_samples(missing_by_locale)
     report_path = timestamped_report_path(root, "i18n_translation_audit.md")
     write_audit_report(stats_by_locale, missing_by_locale, report_path, low_quality_by_locale)
-    # Refresh the picker's coverage source from this audit so the language-picker
-    # badges always reflect the latest measured reality, even on an audit-only run.
-    write_coverage_json(stats_by_locale, root)
+    # Read the catalogs BEFORE writing coverage so the picker badges / README
+    # reflect absent keys and garbage too (previously they claimed 100% while
+    # corrupted text shipped).
+    report = _catalog_gate(locales, sorted_unique, root, translations)
+    write_coverage_json(_fold_catalog_into_stats(stats_by_locale, report), root)
     total_missing = sum(s.missing for s in stats_by_locale.values())
     total_lq = sum(len(v) for v in low_quality_by_locale.values())
     print()
-    print(c("bold", f"  Audit log ({total_missing} gaps, {total_lq} low-quality):"))
+    print(c("bold", f"  Audit log ({total_missing} gaps, {sum(report.absent.values())} absent keys, "
+                    f"{sum(report.garbage.values())} garbage, {total_lq} low-quality):"))
     print(f"    {c('blue', str(report_path))}")
     print(c("gray", "    Sections: low-quality -> cross-locale rollup -> paste-ready stubs -> per-locale lists."))
 
     # Coverage gate (publish only): a non-zero exit lets the caller prompt the
-    # operator. The audit still translated nothing — closing the gap is a
-    # separate, explicit translation run or a dictionaries.py edit.
-    if fail_on_missing and total_missing > 0:
-        print()
-        print(
-            c("red", f"  Coverage gate FAILED: {total_missing} missing translation(s) "
-                     "across locales. This audit translated nothing — add curated "
-                     "entries to dictionaries.py (or run the translator separately) "
-                     "and re-audit."),
-            file=sys.stderr,
-        )
-        return 1
-    return 0
+    # operator. The audit still translated nothing.
+    return _gate_exit(stats_by_locale, report,
+                      fail_on_missing=fail_on_missing, fail_on_stale=fail_on_stale)
 
 
 # Non-TTY cadence: how many strings between plain progress lines when stdout is
@@ -1212,7 +1372,8 @@ def main() -> int:
         # before any MT engine is touched. Honors --fail-on-missing so the publish
         # coverage gate can run an audit (never a translation) and still gate.
         return _run_audit(
-            locales, sorted_unique, mt_cache, root, fail_on_missing=args.fail_on_missing
+            locales, sorted_unique, mt_cache, root,
+            fail_on_missing=args.fail_on_missing, fail_on_stale=args.fail_on_stale,
         )
 
     # The engine-availability announcement is deferred to the first locale with
@@ -1393,7 +1554,10 @@ def main() -> int:
         write_audit_report(stats_by_locale, missing_by_locale, report_path)
         # Refresh the picker's coverage source so newly-completed locales drop
         # their badge and regressed ones gain one, straight from this run's stats.
-        write_coverage_json(stats_by_locale, root)
+        # Catalogs were just written; read them back so coverage also charges
+        # absent keys / garbage, and reuse the report for the final gate.
+        catalog_report = _catalog_gate(locales, sorted_unique, root)
+        write_coverage_json(_fold_catalog_into_stats(stats_by_locale, catalog_report), root)
         total_missing = sum(s.missing for s in stats_by_locale.values())
         print()
         # Make this line easy to find in the scrollback when scanning for "what to fix".
@@ -1419,21 +1583,13 @@ def main() -> int:
         return 130
 
     # Coverage gate (publish only): block the release rather than ship English
-    # placeholders in a translated bundle. Dev runs omit --fail-on-missing and
-    # always succeed so iterating on English strings is never gated.
-    total_missing = sum(s.missing for s in stats_by_locale.values())
-    if args.fail_on_missing and total_missing > 0:
-        print()
-        print(
-            c("red", f"  Coverage gate FAILED: {total_missing} missing translation(s) "
-                     "across locales. Add curated entries to dictionaries.py — use "
-                     "COGNATES for words identical in specific target languages, "
-                     "DO_NOT_TRANSLATE for technical keywords identical everywhere — "
-                     "and rerun, then commit the regenerated locale JSON."),
-            file=sys.stderr,
-        )
-        return 1
-    return 0
+    # placeholders or corrupted text in a translated bundle. Dev runs omit the
+    # flags and always succeed so iterating on English strings is never gated.
+    # An empty run (no stats) still reads the catalogs so the gate can't be skipped.
+    if not stats_by_locale:
+        catalog_report = _catalog_gate(locales, sorted_unique, root)
+    return _gate_exit(stats_by_locale, catalog_report,
+                      fail_on_missing=args.fail_on_missing, fail_on_stale=args.fail_on_stale)
 
 
 if __name__ == "__main__":
