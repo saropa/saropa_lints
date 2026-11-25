@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.9.0] — Unreleased
+## [17.9.0]
 
 Package Vibrancy no longer rewrites `pubspec.lock` in FVM-pinned projects, now uses the project's pinned SDK and respects `saropaLints.enabled`; `avoid_screenshot_sensitive` reports fewer false positives and catches more real authentication and verification screens; and `prefer_test_find_by_key` is now opt-in. [log](https://github.com/saropa/saropa_lints/blob/v17.9.0/CHANGELOG.md)
 

@@ -459,9 +459,9 @@ void main() {
       // Parses [src] and returns whether the rule would report class [name].
       bool reports(String src, String name) {
         final unit = parseString(content: src).unit;
-        final cls = unit.declarations
-            .whereType<ClassDeclaration>()
-            .firstWhere((c) => c.nameToken.lexeme == name);
+        final cls = unit.declarations.whereType<ClassDeclaration>().firstWhere(
+          (c) => c.nameToken.lexeme == name,
+        );
         return AvoidScreenshotSensitiveRule.shouldReportClass(cls);
       }
 
@@ -493,17 +493,20 @@ class _LoginPageState extends State<LoginPage> {
         expect(reports(unprotectedSrc, '_LoginPageState'), isFalse);
       });
 
-      test('comments, strings and unrelated screenshot names do not protect', () {
-        // Identifier-only matching: none of these is a protection API.
-        const String src = '''
+      test(
+        'comments, strings and unrelated screenshot names do not protect',
+        () {
+          // Identifier-only matching: none of these is a protection API.
+          const String src = '''
 class LoginPage extends StatelessWidget {
   // TODO: block screenshots
   void takeScreenshot() {}
   Widget build(BuildContext c) => Text('Screenshots disabled?');
 }
 ''';
-        expect(reports(src, 'LoginPage'), isTrue);
-      });
+          expect(reports(src, 'LoginPage'), isTrue);
+        },
+      );
 
       test('ConsumerState pairing: protected clears, unprotected flags', () {
         const String protectedSrc = '''
@@ -562,8 +565,10 @@ class LoginPage extends StatelessWidget {
         expect(reports(src, 'LoginPage'), isFalse);
       });
 
-      test('createState fallback finds a State with an unconventional base', () {
-        const String protectedSrc = '''
+      test(
+        'createState fallback finds a State with an unconventional base',
+        () {
+          const String protectedSrc = '''
 class LoginPage extends StatefulWidget {
   createState() => _LoginImpl();
 }
@@ -571,12 +576,18 @@ class _LoginImpl extends SecureBase {
   void initState() { FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE); }
 }
 ''';
-        expect(reports(protectedSrc, 'LoginPage'), isFalse);
-        expect(
-          reports(protectedSrc.replaceAll('FlutterWindowManager', 'X').replaceAll('FLAG_SECURE', 'Y'), 'LoginPage'),
-          isTrue,
-        );
-      });
+          expect(reports(protectedSrc, 'LoginPage'), isFalse);
+          expect(
+            reports(
+              protectedSrc
+                  .replaceAll('FlutterWindowManager', 'X')
+                  .replaceAll('FLAG_SECURE', 'Y'),
+              'LoginPage',
+            ),
+            isTrue,
+          );
+        },
+      );
 
       // Positive guard: genuinely sensitive screens must still be detected.
       test('still flags genuinely sensitive screen class names', () {

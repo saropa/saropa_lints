@@ -14356,7 +14356,7 @@
         "description": "Security hotspot default target: >= 80% resolved after review."
       },
       "correction": "Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens. Audit similar patterns across the codebase to ensure consistent security practices.",
-      "problemMessage": "[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording. Financial and authentication screens should disable screenshots using platform APIs to prevent sensitive data exposure. {v5}",
+      "problemMessage": "[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording. Financial and authentication screens should disable screenshots using platform APIs to prevent sensitive data exposure. {v6}",
       "impact": "warning",
       "owasp": {
         "mobile": [
