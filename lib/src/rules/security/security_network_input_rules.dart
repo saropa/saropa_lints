@@ -2094,7 +2094,10 @@ class PreferDataMaskingRule extends SaropaLintRule {
 /// names containing "fromsettings" (e.g. WebViewScreenFromSettings) are
 /// excluded as navigation context, not settings UI.
 ///
-/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
+/// Since: v1.7.8 | Updated: v17.9.0 | Rule version: v6
+///
+/// Class names are matched on whole camelCase words (not substrings), so
+/// "MappingPage" no longer matches `pin`.
 ///
 /// Financial and authentication screens should disable screenshots using
 /// platform APIs to prevent sensitive data exposure. Debug and tooling
@@ -2155,12 +2158,18 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_screenshot_sensitive',
-    '[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording. Financial and authentication screens should disable screenshots using platform APIs to prevent sensitive data exposure. {v5}',
+    '[avoid_screenshot_sensitive] Sensitive screen allows screenshots and screen recording. Financial and authentication screens should disable screenshots using platform APIs to prevent sensitive data exposure. {v6}',
     correctionMessage:
         'Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens. Audit similar patterns across the codebase to ensure consistent security practices.',
     severity: DiagnosticSeverity.INFO,
   );
 
+  /// Sensitive class-name words, matched as EXACT whole words (after
+  /// camelCase splitting and optional trailing-"s" stripping), never as
+  /// substrings. Exact matching keeps short terms like `pin` from firing on
+  /// "mapping"/"shipping"/"pinned"; the cost is that inflections are not
+  /// implicit, so add them explicitly (authentication, verification, ...).
+  /// Plurals need no entry: candidates also include the s-stripped form.
   static const Set<String> _sensitiveScreenNames = {
     'payment',
     'checkout',
@@ -2168,12 +2177,18 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
     'signin',
     'signup',
     'password',
+    'passcode',
     'creditcard',
     'banking',
     'transfer',
     'auth',
+    'authenticate',
+    'authentication',
+    'authenticator',
+    'authorization',
     'otp',
     'verify',
+    'verification',
     'pin',
     'biometric',
     'settings',
@@ -2181,7 +2196,10 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
     'profile',
   };
 
-  /// Class names containing these are treated as debug/tooling, not sensitive.
+  /// Debug/tooling words, also matched as whole words. The old substring
+  /// check let "viewer" match inside "ReviewerPaymentScreen", silently
+  /// suppressing a true positive. Compound entries (webview, devtool) match
+  /// the adjacent-word pairs WebView / DevTool(s).
   static const Set<String> _debugToolingNames = {
     'debug',
     'viewer',
@@ -2190,53 +2208,235 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
     'tooling',
   };
 
+  /// Class-name words that mark a class as a UI surface (screen/page/...).
+  /// Singular only: a plural ("Pages", "Views") names a collection/model, not
+  /// one screen, so it is deliberately not treated as a UI surface.
+  static const Set<String> _uiContainerWords = {
+    'screen',
+    'page',
+    'view',
+    'widget',
+  };
+
+  /// Final words that mark a class as state/logic holder, not a screen:
+  /// "_LoginPageState", "PaymentViewModel", "LoginController". Such classes
+  /// render nothing themselves; the widget they back is what gets checked.
+  static const Set<String> _nonScreenSuffixWords = {
+    'state',
+    'model',
+    'viewmodel',
+    'controller',
+    'bloc',
+    'cubit',
+    'notifier',
+    'provider',
+  };
+
+  /// Splits a class name into lowercase words on camelCase / acronym /
+  /// snake_case boundaries ("UserPinPage" -> user, pin, page).
+  static final RegExp _nameWordPattern = RegExp(
+    r'[A-Z]+(?![a-z])|[A-Z]?[a-z]+|[0-9]+',
+  );
+
+  /// Candidate terms: each word, each adjacent pair joined (so compound
+  /// entries like "signin"/"webview" match SignIn/WebView without
+  /// substrings), and each of those with one trailing "s" stripped (so
+  /// Payments/Transfers/Accounts match without listing plurals).
+  static Set<String> _buildCandidates(List<String> words) {
+    final Set<String> candidates = <String>{...words};
+    for (int i = 0; i + 1 < words.length; i++) {
+      candidates.add('${words[i]}${words[i + 1]}');
+    }
+    for (final String c in candidates.toList()) {
+      // Never strip "ss" (access, process, class): those are not plurals.
+      // The stripped form only ever matters if it is itself in
+      // _sensitiveScreenNames, so "status"->"statu" or "news"->"new" can
+      // never produce a match.
+      if (c.length > 3 && c.endsWith('s') && !c.endsWith('ss')) {
+        candidates.add(c.substring(0, c.length - 1));
+      }
+    }
+    return candidates;
+  }
+
+  /// Whether [rawClassName] names a sensitive (financial/auth) UI class that
+  /// is not debug/tooling. Exposed for unit tests.
+  static bool isSensitiveClassName(String rawClassName) {
+    // Cheap pre-check: a UI-surface word must appear somewhere, so skip the
+    // regex split for the vast majority of classes.
+    final String lower = rawClassName.toLowerCase();
+    if (!(lower.contains('screen') ||
+        lower.contains('page') ||
+        lower.contains('view') ||
+        lower.contains('widget'))) {
+      return false;
+    }
+
+    // LIMITATION: word boundaries come from camelCase/snake_case, so an
+    // all-lowercase name ("loginpage") is a single word and is not matched.
+    // Non-idiomatic Dart naming is accepted as out of scope.
+    final List<String> words = _nameWordPattern
+        .allMatches(rawClassName)
+        .map((Match m) => m.group(0)!.toLowerCase())
+        .toList();
+
+    // Must be a UI surface; otherwise models/services named "Payment..." are
+    // not screens and cannot be screenshotted.
+    if (!words.any(_uiContainerWords.contains)) return false;
+
+    // State/ViewModel/controller classes contain a UI word ("Page") but are
+    // not screens; skip them so the paired State class is not flagged twice.
+    if (words.isNotEmpty && _nonScreenSuffixWords.contains(words.last)) {
+      return false;
+    }
+
+    final Set<String> candidates = _buildCandidates(words);
+
+    // Debug/tooling screens (debug DB viewer, WebView) are out of scope.
+    if (_debugToolingNames.any(candidates.contains)) return false;
+
+    for (final String pattern in _sensitiveScreenNames) {
+      if (!candidates.contains(pattern)) continue;
+      // "settings" in "...FromSettings" is navigation context, not settings
+      // UI (preserves the earlier regression fix).
+      if (pattern == 'settings' && candidates.contains('fromsettings')) {
+        continue;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  /// Identifier names (exact match) that indicate screenshot protection.
+  /// Matched against AST identifiers only, never source text, so comments,
+  /// string literals and unrelated names such as `takeScreenshot()` or
+  /// `screenshotController` cannot silence the rule. `addFlags` alone is not
+  /// listed: it is only protection together with the FLAG_SECURE identifier.
+  static const Set<String> _protectionIdentifiers = {
+    'FLAG_SECURE',
+    'FlutterWindowManager',
+    'secureFlag',
+    'setSecureFlag',
+    'ScreenProtector',
+    'preventScreenshot',
+    'preventScreenshotOn',
+    'NoScreenshot',
+  };
+
+  /// Whether [cls] references any screenshot-protection API identifier.
+  static bool _hasProtection(ClassDeclaration cls) {
+    final _ProtectionIdentifierFinder finder = _ProtectionIdentifierFinder(
+      _protectionIdentifiers,
+    );
+    cls.accept(finder);
+    return finder.found;
+  }
+
+  /// Whether [node] is a sensitive screen with no screenshot protection.
+  ///
+  /// Protection may live in the class itself or, for a StatefulWidget, in its
+  /// paired State class (initState/dispose are there), so the widget must not
+  /// be flagged when the State carries the FLAG_SECURE call. Exposed for tests.
+  static bool shouldReportClass(ClassDeclaration node) {
+    if (!isSensitiveClassName(node.nameToken.lexeme)) return false;
+    if (_hasProtection(node)) return false;
+    final ClassDeclaration? state = _pairedStateClass(node);
+    return state == null || !_hasProtection(state);
+  }
+
+  /// Finds the State class paired with [widget] in the same file, or null.
+  /// Needed because a StatefulWidget never holds lifecycle code itself.
+  ///
+  /// Primary: any class whose superclass name ends in `State` (State,
+  /// ConsumerState, HookConsumerState, a `_BaseState`) and whose first type
+  /// argument names the widget. Fallback: the class instantiated by the
+  /// widget's `createState()`, for State classes with unconventional bases.
+  /// KNOWN LIMITATION: a State class in a different file (part file or
+  /// separate library) is not found, so such widgets are still reported.
+  static ClassDeclaration? _pairedStateClass(ClassDeclaration widget) {
+    final AstNode? unit = widget.parent;
+    if (unit is! CompilationUnit) return null;
+    final String widgetName = widget.nameToken.lexeme;
+    final String? createdName = _createStateTargetName(widget);
+    for (final CompilationUnitMember member in unit.declarations) {
+      if (member is! ClassDeclaration) continue;
+      if (member.nameToken.lexeme == createdName) return member;
+      final NamedType? superType = member.extendsClause?.superclass;
+      if (superType == null || !superType.name.lexeme.endsWith('State')) {
+        continue;
+      }
+      final NodeList<TypeAnnotation>? args = superType.typeArguments?.arguments;
+      final TypeAnnotation? first = (args == null || args.isEmpty)
+          ? null
+          : args.first;
+      if (first is NamedType && first.name.lexeme == widgetName) return member;
+    }
+    return null;
+  }
+
+  /// Class name instantiated by `createState() => _XState();` (expression or
+  /// single-return block body), or null when it cannot be determined.
+  static String? _createStateTargetName(ClassDeclaration widget) {
+    for (final ClassMember m in widget.bodyMembers) {
+      if (m is! MethodDeclaration || m.name.lexeme != 'createState') continue;
+      final FunctionBody body = m.body;
+      Expression? expr;
+      if (body is ExpressionFunctionBody) {
+        expr = body.expression;
+      } else if (body is BlockFunctionBody) {
+        for (final Statement st in body.block.statements) {
+          if (st is ReturnStatement) expr = st.expression;
+        }
+      }
+      // Unresolved parse yields MethodInvocation for `_X()`; resolved AST
+      // yields InstanceCreationExpression. Accept both.
+      if (expr is MethodInvocation && expr.target == null) {
+        return expr.methodName.name;
+      }
+      if (expr is InstanceCreationExpression) {
+        return expr.constructorName.type.name.lexeme;
+      }
+    }
+    return null;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.nameToken.lexeme.toLowerCase();
-
-      // Skip debug/tooling screens (e.g. debug DB viewer, WebView from settings).
-      for (final String tool in _debugToolingNames) {
-        if (className.contains(tool)) return;
-      }
-
+      // Debug/tooling exclusion now lives inside isSensitiveClassName and is
+      // whole-word based ("ReviewerPaymentScreen" is no longer skipped).
       // Check if this looks like a sensitive screen (financial/auth).
-      bool isSensitive = false;
-      for (final String pattern in _sensitiveScreenNames) {
-        if (!className.contains(pattern)) {
-          continue;
-        }
-        if (!(className.contains('screen') ||
-            className.contains('page') ||
-            className.contains('view') ||
-            className.contains('widget'))) {
-          continue;
-        }
-        // "settings" in "fromsettings" is navigation context, not settings UI.
-        if (pattern == 'settings' && className.contains('fromsettings')) {
-          continue;
-        }
-        isSensitive = true;
-        break;
-      }
-
-      if (!isSensitive) return;
-
-      // Check if has screenshot protection
-      final String classSource = node.toSource();
-      if (classSource.contains('FLAG_SECURE') ||
-          classSource.contains('WindowManager') ||
-          classSource.contains('secureFlag') ||
-          classSource.contains('screenshot') ||
-          classSource.contains('Screenshot')) {
-        return; // Has protection
-      }
+      // BUGFIX: the old check used substring matching on the lowercased
+      // class name, so "pin" matched inside "mapping"/"shipping" and "auth"
+      // inside "author"-style names, flagging list pickers and similar
+      // non-sensitive UI. Matching is now done on whole camelCase words.
+      if (!shouldReportClass(node)) return;
 
       reporter.atNode(node);
     });
+  }
+}
+
+/// Walks a class and records whether any identifier is one of [names].
+///
+/// Identifier-only matching (not source text) excludes comments and string
+/// literals by construction.
+class _ProtectionIdentifierFinder extends RecursiveAstVisitor<void> {
+  _ProtectionIdentifierFinder(this._names);
+
+  /// Exact identifier names that count as screenshot protection.
+  final Set<String> _names;
+
+  /// True once any matching identifier has been seen.
+  bool found = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (_names.contains(node.name)) found = true;
+    super.visitSimpleIdentifier(node);
   }
 }
 

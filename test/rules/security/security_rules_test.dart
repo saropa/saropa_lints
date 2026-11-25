@@ -1,5 +1,9 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:saropa_lints/src/analyzer_compat.dart';
+
 import 'package:saropa_lints/src/rules/security/security_auth_storage_rules.dart';
 import 'package:saropa_lints/src/rules/security/security_network_input_rules.dart';
 import 'package:test/test.dart';
@@ -413,6 +417,200 @@ void main() {
 
   group('Data Protection Rules', () {
     group('avoid_screenshot_sensitive', () {
+      // Regression: class-name-only substring matching flagged non-sensitive
+      // UI (pickers, option lists, connected-services screens) and matched
+      // "pin" inside words such as "mapping"/"shipping".
+      test('does not flag non-sensitive UI class names (false positives)', () {
+        for (final String name in <String>[
+          'UserCountryPickerWidget',
+          'UserImportOptionsWidget',
+          'ConnectedServicesScreen',
+          'ConnectedServiceDetailScreen',
+          'UserLinkedContactWidget',
+          'UserContactOptionsView',
+          'MappingPage', // "pin" substring of "mapping"
+          'ShippingScreen', // "pin" substring of "shipping"
+          'PaymentModel', // sensitive word but not a UI surface
+          'WebViewScreenFromSettings', // navigation context
+          'PinnedItemsScreen', // "pinned" is not "pin"
+          // Words ending in s/ss that are not sensitive plurals ("ss" is
+          // never stripped; "access" is not in the sensitive set).
+          'AccessScreen',
+          'ProcessPage',
+          'ClassListView',
+          'StatusScreen',
+          'NewsWidget',
+          // State / ViewModel / controller classes are not screens.
+          '_LoginPageState',
+          'PaymentViewModel',
+          'LoginController',
+          'PaymentPageBloc',
+          'DebugLoginScreen', // debug/tooling
+          'LogViewerScreen', // debug/tooling
+        ]) {
+          expect(
+            AvoidScreenshotSensitiveRule.isSensitiveClassName(name),
+            isFalse,
+            reason: '$name must not be treated as a sensitive screen',
+          );
+        }
+      });
+
+      // Parses [src] and returns whether the rule would report class [name].
+      bool reports(String src, String name) {
+        final unit = parseString(content: src).unit;
+        final cls = unit.declarations
+            .whereType<ClassDeclaration>()
+            .firstWhere((c) => c.nameToken.lexeme == name);
+        return AvoidScreenshotSensitiveRule.shouldReportClass(cls);
+      }
+
+      test('StatefulWidget is cleared by protection in its State class', () {
+        const String protectedSrc = '''
+class LoginPage extends StatefulWidget {
+  State<LoginPage> createState() => _LoginPageState();
+}
+class _LoginPageState extends State<LoginPage> {
+  void initState() {
+    FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  }
+}
+''';
+        expect(reports(protectedSrc, 'LoginPage'), isFalse);
+      });
+
+      test('StatefulWidget whose State lacks protection IS flagged', () {
+        const String unprotectedSrc = '''
+class LoginPage extends StatefulWidget {
+  State<LoginPage> createState() => _LoginPageState();
+}
+class _LoginPageState extends State<LoginPage> {
+  void initState() {}
+}
+''';
+        expect(reports(unprotectedSrc, 'LoginPage'), isTrue);
+        // The State class itself is never reported (not a screen).
+        expect(reports(unprotectedSrc, '_LoginPageState'), isFalse);
+      });
+
+      test('comments, strings and unrelated screenshot names do not protect', () {
+        // Identifier-only matching: none of these is a protection API.
+        const String src = '''
+class LoginPage extends StatelessWidget {
+  // TODO: block screenshots
+  void takeScreenshot() {}
+  Widget build(BuildContext c) => Text('Screenshots disabled?');
+}
+''';
+        expect(reports(src, 'LoginPage'), isTrue);
+      });
+
+      test('ConsumerState pairing: protected clears, unprotected flags', () {
+        const String protectedSrc = '''
+class LoginPage extends ConsumerStatefulWidget {
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+class _LoginPageState extends ConsumerState<LoginPage> {
+  void initState() {
+    FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  }
+}
+''';
+        expect(reports(protectedSrc, 'LoginPage'), isFalse);
+        expect(
+          reports(protectedSrc.replaceAll('FLAG_SECURE', 'OTHER'), 'LoginPage'),
+          isFalse,
+          reason: 'FlutterWindowManager identifier alone still counts',
+        );
+        const String unprotectedSrc = '''
+class LoginPage extends ConsumerStatefulWidget {
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+class _LoginPageState extends ConsumerState<LoginPage> {
+  void initState() {}
+}
+''';
+        expect(reports(unprotectedSrc, 'LoginPage'), isTrue);
+      });
+
+      test('only the unprotected widget is flagged when two share a file', () {
+        const String src = '''
+class LoginPage extends StatefulWidget {
+  State<LoginPage> createState() => _LoginPageState();
+}
+class _LoginPageState extends State<LoginPage> {
+  void initState() { FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE); }
+}
+class PaymentScreen extends StatefulWidget {
+  State<PaymentScreen> createState() => _PaymentScreenState();
+}
+class _PaymentScreenState extends State<PaymentScreen> {}
+''';
+        expect(reports(src, 'LoginPage'), isFalse);
+        expect(reports(src, 'PaymentScreen'), isTrue);
+      });
+
+      test('protection inside the widget class itself clears it', () {
+        const String src = '''
+class LoginPage extends StatelessWidget {
+  Widget build(BuildContext c) {
+    ScreenProtector.preventScreenshotOn();
+    return Container();
+  }
+}
+''';
+        expect(reports(src, 'LoginPage'), isFalse);
+      });
+
+      test('createState fallback finds a State with an unconventional base', () {
+        const String protectedSrc = '''
+class LoginPage extends StatefulWidget {
+  createState() => _LoginImpl();
+}
+class _LoginImpl extends SecureBase {
+  void initState() { FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE); }
+}
+''';
+        expect(reports(protectedSrc, 'LoginPage'), isFalse);
+        expect(
+          reports(protectedSrc.replaceAll('FlutterWindowManager', 'X').replaceAll('FLAG_SECURE', 'Y'), 'LoginPage'),
+          isTrue,
+        );
+      });
+
+      // Positive guard: genuinely sensitive screens must still be detected.
+      test('still flags genuinely sensitive screen class names', () {
+        for (final String name in <String>[
+          'PaymentScreen',
+          '_bad1012_PaymentScreen',
+          'LoginPage',
+          'SignInScreen', // compound entry written as two words
+          'CreditCardWidget',
+          'PinEntryView',
+          'UserSettingsPage',
+          'SettingsScreen',
+          'OtpVerifyScreen',
+          // Inflections/plurals the old substring check caught.
+          'AuthenticationScreen',
+          'AuthorizationPage',
+          'VerificationScreen',
+          'EmailVerificationPage',
+          'PaymentsScreen',
+          'TransfersPage',
+          'AccountsPage',
+          'BiometricsScreen',
+          'PasscodeScreen',
+          // "viewer" must not match inside "Reviewer" (debug filter).
+          'ReviewerPaymentScreen',
+        ]) {
+          expect(
+            AvoidScreenshotSensitiveRule.isSensitiveClassName(name),
+            isTrue,
+            reason: '$name must still be treated as a sensitive screen',
+          );
+        }
+      });
+
       test(
         'fixture has exactly one BAD (expect_lint) so rule triggers once',
         () {

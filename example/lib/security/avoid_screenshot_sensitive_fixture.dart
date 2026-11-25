@@ -137,6 +137,18 @@ class _DriftViewerWebViewScreen extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(body: const SizedBox());
 }
 
+// OK: "pin" is only a substring of "Mapping" (whole-word match) — should NOT trigger
+class _MappingPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(body: const SizedBox());
+}
+
+// OK: picker list with no sensitive word — should NOT trigger
+class _UserCountryPickerWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(body: const SizedBox());
+}
+
 // OK: WebView from settings (navigation context) — should NOT trigger
 class _WebViewScreenFromSettings extends StatelessWidget {
   const _WebViewScreenFromSettings({required this.uri});
