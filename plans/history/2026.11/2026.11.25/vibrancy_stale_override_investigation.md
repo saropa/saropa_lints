@@ -1,6 +1,6 @@
 # Vibrancy stale-override false positive (permission_handler_android): investigation and hardening
 
-Package Vibrancy reported `permission_handler_android: 13.0.1` in `dependency_overrides` as stale although the parent `permission_handler` declares `^14.1.0`. The root cause in the reporting project is unconfirmed; this change fixes one confirmed parser hazard that produces the same symptom and adds diagnostics for the remaining hypotheses. The bug report stays open at `bugs/infra_vibrancy_stale_override_false_positive_permission_handler_android.md`.
+Package Vibrancy reported `permission_handler_android: 13.0.1` in `dependency_overrides` as stale although the parent `permission_handler` declares `^14.1.0`. The root cause in the reporting project is unconfirmed; this change fixes one confirmed parser hazard that produces the same symptom and adds diagnostics for the remaining hypotheses. The bug report is archived at `plans/history/2026.11/2026.11.25/infra_vibrancy_stale_override_false_positive_permission_handler_android.md`.
 
 ## Finish Report (2026-11-25)
 

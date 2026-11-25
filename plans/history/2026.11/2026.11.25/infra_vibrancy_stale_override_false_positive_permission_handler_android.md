@@ -1,5 +1,7 @@
 # Package Vibrancy reports a needed override as stale (permission_handler_android)
 
+Status: Mitigated (2026-11-25). Root cause in the reporting project is unconfirmed: its package_config.json could not be read, so hypotheses A and C were not tested. Shipped: trailing-comment stripping in constraint parsing, logging of skipped constraint reads, an Unverified status when evidence is missing, and an in-file dismissal (`# saropa_lints:ignore stale-override`) with a quick fix. If the warning persists, the `Override constraint index skipped ...` log line names the cause; file a new report with it.
+
 ## Summary
 
 Package Vibrancy (extension-native check) flags `permission_handler_android: 13.0.1` in `dependency_overrides` as `stale-override` ("No version conflict detected"). The override is needed. The parent package `permission_handler` declares a constraint that `13.0.1` does not satisfy, so the override resolves a real conflict.
