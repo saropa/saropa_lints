@@ -813,8 +813,10 @@ class PreferOptionalPositionalParamsRule extends SaropaLintRule {
   }
 
   static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
-    if (p is RegularFormalParameter && p.functionTypedSuffix == null)
+    // Function-typed parameters have no plain type annotation to return.
+    if (p is RegularFormalParameter && p.functionTypedSuffix == null) {
       return p.type;
+    }
     return null;
   }
 }
@@ -898,8 +900,10 @@ class PreferPositionalBoolParamsRule extends SaropaLintRule {
   }
 
   static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
-    if (p is RegularFormalParameter && p.functionTypedSuffix == null)
+    // Function-typed parameters have no plain type annotation to return.
+    if (p is RegularFormalParameter && p.functionTypedSuffix == null) {
       return p.type;
+    }
     return null;
   }
 }

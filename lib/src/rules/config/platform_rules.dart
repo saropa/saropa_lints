@@ -3,10 +3,13 @@
 import 'dart:io';
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 import '../../conditional_import_utils.dart';
 import '../../fixes/platform/add_k_is_web_guard_fix.dart';
 import '../../fixes/platform/replace_platform_check_fix.dart';
+import '../../flutter_widget_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../string_slice_utils.dart';
 
@@ -351,14 +354,27 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
 // prefer_platform_widget_adaptive
 // =============================================================================
 
-/// Suggests platform-adaptive widgets for cross-platform apps.
+/// Suggests the `.adaptive` constructor for Material controls that have one.
 ///
-/// Using only Material widgets on iOS (or only Cupertino on Android) can feel
-/// inconsistent. Prefer Platform.isIOS / Theme.of(context).platform or adaptive widgets.
+/// Since: v6.2.0 | Updated: v17.10.0 | Rule version: v2
 ///
-/// **Bad:** MaterialApp with no platform-specific theming on iOS.
+/// A Material control looks foreign on iOS and macOS. Where Flutter ships an
+/// `.adaptive` constructor, using it is a drop-in way to match the platform.
 ///
-/// **Good:** Use Platform.isIOS to switch or use adaptive widgets.
+/// Only concrete controls are reported. `MaterialApp` is not: it has no
+/// adaptive counterpart and adapting is decided by the widgets and theme below
+/// it. A control built under (or after) an explicit platform branch is also
+/// accepted. `AlertDialog` is left to `prefer_adaptive_dialog`.
+///
+/// **BAD:**
+/// ```dart
+/// Switch(value: on, onChanged: toggle)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Switch.adaptive(value: on, onChanged: toggle)
+/// ```
 class PreferPlatformWidgetAdaptiveRule extends SaropaLintRule {
   PreferPlatformWidgetAdaptiveRule() : super(code: _code);
 
@@ -374,19 +390,34 @@ class PreferPlatformWidgetAdaptiveRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
-  // Only a syntactic constructor-name comparison ('MaterialApp') is used —
-  // no resolved-type APIs are called.
+  // The class must be proven to come from Flutter, not a same-named local one.
   @override
-  bool get usesTypeResolution => false;
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_platform_widget_adaptive',
-    '[prefer_platform_widget_adaptive] Consider platform-adaptive widgets. '
-        'Material-only UI on iOS (or Cupertino-only on Android) may feel inconsistent.',
+    '[prefer_platform_widget_adaptive] Material control has an adaptive '
+        'constructor that is not used. The Material look is rendered on iOS '
+        'and macOS too, where it feels inconsistent with the rest of the '
+        'system. {v2}',
     correctionMessage:
-        'Use Theme.of(context).platform or Platform.isIOS to adapt widgets.',
+        'Use the .adaptive constructor of this widget, or branch on '
+        'Theme.of(context).platform to build a platform-specific control.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  /// Flutter Material widgets that declare an `.adaptive` constructor.
+  static const Set<String> _widgetsWithAdaptive = {
+    'Checkbox',
+    'CheckboxListTile',
+    'CircularProgressIndicator',
+    'Radio',
+    'RadioListTile',
+    'RefreshIndicator',
+    'Slider',
+    'Switch',
+    'SwitchListTile',
+  };
 
   @override
   void runWithReporter(
@@ -394,10 +425,96 @@ class PreferPlatformWidgetAdaptiveRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String name = node.constructorName.type.name.lexeme;
-      if (name != 'MaterialApp') return;
-      reporter.atNode(node);
+      final ConstructorName constructor = node.constructorName;
+
+      // Only the default constructor: `.adaptive` is the fix, and other named
+      // constructors are a different, deliberate choice.
+      final String? named = constructor.name?.name;
+      if (named != null && named != 'new') return;
+
+      if (!_widgetsWithAdaptive.contains(constructor.type.name.lexeme)) {
+        return;
+      }
+      if (!isFlutterSdkInterface(constructor.type.element)) return;
+      if (_isPlatformBranched(node)) return;
+
+      reporter.atNode(constructor);
     });
+  }
+
+  /// True when the author already chose this control per platform: an
+  /// enclosing condition, or an earlier `if` / `switch` in an enclosing block,
+  /// reads the platform.
+  static bool _isPlatformBranched(AstNode node) {
+    AstNode child = node;
+    AstNode? current = node.parent;
+
+    while (current != null && current is! CompilationUnit) {
+      final Expression? condition = switch (current) {
+        IfStatement(:final expression) => expression,
+        IfElement(:final expression) => expression,
+        ConditionalExpression(:final condition) => condition,
+        SwitchStatement(:final expression) => expression,
+        SwitchExpression(:final expression) => expression,
+        _ => null,
+      };
+      if (condition != null && _readsPlatform(condition)) return true;
+
+      // `if (isIOS) return CupertinoSwitch(...); return Switch(...);`
+      if (current is Block && _hasEarlierPlatformBranch(current, child)) {
+        return true;
+      }
+
+      child = current;
+      current = current.parent;
+    }
+
+    return false;
+  }
+
+  /// True if a statement before [child] in [block] branches on the platform.
+  static bool _hasEarlierPlatformBranch(Block block, AstNode child) {
+    for (final Statement statement in block.statements) {
+      if (identical(statement, child)) return false;
+
+      final Expression? condition = switch (statement) {
+        IfStatement(:final expression) => expression,
+        SwitchStatement(:final expression) => expression,
+        _ => null,
+      };
+      if (condition != null && _readsPlatform(condition)) return true;
+    }
+
+    return false;
+  }
+
+  /// True if [condition] reads a platform source.
+  static bool _readsPlatform(Expression condition) {
+    final _PlatformReadFinder finder = _PlatformReadFinder();
+    condition.accept(finder);
+
+    return finder.found;
+  }
+}
+
+/// Detects, by resolved element, a read of `Platform.*` (dart:io),
+/// `defaultTargetPlatform`, or a Flutter `platform` property such as
+/// `ThemeData.platform`.
+class _PlatformReadFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    final Element? element = node.element;
+    final String uri = element?.library?.uri.toString() ?? '';
+
+    if (uri == 'dart:io') {
+      if (element?.enclosingElement?.name == 'Platform') found = true;
+    } else if (uri.startsWith('package:flutter/')) {
+      if (node.name == 'defaultTargetPlatform' || node.name == 'platform') {
+        found = true;
+      }
+    }
   }
 }
 

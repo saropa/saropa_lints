@@ -426,6 +426,17 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'trash',
   },
   {
+    // Accepted-findings list (saropa_accepted.yaml): stale/invalid entry
+    // report. Entries are added from the lightbulb on a finding
+    // (saropaLints.acceptFindingInFile, registered in code only because it
+    // needs the finding's file and rule as arguments).
+    command: 'saropaLints.checkAcceptedFindings',
+    title: 'Check Accepted Findings',
+    description: 'Report saropa_accepted.yaml entries that are stale or invalid, as Problems on the list file.',
+    category: 'Analysis',
+    icon: 'checklist',
+  },
+  {
     // Analysis Optimizer dashboard — tuning and performance.
     command: 'saropaLints.openAnalysisOptimizer',
     title: 'Analysis Optimizer',

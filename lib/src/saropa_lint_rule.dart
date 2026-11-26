@@ -16,6 +16,7 @@ import 'package:analyzer/error/error.dart'
 
 import 'analyzer_compat.dart';
 import 'baseline/baseline_manager.dart';
+import 'accepted/accepted_findings_runtime.dart';
 import 'config/memory_mode.dart';
 import 'ignore_utils.dart';
 import 'native/config_loader.dart'
@@ -2087,6 +2088,11 @@ enum SuppressionKind {
 
   /// Suppressed by the baseline (saropa_baseline.json).
   baseline,
+
+  /// Hidden by an entry in the accepted-findings list
+  /// (`saropa_accepted.yaml`): a reviewed finding with a recorded reason.
+  /// Its own kind so reports never blur "reviewed" with "legacy debt".
+  accepted,
 }
 
 /// A single suppressed diagnostic — a lint that *would* have been reported
@@ -2177,6 +2183,7 @@ class SuppressionTracker {
   static int _ignoreCount = 0;
   static int _ignoreForFileCount = 0;
   static int _baselineCount = 0;
+  static int _acceptedCount = 0;
 
   /// When true, [record] retains the full diagnostic-shaped detail passed
   /// in (column/span/severity/messages/impact) on each [SuppressionRecord]
@@ -2236,6 +2243,8 @@ class SuppressionTracker {
           _ignoreForFileCount++;
         case SuppressionKind.baseline:
           _baselineCount++;
+        case SuppressionKind.accepted:
+          _acceptedCount++;
       }
     }
   }
@@ -2255,11 +2264,15 @@ class SuppressionTracker {
   /// Count of baseline suppressions.
   static int get baselineCount => _baselineCount;
 
+  /// Count of accepted-findings-list suppressions.
+  static int get acceptedCount => _acceptedCount;
+
   /// Counts by kind, suitable for JSON serialization.
   static Map<String, int> get countsByKind => <String, int>{
     'ignore': _ignoreCount,
     'ignoreForFile': _ignoreForFileCount,
     'baseline': _baselineCount,
+    'accepted': _acceptedCount,
   };
 
   /// Suppression counts grouped by rule name.
@@ -2290,10 +2303,12 @@ class SuppressionTracker {
     final ic = ignoreCount;
     final fc = ignoreForFileCount;
     final bc = baselineCount;
+    final ac = acceptedCount;
     final parts = <String>[];
     if (ic > 0) parts.add('$ic ignore');
     if (fc > 0) parts.add('$fc file-level');
     if (bc > 0) parts.add('$bc baseline');
+    if (ac > 0) parts.add('$ac accepted');
     return '$t suppression${t == 1 ? '' : 's'} (${parts.join(', ')})';
   }
 
@@ -2311,6 +2326,7 @@ class SuppressionTracker {
     _ignoreCount = 0;
     _ignoreForFileCount = 0;
     _baselineCount = 0;
+    _acceptedCount = 0;
     captureDetails = false;
   }
 }
@@ -3423,6 +3439,16 @@ class SaropaDiagnosticReporter {
       );
       return;
     }
+    // Accepted-findings list: checked after the baseline so a finding that
+    // is both baselined and accepted keeps its existing baseline count.
+    if (_isAccepted(token.offset)) {
+      _trackSuppression(
+        token.offset,
+        SuppressionKind.accepted,
+        length: token.length,
+      );
+      return;
+    }
     if (_isIgnoredForFile()) {
       _trackSuppression(
         token.offset,
@@ -3464,6 +3490,11 @@ class SaropaDiagnosticReporter {
       _trackSuppression(offset, SuppressionKind.baseline, length: length);
       return;
     }
+    // Same order as atToken: baseline, then the accepted-findings list.
+    if (_isAccepted(offset)) {
+      _trackSuppression(offset, SuppressionKind.accepted, length: length);
+      return;
+    }
     // File-level only — no AST node available for node-level ignore check.
     if (_isIgnoredForFile()) {
       _trackSuppression(offset, SuppressionKind.ignoreForFile, length: length);
@@ -3499,6 +3530,11 @@ class SaropaDiagnosticReporter {
   bool _isSuppressed(int offset, AstNode node) {
     if (_isBaselined(offset, node: node)) {
       _trackSuppression(offset, SuppressionKind.baseline, node: node);
+      return true;
+    }
+    // Same order as atToken: baseline, then the accepted-findings list.
+    if (_isAccepted(offset, node: node)) {
+      _trackSuppression(offset, SuppressionKind.accepted, node: node);
       return true;
     }
     if (_isIgnoredForFile()) {
@@ -3612,6 +3648,19 @@ class SaropaDiagnosticReporter {
       loc.line,
       impact: impact.name,
     );
+  }
+
+  /// Whether an accepted-findings entry (rule + file) hides this finding.
+  ///
+  /// Only the in-server plugin enables the hook (see the config loader); CLI
+  /// producers filter their output afterwards instead and pay only a static
+  /// read here. The location is resolved first because the file's path picks
+  /// which project's list applies.
+  bool _isAccepted(int offset, {AstNode? node}) {
+    if (!AcceptedFindingsRuntime.isEnabled) return false;
+    final loc = _resolveLocation(offset, node);
+    if (loc == null) return false;
+    return AcceptedFindingsRuntime.match(loc.path, _ruleName) != null;
   }
 
   /// Check if this rule is suppressed file-wide via `// ignore_for_file:`.

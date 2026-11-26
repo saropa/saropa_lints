@@ -256,6 +256,16 @@ dart run saropa_lints:project_vibrancy # Function-level code-health scoring
 dart run saropa_lints audit            # Full audit with SARIF output for GitHub
 ```
 
+**Accepted findings:** a `saropa_accepted.yaml` file beside a package's `pubspec.yaml` hides reviewed findings without `// ignore:` comments. Each Dart file uses the list of its nearest `pubspec.yaml`, so a nested package such as `example/` keeps its own list. Each entry needs `rule`, `file` (relative to that package) and `reason`; `kind` (`accepted` or `false_positive`) is optional. `dart run saropa_lints scan --check-accepted` checks every list under the scan target and fails on stale or invalid entries.
+
+```yaml
+version: 1
+accepted:
+  - rule: avoid_print
+    file: lib/tool/report.dart
+    reason: Command-line output is the purpose of this file.
+```
+
 The scanner works on **any Dart project** — even without saropa_lints as a dependency. Ideal for evaluating before adopting.
 
 ---

@@ -65,8 +65,10 @@ bool _isInsideBuildMethod(AstNode node) {
 
 /// Returns a formal parameter's declared type.
 TypeAnnotation? _parameterType(FormalParameter param) {
-  if (param is RegularFormalParameter && param.functionTypedSuffix == null)
+  // Function-typed parameters have no plain type annotation to return.
+  if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
     return param.type;
+  }
   return null;
 }
 

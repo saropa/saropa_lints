@@ -30,6 +30,8 @@ import 'package:saropa_lints/src/report/timing_emitter.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart'
     show RuleTimingTracker, SuppressionKind, SuppressionTracker;
 import 'package:saropa_lints/src/scan/audit_baseline.dart';
+import 'package:saropa_lints/src/accepted/accepted_findings_report.dart';
+import 'package:saropa_lints/src/accepted/accepted_findings_roots.dart';
 
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
@@ -141,8 +143,31 @@ Future<void> main(List<String> args) async {
     exit(2);
   }
 
+  // Accepted-findings lists (saropa_accepted.yaml): findings an entry covers
+  // are left out of the audit output like any other suppression. Each
+  // finding uses its own package's list, as the analyzer plugin does, so a
+  // nested package is filtered by its list and not by the target's.
+  final acceptedLists = AcceptedListSet();
+  // Audit's target holds pubspec.yaml (checked above); its list is loaded up
+  // front so a broken one is warned about even when no finding falls in it.
+  acceptedLists.listAt(path);
+  final acceptedSplit = filterAcceptedByNearestRoot(
+    diagnostics,
+    lists: acceptedLists,
+  );
+  if (!parsed.quiet) {
+    for (final broken in acceptedLists.withProblems) {
+      final n = broken.problems.length;
+      stderr.writeln(
+        'Warning: ${broken.path} has $n invalid entr${n == 1 ? 'y' : 'ies'} '
+        '(they hide nothing). Run '
+        '`dart run saropa_lints scan --check-accepted`.',
+      );
+    }
+  }
+
   // Post-filter by severity / impact when requested.
-  var filtered = diagnostics;
+  var filtered = acceptedSplit.kept;
   if (parsed.minSeverity != null) {
     final threshold = _severityRank(parsed.minSeverity!);
     filtered = filtered
@@ -176,6 +201,24 @@ Future<void> main(List<String> args) async {
       minImpact: parsed.minImpact,
     );
     (json['diagnostics'] as List<Object?>).addAll(suppressedDiagnostics);
+    // Accepted-list hits carry the entry's kind and reason. The same
+    // severity/impact post-filters apply so they cannot reappear below the
+    // requested threshold.
+    final acceptedHidden = acceptedSplit.hidden.where((h) {
+      final d = h.diagnostic;
+      if (parsed.minSeverity != null &&
+          _severityRank(d.severity) < _severityRank(parsed.minSeverity!)) {
+        return false;
+      }
+      if (parsed.minImpact != null &&
+          _impactRank(d.impact ?? '') < _impactRank(parsed.minImpact!)) {
+        return false;
+      }
+      return true;
+    }).toList();
+    (json['diagnostics'] as List<Object?>).addAll(
+      acceptedHiddenToJsonMaps(acceptedHidden),
+    );
   }
 
   // Enrich each diagnostic with its tier and category.
@@ -536,6 +579,7 @@ String suppressedByLabel(SuppressionKind kind) => switch (kind) {
   SuppressionKind.ignore => 'ignore',
   SuppressionKind.ignoreForFile => 'ignore_for_file',
   SuppressionKind.baseline => 'baseline',
+  SuppressionKind.accepted => 'accepted',
 };
 
 /// Converts every record [SuppressionTracker] captured during the scan into
@@ -627,8 +671,9 @@ void _printUsage() {
   print('                        findings then make the exit code 1');
   print('  --baseline-path <p>   Override baseline file path');
   print('  --include-suppressed  Also include findings normally dropped by');
-  print('                        // ignore:, // ignore_for_file:, or the');
-  print('                        baseline — each tagged with a');
+  print('                        // ignore:, // ignore_for_file:, the');
+  print('                        baseline, or saropa_accepted.yaml (with its');
+  print('                        kind and reason) — each tagged with a');
   print('                        "suppressedBy" field. Additive/opt-in;');
   print('                        default output is unchanged.');
   print('  --profile             Emit per-rule timing report');

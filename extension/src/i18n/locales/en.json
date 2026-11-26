@@ -2842,6 +2842,51 @@
       "title": "Fix stale ignores in this file"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Checking accepted findings…"
+    },
+    "error": {
+      "checkFailed": "Check accepted findings failed: {message}",
+      "badOutput": "The scan output could not be read.",
+      "noWorkspace": "No Dart/Flutter workspace found. Open a project with pubspec.yaml first.",
+      "missingDep": "Add saropa_lints to pubspec.yaml before using accepted findings.",
+      "noFinding": "Use the light bulb on a Saropa Lints finding in a Dart file to accept it.",
+      "outsideProject": "This file is not inside a Dart package (no pubspec.yaml above it), so it cannot be added to saropa_accepted.yaml.",
+      "writeFailed": "Could not update saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml has a layout that cannot be extended automatically. Add the entry by hand."
+    },
+    "info": {
+      "alreadyRunning": "An accepted-findings check is already running.",
+      "noList": "No saropa_accepted.yaml found in any package of the workspace. Use \"Accept in this file\" on a finding to start one.",
+      "clean": "Accepted findings: {count} entries checked, none stale or invalid.",
+      "issues": "Accepted findings: {stale} stale and {invalid} invalid, out of {count} entries. See the Problems panel.",
+      "added": "Added {rule} in {file} to {list}. Findings already shown clear when the file is analyzed again."
+    },
+    "action": {
+      "openList": "Open List",
+      "restartAnalysis": "Restart Analysis Server"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Stale entry: {file} no longer exists, so this entry for {rule} hides nothing.",
+      "staleNoFinding": "Stale entry: {rule} found nothing in {file}. Remove the entry if the code was fixed.",
+      "invalid": "Invalid entry, hides nothing: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Why is this finding accepted?",
+      "kindAccepted": "Accepted: the finding is real and the code stays as it is",
+      "kindFalsePositive": "False positive: the rule is wrong here",
+      "reasonTitle": "Reason for accepting {rule} in {file}",
+      "reasonPlaceholder": "Required. Saved in saropa_accepted.yaml for reviewers.",
+      "reasonRequired": "A reason is required."
+    },
+    "quickFix": {
+      "title": "Accept {rule} in this file…"
+    },
+    "summary": {
+      "count": "{count} accepted"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "This report is marked \"{status}\" but is still in bugs/ — archive it to plans/history/ before closing (see ISSUE_REPORT_GUIDE.md)."

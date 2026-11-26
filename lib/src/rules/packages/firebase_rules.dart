@@ -2439,13 +2439,19 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
 
 /// Firebase calls can fail and should have error handling.
 ///
-/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.1.5 | Updated: v17.10.0 | Rule version: v3
 ///
 /// Firebase operations are network calls that can fail for many reasons:
 /// - No network connection
 /// - Permission denied
 /// - Quota exceeded
 /// - Invalid data
+///
+/// A Firebase call inside a library-private (or local) async helper is not
+/// reported when every reference to that helper in the same library is an
+/// awaited call inside a try-catch (directly, or through a private or
+/// `@visibleForTesting` function field holding the helper as a tear-off).
+/// Any other reference, or a library split into `part` files, keeps the report.
 ///
 /// **BAD:**
 /// ```dart
@@ -2481,7 +2487,7 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_firebase_error_handling',
     '[require_firebase_error_handling] Firebase operation without '
-        'error handling. Firebase calls can fail. {v2}',
+        'error handling. Firebase calls can fail. {v3}',
     correctionMessage:
         'Wrap in try-catch or add .catchError() to handle Firebase errors.',
     severity: DiagnosticSeverity.WARNING,
@@ -2516,8 +2522,186 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
       // Check if has .catchError
       if (_hasCatchError(expr)) return;
 
+      // FALSE-POSITIVE FIX: a thin private wrapper around one Firebase call
+      // (often reached through a private / @visibleForTesting function field
+      // used as a test seam) moves the try-catch to its callers. The parent
+      // walk above stops at the wrapper's own body, so it never saw that
+      // handling. Skip only when EVERY reference to the wrapper in this
+      // library is a guarded, awaited call — any untraceable reference keeps
+      // the report. See plans/history/2026.11/2026.11.26/
+      // require_firebase_error_handling_false_positive_private_helper_callers_catch.md.
+      if (_isPrivateHelperWithGuardedCallers(node)) return;
+
       reporter.atNode(node);
     });
+  }
+
+  /// True when [node] sits directly in the body of a library-private (or
+  /// local) async function/method whose every reference in this compilation
+  /// unit is an awaited call inside a `try` that has a `catch` clause.
+  ///
+  /// Soundness: references are matched by NAME across the whole unit, which
+  /// is a superset of the real references (same-named members of other
+  /// classes, shadowing locals). Requiring every name match to be guarded is
+  /// therefore stricter than an element-exact check, never looser, and works
+  /// in both the resolved and the syntactic scan pass. A unit with `part`
+  /// or `part of` directives is rejected because references may live in
+  /// another file of the same library.
+  bool _isPrivateHelperWithGuardedCallers(AwaitExpression node) {
+    final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+    if (body == null || !body.isAsynchronous) return false;
+    final String? name = _traceableFunctionName(body);
+    if (name == null) return false;
+    final AstNode root = node.root;
+    if (root is! CompilationUnit) return false;
+    // Part files would hide callers from this unit-only scan, whether this
+    // unit declares the parts or is one of them.
+    if (root.directives.any(
+      (Directive d) => d is PartDirective || d is PartOfDirective,
+    )) {
+      return false;
+    }
+    return _allReferencesGuarded(root, name, <String>{});
+  }
+
+  /// Name of the function owning [body] when all of its callers are
+  /// guaranteed to be in this library: a `_private` method or top-level
+  /// function, or a local function. Public names (callable from other
+  /// libraries) and accessors/operators return null.
+  static String? _traceableFunctionName(FunctionBody body) {
+    final AstNode? owner = body.parent;
+    if (owner is MethodDeclaration) {
+      // Getters/setters/operators are not invoked by a call expression the
+      // reference check below understands.
+      if (owner.isGetter || owner.isSetter || owner.isOperator) return null;
+      final String name = owner.name.lexeme;
+      return name.startsWith('_') ? name : null;
+    }
+    if (owner is FunctionExpression) {
+      final AstNode? decl = owner.parent;
+      if (decl is! FunctionDeclaration || decl.isGetter || decl.isSetter) {
+        return null;
+      }
+      final String name = decl.name.lexeme;
+      // A local function is only reachable inside its enclosing block.
+      final bool isLocal = decl.parent is FunctionDeclarationStatement;
+      return (isLocal || name.startsWith('_')) ? name : null;
+    }
+    return null;
+  }
+
+  /// True when [name] has at least one reference in [unit] and every
+  /// reference is either a guarded awaited call or a tear-off stored in a
+  /// traceable variable whose own references are all guarded calls.
+  /// [visited] stops tear-off cycles (`_a = _b; _b = _a`).
+  bool _allReferencesGuarded(
+    CompilationUnit unit,
+    String name,
+    Set<String> visited,
+  ) {
+    if (!visited.add(name)) return false;
+    final List<SimpleIdentifier> refs = _FirebaseHelperRefCollector.collect(
+      unit,
+      name,
+    );
+    // An unreferenced helper has no caller handling to credit.
+    if (refs.isEmpty) return false;
+    for (final SimpleIdentifier ref in refs) {
+      final Expression? call = _invocationFor(ref);
+      if (call != null) {
+        if (!_isGuardedAwaitedCall(call)) return false;
+        continue;
+      }
+      // Tear-off seam: `static Future<void> Function() _seam = _helper;`.
+      final String? seam = _traceableTearOffVariable(ref);
+      if (seam == null) return false;
+      if (!_allReferencesGuarded(unit, seam, visited)) return false;
+    }
+    return true;
+  }
+
+  /// The call expression that invokes [ref] directly, or null when [ref] is
+  /// used any other way (tear-off, assignment, argument, comparison).
+  ///
+  /// Covers `_f()`, `this._f()`, `Cls._f()` (MethodInvocation) and the
+  /// resolver's rewrite of a function-typed field call into a
+  /// FunctionExpressionInvocation (`_seam()`, `Cls._seam()`).
+  static Expression? _invocationFor(SimpleIdentifier ref) {
+    final AstNode? parent = ref.parent;
+    if (parent is MethodInvocation && identical(parent.methodName, ref)) {
+      return parent;
+    }
+    AstNode callee = ref;
+    if (parent is PrefixedIdentifier && identical(parent.identifier, ref)) {
+      callee = parent;
+    } else if (parent is PropertyAccess &&
+        identical(parent.propertyName, ref)) {
+      callee = parent;
+    }
+    final AstNode? invocation = callee.parent;
+    if (invocation is FunctionExpressionInvocation &&
+        identical(invocation.function, callee)) {
+      return invocation;
+    }
+    return null;
+  }
+
+  /// True when [call] is awaited (an unawaited Future's error escapes the
+  /// try) and that await is in the `try` block of a try-catch, or the call
+  /// chains `.catchError` / `.onError`. The walk stops at the first function
+  /// body: a try around a closure definition does not guard its later run.
+  bool _isGuardedAwaitedCall(Expression call) {
+    if (call is MethodInvocation && _hasCatchError(call)) return true;
+    AstNode? current = call.parent;
+    while (current is ParenthesizedExpression) {
+      current = current.parent;
+    }
+    if (current is! AwaitExpression) return false;
+    AstNode child = current;
+    AstNode? parent = current.parent;
+    while (parent != null && parent is! FunctionBody) {
+      // Only the protected `try { ... }` block counts — a call inside a
+      // catch or finally clause, or a try with no catch, is not guarded.
+      if (parent is TryStatement &&
+          identical(parent.body, child) &&
+          parent.catchClauses.isNotEmpty) {
+        return true;
+      }
+      child = parent;
+      parent = parent.parent;
+    }
+    return false;
+  }
+
+  /// When [ref] is the whole initializer of a variable (`_seam = _helper`),
+  /// returns that variable's name if all of its uses are in this library:
+  /// a `_private` name, a local variable, or a field annotated
+  /// `@visibleForTesting` (the analyzer reports any production use of it
+  /// outside this library). Otherwise null — the tear-off escapes.
+  static String? _traceableTearOffVariable(SimpleIdentifier ref) {
+    final AstNode? decl = ref.parent;
+    if (decl is! VariableDeclaration || !identical(decl.initializer, ref)) {
+      return null;
+    }
+    final String name = decl.name.lexeme;
+    if (name.startsWith('_')) return name;
+    final AstNode? list = decl.parent;
+    final AstNode? holder = list?.parent;
+    if (holder is VariableDeclarationStatement) return name;
+    if (holder is FieldDeclaration || holder is TopLevelVariableDeclaration) {
+      final NodeList<Annotation> metadata = (holder as AnnotatedNode).metadata;
+      // Exact match on the annotation's final identifier so both
+      // `@visibleForTesting` and `@meta.visibleForTesting` count.
+      final bool visibleForTesting = metadata.any((Annotation a) {
+        final Identifier id = a.name;
+        final String simple = id is PrefixedIdentifier
+            ? id.identifier.name
+            : id.name;
+        return simple == 'visibleForTesting';
+      });
+      return visibleForTesting ? name : null;
+    }
+    return null;
   }
 
   static final List<RegExp> _firebaseClassPatterns = _firebaseClasses
@@ -2564,6 +2748,38 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
       parent = parent.parent;
     }
     return false;
+  }
+}
+
+/// Collects every [SimpleIdentifier] named [_name] in a compilation unit,
+/// for [RequireFirebaseErrorHandlingRule]'s caller trace.
+///
+/// Identifiers inside doc-comment references (`[_helper]`) are skipped: they
+/// are not code paths, and counting them would make every documented helper
+/// look like it had an untraceable reference.
+class _FirebaseHelperRefCollector extends RecursiveAstVisitor<void> {
+  _FirebaseHelperRefCollector(this._name);
+
+  final String _name;
+  final List<SimpleIdentifier> _refs = <SimpleIdentifier>[];
+
+  /// Returns all code references to [name] in [unit].
+  static List<SimpleIdentifier> collect(CompilationUnit unit, String name) {
+    final _FirebaseHelperRefCollector collector = _FirebaseHelperRefCollector(
+      name,
+    );
+    unit.accept(collector);
+    return collector._refs;
+  }
+
+  @override
+  void visitCommentReference(CommentReference node) {
+    // Intentionally not descending: doc references are not calls.
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == _name) _refs.add(node);
   }
 }
 

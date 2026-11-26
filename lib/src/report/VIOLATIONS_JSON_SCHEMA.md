@@ -74,7 +74,7 @@ Aggregate statistics for the analysis run. **This is the primary section for CI 
 | `newCode` | `object` | Date-based new-code metrics block. When configured: `{ "configured": true, "strategy": "date", "since": "YYYY-MM-DD", "countsSource": "reportedViolations", "totalViolations": int, "byImpact": object, "byRuleType": object, "byRuleStatus": object }`; otherwise `{ "configured": false, "strategy": "date" }` |
 | `thresholds` | `object` | Per-rule threshold gate status and breaches (`status`, `warnings`, `failures`) |
 | `baselineDiff` | `object` | Baseline comparison result (`totalNewViolations`, `newViolationsByRule`, baseline metadata) |
-| `suppressions` | `object` | `{ "total": int, "byKind": { "ignore": int, "ignoreForFile": int, "baseline": int }, "byRule": { "rule_name": int, ... }, "byFile": { "relative/path.dart": int, ... } }` — counts of silenced diagnostics merged across analysis isolates (same source as the extension suppressions views) |
+| `suppressions` | `object` | `{ "total": int, "byKind": { "ignore": int, "ignoreForFile": int, "baseline": int, "accepted": int }, "byRule": { "rule_name": int, ... }, "byFile": { "relative/path.dart": int, ... } }` — counts of silenced diagnostics merged across analysis isolates (same source as the extension suppressions views). `accepted` counts findings hidden by `saropa_accepted.yaml` |
 
 Threshold keys under `diagnostic_statistics.thresholds` can target either:
 - concrete rule names (for example `avoid_hardcoded_credentials`)

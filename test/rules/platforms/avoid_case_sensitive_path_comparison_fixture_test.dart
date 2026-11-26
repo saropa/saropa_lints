@@ -710,6 +710,77 @@ bool same(String a, String b) {
 ''');
     });
 
+    // A MIME type constant whose NAME contains "folder" is not a path: the
+    // exemption keys on the constant's value, not on how it is spelled.
+    test('does NOT fire on comparison against a MIME type constant', () async {
+      await assertFixtureMarkers(rule, '''
+const String folderMimeType = 'application/vnd.google-apps.folder';
+
+class Adapter {
+  static const String _folderMimeType = 'application/vnd.google-apps.folder';
+
+  void check(String mimeType) {
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (mimeType != _folderMimeType) {}
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (Adapter._folderMimeType == mimeType) {}
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (mimeType == folderMimeType) {}
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (mimeType == 'application/vnd.google-apps.folder') {}
+    const folderType = 'inode/directory';
+    const folderImage = 'image/svg+xml';
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (mimeType == folderImage) {}
+    // Listed subtype, `x-` subtype and wildcard forms.
+    const folderText = 'text/plain';
+    const folderForm = 'application/x-www-form-urlencoded';
+    const folderAny = 'image/*';
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (mimeType == folderText) {}
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (mimeType == folderForm) {}
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (mimeType == folderAny) {}
+  }
+}
+''');
+    });
+
+    // Constants that hold real paths, and non-const values, must keep linting
+    // even when they contain a slash or are named after a MIME type.
+    test('fires on path constants that are not MIME types', () async {
+      await assertFixtureMarkers(rule, '''
+const String relativeFolder = 'text/readme.txt';
+const String absoluteFolder = '/application/json';
+const String nestedFolder = 'video/clips/raw';
+const String sourceFolder = 'lib/src';
+const String imageFolder = 'image/cache';
+const String clipFolder = 'video/clips';
+const String userFolder = 'model/user';
+String folderMimeType = 'application/json';
+
+void check(String value) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (value == relativeFolder) {}
+  // LINT: avoid_case_sensitive_path_comparison
+  if (value == absoluteFolder) {}
+  // LINT: avoid_case_sensitive_path_comparison
+  if (value == nestedFolder) {}
+  // LINT: avoid_case_sensitive_path_comparison
+  if (value == sourceFolder) {}
+  // LINT: avoid_case_sensitive_path_comparison
+  if (value == imageFolder) {}
+  // LINT: avoid_case_sensitive_path_comparison
+  if (value == clipFolder) {}
+  // LINT: avoid_case_sensitive_path_comparison
+  if (value == userFolder) {}
+  // LINT: avoid_case_sensitive_path_comparison
+  if (value == folderMimeType) {}
+}
+''');
+    });
+
     test('does NOT fire on HttpRequest.uri.path local compared to a static '
         'const route constant (no intermediate req variable)', () async {
       await assertFixtureMarkers(rule, '''

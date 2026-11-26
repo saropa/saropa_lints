@@ -317,6 +317,12 @@
         "enablement": "saropaLints.isDartProject"
       },
       {
+        "command": "saropaLints.checkAcceptedFindings",
+        "title": "%command.checkAcceptedFindings.title%",
+        "icon": "$(checklist)",
+        "enablement": "saropaLints.isDartProject"
+      },
+      {
         "command": "saropaLints.openViolationsWideReport",
         "title": "%command.openViolationsWideReport.title%",
         "category": "%command.openViolationsWideReport.category%",
@@ -1078,6 +1084,11 @@
         }
       ],
       "editor/title": [
+        {
+          "command": "saropaLints.checkAcceptedFindings",
+          "when": "resourceFilename == saropa_accepted.yaml",
+          "group": "navigation"
+        },
         {
           "command": "saropaLints.packageVibrancy.hideCodeLens",
           "when": "resourceFilename == pubspec.yaml && saropaLints.packageVibrancy.codeLensEnabled",

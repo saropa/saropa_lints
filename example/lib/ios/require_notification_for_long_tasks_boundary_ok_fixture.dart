@@ -10,3 +10,16 @@ Future<void> boundaryOnlyMustNotLint() async {
   await _isFacebookFriendsImportAllowedNow();
   await dbProcessAllContactListGroupMemberships();
 }
+
+// A generic `syncAll` name over a same-file callee with only short work.
+Future<void> syncWidgetA() async {}
+Future<void> syncWidgetB() async {}
+
+Future<void> syncAllWidgets() async {
+  await syncWidgetA();
+  await syncWidgetB();
+}
+
+Future<void> shortRefreshMustNotLint() async {
+  await syncAllWidgets();
+}

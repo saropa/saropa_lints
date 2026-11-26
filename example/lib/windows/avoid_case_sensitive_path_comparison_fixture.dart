@@ -359,7 +359,27 @@ void badUploadRequestUriPath(UploadRequest r, File f) {
   if (r.uri.path == f.path) {}
 }
 
-// --- Total count assertion: exactly 13 BAD sites should fire ---
-// LINT_COUNT: avoid_case_sensitive_path_comparison 13
+// --- GOOD: a MIME type constant is not a path, whatever its name says. ---
+
+const String _folderMimeType = 'application/vnd.google-apps.folder';
+
+/// The constant's value is a MIME type, so this is a content type check.
+void goodMimeTypeConstant(String mimeType) {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (mimeType != _folderMimeType) {}
+}
+
+// --- BAD: a slash alone does not make a constant a MIME type. ---
+
+const String _reportFolder = 'text/readme.txt';
+
+/// A relative file path that starts with a MIME top-level word still lints.
+void badRelativeFileConstant(String value) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (value == _reportFolder) {}
+}
+
+// --- Total count assertion: exactly 14 BAD sites should fire ---
+// LINT_COUNT: avoid_case_sensitive_path_comparison 14
 
 void main() {}

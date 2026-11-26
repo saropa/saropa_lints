@@ -5341,9 +5341,11 @@ class AvoidBoolInWidgetConstructorsRule extends SaropaLintRule {
       final FormalParameterList params = node.parameters;
       for (final FormalParameter p in params.parameters) {
         final FormalParameter inner = p;
+        // Only plain typed parameters can be declared as `bool`.
         if (inner is! RegularFormalParameter ||
-            inner.functionTypedSuffix != null)
+            inner.functionTypedSuffix != null) {
           continue;
+        }
         if (!inner.isNamed) continue;
         final String? name = inner.name?.lexeme;
         if (name == null || _widgetBoolParamAllowlist.contains(name)) continue;

@@ -104,6 +104,8 @@ export interface SuppressionsByKind {
   ignore?: number;
   ignoreForFile?: number;
   baseline?: number;
+  /** Hidden by an entry in saropa_accepted.yaml (reviewed, with a reason). */
+  accepted?: number;
 }
 
 /** Aggregate suppression data included in the violations.json summary. */

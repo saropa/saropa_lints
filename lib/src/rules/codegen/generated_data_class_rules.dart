@@ -169,6 +169,9 @@ class PreferGeneratedDataClassesRule extends SaropaLintRule {
       } else if (member is ConstructorDeclaration) {
         // `Foo.fromJson(...)` and `factory Foo.fromJson(...)`.
         if (member.name?.lexeme == 'fromJson') member.body.accept(keys);
+        // The replacement, isComplete, is missing from MethodDeclaration in
+        // analyzer 13.0.0, which pubspec.yaml still allows.
+        // ignore: deprecated_member_use
       } else if (member is MethodDeclaration && !member.isAbstract) {
         final String name = member.name.lexeme;
         if (name == 'copyWith') {

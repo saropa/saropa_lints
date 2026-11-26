@@ -34,6 +34,8 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart' show getRulesFromRegistry;
 import 'package:saropa_lints/scan.dart';
+import 'package:saropa_lints/src/accepted/accepted_findings_roots.dart'
+    show filterAcceptedByNearestRoot;
 import 'package:saropa_lints/src/lsp/scan_progress_notification.dart'
     show buildScanProgressNotification;
 import 'package:saropa_lints/src/report/analysis_reporter.dart'
@@ -1013,7 +1015,14 @@ Future<void> _analyzeFile(Map<String, dynamic> params) async {
 
     // Cache diagnostics per-file so codeAction can look them up later
     // to produce quick fixes for the correct diagnostic range.
-    final fileDiags = diagnostics ?? [];
+    // Accepted-findings lists: drop findings an entry covers before they
+    // reach the editor, matching the analyzer plugin: the list is the one of
+    // the file's own package, not of the server's root, so a file in a nested
+    // package or another workspace folder uses its package's list. Re-read
+    // per analysis (one small file) so list edits apply on the next pass.
+    // Filtered before caching so codeAction never offers fixes for a hidden
+    // finding.
+    final fileDiags = filterAcceptedByNearestRoot(diagnostics ?? const []).kept;
     _fileDiagnostics[fileUri] = fileDiags;
 
     // Convert ScanDiagnostics to LSP Diagnostic objects and publish.

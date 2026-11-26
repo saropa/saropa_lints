@@ -4296,8 +4296,11 @@ class PreferExtensionMethodsRule extends SaropaLintRule {
 
       final FormalParameter first = params.parameters.first;
       final FormalParameter inner = first;
-      if (inner is! RegularFormalParameter || inner.functionTypedSuffix != null)
+      // Only plain typed parameters carry a type annotation to inspect.
+      if (inner is! RegularFormalParameter ||
+          inner.functionTypedSuffix != null) {
         return;
+      }
 
       final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;
@@ -4383,8 +4386,11 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
 
       final FormalParameter first = params.parameters.first;
       final FormalParameter inner = first;
-      if (inner is! RegularFormalParameter || inner.functionTypedSuffix != null)
+      // Only plain typed parameters carry a type annotation to inspect.
+      if (inner is! RegularFormalParameter ||
+          inner.functionTypedSuffix != null) {
         return;
+      }
 
       final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;

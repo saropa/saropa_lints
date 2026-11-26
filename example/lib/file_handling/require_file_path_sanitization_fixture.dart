@@ -202,6 +202,19 @@ Future<File> _openAtExe(String exePath) async {
   return File('$exePath.log');
 }
 
+/// GOOD: `.path` is a property of a local, not the parameter named `path`.
+Future<File> goodPropertySharesParameterName(String path) async {
+  final Directory appDir = Directory('/data/app');
+  return File('${appDir.path}/.write_probe');
+}
+
+/// BAD: the parameter named `path` really is interpolated.
+Future<File> badParameterNamedPath(String path) async {
+  final Directory appDir = Directory('/data/app');
+  // expect_lint: require_file_path_sanitization
+  return File('${appDir.path}/$path');
+}
+
 /// REGRESSION BAD: private helper with zero observed call sites — the
 /// literal-only check returns false (cannot prove all callers pass literals
 /// if we see none), so the lint still fires. Guards against over-suppression.

@@ -7,11 +7,13 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../target_matcher_utils.dart';
 
 // cspell:disable
 
@@ -21,9 +23,14 @@ import '../../saropa_lint_rule.dart';
 
 /// Warns when HTTP response status is not checked.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v17.10.0 | Rule version: v6
 ///
 /// API responses should always check status codes before processing.
+///
+/// A private send helper whose HTTP call is returned as-is (never read) is
+/// not reported when every reference to it in the same file is a direct
+/// call from a method. Each such caller is then treated as making the HTTP
+/// call itself and must check the status.
 ///
 /// **BAD:**
 /// ```dart
@@ -61,7 +68,7 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_http_status_check',
-    '[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately. {v5}',
+    '[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately. {v6}',
     correctionMessage:
         'Check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and error payloads are handled separately.',
     severity: DiagnosticSeverity.WARNING,
@@ -101,16 +108,280 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
+      // Private same-file helpers that only hand the raw response back
+      // to their caller. Calling one counts as making the HTTP call, so the
+      // status-check obligation moves to the caller instead of vanishing.
+      final Set<String> passThrough = _passThroughHelpers(node);
+
       // Check for HTTP calls (word-boundary regex to avoid FP on myhttp.get, dio.getSomething)
-      final hasHttpCall = _httpCallPatterns.any((p) => p.hasMatch(bodySource));
+      final hasHttpCall =
+          _httpCallPatterns.any((p) => p.hasMatch(bodySource)) ||
+          _HttpHelperCallFinder.callsAny(body, passThrough);
       if (!hasHttpCall) return;
 
       // Check if statusCode is checked (word-boundary to avoid FP on myStatusCode)
       final hasStatusCheck = _statusCheckPatterns.any(
         (p) => p.hasMatch(bodySource),
       );
-      if (!hasStatusCheck) reporter.atNode(node);
+      if (hasStatusCheck) return;
+
+      // FALSE-POSITIVE FIX: a private send helper that returns the response
+      // unread never touches the body, so the message ("body is used without
+      // checking the status") is false for it. Its callers are checked above
+      // as HTTP callers, so no unchecked body read escapes. See
+      // plans/history/2026.11/2026.11.26/require_http_status_check_false_positive_response_returned_to_caller.md.
+      if (passThrough.contains(node.name.lexeme)) return;
+
+      reporter.atNode(node);
     });
+  }
+
+  /// Per-unit cache: pass-through helper names are a property of the whole
+  /// file, so they are computed once rather than per visited method.
+  static final Expando<Set<String>> _passThroughCache = Expando<Set<String>>();
+
+  static Set<String> _passThroughHelpers(AstNode node) {
+    final AstNode root = node.root;
+    if (root is! CompilationUnit) return const <String>{};
+    return _passThroughCache[root] ??= _computePassThroughHelpers(root);
+  }
+
+  /// Names of private methods whose every HTTP-producing call is returned
+  /// as-is, and whose every reference in this unit is a direct call made
+  /// from a method body (where this rule checks the caller).
+  ///
+  /// A name qualifies only when ALL methods declared with it qualify, and
+  /// references are matched by name across the unit — a superset of the
+  /// real references — so a collision can only withhold the exemption.
+  /// Iterated to a fixed point so `_a() => _b()` chains resolve. A unit with
+  /// `part` or `part of` directives is rejected: callers could live in another
+  /// file of the same library.
+  static Set<String> _computePassThroughHelpers(CompilationUnit unit) {
+    if (unit.directives.any(
+      (Directive d) => d is PartDirective || d is PartOfDirective,
+    )) {
+      return const <String>{};
+    }
+    final Map<String, List<MethodDeclaration>> byName =
+        _HttpHelperCallFinder.privateMethods(unit);
+    final Set<String> result = <String>{};
+    bool changed = true;
+    while (changed) {
+      changed = false;
+      for (final MapEntry<String, List<MethodDeclaration>> e
+          in byName.entries) {
+        if (result.contains(e.key)) continue;
+        if (!e.value.every((m) => _returnsResponseUnread(m, result))) {
+          continue;
+        }
+        if (!_HttpHelperCallFinder.allRefsAreMethodCalls(
+          unit,
+          e.key,
+          e.value.length,
+        )) {
+          continue;
+        }
+        result.add(e.key);
+        changed = true;
+      }
+    }
+    return result;
+  }
+
+  /// True when [method] makes at least one HTTP call (or call to a known
+  /// pass-through helper in [known]) and every such call is the method's
+  /// return value — so the response object is never read here.
+  static bool _returnsResponseUnread(
+    MethodDeclaration method,
+    Set<String> known,
+  ) {
+    final FunctionBody body = method.body;
+    final String bodySource = body.toSource();
+    final List<MethodInvocation> httpCalls = _HttpHelperCallFinder.httpCalls(
+      body,
+    );
+    // Every regex hit must map to an AST call this check can place; a hit
+    // it cannot see (unusual spelling) means the response may be read.
+    final int regexHits = _httpCallPatterns.fold<int>(
+      0,
+      (int sum, RegExp p) => sum + p.allMatches(bodySource).length,
+    );
+    if (regexHits != httpCalls.length) return false;
+    final List<MethodInvocation> calls = <MethodInvocation>[
+      ...httpCalls,
+      ..._HttpHelperCallFinder.helperCalls(body, known),
+    ];
+    if (calls.isEmpty) return false;
+    return calls.every((MethodInvocation c) => _isReturnedAsIs(c, body));
+  }
+
+  /// True when [call] (optionally awaited / parenthesized) is the operand of
+  /// a `return` or `=>` belonging to [body] itself, not a nested closure.
+  static bool _isReturnedAsIs(MethodInvocation call, FunctionBody body) {
+    AstNode? current = call.parent;
+    while (current != null &&
+        (current is AwaitExpression || current is ParenthesizedExpression)) {
+      current = current.parent;
+    }
+    if (current is ExpressionFunctionBody) return identical(current, body);
+    if (current is ReturnStatement) {
+      return identical(current.thisOrAncestorOfType<FunctionBody>(), body);
+    }
+    return false;
+  }
+}
+
+/// AST helpers for [RequireHttpStatusCheckRule]'s pass-through detection.
+/// Kept private to this file so no other rule depends on these heuristics.
+class _HttpHelperCallFinder extends RecursiveAstVisitor<void> {
+  _HttpHelperCallFinder(this._matches);
+
+  final bool Function(MethodInvocation) _matches;
+  final List<MethodInvocation> _found = <MethodInvocation>[];
+
+  /// HTTP verbs per receiver name — the AST mirror of `_httpCallPatterns`,
+  /// so regex hits and AST calls can be counted against each other.
+  static const Map<String, Set<String>> _verbsByReceiver =
+      <String, Set<String>>{
+        'http': <String>{'get', 'post', 'put', 'delete'},
+        'dio': <String>{'get', 'post'},
+        'client': <String>{'get', 'post'},
+      };
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (_matches(node)) _found.add(node);
+    super.visitMethodInvocation(node);
+  }
+
+  static List<MethodInvocation> _find(
+    AstNode scope,
+    bool Function(MethodInvocation) matches,
+  ) {
+    final _HttpHelperCallFinder finder = _HttpHelperCallFinder(matches);
+    scope.accept(finder);
+    return finder._found;
+  }
+
+  /// Direct HTTP client calls (`http.get(...)`, `this.client.post(...)`).
+  static List<MethodInvocation> httpCalls(AstNode scope) {
+    return _find(scope, (MethodInvocation m) {
+      final Expression? target = m.target;
+      if (target == null || m.typeArguments != null) return false;
+      final Set<String>? verbs = _verbsByReceiver[extractTargetName(target)];
+      return verbs != null && verbs.contains(m.methodName.name);
+    });
+  }
+
+  /// Calls to any helper named in [names], with any receiver.
+  static List<MethodInvocation> helperCalls(AstNode scope, Set<String> names) {
+    if (names.isEmpty) return const <MethodInvocation>[];
+    return _find(
+      scope,
+      (MethodInvocation m) => names.contains(m.methodName.name),
+    );
+  }
+
+  static bool callsAny(AstNode scope, Set<String> names) =>
+      helperCalls(scope, names).isNotEmpty;
+
+  /// Private (`_`-prefixed) non-accessor methods in [unit], grouped by name.
+  static Map<String, List<MethodDeclaration>> privateMethods(
+    CompilationUnit unit,
+  ) {
+    // A visitor rather than walking `.members`: class-body member access
+    // moved between analyzer versions (see analyzer_compat.dart), while
+    // visitMethodDeclaration is stable for every class-like container.
+    final _HttpPrivateMethodCollector collector = _HttpPrivateMethodCollector();
+    unit.accept(collector);
+    return collector.byName;
+  }
+
+  /// True when [name] is referenced at least once and every code reference
+  /// in [unit] is the method name of a call made inside a method
+  /// declaration — the only place this rule checks the caller. A tear-off,
+  /// or a call from a constructor / top-level function / field initializer,
+  /// would let the response reach code the rule never inspects.
+  ///
+  /// [declarationCount] is how many method declarations carry [name]. The
+  /// unit's code tokens spelled [name] must be exactly those declarations
+  /// plus the collected references: any other token is a same-named local,
+  /// parameter, field or function, whose calls would otherwise be mistaken
+  /// for calls to the pass-through helper (a false positive in the caller).
+  static bool allRefsAreMethodCalls(
+    CompilationUnit unit,
+    String name,
+    int declarationCount,
+  ) {
+    final _HttpHelperRefCollector refs = _HttpHelperRefCollector(name);
+    unit.accept(refs);
+    if (refs.refs.isEmpty) return false;
+    if (_countCodeTokens(unit, name) != declarationCount + refs.refs.length) {
+      return false;
+    }
+    return refs.refs.every((SimpleIdentifier ref) {
+      final AstNode? parent = ref.parent;
+      return parent is MethodInvocation &&
+          identical(parent.methodName, ref) &&
+          ref.thisOrAncestorOfType<MethodDeclaration>() != null;
+    });
+  }
+
+  /// Counts tokens spelled [name] in the unit's code token stream. Comment
+  /// tokens (including doc `[refs]`) hang off `precedingComments` and are
+  /// not part of this stream, so they are not counted.
+  static int _countCodeTokens(CompilationUnit unit, String name) {
+    int count = 0;
+    Token token = unit.beginToken;
+    while (!token.isEof) {
+      if (token.lexeme == name) count++;
+      final Token? next = token.next;
+      // Defensive: a malformed stream without EOF must not loop forever.
+      if (next == null || identical(next, token)) break;
+      token = next;
+    }
+    return count;
+  }
+}
+
+/// Groups `_`-prefixed, non-accessor method declarations by name for
+/// [_HttpHelperCallFinder.privateMethods].
+class _HttpPrivateMethodCollector extends RecursiveAstVisitor<void> {
+  final Map<String, List<MethodDeclaration>> byName =
+      <String, List<MethodDeclaration>>{};
+
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    final String name = node.name.lexeme;
+    // Getters/setters/operators are never invoked as `name(...)`, which is
+    // the only reference shape the caller trace accepts.
+    if (name.startsWith('_') &&
+        !node.isGetter &&
+        !node.isSetter &&
+        !node.isOperator) {
+      (byName[name] ??= <MethodDeclaration>[]).add(node);
+    }
+    super.visitMethodDeclaration(node);
+  }
+}
+
+/// Collects every code [SimpleIdentifier] named [_name] for
+/// [_HttpHelperCallFinder.allRefsAreMethodCalls].
+class _HttpHelperRefCollector extends RecursiveAstVisitor<void> {
+  _HttpHelperRefCollector(this._name);
+
+  final String _name;
+  final List<SimpleIdentifier> refs = <SimpleIdentifier>[];
+
+  @override
+  void visitCommentReference(CommentReference node) {
+    // Doc references (`[_send]`) are not code paths; skipping them keeps a
+    // documented helper eligible without weakening the caller trace.
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == _name) refs.add(node);
   }
 }
 

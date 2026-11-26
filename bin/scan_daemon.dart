@@ -71,6 +71,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/scan.dart';
+import 'package:saropa_lints/src/accepted/accepted_findings_roots.dart'
+    show filterAcceptedByNearestRoot;
 import 'package:saropa_lints/src/config/rule_lane.dart' show RuleLane;
 // bin/ is inside this package, so importing src/ directly is allowed; the
 // reporter kill switch is deliberately NOT public API for consumers.
@@ -242,10 +244,17 @@ Future<void> _handleScanRequest(
     }
     // Honor // ignore: and // ignore_for_file: directives so the Problems
     // panel does not show diagnostics the user explicitly suppressed.
-    final effective = filterIgnoredDiagnostics(
+    final ignoreFiltered = filterIgnoredDiagnostics(
       diagnostics: diagnostics,
       files: files,
     );
+    // Accepted-findings lists: scan-on-save feeds the Problems panel, so it
+    // must hide the same findings the analyzer plugin hides, using the list
+    // of each file's own package rather than one at the daemon's root (a
+    // saved file in a nested package is filtered by that package's list).
+    // Re-read per request (small files) so an edit to a list applies on the
+    // next save without restarting the daemon.
+    final effective = filterAcceptedByNearestRoot(ignoreFiltered).kept;
     stderr.writeln(
       '[scan_daemon] Scanned ${files.length} file(s) in '
       '${(sw.elapsedMilliseconds / 1000).toStringAsFixed(2)}s '

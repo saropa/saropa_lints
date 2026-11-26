@@ -168,9 +168,11 @@ class UseCompareWithoutCaseRule extends SaropaLintRule {
     final Expression? target = compareToCall.target;
     final List<Argument> args = compareToCall.argumentList.arguments;
     if (target == null || args.length != 1) return null;
+    // Both sides must be strings for a case-insensitive comparison to apply.
     if (!_isStringTyped(target) ||
-        !_isStringTyped(args.first.argumentExpression))
+        !_isStringTyped(args.first.argumentExpression)) {
       return null;
+    }
 
     return _StringPair(target, args.first.argumentExpression);
   }

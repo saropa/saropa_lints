@@ -6,6 +6,9 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../long_operation_method_name_match.dart';
 import '../../literal_context_utils.dart';
@@ -2432,7 +2435,7 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
 
 /// Suggests showing notification for long-running tasks.
 ///
-/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v2.4.0 | Updated: v17.10.0 | Rule version: v3
 ///
 /// Long operations (uploads, processing, downloads) should show progress
 /// notifications. Silent background work gets killed by the OS and users
@@ -2467,6 +2470,13 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
 /// names like `ImportAllowed` do not match `importAll`. Files that already
 /// show in-app progress (`onStatusUpdate`, `CircularProgressIndicator`, etc.)
 /// or use a notifications plugin are skipped.
+///
+/// The generic `...All` names (`syncAll`, `processAll`, `exportAll`,
+/// `importAll`) say nothing about duration, so they are not reported when the
+/// callee is declared in the same file and its body (followed through other
+/// same-file callees) provably does only short work: no loop, no closure or
+/// function value, and no call that leaves the file other than core SDK
+/// members. A callee that cannot be inspected is still reported.
 class RequireNotificationForLongTasksRule extends SaropaLintRule {
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -2489,10 +2499,14 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // The short-callee proof follows resolved elements to their declarations.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_notification_for_long_tasks',
     '[require_notification_for_long_tasks] Long-running operation detected without progress notification. '
-        'Silent background work may be killed by OS. {v2}',
+        'Silent background work may be killed by OS. {v3}',
     correctionMessage:
         'Show a progress notification for operations that take more than '
         'a few seconds. This keeps users informed and prevents OS termination.',
@@ -2512,6 +2526,15 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
     'backupData',
     'restoreData',
     'migrateDatabase',
+  };
+
+  /// Patterns whose name states only "all of something", not a transfer or
+  /// migration, so the callee body is allowed to disprove long work.
+  static const Set<String> _genericBulkPatterns = {
+    'syncAll',
+    'processAll',
+    'exportAll',
+    'importAll',
   };
 
   /// Substrings that indicate progress is surfaced in-app or via a plugin, so
@@ -2546,13 +2569,478 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      for (final String pattern in _longOperationPatterns) {
-        if (longOperationMethodNameMatchesPattern(methodName, pattern)) {
-          reporter.atNode(node);
-          return;
-        }
+      final List<String> matched = [
+        for (final String pattern in _longOperationPatterns)
+          if (longOperationMethodNameMatchesPattern(methodName, pattern))
+            pattern,
+      ];
+      if (matched.isEmpty) return;
+
+      // Only a purely generic match may be disproved by the body; a name like
+      // `syncAllAndUploadFile` still states a transfer.
+      if (matched.every(_genericBulkPatterns.contains) &&
+          _ShortWorkProof(node.root).isShortCall(node)) {
+        return;
       }
+
+      reporter.atNode(node);
     });
+  }
+}
+
+/// Proves that a call stays short, for `require_notification_for_long_tasks`.
+///
+/// One-sided on purpose: `true` only when every reachable statement is
+/// inspectable and cheap. Anything unknown returns `false`, so the rule keeps
+/// reporting it.
+class _ShortWorkProof {
+  _ShortWorkProof(this._root);
+
+  /// The compilation unit holding the call; only its declarations are read.
+  final AstNode _root;
+
+  /// Callees on the current path, so recursion cannot loop forever.
+  final Set<Element> _active = {};
+
+  /// SDK libraries whose members do no network or file transfer.
+  static const Set<String> _cheapSdkLibraries = {
+    'dart:async',
+    'dart:collection',
+    'dart:convert',
+    'dart:core',
+    'dart:math',
+  };
+
+  /// True when [call] targets a same-file function whose body is short.
+  bool isShortCall(MethodInvocation call) {
+    final Element? element = call.methodName.element?.baseElement;
+
+    // `cb()` where `cb` is a getter or field of function type calls whatever
+    // function value it holds; the getter body says nothing about that
+    // function, so a short getter must not prove the call short.
+    if (element is PropertyAccessorElement) return false;
+
+    return isShortExecutable(element);
+  }
+
+  /// True when [element] is a same-file function, method, getter or setter
+  /// that cannot be overridden and whose body is short.
+  bool isShortExecutable(Element? element) {
+    if (element is! ExecutableElement) return false;
+    final ExecutableElement base = element.baseElement;
+    if (_canBeOverridden(base)) return false;
+
+    // Recursion is unbounded repetition, so a cycle cannot be called short.
+    if (!_active.add(base)) return false;
+
+    final bool short = _bodyIsShort(base);
+
+    // Removed on every path: a callee left in `_active` after an early exit
+    // would make a later, unrelated call to it look recursive.
+    _active.remove(base);
+
+    return short;
+  }
+
+  /// Visits the same-file body of [element]; false when there is none.
+  bool _bodyIsShort(ExecutableElement element) {
+    final _DeclarationFinder finder = _DeclarationFinder(element);
+    _root.accept(finder);
+    final FunctionBody? body = finder.body;
+
+    // No visible body (other file, abstract, external) proves nothing.
+    if (body == null || body is EmptyFunctionBody) return false;
+    if (body is NativeFunctionBody) return false;
+
+    final _LongWorkVisitor visitor = _LongWorkVisitor(this);
+    body.accept(visitor);
+
+    return !visitor.foundLongOrUnknown;
+  }
+
+  /// True when dynamic dispatch could run a body other than the visible one.
+  ///
+  /// Public instance members can be overridden from any library. Private
+  /// ones only from this library, so they are safe only when this file is the
+  /// whole library and no other class, mixin or enum in it declares a member
+  /// of the same name (or a `noSuchMethod` that could answer the call).
+  bool _canBeOverridden(ExecutableElement element) {
+    final Element? owner = element.enclosingElement;
+
+    // Top-level functions and extension members dispatch statically.
+    if (owner is! InterfaceElement) return false;
+    if (element.isStatic) return false;
+    if (!element.isPrivate) return true;
+
+    // A `part` file can hold an override this unit never shows.
+    if (element.library.fragments.length > 1) return true;
+
+    final _OverrideFinder finder = _OverrideFinder(element.name, owner);
+    _root.accept(finder);
+
+    return finder.found;
+  }
+
+  /// True when calling or accessing [element] is a plain read or write, or a
+  /// same-file accessor whose body is short. Non-accessors (locals,
+  /// parameters, types) are always short to touch.
+  bool isShortAccess(Element? element) {
+    if (element is! PropertyAccessorElement) return true;
+    if (isCheapSdkMember(element)) return true;
+
+    // A field read is only a memory read when no getter can replace it.
+    if (element.isOriginVariable) return !_canBeOverridden(element.baseElement);
+
+    return isShortExecutable(element);
+  }
+
+  /// True for a member of an SDK (or Flutter foundation) library that cannot
+  /// by itself be a long transfer.
+  static bool isCheapSdkMember(Element element) {
+    final String uri = element.library?.uri.toString() ?? '';
+
+    return _cheapSdkLibraries.contains(uri) ||
+        uri.startsWith('package:flutter/src/foundation/');
+  }
+}
+
+/// Finds the body of the function or method declaring [target].
+class _DeclarationFinder extends RecursiveAstVisitor<void> {
+  _DeclarationFinder(this.target);
+
+  final Element target;
+
+  /// Null when the declaration lives in another file.
+  FunctionBody? body;
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    if (node.declaredFragment?.element == target) {
+      body = node.functionExpression.body;
+    }
+    super.visitFunctionDeclaration(node);
+  }
+
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    if (node.declaredFragment?.element == target) body = node.body;
+    super.visitMethodDeclaration(node);
+  }
+}
+
+/// Finds a same-file declaration that could take over a library-private
+/// member of [_owner] at run time: a method, accessor or field of the same
+/// [_name] in another class, mixin or enum (subclass override, mixin
+/// application, interface implementation), or any `noSuchMethod`.
+///
+/// Matches by name in any other type rather than walking the type hierarchy:
+/// over-matching only makes the proof give up, never wrongly succeed.
+class _OverrideFinder extends RecursiveAstVisitor<void> {
+  _OverrideFinder(this._name, this._owner);
+
+  final String? _name;
+  final InterfaceElement _owner;
+
+  bool found = false;
+
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    final String lexeme = node.name.lexeme;
+    final Element? owner = node.declaredFragment?.element.enclosingElement;
+
+    // A `noSuchMethod` answers calls to members its class does not declare.
+    if (lexeme == 'noSuchMethod') found = true;
+    if (lexeme == _name) _checkOwner(owner);
+    super.visitMethodDeclaration(node);
+  }
+
+  // A field implicitly declares a getter (and setter) that overrides too.
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    if (node.name.lexeme == _name) {
+      _checkOwner(node.declaredFragment?.element.enclosingElement);
+    }
+    super.visitVariableDeclaration(node);
+  }
+
+  /// Extension members and top-level / local names never override.
+  void _checkOwner(Element? owner) {
+    if (owner is InterfaceElement && owner != _owner) found = true;
+  }
+}
+
+/// Flags any construct in a callee body that may take long or cannot be seen.
+class _LongWorkVisitor extends RecursiveAstVisitor<void> {
+  _LongWorkVisitor(this._proof);
+
+  final _ShortWorkProof _proof;
+
+  bool foundLongOrUnknown = false;
+
+  // Loops repeat work an unknown number of times.
+  @override
+  void visitForStatement(ForStatement node) => foundLongOrUnknown = true;
+
+  @override
+  void visitForElement(ForElement node) => foundLongOrUnknown = true;
+
+  @override
+  void visitWhileStatement(WhileStatement node) => foundLongOrUnknown = true;
+
+  @override
+  void visitDoStatement(DoStatement node) => foundLongOrUnknown = true;
+
+  // A closure is how iteration (`forEach`, `map`) and callbacks hide work.
+  @override
+  void visitFunctionExpression(FunctionExpression node) =>
+      foundLongOrUnknown = true;
+
+  // Calling a function value: the target body is not knowable.
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) =>
+      foundLongOrUnknown = true;
+
+  // Awaiting anything but a call (a field, parameter, getter) waits on work
+  // that started somewhere this proof cannot see.
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    if (node.expression.unParenthesized is! MethodInvocation) {
+      foundLongOrUnknown = true;
+    }
+    super.visitAwaitExpression(node);
+  }
+
+  // `return pending;` / `=> pending` hands the caller a future or stream that
+  // was started elsewhere, so awaiting this callee waits on unseen work. An
+  // async body also awaits a returned future implicitly.
+  @override
+  void visitReturnStatement(ReturnStatement node) {
+    if (_hidesStartedWork(node.expression)) foundLongOrUnknown = true;
+    super.visitReturnStatement(node);
+  }
+
+  @override
+  void visitExpressionFunctionBody(ExpressionFunctionBody node) {
+    if (_hidesStartedWork(node.expression)) foundLongOrUnknown = true;
+    super.visitExpressionFunctionBody(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (!_isShortInvocation(node)) foundLongOrUnknown = true;
+    super.visitMethodInvocation(node);
+  }
+
+  // Getter and setter bodies run on a plain-looking read or write
+  // (`repo.items`, `cache.value = v`), so each accessor must be proven short
+  // like a method call. Locals and parameters are not accessors and pass.
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (!_proof.isShortAccess(node.element)) foundLongOrUnknown = true;
+    super.visitSimpleIdentifier(node);
+  }
+
+  // A member read on a `dynamic` or unresolved receiver can reach any getter.
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (_isUnknownReceiver(node.realTarget)) foundLongOrUnknown = true;
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    // An import prefix has no static type and is not a receiver.
+    if (node.prefix.element is! PrefixElement &&
+        _isUnknownReceiver(node.prefix)) {
+      foundLongOrUnknown = true;
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+
+  // User-defined operators (`a + b`, `a[i]`, `-a`, `a += b`, `a++`) are
+  // method calls in disguise; built-in ones have no element and pass.
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    _checkOperator(node.element, node.leftOperand);
+    super.visitBinaryExpression(node);
+  }
+
+  @override
+  void visitIndexExpression(IndexExpression node) {
+    _checkOperator(node.element, node.realTarget);
+    super.visitIndexExpression(node);
+  }
+
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    _checkOperator(node.element, node.operand);
+    _checkCompound(node);
+    super.visitPrefixExpression(node);
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    _checkOperator(node.element, node.operand);
+    _checkCompound(node);
+    super.visitPostfixExpression(node);
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    _checkOperator(node.element, null);
+    _checkCompound(node);
+    super.visitAssignmentExpression(node);
+  }
+
+  // A constructor body and initializer list can do anything, so only cheap
+  // SDK constructors that are fed no hidden work count as short.
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final ConstructorElement? element = node.constructorName.element;
+    if (!_isShortSdkConstructor(element, node.argumentList)) {
+      foundLongOrUnknown = true;
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+
+  // `.new(...)` / `.named(...)` with a context type: same as `Type(...)`.
+  @override
+  void visitDotShorthandConstructorInvocation(
+    DotShorthandConstructorInvocation node,
+  ) {
+    final Element? element = node.constructorName.element;
+    if (element is! ConstructorElement ||
+        !_isShortSdkConstructor(element, node.argumentList)) {
+      foundLongOrUnknown = true;
+    }
+    super.visitDotShorthandConstructorInvocation(node);
+  }
+
+  // `.load()` with a context type calls a static member that is not a
+  // MethodInvocation, so it would otherwise escape the proof entirely.
+  @override
+  void visitDotShorthandInvocation(DotShorthandInvocation node) {
+    final Element? element = node.memberName.element;
+    final bool short =
+        !_argumentsHideWork(node.argumentList) &&
+        (element != null && _ShortWorkProof.isCheapSdkMember(element) ||
+            _proof.isShortExecutable(element));
+    if (!short) foundLongOrUnknown = true;
+    super.visitDotShorthandInvocation(node);
+  }
+
+  /// Marks long when [element] is a user-defined operator that is not
+  /// provably short, or when [operand] is `dynamic` (any operator may run).
+  void _checkOperator(MethodElement? element, Expression? operand) {
+    if (_isUnknownReceiver(operand)) {
+      foundLongOrUnknown = true;
+      return;
+    }
+    if (element == null || _ShortWorkProof.isCheapSdkMember(element)) return;
+    if (!_proof.isShortExecutable(element)) foundLongOrUnknown = true;
+  }
+
+  /// Checks the read and write of a plain or compound write (`x = v`,
+  /// `x += v`, `x++`, `a[i] = v`). These resolve on the write expression, not
+  /// on the identifier it targets: a setter or getter for property targets,
+  /// the `[]=` / `[]` operators for index targets.
+  void _checkCompound(CompoundAssignmentExpression node) {
+    for (final Element? element in [node.readElement, node.writeElement]) {
+      if (element is MethodElement) {
+        _checkOperator(element, null);
+      } else if (!_proof.isShortAccess(element)) {
+        foundLongOrUnknown = true;
+      }
+    }
+  }
+
+  /// True for a receiver whose members cannot be resolved statically.
+  static bool _isUnknownReceiver(Expression? receiver) {
+    final DartType? type = receiver?.staticType;
+
+    return type is DynamicType || type is InvalidType;
+  }
+
+  /// True when [expression] is a future or stream value this body did not
+  /// create with a visible call.
+  static bool _hidesStartedWork(Expression? expression) {
+    if (expression == null) return false;
+    final Expression value = expression.unParenthesized;
+    if (value is MethodInvocation || value is InstanceCreationExpression) {
+      return false;
+    }
+
+    return _isAsyncValue(value.staticType);
+  }
+
+  /// True for `Future`, `FutureOr` and `Stream` types.
+  static bool _isAsyncValue(DartType? type) =>
+      type != null &&
+      (type.isDartAsyncFuture ||
+          type.isDartAsyncFutureOr ||
+          type.isDartAsyncStream);
+
+  /// Tear-offs (`ids.forEach(upload)`) run once per item, and a stored
+  /// future or stream handed to an SDK member (`Future.value(pending)`)
+  /// carries work this proof never saw.
+  static bool _argumentsHideWork(ArgumentList arguments) =>
+      arguments.arguments.any((Argument arg) {
+        final Expression value = arg.argumentExpression;
+        if (value.staticType is FunctionType) return true;
+
+        return _hidesStartedWork(value);
+      });
+
+  /// True for a dart:core / dart:async constructor (not a `Stream` one) whose
+  /// arguments hide no work.
+  static bool _isShortSdkConstructor(
+    ConstructorElement? element,
+    ArgumentList arguments,
+  ) {
+    if (element == null || !_ShortWorkProof.isCheapSdkMember(element)) {
+      return false;
+    }
+    if (element.enclosingElement.name == 'Stream') return false;
+
+    return !_argumentsHideWork(arguments);
+  }
+
+  /// Either a cheap SDK member or a same-file callee that is itself short.
+  bool _isShortInvocation(MethodInvocation node) {
+    final Element? element = node.methodName.element;
+    if (element == null) return false;
+    if (_argumentsHideWork(node.argumentList)) return false;
+
+    if (!_ShortWorkProof.isCheapSdkMember(element)) {
+      return _proof.isShortCall(node);
+    }
+
+    return _waitsOnlyOnVisibleWork(node, element);
+  }
+
+  /// SDK combinators are only as short as the futures or streams fed to them.
+  bool _waitsOnlyOnVisibleWork(MethodInvocation node, Element element) {
+    final String? owner = element.enclosingElement?.name;
+
+    // A stream's length is unknowable.
+    if (owner == 'Stream') return false;
+    if (owner != 'Future') return true;
+
+    // `Future.wait` must list its calls inline so each one gets visited.
+    if (node.methodName.name == 'wait') {
+      final Argument? first = node.argumentList.arguments.firstOrNull;
+      final Expression? futures = first?.argumentExpression;
+
+      return futures is ListLiteral &&
+          futures.elements.every(
+            (CollectionElement e) => e is MethodInvocation,
+          );
+    }
+
+    // `pending.timeout(...)` on a stored future hides what it waits for.
+    final bool isInstanceMember = element is MethodElement && !element.isStatic;
+
+    return !isInstanceMember || node.realTarget is MethodInvocation;
   }
 }
 

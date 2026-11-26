@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
@@ -192,7 +193,7 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
 
 /// Warns when int/double/num/BigInt/Uri.parse is used without try-catch.
 ///
-/// Since: v1.7.9 | Updated: v4.13.0 | Rule version: v4
+/// Since: v1.7.9 | Updated: v17.10.0 | Rule version: v5
 ///
 /// These parse methods throw FormatException on invalid input. Dynamic data
 /// (user input, API responses, file contents) should use tryParse instead
@@ -231,7 +232,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_try_parse_for_dynamic_data',
-    '[prefer_try_parse_for_dynamic_data] Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers. {v4}',
+    '[prefer_try_parse_for_dynamic_data] Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers. {v5}',
     correctionMessage:
         'Replace parse with tryParse when converting dynamic or user-controlled data to prevent runtime exceptions and improve app robustness. This practice aligns with Dart’s recommendations for safe type conversion. See https://dart.dev/guides/libraries/library-tour#numbers for guidance.',
     severity: DiagnosticSeverity.ERROR,
@@ -314,6 +315,8 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
   }
 
   bool _isConstReference(Expression e) {
+    // The default (unresolved) scan has no elements, so every constant looked
+    // dynamic there; fall back to the declarations written in this file.
     final Element? el = e is SimpleIdentifier
         ? e.element
         : e is PrefixedIdentifier
@@ -323,6 +326,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
       final VariableElement? v = el.variable;
       return v != null && v.isConst;
     }
+    if (el == null) return _isDeclaredConstInFile(e);
     return el is VariableElement && el.isConst;
   }
 
@@ -658,6 +662,118 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     return RegExp(
       r'^\^?\\d(?:\{\d+(?:,\d+)?\}|[+*?])\$?$',
     ).hasMatch(normalized);
+  }
+}
+
+/// Syntactic proof that [e] names a `const` declared in the same file. Returns
+/// false for anything it cannot prove (imports, inherited members, shadowing),
+/// so those calls are still reported.
+bool _isDeclaredConstInFile(Expression e) {
+  final CompilationUnit? unit = e.thisOrAncestorOfType<CompilationUnit>();
+  if (unit == null) return false;
+
+  if (e is SimpleIdentifier) {
+    final _BindingCollector all = _BindingCollector(e.name);
+    unit.accept(all);
+    // A non-const binding in scope may be what the name actually refers to.
+    if (all.others.any((AstNode n) => _canShadow(n, e))) return false;
+    return all.constants.any((VariableDeclaration d) => _isVisibleFrom(d, e));
+  }
+
+  if (e is PrefixedIdentifier) {
+    // `Type.name`: the prefix must not be a variable that hides the type.
+    final _BindingCollector prefix = _BindingCollector(e.prefix.name);
+    unit.accept(prefix);
+    if (<AstNode>[
+      ...prefix.others,
+      ...prefix.constants,
+    ].any((AstNode n) => _canShadow(n, e))) {
+      return false;
+    }
+    final _BindingCollector all = _BindingCollector(e.identifier.name);
+    unit.accept(all);
+    return all.constants.any(
+      (VariableDeclaration d) => _isStaticFieldOf(d, e.prefix.name),
+    );
+  }
+  return false;
+}
+
+/// Whether [binding] could hide an outer name at [use]: it is declared inside
+/// the same class member (or top-level function), or is a field or method of
+/// the enclosing type. A parameter of a sibling method cannot.
+bool _canShadow(AstNode binding, AstNode use) {
+  final AstNode? type = use.thisOrAncestorOfType<CompilationUnitMember>();
+  final AstNode? scope =
+      use.thisOrAncestorMatching((AstNode n) => n is ClassMember) ?? type;
+  if (binding.thisOrAncestorMatching((AstNode n) => identical(n, scope)) !=
+      null) {
+    return true;
+  }
+  final bool isTypeMember =
+      binding is MethodDeclaration ||
+      (binding is VariableDeclaration &&
+          binding.parent?.parent is FieldDeclaration);
+  return isTypeMember &&
+      identical(binding.thisOrAncestorOfType<CompilationUnitMember>(), type);
+}
+
+/// Whether the unqualified name at [use] can resolve to [declaration].
+bool _isVisibleFrom(VariableDeclaration declaration, AstNode use) {
+  final AstNode? owner = declaration.parent?.parent;
+  if (owner is TopLevelVariableDeclaration) return true;
+  // A field is in scope only inside its own type; a local only in its block.
+  final AstNode? scope = owner is FieldDeclaration
+      ? owner.thisOrAncestorOfType<CompilationUnitMember>()
+      : owner is VariableDeclarationStatement
+      ? owner.parent
+      : null;
+  return scope != null &&
+      use.thisOrAncestorMatching((AstNode n) => identical(n, scope)) != null;
+}
+
+/// Whether [declaration] is a static field of the type named [typeName].
+bool _isStaticFieldOf(VariableDeclaration declaration, String typeName) {
+  final AstNode? field = declaration.parent?.parent;
+  if (field is! FieldDeclaration || !field.isStatic) return false;
+  final CompilationUnitMember? type = field
+      .thisOrAncestorOfType<CompilationUnitMember>();
+  final String? name = type is ClassDeclaration
+      ? type.nameToken.lexeme
+      : type is MixinDeclaration
+      ? type.name.lexeme
+      : type is EnumDeclaration
+      ? type.nameToken.lexeme
+      : null;
+  return name == typeName;
+}
+
+/// Collects every declaration that binds [name] below the visited node, split
+/// into `const` variables and everything else.
+class _BindingCollector extends GeneralizingAstVisitor<void> {
+  _BindingCollector(this.name);
+
+  final String name;
+  final List<VariableDeclaration> constants = <VariableDeclaration>[];
+  final List<AstNode> others = <AstNode>[];
+
+  @override
+  void visitNode(AstNode node) {
+    if (node is VariableDeclaration && node.name.lexeme == name) {
+      if (node.isConst) {
+        constants.add(node);
+      } else {
+        others.add(node);
+      }
+    } else if ((node is FormalParameter && node.name?.lexeme == name) ||
+        (node is DeclaredIdentifier && node.name.lexeme == name) ||
+        (node is DeclaredVariablePattern && node.name.lexeme == name) ||
+        (node is CatchClauseParameter && node.name.lexeme == name) ||
+        (node is FunctionDeclaration && node.name.lexeme == name) ||
+        (node is MethodDeclaration && node.name.lexeme == name)) {
+      others.add(node);
+    }
+    super.visitNode(node);
   }
 }
 
@@ -2420,8 +2536,9 @@ class AvoidDateTimeConstructorUnvalidatedRule extends SaropaLintRule {
     if (parent is ReturnStatement) return true;
 
     // Used in a named expression (widget parameter).
-    if (parent is NamedArgument || parent is RecordLiteralNamedField)
+    if (parent is NamedArgument || parent is RecordLiteralNamedField) {
       return true;
+    }
 
     // Field initializer (not a local variable).
     if (parent is VariableDeclaration) {

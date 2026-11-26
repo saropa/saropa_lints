@@ -461,6 +461,7 @@ class ViolationExporter {
     var ignoreCount = 0;
     var ignoreForFileCount = 0;
     var baselineCount = 0;
+    var acceptedCount = 0;
     final byRule = <String, int>{};
     final byFile = <String, int>{};
 
@@ -472,6 +473,10 @@ class ViolationExporter {
           ignoreForFileCount++;
         case SuppressionKind.baseline:
           baselineCount++;
+        // Accepted-findings list hits get their own bucket so a reviewer can
+        // tell recorded decisions apart from frozen legacy debt.
+        case SuppressionKind.accepted:
+          acceptedCount++;
       }
       byRule[s.rule] = (byRule[s.rule] ?? 0) + 1;
       // File paths in consolidated records are already normalized to
@@ -487,6 +492,7 @@ class ViolationExporter {
         'ignore': ignoreCount,
         'ignoreForFile': ignoreForFileCount,
         'baseline': baselineCount,
+        'accepted': acceptedCount,
       },
       'byRule': byRule,
       'byFile': byFile,

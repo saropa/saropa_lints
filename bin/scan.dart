@@ -25,6 +25,8 @@ import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 import 'package:saropa_lints/src/scan/scan_jobs.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 import 'package:saropa_lints/src/tiers.dart';
+import 'package:saropa_lints/src/accepted/accepted_findings_check.dart';
+import 'package:saropa_lints/src/accepted/accepted_findings_roots.dart';
 
 /// Standalone lint scanner that runs saropa_lints rules against any Dart
 /// project without requiring it as a dependency.
@@ -109,6 +111,15 @@ Future<void> main(List<String> args) async {
   // discovery so excluded files are never treated as scanned.
   final excludeGlobs = [...loadAnalyzerExcludes(path), ...parsed.excludeGlobs];
 
+  // Non-error output is uncapped by default for the CLI: a silent cap makes
+  // --fail-on-count thresholds and CI reports wrong. --max-issues N or the
+  // SAROPA_LINTS_MAX env var (shared with the IDE plugin) opt back in. Held
+  // in a local so --check-accepted can tell whether output may be trimmed.
+  final maxIssues =
+      parsed.maxIssues ??
+      int.tryParse(Platform.environment['SAROPA_LINTS_MAX'] ?? '') ??
+      0;
+
   // --quiet: suppress ALL stderr progress/status from the scanner by routing
   // messages to a no-op sink. The caller gets only the exit code + stdout.
   final runner = ScanRunner(
@@ -122,13 +133,7 @@ Future<void> main(List<String> args) async {
     lane: parseRuleLane(parsed.lane ?? 'full'),
     laneStats: parsed.laneStats,
     messageSink: parsed.quiet && parsed.progress != 'json' ? (_) {} : null,
-    // Non-error output is uncapped by default for the CLI: a silent cap makes
-    // --fail-on-count thresholds and CI reports wrong. --max-issues N or the
-    // SAROPA_LINTS_MAX env var (shared with the IDE plugin) opt back in.
-    maxIssues:
-        parsed.maxIssues ??
-        int.tryParse(Platform.environment['SAROPA_LINTS_MAX'] ?? '') ??
-        0,
+    maxIssues: maxIssues,
     excludeGlobs: excludeGlobs,
     includeGlobs: parsed.includeGlobs,
     // When the user explicitly names files via --files, honor that intent —
@@ -142,6 +147,10 @@ Future<void> main(List<String> args) async {
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default
   // path stays the fast syntactic parse.
+  // --check-accepted always resolves: list entries record findings seen in the
+  // editor, which is resolved, so a syntactic run would call an entry for a
+  // type-based rule stale and fail CI on a finding that still exists.
+  final useResolve = parsed.resolve || parsed.checkAccepted;
   final List<ScanDiagnostic>? diagnostics;
   {
     // Worker count and memory budget. Resolution order: --jobs, then the
@@ -157,7 +166,7 @@ Future<void> main(List<String> args) async {
       requested: requested,
       fileCount: runner.countFilesToScan(),
       machine: machine,
-      resolved: parsed.resolve,
+      resolved: useResolve,
       incompatibleReason: parsed.profile
           ? '--profile records timings per process'
           : parsed.debugRule != null
@@ -178,7 +187,7 @@ Future<void> main(List<String> args) async {
     }
     diagnostics = await runner.runParallel(
       jobsDecision.jobs,
-      resolve: parsed.resolve,
+      resolve: useResolve,
       config: ScanParallelConfig(
         maxMemoryMb: parsed.maxMemoryMb ?? envMem,
         availableMemoryMb: machine.availableMemoryMb,
@@ -206,7 +215,7 @@ Future<void> main(List<String> args) async {
     final timingPath = writeRuleTimingReport(
       projectRoot: path,
       tier: tier,
-      resolved: parsed.resolve,
+      resolved: useResolve,
       fileCount: dartFiles.isEmpty ? null : dartFiles.length,
     );
     if (timingPath != null) {
@@ -293,10 +302,62 @@ Future<void> main(List<String> args) async {
           excludeGlobs: excludeGlobs,
           includeGlobs: parsed.includeGlobs,
         );
-  final effectiveDiagnostics = filterIgnoredDiagnostics(
+  final ignoreFiltered = filterIgnoredDiagnostics(
     diagnostics: diagnostics,
     files: scannedFiles,
   );
+
+  // Accepted-findings lists (saropa_accepted.yaml beside each package's
+  // pubspec.yaml): drop findings an entry covers from every output below.
+  // Each finding uses the list of its own nearest package, the same rule the
+  // analyzer plugin applies, so a nested package (example/) is filtered by its
+  // own list, not the outer one. Applied after the ignore filter so an entry
+  // whose findings are all `// ignore:`d counts as hiding nothing (and shows
+  // up as stale, i.e. redundant).
+  final acceptedLists = AcceptedListSet();
+  // Loaded up front so a broken list at the target's own package is warned
+  // about even when no finding falls in it, as before per-package lists.
+  if (acceptedRootForDir(p.absolute(path)) case final targetRoot?) {
+    acceptedLists.listAt(targetRoot);
+  }
+  final acceptedSplit = filterAcceptedByNearestRoot(
+    ignoreFiltered,
+    lists: acceptedLists,
+  );
+
+  // --check-accepted: report every list under the target (hidden count,
+  // stale, invalid) and exit. Runs here, after both filters, so it judges the
+  // same finding set the normal output would have shown.
+  if (parsed.checkAccepted) {
+    _runCheckAccepted(
+      target: p.absolute(path),
+      lists: acceptedLists,
+      split: acceptedSplit,
+      scannedFiles: scannedFiles,
+      ranRules: runner.ranRuleNames,
+      // Trimmed or aborted output may be missing findings, so "no finding"
+      // cannot be trusted as stale in that case.
+      complete:
+          maxIssues <= 0 && !(runner.lastParallelReport?.aborted ?? false),
+      skippedFiles: runner.lastParallelReport?.skippedFiles ?? const [],
+      formatJson: formatJson,
+      jsonFilePath: parsed.jsonFilePath,
+      quiet: quiet,
+    );
+    // _runCheckAccepted calls exit() internally.
+  }
+
+  // A broken list hides nothing; say so instead of failing silently. Not an
+  // exit-code change: only --check-accepted gates on list health.
+  if (!quiet) {
+    for (final broken in acceptedLists.withProblems) {
+      stderr.writeln(
+        'Warning: ${broken.path} has ${broken.problems.length} problem(s); '
+        'invalid entries hide nothing. Run with --check-accepted for details.',
+      );
+    }
+  }
+  final effectiveDiagnostics = acceptedSplit.kept;
 
   // Warn about unrecognized severity values so a future analyzer change
   // doesn't silently drop diagnostics through the rank-0 fallback.
@@ -683,6 +744,44 @@ void _runFindStaleIgnores(
   exit(1);
 }
 
+/// Reports every `saropa_accepted.yaml` under [target] for `--check-accepted`
+/// and exits: 1 when any entry is stale or invalid (CI gate), else 0. Never
+/// edits a list — removal is a reviewed decision, not an automatic one.
+void _runCheckAccepted({
+  required String target,
+  required AcceptedListSet lists,
+  required AcceptedSplit split,
+  required List<String> scannedFiles,
+  required Set<String> ranRules,
+  required bool complete,
+  required List<String> skippedFiles,
+  required bool formatJson,
+  required String? jsonFilePath,
+  required bool quiet,
+}) {
+  // Files a worker skipped (timeout, crash) were not really scanned, so an
+  // entry on one of them must stay "not checked" rather than turn stale.
+  final skipped = {for (final f in skippedFiles) rootKey(canonicalRoot(f))};
+  final checks = checkAcceptedLists(
+    target: target,
+    lists: lists,
+    split: split,
+    scannedFiles: [
+      for (final f in scannedFiles)
+        if (!skipped.contains(rootKey(canonicalRoot(f)))) f,
+    ],
+    rulesRun: ranRules,
+    complete: complete,
+  );
+  if (formatJson) {
+    _writeJson(acceptedCheckToJsonString(checks), jsonFilePath, quiet: quiet);
+  } else {
+    print('');
+    acceptedCheckToText(checks).forEach(print);
+  }
+  exit(acceptedCheckFails(checks) ? 1 : 0);
+}
+
 /// Detects stale `// ignore:` comments and automatically removes them from
 /// the source files. Prints a summary of what was fixed.
 ///
@@ -971,6 +1070,18 @@ void _printUsage() {
   print(
     '                      // ignore: saropa_lints/rule_name for all known rules.',
   );
+  print('');
+  print('Accepted findings (saropa_accepted.yaml beside each pubspec.yaml):');
+  print(
+    '  --check-accepted    Report each entry: findings hidden, stale (file',
+  );
+  print('                      gone, or rule ran there and found nothing), or');
+  print('                      invalid. Exits 1 if any stale/invalid, else 0.');
+  print('                      Checks every list under the target (dependency');
+  print('                      and build folders skipped); each file uses the');
+  print('                      list of its nearest pubspec.yaml.');
+  print('                      Never edits a list. Supports --format json.');
+  print('                      Always runs resolved, as with --resolve.');
   print('');
   print('Stale ignore management:');
   print(

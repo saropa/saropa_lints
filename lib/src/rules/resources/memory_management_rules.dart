@@ -1194,22 +1194,361 @@ class _CacheClearVisitor extends RecursiveAstVisitor<void> {
 /// serialization method whose return type contains `Map<` does not count as
 /// cache storage — a whole-source `contains('map<')` scan wrongly does. Shared
 /// by [RequireCacheExpirationRule] and [AvoidUnboundedCacheGrowthRule].
-bool _hasMapCacheField(ClassDeclaration node) {
+bool _hasMapCacheField(ClassDeclaration node) => node.bodyMembers.any(
+  (ClassMember m) => m is FieldDeclaration && _isMapStorageField(m),
+);
+
+/// A typed Map field, or a bare `= {}` initializer (map/set literal).
+bool _isMapStorageField(FieldDeclaration member) {
+  final String fieldSource = member.toSource().toLowerCase();
+  return fieldSource.contains('map<') || fieldSource.contains('= {}');
+}
+
+/// Returns true when every collection field of [node] is a *snapshot*: private,
+/// only ever replaced whole by a freshly built map, and never grown in place.
+///
+/// Such a cache holds exactly what the last rebuild put in it. Old entries are
+/// dropped on each replacement, so entries cannot accumulate, and the
+/// replacement is itself the invalidation (a TTL would discard valid rows).
+///
+/// Proven structurally, by whitelisting every reference to those fields in the
+/// compilation unit. Anything not provably read-only or a whole replacement
+/// (per-key write, `addAll`, alias, argument, return, content enumeration that
+/// could be merged back in) keeps the diagnostic. Unresolved types also keep it.
+bool _isSnapshotReplacedCache(ClassDeclaration node) {
+  final CompilationUnit? unit = node.thisOrAncestorOfType<CompilationUnit>();
+  if (unit == null) return false;
+  // A `part` shares private scope, so writes could hide in an unseen file.
+  if (unit.directives.any(
+    (Directive d) => d is PartDirective || d is PartOfDirective,
+  )) {
+    return false;
+  }
+
+  final Set<Element>? fields = _snapshotCandidateFields(node);
+  if (fields == null || fields.isEmpty) return false;
+
+  // A rebuild can pull old entries in through a helper, so its callees must be
+  // inspectable too.
+  final _HelperCollector helpers = _HelperCollector();
+  unit.accept(helpers);
+
+  final _SnapshotUsageVisitor visitor = _SnapshotUsageVisitor(
+    fields,
+    helpers.bodies,
+  );
+  unit.accept(visitor);
+  // Each field needs a real rebuild; one that is merely read proves nothing.
+  return !visitor.unsafe && visitor.rebuilt.containsAll(fields);
+}
+
+/// The collection fields of [node] that must all behave as snapshots, or null
+/// when some field rules the exemption out up front.
+Set<Element>? _snapshotCandidateFields(ClassDeclaration node) {
+  final Set<Element> fields = <Element>{};
   for (final ClassMember member in node.bodyMembers) {
-    if (member is FieldDeclaration) {
-      final String fieldSource = member.toSource().toLowerCase();
-      // A typed Map field, or a bare `= {}` initializer (map/set literal).
-      if (fieldSource.contains('map<') || fieldSource.contains('= {}')) {
-        return true;
+    // A const collection cannot change, so it neither grows nor needs proof.
+    if (member is! FieldDeclaration || member.fields.isConst) continue;
+    // Whatever [_hasMapCacheField] counts as cache storage must be proven
+    // here, not silently skipped.
+    final bool isStorage = _isMapStorageField(member);
+
+    for (final VariableDeclaration v in member.fields.variables) {
+      final Element? element = v.declaredFragment?.element;
+      if (element is! VariableElement) return null;
+      final DartType type = element.type;
+      if (!_isCollectionType(type)) {
+        if (isStorage || type is DynamicType) return null;
+        continue;
       }
+      // A public field can be grown by another library, which is not visible.
+      // Collection values can grow per key through a plain lookup
+      // (`_byKey[k]!.add(x)`), so replacing the outer map proves little.
+      if (!element.isPrivate || _hasCollectionValues(type)) return null;
+      fields.add(element);
     }
   }
-  return false;
+  return fields;
+}
+
+/// Whether [type] is a two-argument (map) type whose values are collections.
+bool _hasCollectionValues(DartType type) =>
+    type is InterfaceType &&
+    type.typeArguments.length == 2 &&
+    _isCollectionType(type.typeArguments[1]);
+
+/// Whether [type] is a Map or Iterable, including subtypes such as HashMap,
+/// List and Set.
+bool _isCollectionType(DartType type) {
+  if (type is! InterfaceType) return false;
+  return <InterfaceType>[
+    type,
+    ...type.allSupertypes,
+  ].any((InterfaceType t) => t.isDartCoreMap || t.isDartCoreIterable);
+}
+
+/// The variable behind [id], unwrapping the induced getter/setter. A pure write
+/// target (`_f = x`) has no `.element`, so the assignment's write element is
+/// used for it.
+Element? _referencedVariable(SimpleIdentifier id) {
+  Element? element = id.element;
+  if (element == null) {
+    final Expression whole = _wholeReference(id);
+    final AstNode? parent = whole.parent;
+    if (parent is AssignmentExpression && parent.leftHandSide == whole) {
+      element = parent.writeElement;
+    }
+  }
+  return element is PropertyAccessorElement ? element.variable : element;
+}
+
+/// Widens [id] over a qualifier (`this._f`, `Cache._f`), parentheses and `!`,
+/// so the parent of the result is what actually consumes the field's value.
+Expression _wholeReference(SimpleIdentifier id) {
+  Expression current = id;
+  while (true) {
+    final AstNode? parent = current.parent;
+    final bool wraps =
+        (parent is PrefixedIdentifier && parent.identifier == current) ||
+        (parent is PropertyAccess && parent.propertyName == current) ||
+        parent is ParenthesizedExpression ||
+        (parent is PostfixExpression && parent.operator.type == TokenType.BANG);
+    if (!wraps || parent is! Expression) return current;
+    current = parent;
+  }
+}
+
+/// Classifies every reference to the candidate snapshot [_fields] in a unit.
+class _SnapshotUsageVisitor extends RecursiveAstVisitor<void> {
+  _SnapshotUsageVisitor(this._fields, this._helpers);
+
+  final Set<Element> _fields;
+
+  /// Functions, methods and getters declared in the unit, by element.
+  final Map<Element, Declaration> _helpers;
+
+  /// Fields that are assigned a freshly built collection somewhere.
+  final Set<Element> rebuilt = <Element>{};
+
+  /// Set once any reference could grow a field or leak it for later growth.
+  bool unsafe = false;
+
+  /// Map members that reveal nothing which could be merged into a rebuild.
+  static const Set<String> _safeProperties = <String>{
+    'length',
+    'isEmpty',
+    'isNotEmpty',
+  };
+  static const Set<String> _safeMethods = <String>{
+    'containsKey',
+    'containsValue',
+  };
+
+  /// `this._f` constructor parameters store a caller-owned collection, which
+  /// the caller can keep growing.
+  @override
+  void visitFieldFormalParameter(FieldFormalParameter node) {
+    if (_fields.any((Element f) => f.name == node.name.lexeme)) unsafe = true;
+    super.visitFieldFormalParameter(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    // Doc-comment `[_field]` references are not uses.
+    if (node.parent is CommentReference) return;
+    if (!_fields.any((Element f) => f.name == node.name)) return;
+
+    final Element? target = _referencedVariable(node);
+    // Unresolved: cannot tell whether this is the field, so assume the worst.
+    if (target == null) {
+      unsafe = true;
+      return;
+    }
+    if (!_fields.contains(target)) return; // shadowing local or namesake
+
+    final Expression whole = _wholeReference(node);
+    final AstNode? parent = whole.parent;
+    if (parent is AssignmentExpression && parent.leftHandSide == whole) {
+      _checkAssignment(parent, target);
+    } else if (!_isHarmlessRead(whole, parent)) {
+      unsafe = true;
+    }
+  }
+
+  /// Only `= null` (reset) and `= <fresh collection>` (rebuild) are allowed.
+  /// `??=` is load-once and compound operators merge, so both are rejected.
+  void _checkAssignment(AssignmentExpression node, Element field) {
+    if (node.operator.type != TokenType.EQ) {
+      unsafe = true;
+      return;
+    }
+    final Expression value = node.rightHandSide;
+    if (value is NullLiteral) return;
+
+    // The whole enclosing member (or top-level function), closures included.
+    final AstNode? member =
+        node.thisOrAncestorOfType<ClassMember>() ??
+        node.thisOrAncestorMatching((AstNode n) => n.parent is CompilationUnit);
+    if (member == null) {
+      unsafe = true;
+      return;
+    }
+    // Reading any stored collection while rebuilding can carry old entries
+    // over (`{..._f, k: v}`, `Map.of(_pending)`), which is accumulation.
+    final _RebuildScopeVisitor scope = _RebuildScopeVisitor(
+      node.thisOrAncestorOfType<ClassDeclaration>()?.declaredFragment?.element,
+      _helpers,
+    );
+    member.accept(scope);
+    if (scope.readsStoredCollection || !scope.isFresh(value)) {
+      unsafe = true;
+      return;
+    }
+    rebuilt.add(field);
+  }
+
+  /// Key lookup, size checks, key/value tests and null comparisons.
+  bool _isHarmlessRead(Expression whole, AstNode? parent) {
+    if (parent is IndexExpression) {
+      // `inSetterContext` covers `f[k] = v`, `f[k] ??= v` and `f[k]++`.
+      return parent.target == whole && !parent.inSetterContext();
+    }
+    if (parent is PrefixedIdentifier) {
+      return _safeProperties.contains(parent.identifier.name);
+    }
+    if (parent is PropertyAccess) {
+      return _safeProperties.contains(parent.propertyName.name);
+    }
+    if (parent is MethodInvocation) {
+      return parent.target == whole &&
+          _safeMethods.contains(parent.methodName.name);
+    }
+    if (parent is BinaryExpression) {
+      final TokenType op = parent.operator.type;
+      return (op == TokenType.EQ_EQ || op == TokenType.BANG_EQ) &&
+          (parent.leftOperand is NullLiteral ||
+              parent.rightOperand is NullLiteral);
+    }
+    return false;
+  }
+}
+
+/// Indexes every function, method and getter in a unit so a rebuild's calls can
+/// be followed into their bodies.
+class _HelperCollector extends RecursiveAstVisitor<void> {
+  final Map<Element, Declaration> bodies = <Element, Declaration>{};
+
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    final Element? element = node.declaredFragment?.element;
+    if (element != null) bodies[element] = node;
+    super.visitMethodDeclaration(node);
+  }
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    final Element? element = node.declaredFragment?.element;
+    if (element != null) bodies[element] = node;
+    super.visitFunctionDeclaration(node);
+  }
+}
+
+/// Inspects the member that rebuilds a snapshot: what it and the helpers it
+/// calls read, and how its locals are initialized.
+///
+/// Helpers declared in another file cannot be inspected.
+class _RebuildScopeVisitor extends RecursiveAstVisitor<void> {
+  _RebuildScopeVisitor(this._owner, this._helpers);
+
+  /// Class containing the code being inspected (the rebuild, or the helper
+  /// being followed); its fields are stored state a rebuild must not draw from.
+  Element? _owner;
+
+  final Map<Element, Declaration> _helpers;
+
+  /// Helpers already walked, so recursive and repeated calls terminate.
+  final Set<Element> _followed = <Element>{};
+
+  bool readsStoredCollection = false;
+  final Map<Element, Expression> _initializers = <Element, Expression>{};
+  final Set<Element> _reassigned = <Element>{};
+
+  /// Whether [value] is a newly built collection: a literal, a dart:core /
+  /// dart:collection constructor (views excluded), or a never-reassigned local
+  /// holding one. A parameter or helper result may be an alias of a growing map.
+  bool isFresh(Expression value) {
+    if (_isNewCollection(value)) return true;
+    if (value is! SimpleIdentifier) return false;
+    final Element? local = value.element;
+    if (local == null || _reassigned.contains(local)) return false;
+    final Expression? initializer = _initializers[local];
+    return initializer != null && _isNewCollection(initializer);
+  }
+
+  bool _isNewCollection(Expression value) {
+    if (value is SetOrMapLiteral) return true;
+    if (value is! InstanceCreationExpression) return false;
+    // `MapView` / `UnmodifiableMapView` wrap the argument instead of copying
+    // it, so they alias a map that can still grow elsewhere.
+    if (value.constructorName.type.name.lexeme.endsWith('View')) return false;
+    final String? library = value.constructorName.element?.library.uri
+        .toString();
+    return library == 'dart:core' || library == 'dart:collection';
+  }
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    final Element? element = node.declaredFragment?.element;
+    final Expression? initializer = node.initializer;
+    if (element != null && initializer != null) {
+      _initializers[element] = initializer;
+    }
+    super.visitVariableDeclaration(node);
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Element? written = node.writeElement;
+    if (written is LocalVariableElement) _reassigned.add(written);
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    // A write-only target has no `.element`, so only reads are seen here.
+    Element? element = node.element;
+    // Calls, tear-offs and explicit getters: what they read feeds the rebuild.
+    if (element != null) _follow(element.baseElement);
+    if (element is PropertyAccessorElement) element = element.variable;
+    // Another class's static is as persistent as this class's field. Its
+    // instance fields are not counted, as they are usually the input data.
+    final bool isStored =
+        element is TopLevelVariableElement ||
+        (element is FieldElement &&
+            (element.isStatic || element.enclosingElement == _owner));
+    if (isStored &&
+        element is VariableElement &&
+        !element.isConst &&
+        _isCollectionType(element.type)) {
+      readsStoredCollection = true;
+    }
+  }
+
+  /// Walks the body of [element] when it is a helper declared in this unit.
+  void _follow(Element element) {
+    final Declaration? body = _helpers[element];
+    if (body == null || !_followed.add(element)) return;
+    // The helper's own class defines what counts as stored inside it.
+    final Element? caller = _owner;
+    _owner = element.enclosingElement;
+    body.accept(this);
+    _owner = caller;
+  }
 }
 
 /// Warns when cache implementations lack expiration logic.
 ///
-/// Since: v4.1.8 | Updated: v13.12.6 | Rule version: v3
+/// Since: v4.1.8 | Updated: v17.10.0 | Rule version: v4
 ///
 /// `[HEURISTIC]` - Detects cache-like classes without TTL/expiration.
 ///
@@ -1235,6 +1574,8 @@ bool _hasMapCacheField(ClassDeclaration node) {
 /// - Files with an explicit `.clear()` call anywhere in the same
 ///   compilation unit, via [_fileHasExplicitCacheClear] — invalidation may
 ///   be driven from outside the cache class itself.
+/// - Snapshot caches whose maps are only replaced whole, via
+///   [_isSnapshotReplacedCache] — the replacement is the invalidation.
 ///
 /// **BAD:**
 /// ```dart
@@ -1280,7 +1621,7 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_cache_expiration',
-    '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v3}',
+    '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v4}',
     correctionMessage:
         'Add TTL/expiration to prevent serving stale data indefinitely. Use the DevTools memory profiler to verify the leak is resolved after the fix.',
     severity: DiagnosticSeverity.WARNING,
@@ -1339,9 +1680,12 @@ class RequireCacheExpirationRule extends SaropaLintRule {
       // deliberately TTL-less but bounded cache is a valid design; only flag a
       // genuinely unbounded, TTL-less Map cache that can serve stale data
       // while also growing without limit.
+      // The snapshot check is last because it walks the whole unit: a map that
+      // is only replaced whole is invalidated by that and needs no TTL.
       if (hasMapCache &&
           !hasExpiration &&
-          !_cacheSourceIsBounded(classSource)) {
+          !_cacheSourceIsBounded(classSource) &&
+          !_isSnapshotReplacedCache(node)) {
         reporter.atNode(node);
       }
     });
@@ -1350,7 +1694,7 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 
 /// Warns when caches can grow without bounds.
 ///
-/// Since: v4.1.8 | Updated: v13.12.6 | Rule version: v4
+/// Since: v4.1.8 | Updated: v17.10.0 | Rule version: v5
 ///
 /// `[HEURISTIC]` - Detects Map-based caches without size limits.
 ///
@@ -1376,6 +1720,8 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 ///   `executables:` - the process exits after one run.
 /// - Files with an explicit `.clear()` call anywhere in the same
 ///   compilation unit - invalidation may be driven from outside the class.
+/// - Snapshot caches whose maps are only replaced whole by a freshly built
+///   map, via [_isSnapshotReplacedCache] - old entries are dropped.
 ///
 /// **BAD:**
 /// ```dart
@@ -1434,7 +1780,7 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_unbounded_cache_growth',
-    '[avoid_unbounded_cache_growth] Map or collection used as a cache has no maximum size constraint. Without eviction logic, the cache grows indefinitely as new entries are added, consuming increasing amounts of device memory. This eventually exhausts available RAM and crashes the app with an out-of-memory error, particularly on mobile devices with limited memory resources. {v4}',
+    '[avoid_unbounded_cache_growth] Map or collection used as a cache has no maximum size constraint. Without eviction logic, the cache grows indefinitely as new entries are added, consuming increasing amounts of device memory. This eventually exhausts available RAM and crashes the app with an out-of-memory error, particularly on mobile devices with limited memory resources. {v5}',
     correctionMessage:
         'Implement a bounded cache with a maximum entry count and LRU (Least Recently Used) eviction policy, or use a cache library that manages size limits automatically.',
     severity: DiagnosticSeverity.WARNING,
@@ -1507,6 +1853,10 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
       if (!_hasMutationPatterns(classSource)) {
         return;
       }
+
+      // The textual mutation scan above also matches `next[k] = v` on a local
+      // that then replaces the field. Checked last: it walks the whole unit.
+      if (_isSnapshotReplacedCache(node)) return;
 
       reporter.atNode(node);
     });
@@ -1918,8 +2268,10 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
   bool _isConstValueClass(ClassDeclaration node) {
     bool hasConst = false;
     for (final ClassMember m in node.bodyMembers) {
-      if (m is ConstructorDeclaration && m.constKeyword != null)
+      // Remember that a const constructor exists; fields are checked below.
+      if (m is ConstructorDeclaration && m.constKeyword != null) {
         hasConst = true;
+      }
       if (m is FieldDeclaration &&
           !m.isStatic &&
           !m.fields.isFinal &&

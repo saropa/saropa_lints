@@ -1,6 +1,6 @@
 # prefer_try_parse_for_dynamic_data: false positive on Uri.parse of a static const class field interpolation
 
-- **Status:** Open
+- **Status:** Fixed
 - **Created:** 2026-11-25
 - **Rule:** `prefer_try_parse_for_dynamic_data` {v4}
 - **Version:** saropa_lints 17.9.1
@@ -63,3 +63,15 @@ Add the reproducer to the fixture, find which branch returns false, and make `_i
 - saropa_lints 17.9.1 (contacts `pubspec.yaml` `^17.9.1`)
 - Consumer site: contacts `lib/service/google_calendar_api/google_calendar_event_insert_utils.dart:141`
 - Windows 11, VS Code extension scan
+
+---
+
+## Finish Report (2026-11-26)
+
+**Root cause:** the causes suspected above were mostly wrong. Neither the static class field nor the `.replace(...)` chain defeats the check; resolved analysis already handled both. The defect was the third candidate only: in the unresolved scan `element` is null, so every constant looked dynamic.
+
+**Fix** (`lib/src/rules/data/json_datetime_rules.dart`, rule version v5): when there is no element, the reference is checked against `const` declarations in the same file (top-level, local, static field, `Type.name`), rejecting any binding that can shadow it. Imported constants cannot be proven and are still reported in the unresolved scan.
+
+**Related, not fixed:** the fixture's existing GOOD cases `goodRegexGuardedSubstring` and `goodRegexCaptureGroup` still report, filed as `bugs/prefer_try_parse_for_dynamic_data_false_positive_regex_validated_inputs.md`.
+
+Tests: `dart test test/rules/data/prefer_try_parse_const_uri_test.dart test/rules/data/json_datetime_rules_test.dart test/scan/fixture_lint_integration_test.dart` - passed.

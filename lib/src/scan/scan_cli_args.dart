@@ -48,6 +48,7 @@ class ScanCliArgs {
     this.fixIgnores = false,
     this.findStaleIgnores = false,
     this.fixStaleIgnores = false,
+    this.checkAccepted = false,
     this.checkSdkCompat = false,
     this.minSeverity,
     this.maxSeverity,
@@ -175,6 +176,13 @@ class ScanCliArgs {
   /// comments have only the stale rules pruned. Prints a summary of changes.
   final bool fixStaleIgnores;
 
+  /// When true, run the normal scan and then report every entry in
+  /// `saropa_accepted.yaml`: how many findings it hides, whether it is stale
+  /// (file gone, or the rule ran on the file and found nothing), and any
+  /// invalid entries. Exits 1 when any entry is stale or invalid so CI can
+  /// gate on it; never edits the list.
+  final bool checkAccepted;
+
   /// When true, run a standalone SDK compatibility audit: cross-reference
   /// the pubspec.yaml SDK lower bound against Dart syntax features in lib/
   /// and output a summary showing the minimum required version.
@@ -298,6 +306,7 @@ ScanParseResult parseScanArgs(
   bool fixIgnores = false;
   bool findStaleIgnores = false;
   bool fixStaleIgnores = false;
+  bool checkAccepted = false;
   bool checkSdkCompat = false;
   bool profile = false;
   bool excludeLightLane = false;
@@ -339,6 +348,13 @@ ScanParseResult parseScanArgs(
     // and then remove them from the source files automatically.
     if (arg == '--fix-stale-ignores') {
       fixStaleIgnores = true;
+      i++;
+      continue;
+    }
+    // Accepted-findings list check: run the scan, then judge each entry of
+    // saropa_accepted.yaml against the findings it hid.
+    if (arg == '--check-accepted') {
+      checkAccepted = true;
       i++;
       continue;
     }
@@ -760,6 +776,7 @@ ScanParseResult parseScanArgs(
       fixIgnores: fixIgnores,
       findStaleIgnores: findStaleIgnores,
       fixStaleIgnores: fixStaleIgnores,
+      checkAccepted: checkAccepted,
       checkSdkCompat: checkSdkCompat,
       minSeverity: minSeverity,
       maxSeverity: maxSeverity,

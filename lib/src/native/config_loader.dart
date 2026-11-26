@@ -12,6 +12,7 @@
 ///   [SaropaLintRule.disabledRules])
 /// - [SaropaLintRule.severityOverrides] and [SaropaLintRule.disabledRules]
 /// - [BaselineManager] (baseline path, enabled)
+/// - [AcceptedFindingsRuntime] (saropa_accepted.yaml, in-server plugin only)
 /// - [ProgressTracker] (max_issues, file-only output)
 /// - [BannedUsageConfig] from custom yaml
 library;
@@ -26,6 +27,7 @@ import '../config/avoid_ignoring_return_values_config.dart';
 import '../config/max_declarations_config.dart';
 import '../baseline/baseline_config.dart';
 import '../baseline/baseline_manager.dart';
+import '../accepted/accepted_findings_runtime.dart';
 import '../config/analysis_options_rule_packs.dart';
 import '../config/pubspec_lock_resolver.dart';
 import '../config/rule_packs.dart';
@@ -164,6 +166,16 @@ void _loadFromRoot(String? projectRoot) {
       _loadRulePacksConfig();
     }
     _loadBaselineConfig(content);
+    // Accepted-findings list (saropa_accepted.yaml at the project root).
+    // In-server plugin only: the scan/audit/daemon/LSP CLIs filter their
+    // output afterwards instead, so their stale-entry check still sees every
+    // finding an entry hid. Applying it here too would hide those findings
+    // before the check runs and report every entry as stale.
+    if (_nativePluginStarted) {
+      // Only switches the hook on: this loader runs for one root, while the
+      // runtime picks each analyzed file's own project list.
+      AcceptedFindingsRuntime.enable();
+    }
     loadBannedUsageConfig(content);
     loadAlwaysSpecifyParameterNamesConfig(content);
     loadMaxDeclarationsConfig(content);

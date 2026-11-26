@@ -333,7 +333,10 @@
     "src/extensionChecks/docPlacementCheck.ts",
     "src/test/extensionChecks/docPlacementCheck.test.ts",
     "src/analyzerExclusions.ts",
-    "src/test/extensionChecks/analyzerExclusions.test.ts"
+    "src/test/extensionChecks/analyzerExclusions.test.ts",
+    "src/acceptedFindingsModel.ts",
+    "src/accepted-findings-commands.ts",
+    "src/test/views/acceptedFindings.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

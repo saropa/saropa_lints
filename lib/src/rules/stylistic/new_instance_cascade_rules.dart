@@ -77,8 +77,10 @@ bool _isFreshInstanceConfigStatement(Statement stmt, String varName) {
 /// self-reference the receiver if folded into its own cascade initializer.
 bool _argumentsReferenceVariable(ArgumentList args, String varName) {
   for (final Argument arg in args.arguments) {
-    if (_expressionReferencesVariable(arg.argumentExpression, varName))
+    // One self-referencing argument is enough to reject the cascade.
+    if (_expressionReferencesVariable(arg.argumentExpression, varName)) {
       return true;
+    }
   }
   return false;
 }

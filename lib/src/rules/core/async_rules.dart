@@ -7,7 +7,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
-import '../../analyzer_compat.dart';
 import '../../early_exit_guard_utils.dart';
 import '../../async_context_utils.dart'
     show awaitConfinedToExitingBranches, containsAwait, isMapRemoveCall;

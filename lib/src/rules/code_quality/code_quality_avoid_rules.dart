@@ -3528,8 +3528,11 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
       final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final param = params.first;
-      if (param is! RegularFormalParameter || param.functionTypedSuffix != null)
+      // Only a plain typed parameter declares a representation type.
+      if (param is! RegularFormalParameter ||
+          param.functionTypedSuffix != null) {
         return;
+      }
       final TypeAnnotation? repType = param.type;
       if (repType == null) return;
 

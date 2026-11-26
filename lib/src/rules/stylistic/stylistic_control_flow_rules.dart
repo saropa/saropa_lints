@@ -618,8 +618,9 @@ class PreferSwitchStatementRule extends SaropaLintRule {
     if (parent is YieldStatement) return true;
 
     // label: switch (...) { ... }  (named argument — value position)
-    if (parent is NamedArgument || parent is RecordLiteralNamedField)
+    if (parent is NamedArgument || parent is RecordLiteralNamedField) {
       return true;
+    }
 
     return false;
   }

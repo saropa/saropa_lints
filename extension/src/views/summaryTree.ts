@@ -12,6 +12,7 @@ import {
   sortedNumericCountEntries,
 } from '../keyedCountBreakdown';
 import { getProjectRoot } from '../projectRoot';
+import { l10n } from '../i18n/runtime';
 import { readDisabledRules } from '../configWriter';
 import {
   SecurityHotspotReviewStateService,
@@ -146,9 +147,13 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
         const nIgnore = normalizeNonNegativeInteger(byKind?.ignore) ?? 0;
         const nFile = normalizeNonNegativeInteger(byKind?.ignoreForFile) ?? 0;
         const nBaseline = normalizeNonNegativeInteger(byKind?.baseline) ?? 0;
+        // Accepted-findings list hits: shown apart from the baseline so a
+        // reviewed decision never reads as frozen legacy debt.
+        const nAccepted = normalizeNonNegativeInteger(byKind?.accepted) ?? 0;
         if (nIgnore > 0) parts.push(`${nIgnore} ignore`);
         if (nFile > 0) parts.push(`${nFile} file-level`);
         if (nBaseline > 0) parts.push(`${nBaseline} baseline`);
+        if (nAccepted > 0) parts.push(l10n('acceptedFindings.summary.count', { count: String(nAccepted) }));
         const desc = parts.length > 0 ? parts.join(', ') : `${s?.suppressions?.total ?? 0} total`;
         items.push(
           new SummaryItem(

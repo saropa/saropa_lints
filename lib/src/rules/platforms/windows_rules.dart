@@ -166,6 +166,93 @@ bool _isBothSidesString(BinaryExpression node) {
   return true;
 }
 
+/// Registered subtypes per top-level MIME type. A bare word after the slash is
+/// only believed when it is listed here: `image/cache`, `video/clips` and
+/// `model/user` are relative folders that share a top-level word.
+const Map<String, Set<String>> _knownMimeSubtypes = <String, Set<String>>{
+  'application': <String>{
+    'ecmascript', 'gzip', 'javascript', 'json', 'msword', 'octet-stream', //
+    'ogg', 'pdf', 'rtf', 'sql', 'toml', 'wasm', 'xml', 'yaml', 'zip',
+  },
+  'audio': <String>{
+    'aac', 'amr', 'flac', 'midi', 'mp3', 'mp4', 'mpeg', 'ogg', 'opus', //
+    'wav', 'webm',
+  },
+  // `chemical` only has `x-` subtypes, which the form regex covers.
+  'chemical': <String>{},
+  'font': <String>{'collection', 'otf', 'sfnt', 'ttf', 'woff', 'woff2'},
+  'image': <String>{
+    'apng', 'avif', 'bmp', 'gif', 'heic', 'heif', 'jpeg', 'jpg', 'jxl', //
+    'png', 'tiff', 'webp',
+  },
+  'inode': <String>{'directory'},
+  'message': <String>{'partial', 'rfc822'},
+  'model': <String>{'gltf-binary', 'obj', 'stl'},
+  'multipart': <String>{
+    'alternative', 'byteranges', 'digest', 'form-data', 'mixed', //
+    'parallel', 'related',
+  },
+  'text': <String>{
+    'calendar', 'css', 'csv', 'event-stream', 'html', 'javascript', //
+    'markdown', 'plain', 'richtext', 'rtf', 'tab-separated-values', //
+    'uri-list', 'vcard', 'vtt', 'xml', 'yaml',
+  },
+  'video': <String>{
+    '3gpp', 'av1', 'h264', 'h265', 'mp2t', 'mp4', 'mpeg', 'ogg', //
+    'quicktime', 'webm',
+  },
+};
+
+/// Subtype forms that no ordinary folder name takes, so they need no listing:
+/// a wildcard, the `vnd.`/`prs.`/`x.` registration trees, an `x-` private
+/// subtype, or a structured syntax suffix such as `+json`.
+final RegExp _mimeSubtypeFormRegex = RegExp(
+  r'^(?:\*|(?:vnd|prs|x)\.[\w.+-]+|x-[\w+-]+|'
+  r'[\w-]+\+(?:cbor|json|xml|yaml|zip))$',
+);
+
+/// Whether [value] is a whole MIME type such as `text/plain`, `image/svg+xml`
+/// or `application/vnd.google-apps.folder`: exactly one slash, a registered
+/// top-level type, and a subtype that is either listed or unmistakable by form.
+bool _isMimeTypeValue(String value) {
+  final List<String> parts = value.split('/');
+  if (parts.length != 2) return false;
+  final Set<String>? known = _knownMimeSubtypes[parts.first];
+  if (known == null) return false;
+  return known.contains(parts.last) ||
+      _mimeSubtypeFormRegex.hasMatch(parts.last);
+}
+
+/// Returns true when [expr] is a compile-time string (literal or `const`
+/// reference) whose VALUE is a MIME type. Comparing against one is a content
+/// type check, not a path comparison, even when its name says "folder"
+/// (`_folderMimeType`). Judged by value, never by the identifier's spelling.
+bool _isMimeTypeConstant(Expression expr) {
+  final String? value = _constantStringValue(expr.unParenthesized);
+  return value != null && _isMimeTypeValue(value);
+}
+
+/// Returns the compile-time string value of [expr], or null when it is not a
+/// string literal or a reference to a `const` string.
+String? _constantStringValue(Expression expr) {
+  if (expr is StringLiteral) return expr.stringValue;
+
+  final Element? element = switch (expr) {
+    SimpleIdentifier() => expr.element,
+    PrefixedIdentifier() => expr.identifier.element,
+    PropertyAccess() => expr.propertyName.element,
+    _ => null,
+  };
+  // A top-level or static const is read through its getter; a local const
+  // resolves to the variable itself.
+  final Element? variable = element is PropertyAccessorElement
+      ? element.variable
+      : element;
+  // A non-const variable has no constant value, so it stays reportable.
+  if (variable is! VariableElement || !variable.isConst) return null;
+  return variable.computeConstantValue()?.toStringValue();
+}
+
 // =============================================================================
 // avoid_hardcoded_drive_letters
 // =============================================================================
@@ -362,7 +449,9 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
 
 /// Detects file path comparisons that don't account for case insensitivity.
 ///
-/// Since: v4.9.20 | Updated: v4.13.0 | Rule version: v3
+/// Since: v4.9.20 | Updated: v17.10.0 | Rule version: v4
+///
+/// Comparisons against a constant whose value is a MIME type are ignored.
 ///
 /// Alias: case_path, windows_case
 ///
@@ -416,7 +505,7 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_case_sensitive_path_comparison',
     '[avoid_case_sensitive_path_comparison] File path compared without '
-        'case normalization. Windows filesystem is case-insensitive. {v3}',
+        'case normalization. Windows filesystem is case-insensitive. {v4}',
     correctionMessage:
         'Use .toLowerCase() on both sides or path.equals() from the '
         "'path' package for case-insensitive comparison.",
@@ -459,6 +548,14 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
       // name (e.g. '--json-file-path') triggered the heuristic wrongly.
       if (_isNonPathStringLiteral(node.leftOperand) ||
           _isNonPathStringLiteral(node.rightOperand)) {
+        return;
+      }
+
+      // A MIME type constant on either side makes this a content type check;
+      // the path-like word in its name (`_folderMimeType`) or value
+      // (`.../vnd.google-apps.folder`) says nothing about a filesystem.
+      if (_isMimeTypeConstant(node.leftOperand) ||
+          _isMimeTypeConstant(node.rightOperand)) {
         return;
       }
 

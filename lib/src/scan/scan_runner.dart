@@ -224,6 +224,11 @@ class ScanRunner {
   /// Number of files skipped for being outside the analysis context root.
   int get skippedFileCount => _skippedFileCount;
 
+  /// Rules the last run actually instantiated (after tier, lane and config
+  /// gating). The accepted-findings stale check uses it so an entry for a
+  /// rule that did not run is never reported as stale.
+  Set<String> get ranRuleNames => _ruleImpactMap.keys.toSet();
+
   /// Builds an [AnalysisContextCollection] rooted at [projectRoot] for a
   /// long-lived caller (the scan daemon) to hold and reuse across many
   /// [runResolvedWithCollection] calls. This is the expensive step

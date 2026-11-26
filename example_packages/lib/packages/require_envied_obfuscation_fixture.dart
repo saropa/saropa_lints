@@ -119,3 +119,15 @@ abstract class _good697_Env {
   @EnviedField(obfuscate: true)
   static const String apiKey = _Env.apiKey;
 }
+
+// A bool toggle holds no secret; a String beside it still does.
+@Envied(obfuscate: true)
+abstract class _toggle697_Env {
+  // GOOD: Should NOT trigger require_envied_obfuscation
+  @EnviedField(obfuscate: false, defaultValue: false)
+  static const bool demoMode = _Env.demoMode;
+
+  // expect_lint: require_envied_obfuscation
+  @EnviedField(obfuscate: false)
+  static const String apiKey = _Env.apiKey;
+}

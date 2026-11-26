@@ -134,3 +134,26 @@ class _ApiClient {
     }
   }
 }
+
+class _OrderApi {
+  // GOOD: private send helper returns the response unread; every caller in
+  // this file is a method, so the status check is owed by the caller.
+  Future<http.Response> _send(http.Client client, Uri uri) async {
+    return await client.post(uri);
+  }
+
+  // GOOD: caller of the pass-through helper checks the status first.
+  Future<String?> create(http.Client client, Uri uri) async {
+    final http.Response response = await _send(client, uri);
+    if (response.statusCode != 200) return null;
+    return response.body;
+  }
+
+  // BAD: caller of the pass-through helper reads the body unchecked — the
+  // obligation moved here from the helper.
+  // expect_lint: require_http_status_check
+  Future<String> createUnchecked(http.Client client, Uri uri) async {
+    final http.Response response = await _send(client, uri);
+    return response.body;
+  }
+}

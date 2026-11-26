@@ -590,8 +590,10 @@ function ensureSaropaDependency(workspaceRoot: string): boolean {
  * The scan CLI exits 1 when stale ignores are found — that's "success with
  * findings", not a failure. A genuine error has meaningful stderr content
  * beyond the Dart VM's boilerplate. This heuristic distinguishes the two.
+ * Exported for the accepted-findings check, whose CLI uses the same
+ * "exit 1 = findings" convention.
  */
-function isExpectedNonZeroExit(stderr: string): boolean {
+export function isExpectedNonZeroExit(stderr: string): boolean {
   const trimmed = stderr.trim();
   // Empty stderr or only Dart observatory/VM-service lines = expected exit.
   if (!trimmed) return true;
@@ -602,7 +604,7 @@ function isExpectedNonZeroExit(stderr: string): boolean {
 }
 
 /** Extracts a short error message from stderr for user-facing notifications. */
-function summarizeError(stderr: string): string {
+export function summarizeError(stderr: string): string {
   const trimmed = stderr.trim();
   if (!trimmed) return 'See Output for details.';
   const firstLine = trimmed.split(/\r?\n/)[0] ?? 'See Output for details.';

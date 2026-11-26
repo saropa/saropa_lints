@@ -183,3 +183,27 @@ void _goodCompoundAssignment(int x) {
 
 String? _fallback() => null;
 int _delta() => -10;
+
+bool get _isEntitled => DateTime.now().second.isEven;
+
+// GOOD: the getter can change while the function is suspended.
+Future<void> _goodRecheckAfterAwait(Future<void> Function() read) async {
+  if (_isEntitled) {
+    await read();
+    if (_isEntitled) {
+      return;
+    }
+  }
+}
+
+// BAD: a final local cannot change during the await.
+Future<void> _badLocalAfterAwait(Future<void> Function() read) async {
+  final bool allowed = _isEntitled;
+  if (allowed) {
+    await read();
+    // expect_lint: no_equal_nested_conditions
+    if (allowed) {
+      return;
+    }
+  }
+}

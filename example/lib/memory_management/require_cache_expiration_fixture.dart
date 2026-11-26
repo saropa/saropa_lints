@@ -197,10 +197,12 @@ class _good474_ContentHashCache {
 // same file explicitly calls `.clear()` on it — invalidation is driven from
 // outside the cache class. Must NOT lint.
 class _good474_ExternallyManagedCache {
-  final Map<String, User> _cache = {};
+  // The clear() exemption matches by field name across the file, so this name
+  // must stay unique or the BAD cases above stop firing.
+  final Map<String, User> _externalEntries = {};
 
-  User? get(String id) => _cache[id];
-  void set(String id, User user) => _cache[id] = user;
+  User? get(String id) => _externalEntries[id];
+  void set(String id, User user) => _externalEntries[id] = user;
 }
 
 class _good474_CacheInvalidator {
@@ -209,5 +211,35 @@ class _good474_CacheInvalidator {
 
   // Scheduled/triggered from elsewhere; presence of any `.clear()` call in
   // the file is the signal, not who calls it or when.
-  void onMemoryPressure() => cache._cache.clear();
+  void onMemoryPressure() => cache._externalEntries.clear();
+}
+
+// GOOD: snapshot cache (class names here must avoid "ttl", which the rule
+// reads as expiration). The private map is only replaced whole by a freshly
+// built map, so entries cannot accumulate and each replacement invalidates it.
+// Must NOT lint.
+class SnapshotLinkCacheFreshness {
+  static Map<String, int> _byId = <String, int>{};
+
+  static void replace(List<String> serverIds) {
+    final Map<String, int> next = <String, int>{};
+    for (final String id in serverIds) {
+      next[id] = id.length; // writes a local, not the field
+    }
+    _byId = next; // old entries are dropped
+  }
+
+  static int? forId(String id) => _byId[id];
+}
+
+// BAD: replaced whole in one place but also filled per key, so it still grows.
+// expect_lint: require_cache_expiration
+class PartlySnapshotCacheFreshness {
+  static Map<String, int> _byId = <String, int>{};
+
+  static void replace(List<String> serverIds) {
+    _byId = <String, int>{for (final String id in serverIds) id: id.length};
+  }
+
+  static void store(String id) => _byId[id] = id.length;
 }

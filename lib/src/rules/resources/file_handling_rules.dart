@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:saropa_lints/src/platform_path_utils.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
@@ -1761,12 +1762,16 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
 
 /// Warns when file paths are constructed from user input without sanitization.
 ///
-/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.2.0 | Updated: v17.10.0 | Rule version: v4
 ///
 /// Alias: sanitize_file_path, path_traversal
 ///
 /// User-provided paths can contain ../ to access files outside intended
 /// directory. Validate and sanitize paths before file operations.
+///
+/// A parameter counts only when the path expression references it. A property
+/// (`dir.path`), field (`this.name`), shadowing local, or literal text that
+/// merely shares the parameter's name does not.
 ///
 /// **BAD:**
 /// ```dart
@@ -1820,7 +1825,7 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_file_path_sanitization',
     '[require_file_path_sanitization] File path constructed from parameter '
-        'without sanitization. Path traversal attack possible with ../ {v3}',
+        'without sanitization. Path traversal attack possible with ../ {v4}',
     correctionMessage:
         'Use path.basename() to extract filename and path.isWithin() to verify.',
     severity: DiagnosticSeverity.WARNING,
@@ -1905,13 +1910,15 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
       final String paramName = param.name?.lexeme ?? '';
       if (paramName.isEmpty) continue;
 
-      // Match the parameter name as a whole identifier, not a substring. A bare
-      // `contains(paramName)` reported `File('${dir.path}/identity.json')` when
-      // a parameter happened to be named `id` (it is a substring of "identity"),
-      // even though `id` is never used in the path. Word-boundary matching
-      // requires the parameter to appear as its own token in the path source.
-      final RegExp paramWord = RegExp('\\b${RegExp.escape(paramName)}\\b');
-      if (!paramWord.hasMatch(pathSource)) continue;
+      // The path must actually reference this parameter. Matching the name in
+      // the source text (even on word boundaries) reported `appDir.path` for a
+      // parameter named `path`, and `'$root/id.json'` for one named `id`.
+      final _ParameterReferenceFinder finder = _ParameterReferenceFinder(
+        paramName,
+        param.declaredFragment?.element,
+      );
+      node.argumentList.arguments.first.accept(finder);
+      if (!finder.isFound) continue;
 
       // A private helper whose tainted parameter receives nothing but
       // compile-time string literals at every observed call site cannot be
@@ -1924,5 +1931,50 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
       reporter.atNode(node);
       return;
     }
+  }
+}
+
+/// Finds a real reference to one parameter inside a path expression, for
+/// [RequireFilePathSanitizationRule].
+///
+/// This guards a security rule, so it is deliberately lenient about what counts
+/// as a reference: any use of the parameter (bare, receiver of a member, call
+/// argument, index target) matches. Only identifiers that cannot be the
+/// parameter are rejected.
+class _ParameterReferenceFinder extends RecursiveAstVisitor<void> {
+  _ParameterReferenceFinder(this._name, this._element);
+
+  final String _name;
+
+  /// Null when the unit is unresolved (syntactic scan).
+  final Element? _element;
+
+  bool isFound = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name != _name || _isMemberName(node)) return;
+
+    // Element identity rejects a shadowing local. An identifier that has no
+    // element (unresolved code) is still treated as the parameter, so missing
+    // type information never silences a real traversal risk.
+    final Element? referenced = node.element;
+    if (referenced == null || _element == null || referenced == _element) {
+      isFound = true;
+    }
+  }
+
+  /// True when [node] names a member of some other object (`dir.path`,
+  /// `this.path`, `box.path()`). Checked structurally because a member on a
+  /// dynamic receiver has no element to compare.
+  bool _isMemberName(SimpleIdentifier node) {
+    final AstNode? parent = node.parent;
+    if (parent is PropertyAccess) return parent.propertyName == node;
+    if (parent is PrefixedIdentifier) return parent.identifier == node;
+    // A target-less call (`path()`) can be a function-typed parameter, so only
+    // a call with a receiver is a member name.
+    return parent is MethodInvocation &&
+        parent.methodName == node &&
+        parent.realTarget != null;
   }
 }

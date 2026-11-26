@@ -301,15 +301,28 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a function always returns the same value.
+/// Warns when a nested `if` repeats an enclosing `if` condition.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v17.10.0 | Rule version: v5
 ///
-/// Example of **bad** code:
+/// A repeated check is not reported when the value can have changed in between:
+/// a condition variable was reassigned, or execution suspended (`await`,
+/// `await for`, `yield`) and the condition reads something other code can
+/// change (a getter, mutable field, method call, or a local that a closure
+/// writes).
+///
+/// **BAD:**
 /// ```dart
-/// int getValue(bool condition) {
-///   if (condition) return 42;
-///   return 42;  // Always returns 42
+/// if (isReady) {
+///   if (isReady) run();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (service.isReady) {
+///   await service.load();
+///   if (service.isReady) run(); // may have changed during the await
 /// }
 /// ```
 class NoEqualNestedConditionsRule extends SaropaLintRule {
@@ -333,7 +346,7 @@ class NoEqualNestedConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'no_equal_nested_conditions',
-    '[no_equal_nested_conditions] Inner condition is identical to an enclosing outer condition. The nested check is always true at that point because the outer condition already guarantees it, making the inner branch redundant dead logic that adds nesting depth without any behavioral effect. {v4}',
+    '[no_equal_nested_conditions] Inner condition is identical to an enclosing outer condition. The nested check is always true at that point because the outer condition already guarantees it, making the inner branch redundant dead logic that adds nesting depth without any behavioral effect. {v5}',
     correctionMessage:
         'Remove the redundant nested condition and keep only the code inside it, since the outer condition already provides the same guarantee.',
     severity: DiagnosticSeverity.WARNING,
@@ -374,6 +387,86 @@ class _NestedConditionChecker extends RecursiveAstVisitor<void> {
   /// so it is a mandatory guard, not redundant dead logic.
   final Set<String> _reassignedBefore = <String>{};
 
+  /// True once execution may have suspended between the outer check and the
+  /// node being visited. Other code runs during a suspension, so a condition
+  /// that reads shared state must be tested again.
+  bool _suspendedBefore = false;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    // Operand first: it is evaluated before the function suspends.
+    super.visitAwaitExpression(node);
+    _suspendedBefore = true;
+  }
+
+  @override
+  void visitYieldStatement(YieldStatement node) {
+    // A generator pauses at `yield` while the consumer runs arbitrary code.
+    super.visitYieldStatement(node);
+    _suspendedBefore = true;
+  }
+
+  @override
+  void visitForStatement(ForStatement node) {
+    // A later iteration re-runs earlier statements after the suspension, so a
+    // check written above the `await` in the loop body is affected too.
+    if (_containsSuspension(node)) _suspendedBefore = true;
+    super.visitForStatement(node);
+  }
+
+  @override
+  void visitWhileStatement(WhileStatement node) {
+    // Same back-edge reasoning as visitForStatement.
+    if (_containsSuspension(node)) _suspendedBefore = true;
+    super.visitWhileStatement(node);
+  }
+
+  @override
+  void visitDoStatement(DoStatement node) {
+    // Same back-edge reasoning as visitForStatement.
+    if (_containsSuspension(node)) _suspendedBefore = true;
+    super.visitDoStatement(node);
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // A closure body can run later (stored listener, timer, `then`), after
+    // other code changed what the outer check saw, so a check inside it is
+    // treated like one after a suspension: only stable conditions are
+    // reported there. Without this, `if (ready) { later(() { if (ready) ...
+    // }); }` was reported although the closure may run once `ready` is false.
+    // An `await` inside the closure suspends the closure, not this function,
+    // so the flag is restored for the statements that follow the closure.
+    final bool before = _suspendedBefore;
+    _suspendedBefore = true;
+    super.visitFunctionExpression(node);
+    _suspendedBefore = before;
+  }
+
+  /// True once any call ran between the outer check and the node being
+  /// visited. A call can synchronously fire a stored callback (listener,
+  /// completion handler) that writes the condition's state.
+  bool _calledBefore = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    super.visitMethodInvocation(node);
+    _calledBefore = true;
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    super.visitFunctionExpressionInvocation(node);
+    _calledBefore = true;
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    // A constructor body can invoke callbacks just like a method.
+    super.visitInstanceCreationExpression(node);
+    _calledBefore = true;
+  }
+
   @override
   void visitAssignmentExpression(AssignmentExpression node) {
     final Expression lhs = node.leftHandSide;
@@ -389,7 +482,9 @@ class _NestedConditionChecker extends RecursiveAstVisitor<void> {
   void visitIfStatement(IfStatement node) {
     final String innerCondition = node.expression.toSource();
     if (innerCondition == outerCondition &&
-        !_conditionUsesReassignedVar(node.expression)) {
+        !_conditionUsesReassignedVar(node.expression) &&
+        !_mayChangeAcrossSuspension(node.expression) &&
+        !_mayChangeThroughCallback(node.expression)) {
       reporter.atNode(node.expression, code);
     }
     super.visitIfStatement(node);
@@ -404,6 +499,261 @@ class _NestedConditionChecker extends RecursiveAstVisitor<void> {
         _ConditionIdentifierCollector();
     condition.accept(collector);
     return collector.names.any(_reassignedBefore.contains);
+  }
+
+  /// True when re-evaluating [condition] can give a new result because of a
+  /// suspension. A condition that itself awaits re-runs async work each time.
+  bool _mayChangeAcrossSuspension(Expression condition) {
+    if (_containsSuspension(condition)) return true;
+    return _suspendedBefore && !_isSuspensionStable(condition);
+  }
+
+  /// True when a call ran between the checks and [condition] reads a
+  /// variable or field that some closure in the enclosing declaration writes
+  /// (`later(() => canceled = true)` registered before the outer `if`, then
+  /// `notify()` fires it synchronously). No `await` is involved, so the
+  /// suspension check alone missed it.
+  bool _mayChangeThroughCallback(Expression condition) {
+    if (!_calledBefore) return false;
+    final _IdentifierNodeCollector collector = _IdentifierNodeCollector();
+    condition.accept(collector);
+    return collector.identifiers.any(_isWrittenByClosure);
+  }
+}
+
+/// Collects every identifier node in an expression, for element lookups.
+class _IdentifierNodeCollector extends RecursiveAstVisitor<void> {
+  final List<SimpleIdentifier> identifiers = <SimpleIdentifier>[];
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    identifiers.add(node);
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+/// True when [node] suspends the enclosing function (closures excluded).
+bool _containsSuspension(AstNode node) {
+  final _SuspensionFinder finder = _SuspensionFinder();
+  node.accept(finder);
+  return finder.found;
+}
+
+/// Looks for `await` / `await for` / `yield` without entering closures.
+class _SuspensionFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) => found = true;
+
+  @override
+  void visitYieldStatement(YieldStatement node) => found = true;
+
+  @override
+  void visitForStatement(ForStatement node) {
+    if (node.awaitKeyword != null) found = true;
+    super.visitForStatement(node);
+  }
+
+  // A closure's suspensions belong to the closure.
+  @override
+  void visitFunctionExpression(FunctionExpression node) {}
+}
+
+/// True only when no other code can change the value of [e] while the function
+/// is suspended. Anything not recognized is treated as changeable.
+bool _isSuspensionStable(Expression e) {
+  if (e is BooleanLiteral ||
+      e is NullLiteral ||
+      e is IntegerLiteral ||
+      e is DoubleLiteral ||
+      e is SimpleStringLiteral ||
+      e is ThisExpression) {
+    return true;
+  }
+  if (e is ParenthesizedExpression) return _isSuspensionStable(e.expression);
+  if (e is PrefixExpression) return _isSuspensionStable(e.operand);
+  if (e is PostfixExpression) return _isSuspensionStable(e.operand);
+  if (e is IsExpression) return _isSuspensionStable(e.expression);
+  if (e is AsExpression) return _isSuspensionStable(e.expression);
+  if (e is BinaryExpression) {
+    return _isSuspensionStable(e.leftOperand) &&
+        _isSuspensionStable(e.rightOperand);
+  }
+  if (e is SimpleIdentifier) return _isStableVariable(e);
+  if (e is PrefixedIdentifier) return _isStableMember(e.prefix, e.identifier);
+  if (e is PropertyAccess) {
+    // Cascades have no explicit target; treat them as changeable.
+    final Expression? target = e.target;
+    return target != null && _isStableMember(target, e.propertyName);
+  }
+  if (e is MethodInvocation) {
+    // Only methods on immutable core values (`name.startsWith('a')`).
+    final Expression? target = e.target;
+    return target != null &&
+        _isImmutableCoreValue(target) &&
+        _isSuspensionStable(target) &&
+        e.argumentList.arguments.every(
+          (Argument a) => _isSuspensionStable(a.argumentExpression),
+        );
+  }
+  return false;
+}
+
+/// `target.member` is stable when the target cannot be swapped out and the
+/// member is a final/const field or a property of an immutable core value.
+bool _isStableMember(Expression target, SimpleIdentifier member) {
+  final Element? targetElement = target is SimpleIdentifier
+      ? target.element
+      : null;
+  // A type name or import prefix is not a value, so only the member matters.
+  final bool isNamespace =
+      targetElement is InterfaceElement || targetElement is PrefixElement;
+  if (!isNamespace && !_isSuspensionStable(target)) return false;
+  return _isImmutableCoreValue(target) || _isStableVariable(member);
+}
+
+/// Whether [e] has a `dart:core` type whose observable state never changes.
+bool _isImmutableCoreValue(Expression e) {
+  final DartType? type = e.staticType;
+  if (type == null) return false;
+  return type.isDartCoreString ||
+      type.isDartCoreInt ||
+      type.isDartCoreDouble ||
+      type.isDartCoreNum ||
+      type.isDartCoreBool;
+}
+
+/// Whether the variable named by [id] keeps its value across a suspension.
+bool _isStableVariable(SimpleIdentifier id) {
+  final Element? element = id.element;
+  if (element is LocalVariableElement || element is FormalParameterElement) {
+    return !_isWrittenByClosure(id);
+  }
+  if (element is GetterElement) {
+    // Only a declared final/const variable; an explicit getter runs code.
+    return element.isOriginVariable &&
+        (element.variable.isFinal || element.variable.isConst);
+  }
+  // Unresolved scan: only a name declared as a local or parameter is provably
+  // out of reach of other code. Fields and globals stay "changeable".
+  return element == null &&
+      _isDeclaredInEnclosingMember(id) &&
+      !_isWrittenByClosure(id);
+}
+
+/// Syntactic check that [id] names a local or parameter of its enclosing
+/// function or method (used only when elements are unavailable).
+bool _isDeclaredInEnclosingMember(SimpleIdentifier id) {
+  final AstNode? member = id.thisOrAncestorMatching(
+    (AstNode n) => n is MethodDeclaration || n is FunctionDeclaration,
+  );
+  if (member == null) return false;
+  final _LocalDeclarationFinder finder = _LocalDeclarationFinder(id.name);
+  member.visitChildren(finder);
+  return finder.found;
+}
+
+/// Finds a parameter or local variable declaration with a given name.
+class _LocalDeclarationFinder extends GeneralizingAstVisitor<void> {
+  _LocalDeclarationFinder(this.name);
+
+  final String name;
+  bool found = false;
+
+  @override
+  void visitNode(AstNode node) {
+    if ((node is FormalParameter && node.name?.lexeme == name) ||
+        (node is VariableDeclaration && node.name.lexeme == name)) {
+      found = true;
+    }
+    super.visitNode(node);
+  }
+}
+
+/// A closure that writes the variable can run during a suspension (a callback
+/// setting a `canceled` flag), which makes even a local changeable.
+bool _isWrittenByClosure(SimpleIdentifier id) {
+  final AstNode? member = id.thisOrAncestorOfType<CompilationUnitMember>();
+  if (member == null) return false;
+  final _ClosureWriteFinder finder = _ClosureWriteFinder(id);
+  member.accept(finder);
+  return finder.found;
+}
+
+/// Finds writes to one variable from inside a closure or local function.
+class _ClosureWriteFinder extends RecursiveAstVisitor<void> {
+  _ClosureWriteFinder(this.target);
+
+  final SimpleIdentifier target;
+  bool found = false;
+
+  /// Number of closures / local functions currently being visited.
+  int _depth = 0;
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // A top-level function's own body is a FunctionExpression, not a closure.
+    final AstNode? parent = node.parent;
+    final bool isClosure =
+        parent is! FunctionDeclaration || parent.parent is! CompilationUnit;
+    if (isClosure) _depth++;
+    super.visitFunctionExpression(node);
+    if (isClosure) _depth--;
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    _check(node.leftHandSide, node.writeElement);
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    if (node.operator.type.isIncrementOperator) {
+      _check(node.operand, node.writeElement);
+    }
+    super.visitPrefixExpression(node);
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    if (node.operator.type.isIncrementOperator) {
+      _check(node.operand, node.writeElement);
+    }
+    super.visitPostfixExpression(node);
+  }
+
+  /// Matches by element when resolved, by name in the unresolved scan.
+  ///
+  /// Field writes (`flag = x`, `this.flag = x`, `box.open = x`) count too: a
+  /// field read resolves to its getter and the write to its setter, so both
+  /// are compared through the variable they belong to.
+  void _check(Expression written, Element? writeElement) {
+    if (_depth == 0) return;
+    final SimpleIdentifier? name = switch (written) {
+      SimpleIdentifier() => written,
+      PrefixedIdentifier() => written.identifier,
+      PropertyAccess() => written.propertyName,
+      _ => null,
+    };
+    if (name == null) return;
+    final Element? element = target.element;
+    if (element == null
+        ? name.name == target.name
+        : _sameVariable(writeElement, element)) {
+      found = true;
+    }
+  }
+
+  /// True when [write] and [read] are the same local, or accessors of the
+  /// same field or top-level variable.
+  static bool _sameVariable(Element? write, Element read) {
+    if (write == read) return true;
+    if (write is PropertyAccessorElement && read is PropertyAccessorElement) {
+      return write.variable.baseElement == read.variable.baseElement;
+    }
+    return false;
   }
 }
 

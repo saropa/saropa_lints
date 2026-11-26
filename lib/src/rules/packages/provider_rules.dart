@@ -12,7 +12,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
-import '../../analyzer_compat.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/packages/provider/remove_listen_false_fix.dart';
 

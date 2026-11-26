@@ -54,3 +54,24 @@ const String _apiBase = 'https://example.com/api';
 Uri goodConstBaseUri() => Uri.parse('$_apiBase/items');
 Uri goodEncodedQueryUri(String v) =>
     Uri.parse('app:///co?q=${Uri.encodeComponent(v)}');
+
+// GOOD: static const class fields, including one aliasing another class's
+// const, with Uri.parse as the target of a method chain.
+abstract final class _Settings {
+  static const String apiBase = 'https://example.com/calendar/v3';
+}
+
+abstract final class _Client {
+  static const String _baseUrl = _Settings.apiBase;
+
+  static Uri insertUri() => Uri.parse(
+    '$_baseUrl/events',
+  ).replace(queryParameters: <String, String>{'sendUpdates': 'all'});
+
+  static Uri qualifiedUri() => Uri.parse('${_Settings.apiBase}/events');
+
+  // BAD: the parameter shadows the const, so the value is dynamic.
+  static Uri shadowedUri(String _baseUrl) =>
+      // expect_lint: prefer_try_parse_for_dynamic_data
+      Uri.parse('$_baseUrl/events');
+}

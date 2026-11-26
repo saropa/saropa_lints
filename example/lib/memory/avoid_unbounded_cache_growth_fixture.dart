@@ -277,3 +277,32 @@ class ContentHashResultCache {
 
   String? get(String sha256Hash) => _cache[sha256Hash];
 }
+
+// GOOD: snapshot cache. The private map is only replaced whole by a freshly
+// built map, so entries cannot accumulate and each replacement invalidates it.
+// Must NOT lint.
+class SnapshotLinkCacheGrowth {
+  static Map<String, int> _byId = <String, int>{};
+
+  static void replace(List<String> serverIds) {
+    final Map<String, int> next = <String, int>{};
+    for (final String id in serverIds) {
+      next[id] = id.length; // writes a local, not the field
+    }
+    _byId = next; // old entries are dropped
+  }
+
+  static int? forId(String id) => _byId[id];
+}
+
+// BAD: replaced whole in one place but also filled per key, so it still grows.
+// expect_lint: avoid_unbounded_cache_growth
+class PartlySnapshotCacheGrowth {
+  static Map<String, int> _byId = <String, int>{};
+
+  static void replace(List<String> serverIds) {
+    _byId = <String, int>{for (final String id in serverIds) id: id.length};
+  }
+
+  static void store(String id) => _byId[id] = id.length;
+}
