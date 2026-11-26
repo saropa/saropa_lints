@@ -1,6 +1,6 @@
 # BUG: `avoid_path_traversal` - parameter named `path` matches the property `directory.path`
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-11-26
 Rule: `avoid_path_traversal`
@@ -64,3 +64,15 @@ Search the argument's AST for a real reference to the parameter, as `require_fil
 ## Environment
 
 - saropa_lints version: 17.9.1 plus unreleased 17.10.0 changes
+
+---
+
+## Resolution
+
+**Status: Fixed** (2026-11-26, rule version v9)
+
+Report confirmed. The parameter test is now an AST reference check shared with `require_file_path_sanitization`: `expressionReferencesParameter` in `lib/src/parameter_reference_utils.dart`. Member names, shadowing locals, and string literal text no longer match.
+
+Second defect fixed in the same block: only the first matching parameter was checked against the literal-only-call-sites escape, so a literal-only parameter hid a user-supplied one later in the same path. All referenced parameters must now qualify.
+
+Tests: `test/rules/security/avoid_path_traversal_parameter_reference_test.dart`.

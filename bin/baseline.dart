@@ -19,13 +19,15 @@
 /// 1. Runs `dart analyze` on your project
 /// 2. Parses the output to extract violations
 /// 3. Generates a baseline JSON file
-/// 4. Optionally updates analysis_options.yaml
+/// 4. Optionally activates it in analysis_options_custom.yaml
 library;
 
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/baseline/analysis_failure.dart';
+import 'package:saropa_lints/src/baseline/baseline_activation.dart';
 import 'package:saropa_lints/src/baseline/baseline_file.dart';
 import 'package:saropa_lints/src/violation_parser.dart';
 
@@ -64,6 +66,16 @@ Future<void> main(List<String> args) async {
     }
   }
 
+  // A relative output path belongs to the analyzed project, not to the
+  // shell's directory: `baseline ./my_project` used to write the JSON into
+  // the caller's folder while the plugin looks for it under my_project.
+  // `configPath` stays as given, because the loader resolves it against the
+  // project root itself.
+  final configPath = outputPath;
+  if (!p.isAbsolute(outputPath)) {
+    outputPath = p.join(workingDir, outputPath);
+  }
+
   print('Saropa Lints Baseline Generator');
   print('================================');
   print('');
@@ -84,12 +96,16 @@ Future<void> main(List<String> args) async {
   print('Running lint analysis...');
   print('');
 
-  // Run dart analyze
+  // Run dart analyze with the baseline switched off in the plugin. An active
+  // baseline hides the findings it lists, so this run would otherwise see
+  // only new findings: `--update` dropped every still-present entry, and a
+  // plain re-run overwrote the baseline with the new findings alone.
   final result = await Process.run(
     'dart',
     ['analyze'],
     workingDirectory: workingDir,
     runInShell: true,
+    environment: {kSkipBaselineEnvVar: '1'},
   );
 
   final output = result.stdout.toString();
@@ -225,7 +241,7 @@ Future<void> main(List<String> args) async {
 
   if (dryRun) {
     print('[DRY RUN] Would write baseline to: $outputPath');
-    print('[DRY RUN] Would update analysis_options.yaml');
+    print('[DRY RUN] Would update $kBaselineConfigFileName');
     print('');
     print('Baseline content preview:');
     final encoder = const JsonEncoder.withIndent('  ');
@@ -245,11 +261,11 @@ Future<void> main(List<String> args) async {
   baseline.save(outputPath);
   print('Baseline written to: $outputPath');
 
-  // Update analysis_options.yaml
+  // Activate the baseline where the loader reads it.
   if (!skipConfig) {
-    final updated = _updateAnalysisOptions(outputPath);
+    final updated = _activateBaseline(workingDir, configPath);
     if (updated) {
-      print('Updated analysis_options.yaml with baseline configuration');
+      print('Updated $kBaselineConfigFileName with baseline configuration');
     }
   }
 
@@ -266,72 +282,36 @@ void _printError(String message) {
   stderr.writeln(message);
 }
 
-/// Update analysis_options.yaml to include baseline configuration.
-bool _updateAnalysisOptions(String baselinePath) {
-  final file = File('analysis_options.yaml');
+/// Adds a top-level `baseline:` section to `analysis_options_custom.yaml` in
+/// [projectDir], creating the file when missing. Returns true when written.
+///
+/// This replaces an insert into the plugin block of `analysis_options.yaml`,
+/// which the loader never read, so a generated baseline was never active.
+bool _activateBaseline(String projectDir, String baselinePath) {
+  final file = File(p.join(projectDir, kBaselineConfigFileName));
+  final existing = file.existsSync() ? file.readAsStringSync() : '';
+  final updated = addBaselineActivation(existing, baselinePath);
 
-  if (!file.existsSync()) {
-    print('Note: analysis_options.yaml not found, skipping config update');
-    return false;
+  // An existing top-level section is the user's own setting: leave it.
+  if (updated == null) {
+    print('Note: baseline already configured in $kBaselineConfigFileName');
+  } else {
+    file.writeAsStringSync(updated);
   }
 
-  var content = file.readAsStringSync();
-
-  // Check if baseline is already configured
-  if (content.contains('baseline:') && content.contains('file:')) {
-    print('Note: baseline already configured in analysis_options.yaml');
-    return false;
+  // An older CLI wrote an indented `baseline:` into analysis_options.yaml.
+  // It never took effect; point it out so the user can delete it.
+  final options = File(p.join(projectDir, 'analysis_options.yaml'));
+  if (options.existsSync() &&
+      hasLegacyNestedBaseline(options.readAsStringSync())) {
+    print(
+      'Note: analysis_options.yaml has a nested "baseline:" entry that is '
+      'not read. The baseline is configured in $kBaselineConfigFileName; '
+      'the old entry can be removed.',
+    );
   }
 
-  // Find the saropa_lints section and add baseline config
-  // Look for pattern like:
-  //   saropa_lints:
-  //     tier: recommended
-  final saropaPattern = RegExp(
-    r'(\s*saropa_lints:\s*\n\s*tier:\s*\w+)',
-    multiLine: true,
-  );
-
-  final match = saropaPattern.firstMatch(content);
-  if (match != null) {
-    final group0 = match.group(0);
-    if (group0 != null) {
-      // Add baseline config after tier
-      final indent = _detectIndent(content, match.start);
-      final baselineConfig =
-          '\n$indent  baseline:\n$indent    file: "$baselinePath"';
-      content = content.replaceFirst(group0, '$group0$baselineConfig');
-      file.writeAsStringSync(content);
-      return true;
-    }
-  }
-
-  print('Note: Could not find saropa_lints section in analysis_options.yaml');
-  print('Add this manually:');
-  print('');
-  print('plugins:');
-  print('  saropa_lints:');
-  print('    baseline:');
-  print('      file: "$baselinePath"');
-  return false;
-}
-
-/// Detect the indentation used in the YAML file.
-String _detectIndent(String content, int position) {
-  // Find the start of the line
-  var lineStart = position;
-  while (lineStart > 0 && content[lineStart - 1] != '\n') {
-    lineStart--;
-  }
-
-  // Count leading spaces
-  var spaces = 0;
-  while (lineStart + spaces < content.length &&
-      content[lineStart + spaces] == ' ') {
-    spaces++;
-  }
-
-  return ' ' * spaces;
+  return updated != null;
 }
 
 void _printUsage() {
@@ -353,7 +333,7 @@ void _printUsage() {
   print(
     '  --dry-run             Show what would be done without making changes',
   );
-  print('  --skip-config         Skip updating analysis_options.yaml');
+  print('  --skip-config         Skip updating $kBaselineConfigFileName');
   print('  -h, --help            Show this help message');
   print('');
   print('Examples:');

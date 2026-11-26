@@ -124,3 +124,13 @@ void _good1421() {
     itemCount: 100,
   );
 }
+
+// GOOD: Should NOT trigger require_refresh_indicator: a constant list has
+// nothing to reload.
+const _staticZones = <String>['UTC', 'GMT'];
+void _goodConstList() {
+  ListView.builder(
+    itemCount: _staticZones.length,
+    itemBuilder: (context, index) => ListTile(),
+  );
+}

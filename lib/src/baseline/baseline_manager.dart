@@ -17,19 +17,17 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 ///
 /// ## Configuration Example
 ///
-/// ```yaml
-/// plugins:
-///   saropa_lints:
-///     diagnostics:
-///       # ... rule overrides ...
+/// Top-level key in `analysis_options_custom.yaml` at the project root (the
+/// only place the config loader reads it; see `baseline_activation.dart`):
 ///
-///     baseline:
-///       file: "saropa_baseline.json"    # Specific violations
-///       date: "2025-01-15"              # Code unchanged since this date
-///       paths:                           # Directories/patterns
-///         - "lib/legacy/"
-///         - "**/generated/"
-///       only_impacts: [low, medium]     # Only baseline these severities
+/// ```yaml
+/// baseline:
+///   file: "saropa_baseline.json"    # Specific violations
+///   date: "2025-01-15"              # Code unchanged since this date
+///   paths:                          # Directories/patterns
+///     - "lib/legacy/"
+///     - "**/generated/"
+///   only_impacts: [low, medium]     # Only baseline these severities
 /// ```
 ///
 /// ## Usage

@@ -193,7 +193,7 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
 
 /// Warns when int/double/num/BigInt/Uri.parse is used without try-catch.
 ///
-/// Since: v1.7.9 | Updated: v17.10.0 | Rule version: v5
+/// Since: v1.7.9 | Updated: v17.10.0 | Rule version: v6
 ///
 /// These parse methods throw FormatException on invalid input. Dynamic data
 /// (user input, API responses, file contents) should use tryParse instead
@@ -232,7 +232,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_try_parse_for_dynamic_data',
-    '[prefer_try_parse_for_dynamic_data] Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers. {v5}',
+    '[prefer_try_parse_for_dynamic_data] Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers. {v6}',
     correctionMessage:
         'Replace parse with tryParse when converting dynamic or user-controlled data to prevent runtime exceptions and improve app robustness. This practice aligns with Dart’s recommendations for safe type conversion. See https://dart.dev/guides/libraries/library-tour#numbers for guidance.',
     severity: DiagnosticSeverity.ERROR,
@@ -382,26 +382,26 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     }
   }
 
+  /// `int.parse(match[1]!)` where the match comes from a visible `firstMatch`
+  /// and that group is a non-empty run of digits.
   bool _isDigitOnlyRegexCapture(
     Expression argument,
     MethodInvocation parseCall,
   ) {
     final _CaptureAccess? capture = _captureAccessFromExpression(argument);
     if (capture == null) return false;
-    final String? pattern = _findRegexPatternForVariable(
-      parseCall,
-      variableName: capture.variableName,
-      methodName: 'firstMatch',
-    );
+    final String? pattern = _firstMatchPattern(parseCall, capture.variableName);
     if (pattern == null) return false;
     final String? groupPattern = _captureGroupPattern(
       pattern,
       capture.groupIndex,
     );
     if (groupPattern == null) return false;
-    return _isDigitOnlyGroupPattern(groupPattern);
+    return _digitRunMinLength(groupPattern) != null;
   }
 
+  /// `int.parse(token.substring(..))` after an early exit that proves `token`
+  /// is all digits, for bounds that cannot produce an empty string.
   bool _isRegexValidatedSubstring(
     Expression argument,
     MethodInvocation parseCall,
@@ -418,13 +418,40 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     if (guard == null) return false;
     final String? regexVariableName = _regexVariableNameFromGuard(guard);
     if (regexVariableName == null) return false;
-    final String? pattern = _findRegexPatternForVariable(
-      parseCall,
-      variableName: regexVariableName,
-      methodName: 'hasMatch',
+    // The RegExp is often declared outside the loop that holds the guard.
+    final NodeList<Argument>? regExpArgs = _regExpArguments(
+      _visibleInitializer(guard, regexVariableName),
     );
+    if (regExpArgs == null) return false;
+    // With multiLine, ^ and $ bound a line, not the whole string.
+    if (regExpArgs.any(
+      (Argument a) => a.toSource().replaceAll(' ', '') == 'multiLine:true',
+    )) {
+      return false;
+    }
+    final String? pattern = _extractPatternFromRegExpArgs(regExpArgs);
     if (pattern == null) return false;
-    return _isDigitOnlyWholePattern(pattern);
+    final int? minLength = _wholeDigitPatternMinLength(pattern);
+    if (minLength == null) return false;
+    return _isNonEmptySubstring(argument.argumentList.arguments, minLength);
+  }
+
+  /// Whether `substring` with [bounds], on a string of at least [minLength]
+  /// characters, never returns `''` (which `int.parse` rejects). Bounds past
+  /// the end throw `RangeError`, which `tryParse` would not prevent either.
+  bool _isNonEmptySubstring(NodeList<Argument> bounds, int minLength) {
+    if (bounds.isEmpty || bounds.length > 2) return false;
+    final Expression start = bounds.first.argumentExpression;
+    // Computed bounds cannot be proven non-empty.
+    if (start is! IntegerLiteral) return false;
+    final int? from = start.value;
+    if (from == null) return false;
+    // Open-ended: `substring(6)` on a 6-character string is empty.
+    if (bounds.length == 1) return from < minLength;
+    final Expression end = bounds[1].argumentExpression;
+    if (end is! IntegerLiteral) return false;
+    final int? to = end.value;
+    return to != null && to > from;
   }
 
   _CaptureAccess? _captureAccessFromExpression(Expression expression) {
@@ -528,63 +555,95 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     return null;
   }
 
-  String? _findRegexPatternForVariable(
-    MethodInvocation node, {
-    required String variableName,
-    required String methodName,
-  }) {
-    final Statement? statement = node.thisOrAncestorOfType<Statement>();
-    final Block? block = node.thisOrAncestorOfType<Block>();
-    if (statement == null || block == null) return null;
+  /// Pattern of the RegExp whose `firstMatch` result is stored in [matchName].
+  String? _firstMatchPattern(AstNode use, String matchName) {
+    final Expression? initializer = _visibleInitializer(use, matchName);
+    if (initializer is! MethodInvocation ||
+        initializer.methodName.name != 'firstMatch') {
+      return null;
+    }
+    // Either a named RegExp variable or inline `RegExp(r'...').firstMatch(x)`.
+    // A name is looked up from the match's declaration, where it was used.
+    final Expression? target = initializer.target;
+    final NodeList<Argument>? args = _regExpArguments(
+      target is SimpleIdentifier
+          ? _visibleInitializer(initializer, target.name)
+          : target,
+    );
+    return args == null ? null : _extractPatternFromRegExpArgs(args);
+  }
 
-    final int statementIndex = block.statements.indexOf(statement);
-    if (statementIndex <= 0) return null;
-
-    for (int i = statementIndex - 1; i >= 0; i--) {
-      final Statement candidate = block.statements[i];
-      if (candidate is! VariableDeclarationStatement) continue;
-      for (final VariableDeclaration declaration
-          in candidate.variables.variables) {
-        if (declaration.name.lexeme != variableName) continue;
-        final Expression? initializer = declaration.initializer;
-        if (initializer is! InstanceCreationExpression &&
-            initializer is! MethodInvocation) {
-          return null;
-        }
-
-        if (methodName == 'hasMatch' &&
-            initializer is InstanceCreationExpression) {
-          final String typeName = initializer.constructorName.type.name.lexeme;
-          if (typeName != 'RegExp') return null;
-          return _extractPatternFromRegExpArgs(
-            initializer.argumentList.arguments,
-          );
-        }
-
-        if (methodName == 'firstMatch' && initializer is MethodInvocation) {
-          if (initializer.methodName.name != 'firstMatch') return null;
-          final Expression? target = initializer.target;
-          // Inline `RegExp(r'...').firstMatch(x)`.
-          if (target is InstanceCreationExpression &&
-              target.constructorName.type.name.lexeme == 'RegExp') {
-            return _extractPatternFromRegExpArgs(target.argumentList.arguments);
-          }
-          if (target is MethodInvocation &&
-              target.target == null &&
-              target.methodName.name == 'RegExp') {
-            return _extractPatternFromRegExpArgs(target.argumentList.arguments);
-          }
-          if (target is! SimpleIdentifier) return null;
-          final String regExpName = target.name;
-          return _findRegexPatternForVariable(
-            node,
-            variableName: regExpName,
-            methodName: 'hasMatch',
-          );
-        }
-      }
+  /// Arguments of a `RegExp(...)` expression. Without type resolution (the
+  /// default scan) a call with no `new`/`const` parses as a method invocation,
+  /// so both node shapes must be accepted.
+  NodeList<Argument>? _regExpArguments(Expression? e) {
+    if (e is InstanceCreationExpression &&
+        e.constructorName.type.name.lexeme == 'RegExp') {
+      return e.argumentList.arguments;
+    }
+    if (e is MethodInvocation &&
+        e.target == null &&
+        e.methodName.name == 'RegExp') {
+      return e.argumentList.arguments;
     }
     return null;
+  }
+
+  /// Initializer of the local variable [name] in scope at [use], searching the
+  /// enclosing block first and then outward. Returns null when a parameter or
+  /// loop variable hides the name, or when an outer-block variable is
+  /// reassignable (its initializer proves nothing about its value later).
+  Expression? _visibleInitializer(AstNode use, String name) {
+    AstNode child = use;
+    bool isOuterBlock = false;
+    for (AstNode? node = use.parent; node != null; node = node.parent) {
+      if (_bindsName(node, name)) return null;
+      final NodeList<Statement>? statements = node is Block
+          ? node.statements
+          : node is SwitchMember
+          ? node.statements
+          : null;
+      if (statements != null && child is Statement) {
+        for (int i = statements.indexOf(child) - 1; i >= 0; i--) {
+          final Statement candidate = statements[i];
+          if (candidate is! VariableDeclarationStatement) continue;
+          final VariableDeclarationList list = candidate.variables;
+          for (final VariableDeclaration declaration in list.variables) {
+            if (declaration.name.lexeme != name) continue;
+            if (isOuterBlock && !list.isFinal && !list.isConst) return null;
+            return declaration.initializer;
+          }
+        }
+        isOuterBlock = true;
+      }
+      child = node;
+    }
+    return null;
+  }
+
+  /// Whether [node] introduces [name] as a parameter or loop variable.
+  bool _bindsName(AstNode node, String name) {
+    final FormalParameterList? parameters = node is FunctionExpression
+        ? node.parameters
+        : node is MethodDeclaration
+        ? node.parameters
+        : node is ConstructorDeclaration
+        ? node.parameters
+        : null;
+    if (parameters != null) {
+      return parameters.parameters.any(
+        (FormalParameter p) => p.name?.lexeme == name,
+      );
+    }
+    if (node is! ForStatement) return false;
+    final ForLoopParts parts = node.forLoopParts;
+    if (parts is ForEachPartsWithDeclaration) {
+      return parts.loopVariable.name.lexeme == name;
+    }
+    return parts is ForPartsWithDeclarations &&
+        parts.variables.variables.any(
+          (VariableDeclaration v) => v.name.lexeme == name,
+        );
   }
 
   String? _extractPatternFromRegExpArgs(NodeList<Argument> args) {
@@ -652,16 +711,23 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     return groups[index];
   }
 
-  bool _isDigitOnlyGroupPattern(String groupPattern) {
-    final String normalized = groupPattern.replaceAll(' ', '');
-    return RegExp(r'^\\d(?:\{\d+(?:,\d+)?\}|[+*?])?$').hasMatch(normalized);
+  /// Minimum length matched by [body] when it is a single run of `\d` that
+  /// cannot be empty; null otherwise (`\d*`, `\d?`, `\d{0,n}` allow `''`).
+  int? _digitRunMinLength(String body) {
+    final RegExpMatch? match = RegExp(
+      r'^\\d(?:\{(\d+)(?:,\d+)?\}|\+)?$',
+    ).firstMatch(body.replaceAll(' ', ''));
+    if (match == null) return null;
+    // `\d` and `\d+` carry no explicit count: at least one digit.
+    final int minLength = int.tryParse(match.group(1) ?? '1') ?? 0;
+    return minLength > 0 ? minLength : null;
   }
 
-  bool _isDigitOnlyWholePattern(String pattern) {
-    final String normalized = pattern.replaceAll(' ', '');
-    return RegExp(
-      r'^\^?\\d(?:\{\d+(?:,\d+)?\}|[+*?])\$?$',
-    ).hasMatch(normalized);
+  /// As [_digitRunMinLength], for a pattern that must cover the whole string:
+  /// without both anchors, `hasMatch` accepts digits surrounded by anything.
+  int? _wholeDigitPatternMinLength(String pattern) {
+    if (!pattern.startsWith('^') || !pattern.endsWith(r'$')) return null;
+    return _digitRunMinLength(pattern.substring(1, pattern.length - 1));
   }
 }
 

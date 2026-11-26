@@ -783,6 +783,10 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
       // toggles rather than remote data.
       if (hasNeverScrollablePhysics(node.argumentList)) return;
       if (isInsideTransientOverlay(node)) return;
+      // Same dialog case when the body is its own private widget class,
+      // and constant data has nothing to reload on any surface.
+      if (isHostedOnlyInOverlay(node)) return;
+      if (isConstBackedList(node.argumentList)) return;
 
       // Check if already wrapped in RefreshIndicator
       AstNode? current = node.parent;

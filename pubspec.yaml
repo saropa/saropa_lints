@@ -12,8 +12,9 @@ version: 17.9.1
 # SPDX license identifier shown on pub.dev
 license: MIT
 
-# Link shown on pub.dev package page
-homepage: https://pub.dev/packages/saropa_lints
+# Link shown on pub.dev package page. Points at the saropa.com product page so
+# mirror listings link back to the original; extension/package.json matches it.
+homepage: https://saropa.com/developers/saropa-lints/
 
 # Source code link shown on pub.dev
 repository: https://github.com/saropa/saropa_lints

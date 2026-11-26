@@ -25,6 +25,8 @@ import '../banned_usage_config.dart';
 import '../config/always_specify_parameter_names_config.dart';
 import '../config/avoid_ignoring_return_values_config.dart';
 import '../config/max_declarations_config.dart';
+import '../baseline/baseline_activation.dart'
+    show isBaselineSkippedByEnv, kSkipBaselineEnvVar;
 import '../baseline/baseline_config.dart';
 import '../baseline/baseline_manager.dart';
 import '../accepted/accepted_findings_runtime.dart';
@@ -165,7 +167,7 @@ void _loadFromRoot(String? projectRoot) {
     } else {
       _loadRulePacksConfig();
     }
-    _loadBaselineConfig(content);
+    _loadBaselineConfig(content, projectRoot);
     // Accepted-findings list (saropa_accepted.yaml at the project root).
     // In-server plugin only: the scan/audit/daemon/LSP CLIs filter their
     // output afterwards instead, so their stale-entry check still sees every
@@ -899,8 +901,24 @@ void _reloadRulePacksFromRoot(String projectRoot) {
 ///   paths:
 ///     - "lib/legacy/"
 /// ```
-void _loadBaselineConfig(String? content) {
+///
+/// [projectRoot] is the root [content] was read from. The baseline file path
+/// resolves against it, not [Directory.current]: inside the analysis server
+/// the plugin's working directory is the server's, so a relative
+/// `file: "saropa_baseline.json"` used to resolve nowhere and the baseline
+/// loaded as null with no message. Null (plugin start before any file is
+/// known) lets the manager walk up from the working directory to the nearest
+/// `pubspec.yaml`.
+void _loadBaselineConfig(String? content, String? projectRoot) {
   if (content == null) return;
+
+  // The `baseline` CLI sets this on the `dart analyze` run it spawns, so an
+  // active baseline does not hide the findings that run must record.
+  if (isBaselineSkippedByEnv(Platform.environment)) {
+    BaselineManager.reset();
+    PluginLogger.log('Baseline skipped ($kSkipBaselineEnvVar is set).');
+    return;
+  }
 
   final sectionMatch = RegExp(
     r'^baseline:\s*$',
@@ -911,7 +929,17 @@ void _loadBaselineConfig(String? content) {
   final map = _parseBaselineSection(content, sectionMatch.end);
   final config = BaselineConfig.fromYaml(map);
   if (config.isEnabled) {
-    BaselineManager.initialize(config, projectRoot: Directory.current.path);
+    BaselineManager.initialize(config, projectRoot: projectRoot);
+    // A configured file that did not load used to fail silently, which looks
+    // exactly like "baseline active, nothing matched". Say so in the log.
+    final file = config.file;
+    if (file != null && BaselineManager.baselineFile == null) {
+      PluginLogger.warning(
+        'Baseline file "$file" not found or unreadable under '
+        '${BaselineManager.projectRoot ?? Directory.current.path}; '
+        'no file-based baseline applied.',
+      );
+    }
   }
 }
 

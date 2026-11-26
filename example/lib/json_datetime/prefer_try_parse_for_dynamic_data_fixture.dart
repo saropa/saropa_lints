@@ -35,6 +35,8 @@ void goodRegexGuardedSubstring(String password) {
 
       final year = int.parse(token.substring(0, 4));
       final month = int.parse(token.substring(4, 6));
+      // BAD: a 6-digit token leaves '' here, which int.parse rejects.
+      // expect_lint: prefer_try_parse_for_dynamic_data
       final day = int.parse(token.substring(6));
     }
   }

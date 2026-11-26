@@ -15,7 +15,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { runInWorkspaceAsync, getSharedOutputChannel } from './setup';
-import { getProjectRoot } from './projectRoot';
+import { findProjectRootIn } from './projectRoot';
+import { type CheckRun, planCheckRuns } from './acceptedCheckRoots';
 import { hasSaropaLintsDep } from './pubspecReader';
 import { l10n } from './i18n/runtime';
 import { saropaLintsDataPath } from './reportsPaths';
@@ -86,13 +87,13 @@ export function registerAcceptedFindingsCommands(
 /** Runs the CLI check, publishes markers, and reports the outcome. */
 async function runCheck(): Promise<void> {
   await withBusyGuard(async () => {
-    const roots = checkRootsOrError();
-    if (!roots) return;
+    const runs = checkRunsOrError();
+    if (!runs) return;
     const results: AcceptedCheckResult[] = [];
     // Sequential, not parallel: each run is a full resolved scan, and two at
     // once would double memory beside the analysis server.
-    for (const root of roots) {
-      const one = await runCheckScan(root);
+    for (const run of runs) {
+      const one = await runCheckScan(run);
       if (one === null) return; // Cancelled, or the error was already shown.
       results.push(one);
     }
@@ -134,36 +135,47 @@ async function runCheck(): Promise<void> {
 }
 
 /**
- * Folders to run the check in: each workspace folder whose pubspec.yaml
- * depends on saropa_lints (the CLI runs from there with `dart run`), plus the
- * first folder's discovered project root. The CLI checks every list under
- * each one, so nested packages are covered by their enclosing folder; a root
- * inside another root is dropped so its lists are not scanned twice. Shows an
- * error and returns null when there is nothing to run in.
+ * The CLI runs for this window (see `planCheckRuns`): every workspace
+ * folder's package root, found at the folder or one level down. A root that
+ * depends on saropa_lints runs the CLI itself; one that only uses the plugin
+ * (a list, or the plugin in its analysis options) is checked by launching the
+ * CLI from the first root that has the package. The CLI checks every list
+ * under each target, so nested packages are covered by their enclosing
+ * folder. Shows an error and returns null when there is nothing to run.
  */
-function checkRootsOrError(): string[] | null {
+function checkRunsOrError(): CheckRun[] | null {
   const folders = vscode.workspace.workspaceFolders?.map((f) => f.uri.fsPath) ?? [];
   if (folders.length === 0) {
     void vscode.window.showErrorMessage(l10n('acceptedFindings.error.noWorkspace'));
     return null;
   }
-  const candidates = [...folders, getProjectRoot()].filter(
-    (r): r is string => !!r && hasSaropaLintsDep(r),
-  );
-  const unique = [...new Set(candidates.map((r) => path.resolve(r)))];
-  const roots = unique.filter(
-    (r) => !unique.some((o) => o !== r && projectRelativePath(o, r) !== undefined),
-  );
-  if (roots.length === 0) {
+  const runs = planCheckRuns(folders, {
+    projectRootIn: findProjectRootIn,
+    hasDep: hasSaropaLintsDep,
+    exists: fs.existsSync,
+    read: (f) => {
+      try {
+        return fs.readFileSync(f, 'utf-8');
+      } catch {
+        return undefined;
+      }
+    },
+  });
+  if (runs.length === 0) {
     void vscode.window.showErrorMessage(l10n('acceptedFindings.error.missingDep'));
     return null;
   }
-  return roots;
+  return runs;
 }
 
-/** Spawns the scan CLI and reads its JSON file. Null on cancel or failure. */
-async function runCheckScan(root: string): Promise<AcceptedCheckResult | null> {
-  const jsonPath = path.join(saropaLintsDataPath(root), 'accepted_findings.json');
+/**
+ * Spawns the scan CLI from `run.host` against `run.target` and reads its
+ * JSON file. Null on cancel or failure. The JSON goes under the target's own
+ * reports folder so two runs sharing a host do not overwrite each other.
+ */
+async function runCheckScan(run: CheckRun): Promise<AcceptedCheckResult | null> {
+  const { host, target } = run;
+  const jsonPath = path.join(saropaLintsDataPath(target), 'accepted_findings.json');
   // A project that never ran a scan has no reports dir; the CLI would ENOENT.
   fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
   // Drop the previous run's output: a run that fails with a quiet exit 1/2
@@ -179,9 +191,9 @@ async function runCheckScan(root: string): Promise<AcceptedCheckResult | null> {
       // shell: false and no analytics, same as the stale-ignore scan: keeps
       // the child process tree flat beside the Flutter daemon.
       runInWorkspaceAsync(
-        root,
+        host,
         'dart',
-        ['run', 'saropa_lints:scan', root, '--check-accepted', '--format', 'json', '--json-file-path', jsonPath, '-q'],
+        ['run', 'saropa_lints:scan', target, '--check-accepted', '--format', 'json', '--json-file-path', jsonPath, '-q'],
         { logToOutput: true, token, shell: false, env: { DART_SUPPRESS_ANALYTICS: 'true' } },
       ),
   );

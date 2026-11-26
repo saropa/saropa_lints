@@ -1,6 +1,6 @@
 # Accepted-findings list: open items
 
-**Status: Open**
+**Status: Open** (agent pass 2026-11-26: fixable items done; remaining items need F5, a translation run, a live analysis server, or a schema decision)
 
 Created: 2026-11-26
 Source: `plans/history/2026.11/2026.11.26/proposal_infra_accepted_findings_list.md`
@@ -19,7 +19,7 @@ Source: `plans/history/2026.11/2026.11.26/proposal_infra_accepted_findings_list.
 
 ## Translations
 
-- [ ] Regenerate translation catalogs for the new `acceptedFindings.*` and `command.checkAcceptedFindings.title` keys. Locale-parity tests fail until then. `acceptedFindings.info.added` now takes `{list}`; `info.noList` and `error.outsideProject` were reworded.
+- [ ] (Human: translation pipeline must not be run by an agent.) Regenerate translation catalogs for the new `acceptedFindings.*` and `command.checkAcceptedFindings.title` keys. Locale-parity tests fail until then. `acceptedFindings.info.added` now takes `{list}`; `info.noList` and `error.outsideProject` were reworded.
 
 ## Nested packages: one root rule everywhere
 
@@ -29,24 +29,24 @@ Every surface now matches a file against the list beside its nearest `pubspec.ya
 - [x] `scan --check-accepted` checks every list under the target (`discoverAcceptedLists`; dot folders, `build`, `node_modules` and `Pods` skipped, links not followed). JSON is now version 2: one object per list under `lists`. An outer entry naming a nested package's file, and a list with no `pubspec.yaml` beside it, are reported as invalid.
 - [x] Extension "Accept {rule} in this file" writes to the list of the file's nearest `pubspec.yaml`.
 - [x] Extension "Check Accepted Findings" runs the CLI once per workspace folder that depends on saropa_lints (plus the first folder's project root), merges the results and places markers on every list.
-- [ ] Extension check: a second workspace folder whose `pubspec.yaml` sits one level down, or that does not depend on saropa_lints itself, is not checked.
-- [ ] F5: Accept in a nested package and in a second workspace folder; Check with lists in two packages (markers on both files, "Open List" opens the first failing one).
+- [x] Extension check: a second workspace folder whose `pubspec.yaml` sits one level down, or that does not depend on saropa_lints itself, is not checked. Fixed 2026-11-26: `planCheckRuns` (`extension/src/acceptedCheckRoots.ts`) finds each folder's package root at the folder or one level down (`findProjectRootIn`, split out of `getProjectRoot`); a root without the dependency that has a list or enables the plugin in `analysis_options.yaml` is scanned by launching the CLI from the first root that has the package. Mocha `acceptedCheckRoots.test.ts` (7 cases). Not run in an Extension Development Host.
+- [ ] F5: Accept in a nested package and in a second workspace folder; Check with lists in two packages (markers on both files, "Open List" opens the first failing one). Also: a second folder with `pubspec.yaml` one level down, and a folder that only enables the plugin in `analysis_options.yaml` (CLI launched from another folder); "Migrate Renamed Rules" on a list naming a renamed rule.
 
 Verified 2026-11-26: `dart test test/accepted/` (31 passed), throwaway project with `example/` nested package: `scan` hid each package's own entries only; `--check-accepted` reported 3 lists (nested entry `hides 1`, missing file stale, outer entry into `example/` invalid, stray `tool/` list invalid, `build/` list skipped), exit 1. Daemon and language server compile but are not run against a nested package.
 
 ## Not implemented
 
-- [ ] Rule-rename migration of list entries (`saropaLints.migrateRuleNames`)
-- [ ] Per-entry maximum count
-- [ ] Baseline defect 1: activation location mismatch (CLI writes `analysis_options.yaml`, loader reads `analysis_options_custom.yaml`)
-- [ ] Baseline defect 2: manager initialized with `Directory.current.path` instead of the project root
-- [ ] Baseline defect 3: `--update` with an active baseline drops still-present entries
+- [x] Rule-rename migration of list entries (`saropaLints.migrateRuleNames`). Done 2026-11-26: `rewriteAcceptedList` (`extension/src/ruleMigration/acceptedListRewriter.ts`) rewrites `rule:` values; the scanner includes `**/saropa_accepted.yaml`. Removed rules are left in place (they carry a reason; `--check-accepted` reports them as unknown). Mocha `acceptedListRewriter.test.ts` (5 cases).
+- [ ] Per-entry maximum count. Needs a decision: the proposal marks `max:` as "needs discussion"; adding it changes the version 1 schema (`max` is currently an invalid key), the check JSON and the extension parser.
+- [x] Baseline defect 1: activation location mismatch (CLI writes `analysis_options.yaml`, loader reads `analysis_options_custom.yaml`). Confirmed in code (`bin/baseline.dart` inserted under `saropa_lints:` + `tier:`; loader matched `^baseline:` in the custom file). Fixed 2026-11-26: CLI writes a top-level section to `<project>/analysis_options_custom.yaml` via `addBaselineActivation` (`lib/src/baseline/baseline_activation.dart`) and notes a leftover nested entry.
+- [x] Baseline defect 2: manager initialized with `Directory.current.path` instead of the project root. Confirmed (`config_loader.dart` `_loadBaselineConfig`). Fixed 2026-11-26: passes the loaded project root and logs a warning when the configured file does not load. Test `test/baseline/baseline_activation_test.dart` loads from a temp root while cwd is the repo.
+- [x] Baseline defect 3: `--update` with an active baseline drops still-present entries. Confirmed by reading (the CLI parsed `dart analyze`, which the plugin filters by the baseline). Fixed 2026-11-26: the CLI sets `SAROPA_LINTS_SKIP_BASELINE=1` on its `dart analyze` run and the loader skips the baseline when it is set. Unit-tested (env parsing); not run end to end, because that needs `dart analyze` with the plugin.
 
 ## Untested
 
-- [ ] Language server filtering
-- [ ] Plugin with several project roots inside a running analysis server. `test/accepted/accepted_findings_test.dart` covers the per-root lookup, not the reporter in a live server.
-- [ ] Scan-on-save through the VS Code extension (the daemon itself is verified below)
+- [x] Language server filtering. Verified by hand 2026-11-26: throwaway project with nested `pkg/`, driven over stdio (`didSave`): outer list hid `avoid_catch_all` in `lib/a.dart` only (`lib/b.dart` unchanged); nested list hid `avoid_generic_exceptions` in `pkg/lib/c.dart`; an outer entry naming `pkg/lib/c.dart` hid nothing.
+- [ ] Plugin with several project roots inside a running analysis server. Needs a human run: requires `dart analyze` or the IDE with the plugin installed. `test/accepted/accepted_findings_test.dart` covers the per-root lookup, not the reporter in a live server.
+- [ ] Scan-on-save through the VS Code extension (the daemon itself is verified below). Needs F5.
 
 ## Verified by hand
 

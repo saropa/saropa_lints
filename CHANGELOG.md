@@ -56,7 +56,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
    **Unreleased convention** — While work is in progress, the top section MUST be headed `## [X.Y.Z] — Unreleased`. Put all new entries in this ONE section: never create a second unreleased section or bump the version. The publish script strips ` — Unreleased` (and typo variants like ` - Unreleased`) via `_strip_unreleased_suffix()`. `pubspec.yaml` and `package.json` stay at the LAST PUBLISHED version until the publish script updates them. After publishing, manually add a new `## [X.Y.Z] — Unreleased` section for the next cycle. A section is published only when its git tag `vX.Y.Z` exists (`git tag -l vX.Y.Z`). If the top section has no tag, it is the unreleased section even when the ` — Unreleased` suffix is missing, so add entries there.
 
-   **Tagged changelog** — Published versions use git tag `vx.y.z`, and each section ends its summary with `[log](url)` pointing to that tag's snapshot. Compare against [current `main`](https://github.com/saropa/saropa-lints/blob/main/CHANGELOG.md).
+   **Tagged changelog** — Published versions use git tag `vx.y.z`, and each section ends its summary with `[log](url)` pointing to that tag's snapshot. Compare against [current `main`](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md).
 
    **Published version** — `"version": "x.y.z"` in [package.json](./package.json).
 
@@ -77,19 +77,27 @@ Many lint rules report fewer false positives, covering paths, caches, async guar
 ### Changed
 
 - `prefer_platform_widget_adaptive` no longer reports `MaterialApp`; it now reports Material controls that leave an available `.adaptive` constructor unused and are not already branched by platform, in resolved analysis such as the editor. Review any new reports.
+- The homepage link of the package and the VS Code extension now opens the product page at [saropa.com/developers/saropa-lints](https://saropa.com/developers/saropa-lints/). No action required.
 
 ### Fixed
 
 - `avoid_case_sensitive_path_comparison` no longer flags a comparison against a MIME type, so content type checks are not treated as file path checks (a named constant is recognized only in resolved analysis such as the editor). No action required.
 - `require_file_path_sanitization` now reports only when the path actually uses a parameter, not when a property or literal text merely shares its name. No action required.
+- `avoid_path_traversal` now reports only when the path actually uses a parameter, not when a property or literal text merely shares its name. It also no longer stays silent when a literal-only parameter precedes a user-supplied one in the same path. No action required.
 - `avoid_unbounded_cache_growth` no longer flags a private cache map that is only ever replaced whole by a freshly built map, since old entries cannot accumulate. No action required.
 - `require_cache_expiration` no longer asks for expiration on a private cache map that is only ever replaced whole, since each replacement already refreshes it. No action required.
 - `no_equal_nested_conditions` no longer flags a condition checked again after `await` or `yield` when its value can change during the suspension, such as a getter, mutable field, or method call. The same applies to a check repeated inside a closure that may run later, and to a check after a call when a closure in the same declaration writes the condition's variable or field. No action required.
 - `prefer_try_parse_for_dynamic_data` no longer flags, in the unresolved scan, `Uri.parse` of an interpolation of constants declared in the same file, including static class fields. No action required.
+- `prefer_try_parse_for_dynamic_data` now recognizes digit-only regex checks declared in an outer block or seen by the unresolved scan, and reports guarded parses that can still receive empty or non-digit text (such as an unanchored pattern or an open-ended `substring`). Review any new reports.
 - `require_envied_obfuscation` no longer reports `bool` fields, which cannot hold a secret and lose `static const` when obfuscated. No action required.
 - `require_notification_for_long_tasks` no longer reports a `syncAll`, `processAll`, `exportAll`, or `importAll` call whose same-file function provably does only short work, in resolved analysis such as the editor. No action required.
 - `require_http_status_check` no longer reports a private send helper that returns the HTTP response unread when all its callers in the file are methods, which now carry the status check requirement (assigning to a local before returning is still reported). Add a status check to any newly reported caller.
+- `require_refresh_indicator` and `require_refresh_indicator_on_lists` no longer report a list in a private widget that its file only shows in a dialog, popup, menu or bottom sheet (including `show...Dialog` wrappers), or a list whose `itemCount` is the length of a constant list. No action required.
 - `require_firebase_error_handling` no longer reports a Firebase call in a private async helper when every reference in the library is an awaited call inside try-catch, directly or through a private or `@visibleForTesting` function field. No action required.
+- `dart run saropa_lints:baseline` now activates the baseline as a top-level `baseline:` section in `analysis_options_custom.yaml`, where it is read; it previously wrote it into `analysis_options.yaml`, where it never took effect. The baseline file now resolves against the project root instead of the analysis server's working directory. Re-run the command once if you created a baseline before; an old nested `baseline:` entry in `analysis_options.yaml` can be removed.
+- `dart run saropa_lints:baseline` (including `--update`) no longer drops entries that are still present when a baseline is already active, because its analysis run now ignores the current baseline. A relative output path now lands in the analyzed project when a project path is given. No action required.
+- "Check Accepted Findings" in the VS Code extension now also checks a workspace folder whose `pubspec.yaml` sits one folder down, and a folder that uses saropa_lints without listing it in `pubspec.yaml`. No action required.
+- "Migrate Renamed Rules" in the VS Code extension now also renames rules in `saropa_accepted.yaml`, so renamed rules keep their reviewed entries. Entries for removed rules are kept and reported by `--check-accepted` for you to delete.
 
 ---
 

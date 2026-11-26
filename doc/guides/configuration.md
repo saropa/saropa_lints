@@ -295,7 +295,7 @@ This command:
 
 1. Runs analysis to find all current violations.
 2. Creates `saropa_baseline.json` with those violations.
-3. Updates your `analysis_options.yaml` automatically.
+3. Adds a top-level `baseline:` section to `analysis_options_custom.yaml` (created if missing). The analysis it runs ignores any active baseline, so re-running or `--update` keeps entries that are still present.
 
 **Result**: Old violations are hidden, new code is still checked.
 
@@ -310,9 +310,9 @@ Both types are combinable: any match suppresses the violation.
 
 ### Full Configuration
 
-> **Note:** Baseline configuration via YAML is not yet supported. Use the
-> `dart run saropa_lints:baseline` CLI command shown above, which generates
-> the baseline file and updates your config automatically.
+> **Note:** The `baseline:` section is read from `analysis_options_custom.yaml`
+> at the project root (top-level key), and `file:` resolves against that root.
+> The `dart run saropa_lints:baseline` CLI command shown above writes it for you.
 
 The baseline CLI supports these options:
 
@@ -366,7 +366,7 @@ Baseline Update Summary:
 dart run saropa_lints:baseline              # Generate new baseline
 dart run saropa_lints:baseline --update     # Refresh, remove fixed violations
 dart run saropa_lints:baseline --dry-run    # Preview without changes
-dart run saropa_lints:baseline --skip-config # Don't update analysis_options.yaml
+dart run saropa_lints:baseline --skip-config # Don't update analysis_options_custom.yaml
 dart run saropa_lints:baseline -o custom.json # Custom output path
 dart run saropa_lints:baseline ./my_project  # Run on specific directory
 dart run saropa_lints:baseline --help        # See all options

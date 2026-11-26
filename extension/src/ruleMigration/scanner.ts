@@ -5,6 +5,10 @@
 import * as path from 'node:path';
 import { findNestedPubspecDirs } from '../analysisOptimizer/nestedRoots';
 import { rewriteBaseline, rewriteDartIgnores, rewriteYamlKeys } from './rewriters';
+// Accepted-findings list entries name rules too; without this a rename
+// turned each entry into an "Unknown rule" that hides nothing.
+import { rewriteAcceptedList } from './acceptedListRewriter';
+import { ACCEPTED_FILE_NAME } from '../acceptedFindingsModel';
 import type { Finding, RenameMap } from './types';
 
 export interface ScanDeps {
@@ -56,8 +60,9 @@ export function owningRoot(file: string, roots: readonly string[]): string {
   return best;
 }
 
-function kindOf(file: string): 'dart' | 'options' | 'custom' | 'baseline' {
+function kindOf(file: string): 'dart' | 'options' | 'custom' | 'baseline' | 'accepted' {
   const base = path.basename(file);
+  if (base === ACCEPTED_FILE_NAME) return 'accepted';
   if (base === 'analysis_options.yaml') return 'options';
   if (base === 'analysis_options_custom.yaml') return 'custom';
   if (base.endsWith('.json')) return 'baseline';
@@ -78,7 +83,13 @@ export async function scanWorkspace(deps: ScanDeps, packages: readonly PackageSc
   const seen = new Set<string>();
   for (const pkg of packages) {
     if (pkg.renames.size === 0) continue;
-    const globs = ['**/*.dart', '**/analysis_options.yaml', '**/analysis_options_custom.yaml', '**/*baseline*.json'];
+    const globs = [
+      '**/*.dart',
+      '**/analysis_options.yaml',
+      '**/analysis_options_custom.yaml',
+      '**/*baseline*.json',
+      `**/${ACCEPTED_FILE_NAME}`,
+    ];
     for (const glob of globs) {
       for (const file of await deps.findFiles(pkg.root, glob, EXCLUDE_GLOB)) {
         // A nested package's files belong to its own scan (its own locked version).
@@ -104,7 +115,9 @@ export async function scanWorkspace(deps: ScanDeps, packages: readonly PackageSc
             ? rewriteDartIgnores(before, pkg.renames)
             : kind === 'baseline'
               ? rewriteBaseline(before, pkg.renames)
-              : rewriteYamlKeys(before, pkg.renames, kind);
+              : kind === 'accepted'
+                ? rewriteAcceptedList(before, pkg.renames)
+                : rewriteYamlKeys(before, pkg.renames, kind);
         if (r.text !== before || r.findings.length > 0) {
           result.changes.push({ file, before, after: r.text, hits: r.hits, findings: r.findings });
         }

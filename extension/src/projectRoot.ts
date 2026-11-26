@@ -56,34 +56,33 @@ export function getProjectRoot(): string | undefined {
   if (cachedProjectRoot !== null) return cachedProjectRoot;
 
   const wsRoot = getWorkspaceRoot();
-  if (!wsRoot) {
-    cachedProjectRoot = undefined;
-    return undefined;
-  }
+  cachedProjectRoot = wsRoot ? findProjectRootIn(wsRoot) : undefined;
+  return cachedProjectRoot;
+}
 
-  // Common case: pubspec.yaml at workspace root.
-  if (fs.existsSync(path.join(wsRoot, 'pubspec.yaml'))) {
-    cachedProjectRoot = wsRoot;
-    return wsRoot;
-  }
+/**
+ * The Dart project root for any folder (not only the first workspace
+ * folder): the folder itself when it holds pubspec.yaml, else its first
+ * immediate subdirectory that does. Uncached. Split out of getProjectRoot so
+ * multi-root features (the accepted-findings check) apply the same one-level
+ * rule to every workspace folder instead of only the first.
+ */
+export function findProjectRootIn(folder: string): string | undefined {
+  // Common case: pubspec.yaml at the folder itself.
+  if (fs.existsSync(path.join(folder, 'pubspec.yaml'))) return folder;
 
   // Search one level deep for a subdirectory containing pubspec.yaml.
   try {
-    const entries = fs.readdirSync(wsRoot, { withFileTypes: true });
+    const entries = fs.readdirSync(folder, { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       if (entry.name.startsWith('.') || SKIP_DIRS.has(entry.name)) continue;
-      const candidate = path.join(wsRoot, entry.name);
-      if (fs.existsSync(path.join(candidate, 'pubspec.yaml'))) {
-        cachedProjectRoot = candidate;
-        return candidate;
-      }
+      const candidate = path.join(folder, entry.name);
+      if (fs.existsSync(path.join(candidate, 'pubspec.yaml'))) return candidate;
     }
   } catch {
     // Permission error or similar — fall through.
   }
-
-  cachedProjectRoot = undefined;
   return undefined;
 }
 

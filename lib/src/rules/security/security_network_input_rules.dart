@@ -13,6 +13,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
 import '../../catch_body_logging_utils.dart';
+import '../../parameter_reference_utils.dart';
 import '../../platform_path_utils.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -2494,11 +2495,11 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_path_traversal',
-    '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. Validate and canonicalize paths before file access, and reject any input containing parent-directory segments. {v8}',
+    '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. Validate and canonicalize paths before file access, and reject any input containing parent-directory segments. {v9}',
     correctionMessage:
         'Sanitize and validate file paths to prevent traversal (e.g., remove "../", use path package), and restrict access to allowed directories only.',
     // SEV-01 (upgraded to ERROR): structural — a function parameter proven to
-    // reach a File/Directory path (whole-identifier match); residuals suppress.
+    // reach a File/Directory path (AST reference); residuals suppress.
     severity: DiagnosticSeverity.ERROR,
   );
 
@@ -2538,35 +2539,33 @@ class AvoidPathTraversalRule extends SaropaLintRule {
       final FormalParameterList? params = _getFunctionParameters(node);
       if (params == null) return;
 
-      // Check if any parameter is used in the path. Use a word-boundary
-      // match rather than a bare substring: a parameter named `id` or `dir`
-      // would otherwise match inside unrelated identifiers (`config.idPath`,
-      // `appDirectory`), falsely marking the path as parameter-tainted and
-      // flagging a path the user never influenced. `\b` ensures the
-      // identifier is referenced as a whole token.
-      String? usedParam;
-      for (final FormalParameter param in params.parameters) {
-        final String paramName = param.name?.lexeme ?? '';
-        if (paramName.isEmpty) continue;
-        final RegExp paramRef = RegExp('\\b${RegExp.escape(paramName)}\\b');
-        if (paramRef.hasMatch(argSource)) {
-          usedParam = paramName;
-          break;
-        }
-      }
+      // The path expression must actually reference a parameter. Matching the
+      // name in the source text (even on word boundaries) reported
+      // `appDir.path` for an unused parameter named `path`.
+      final List<String> usedParams = <String>[
+        for (final FormalParameter param in params.parameters)
+          if (expressionReferencesParameter(firstArg, param))
+            param.name?.lexeme ?? '',
+      ];
 
       // No parameter used in path - safe (e.g., system APIs, constants)
-      if (usedParam == null) return;
+      if (usedParams.isEmpty) return;
 
       // Check if the function body (or a caller of this private method)
       // calls a trusted platform path API.
       if (isFromPlatformPathApi(node)) return;
 
-      // Private helper whose tainted parameter is only fed compile-time
-      // string literals at every call site. No attacker-controlled input can
-      // reach the `File(...)` path, so this is not path traversal. See
+      // Private helper whose tainted parameters are only fed compile-time
+      // string literals at every call site: no attacker-controlled input can
+      // reach the `File(...)` path. EVERY referenced parameter must qualify;
+      // testing only the first let `_open('data', userInput)` go unreported.
+      // See
       // bugs/avoid_path_traversal_false_positive_internal_resolver_parameter.md.
-      if (isParamPassedOnlyLiteralsAtCallSites(node, usedParam)) return;
+      if (usedParams.every(
+        (String name) => isParamPassedOnlyLiteralsAtCallSites(node, name),
+      )) {
+        return;
+      }
 
       // Parameter is used - check for validation
       if (_hasPathValidation(node)) return;
