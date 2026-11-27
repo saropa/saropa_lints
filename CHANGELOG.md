@@ -106,6 +106,7 @@ Many lint rules report fewer false positives, covering paths, caches, async guar
 - The Hebrew VS Code extension no longer shows Arabic or Japanese characters and garbled words in six accepted-findings and stale-override messages, and the language picker title no longer carries extra trailing words. No action required.
 - Translated VS Code extension text no longer falls back to English in the status bar's install-route labels and a few other strings, keeps the command links and code samples that several walkthrough steps and settings had lost, and shows a clean language picker title in 17 languages. The Hebrew accepted-findings messages use consistent wording. No action required.
 - Translated VS Code extension text no longer shows the translator's own instructions ("Strict rules: 1. Return only the translated string…"), labels repeated three or four times ("Linea Linea Linea Linea"), or sentences that run on far past the English, in walkthrough steps, settings, column headers and messages across all 24 languages. No action required.
+- Translated VS Code extension text no longer contains sentences the translator invented (such as "Es el nombre de la persona que tiene…" after "Saropa Lints:") or nonsense labels such as "El mensaje es el mensaje." for "Message", and buttons and column headers no longer end in a stray full stop, in all 24 languages. No action required.
 - `scan` and other command-line scans given a relative folder such as `.` now apply that project's baselines, configuration and `// ignore:` matching as they do for a full path. No action required.
 - "Check Accepted Findings" and `scan --check-accepted` now run when the VS Code extension has commented out the plugin block (its default with the language server on) instead of skipping without a result. No action required.
 - Scans run by the language server, scan-on-save and `--tier` now keep the rule settings in a plugin block the extension commented out, so rules turned off there stay off. No action required.
@@ -114,6 +115,7 @@ Many lint rules report fewer false positives, covering paths, caches, async guar
 ### Internal
 
 - The locale parity test and `bad_translations.py` now fail on a leaked numbered translator prompt, a word or phrase repeated three times in a row, or a long value more than 2.5 times the English length; flagged entries are also pruned from the translation cache.
+- The same guards now also fail on 85 known invented phrases (`extension/scripts/i18n/invented_phrases.json`, each excused when the English justifies it) and on Chinese, Japanese or Korean text repeated back to back; the hand repairs live in `extension/scripts/i18n/invented_repairs/`.
 - Added behavioral tests for `require_copy_with_null_handling` and documented that it judges the `copyWith` declaration only, not callers or clear-by-empty conventions; detection is unchanged.
 
 ---
