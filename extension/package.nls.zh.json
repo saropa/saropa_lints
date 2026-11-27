@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints：跨文件 — 生成 HTML 报告",
   "command.findStaleIgnores.title": "Saropa Lints：查找过期忽略注释",
   "command.fixStaleIgnores.title": "Saropa Lints: 修复过期的忽略注释",
+  "command.checkAcceptedFindings.title": "Saropa Lints：检查已接受的发现",
   "command.openViolationsWideReport.title": "Saropa Lints: 没有一个人. 打开发现仪表板",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints：打开结果仪表板（保留过滤器）",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "扫描包装的数据",
   "command.packageVibrancy.rescan.title": "重新扫描包 (新鲜) 的使用",
   "command.packageVibrancy.openOtherProject.title": "扫描另一个项目...",
+  "command.packageVibrancy.explainLastSkip.title": "说明上次 Vibrancy 跳过",
   "command.packageVibrancy.showReport.title": "打开一个包仪表板.",
   "command.packageVibrancy.showOpportunities.title": "开放升级机会,提供升级的机会.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "导出完整机会报告",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints：同步插件版本到 pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: 状态菜单",
   "command.scanWithLatestEngine.title": "Saropa Lints：使用最新引擎扫描（旧版 Dart 项目）",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK文件夹（包含bin/dart）用于“使用最新引擎扫描”。必须为Dart 3.11或更新版本。留空则使用PATH中的dart。",
-  "command.packageVibrancy.explainLastSkip.title": "说明上次 Vibrancy 跳过"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK文件夹（包含bin/dart）用于“使用最新引擎扫描”。必须为Dart 3.11或更新版本。留空则使用PATH中的dart。"
 }

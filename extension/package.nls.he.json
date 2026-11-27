@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File - צור דוח HTML",
   "command.findStaleIgnores.title": "Saropa Lints: איתור הערות התעלמות מיושנות",
   "command.fixStaleIgnores.title": "Saropa Lints: תיקון הערות זכירות להתעלמות",
+  "command.checkAcceptedFindings.title": "Saropa Lints: בדוק תוצאות מתקבלות",
   "command.openViolationsWideReport.title": "Saropa Lints: פתח דשבורד ממצאים פתוחים.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: פתח דש-בורד תוצאות (לשמור על מסננים)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "חבילות סריקה של חבלי סקירה",
   "command.packageVibrancy.rescan.title": "חבילות סריקה מחדש (טריות)",
   "command.packageVibrancy.openOtherProject.title": "סורק פרויקט אחר...",
+  "command.packageVibrancy.explainLastSkip.title": "הסבר על הדילוג האחרון של Vibrancy",
   "command.packageVibrancy.showReport.title": "פתח את לוח המחוונים של החבילה (Package Dashboard).",
   "command.packageVibrancy.showOpportunities.title": "פתח הזדמנויות שדרוג פתוחה.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "הצגת דוח הזדמנויות מלא",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: סינכון גרסה של.Plugin ל-pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: תפריט סטטוס",
   "command.scanWithLatestEngine.title": "Saropa Lints: סריקה עם המנוע העדכני (פרויקטי Dart ישנים)",
-  "config.property.externalEngine.dartSdkPath.description": "תיקיית SDK Dart (מכילה bin/dart) המשמשת \"סריקה עם מנוע עדכני\". חייב להיות Dart 3.11 או עדכני יותר. השאירו ריק כדי להשתמש בdart ב-PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "הסבר על הדילוג האחרון של Vibrancy"
+  "config.property.externalEngine.dartSdkPath.description": "תיקיית SDK Dart (מכילה bin/dart) המשמשת \"סריקה עם מנוע עדכני\". חייב להיות Dart 3.11 או עדכני יותר. השאירו ריק כדי להשתמש בdart ב-PATH."
 }

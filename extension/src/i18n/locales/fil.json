@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Unverified",
+    "unverifiedTooltip": "Hindi maitataya — {reason}. Panatilihing ito ang override hanggang magtagumpay ang scan.",
+    "unverifiedStatus": "Hindi sinuri — {reason}",
+    "incompleteData": "incomplete data",
+    "groupUnverifiedTooltip": "{count} override(s) ay hindi maaring masuri; ang pag-scan ay hindi kompletong ginawa."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Piliin ang isang pakete upang makita ang mga detalye."
@@ -2835,6 +2842,52 @@
       "title": "Iayos ang mga hindi kinakailangang ignores dito"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Nag-check ng mga pinapayong finding…"
+    },
+    "error": {
+      "checkFailed": "Sukat ng mga inilalagay na paghahanap ay nabigo: {message}",
+      "badOutput": "Hindi mabasa ang output ng scan.",
+      "noWorkspace": "Walang Dart/Flutter workspace. Bumuksan ang isang proyekto sa pubspec.yaml muna.",
+      "missingDep": "Ibigay ang saropa_lints sa pubspec.yaml bago gamitin ang mga pinakamayakas na paghahanap.",
+      "noFinding": "Gamitin ang light bulb sa isang Saropa Lints finding sa isang Dart file upang sumang-ayon dito.",
+      "outsideProject": "Ito ay file ay hindi nasa loob ng isang Dart package (walang pubspec.yaml sa itaas nito), kaya hindi ito maaaring idagdag sa saropa_accepted.yaml.",
+      "writeFailed": "Hindi maaaring i-update ang saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml ay may layout na hindi maaaring i-extend nang automatic. Idagdag ang entry sa kamay.",
+      "entryExists": "saropa_accepted.yaml na may entry na para sa {rule} sa {file}. Kung ang entry ay may max count, i-raise ito manu-manong."
+    },
+    "info": {
+      "alreadyRunning": "Nag-uusap na ang isang pagsusuring accepted-findings.",
+      "noList": "Walang saropa_accepted.yaml na nakita sa anumang package ng workspace. Gamitin ang \"Pangangatuwiran dito\" sa isang finding upang magsimula ng isang bagong saropa.",
+      "clean": "Nakatanggap ng mga finding: {count} mga entry na nakasuri, walang nakaraan o walidong entry.",
+      "issues": "Nakatanggap ng mga finding: {stale} hindi aktibo at {invalid} walang kahulugan, mula sa {count} mga entry. Tingnan ang panel ng Problems.",
+      "added": "Nagdagdag ng {rule} sa {file} para sa {list}. Ang mga finding ay nangangahulugan na malinaw nang uli itong isanalaysay ang file."
+    },
+    "action": {
+      "openList": "I-Open List",
+      "restartAnalysis": "Ibalik ang Server ng Pagsusuri"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Nag-iiwan na entry: {file} ay wala nang magmula, kaya ang entry na ito para sa {rule} ay walang nangangatwiran.",
+      "staleNoFinding": "Naglalabas na entry: {rule} walang nakita sa {file}. Alisin ang entry kung ang code ay naiayos na.",
+      "invalid": "Invalid entry, walang nangungunang: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Bakit pinapayagan ito finding?",
+      "kindAccepted": "Nakatanggap: ang finding ay tunay at ang code ay mananatili na tulad nito",
+      "kindFalsePositive": "False positive: ang rule ay mali dito",
+      "reasonTitle": "Sagot sa pag-angat ng {rule} sa {file}",
+      "reasonPlaceholder": "Kinakailangan. I-save sa saropa_accepted.yaml para sa mga reviewer.",
+      "reasonRequired": "Isang reason ay kinakailangan."
+    },
+    "quickFix": {
+      "title": "Mag-accept ng {rule} sa file na ito…"
+    },
+    "summary": {
+      "count": "{count} naakma"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Ito ang report na may marka \"{status}\" ngunit pa rin nasa bugs/ — i-archieve ito sa plans/history/ bago i-close (tanungin ang ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Ipinagbawal (intentional old SDK)"
+    },
+    "staleOverride": {
+      "suppress": "Ipinagbawal (ang override ay intente)"
     }
   },
   "blastRadius": {

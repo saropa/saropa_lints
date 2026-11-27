@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Archivo cruzado: generar informe HTML",
   "command.findStaleIgnores.title": "Saropa Lints: Buscar comentarios de ignorar obsoletos",
   "command.fixStaleIgnores.title": "Saropa Lints: Corrige comentarios de ignorar obsoletos",
+  "command.checkAcceptedFindings.title": "Saropa Lints: Revisar Hallazgos Aceptados",
   "command.openViolationsWideReport.title": "Saropa Lints: Abre el panel de resultados.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Abre el panel de resultados (preserva los filtros)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Paquetes de escaneo para el análisis.",
   "command.packageVibrancy.rescan.title": "Paquetes de rescan (frescos) para el nuevo escaneo",
   "command.packageVibrancy.openOtherProject.title": "Escanear Otro Proyecto...",
+  "command.packageVibrancy.explainLastSkip.title": "Explicar la última omisión de Vibrancy",
   "command.packageVibrancy.showReport.title": "Abra el panel de control del paquete.",
   "command.packageVibrancy.showOpportunities.title": "Abrir oportunidades de actualización abiertas.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Exportar Informe de Oportunidades Completo",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: Sincronizar Versión del Plugin con pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menú de Estado",
   "command.scanWithLatestEngine.title": "Saropa Lints: Escaneo con Motor Más Reciente (Proyectos Dart Antiguos)",
-  "config.property.externalEngine.dartSdkPath.description": "Carpeta del SDK Dart (contiene bin/dart) usada por \"Scan with Latest Engine\". Debe ser Dart 3.11 o más reciente. Dejar en blanco para usar el dart en PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "Explicar la última omisión de Vibrancy"
+  "config.property.externalEngine.dartSdkPath.description": "Carpeta del SDK Dart (contiene bin/dart) usada por \"Scan with Latest Engine\". Debe ser Dart 3.11 o más reciente. Dejar en blanco para usar el dart en PATH."
 }

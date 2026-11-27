@@ -5,54 +5,54 @@
     "unknownPathSdk": "PATH-এর dart-এর জন্য Dart SDK সংস্করণ নির্ধারণ করা যায়নি, এবং প্রকল্পে পড়ার মতো কোনো SDK সংস্করণ নেই।",
     "staleLock": "pubspec.lock নেই বা পড়া যায় না, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
     "staleConfig": "প্যাকেজ কনফিগারেশন নেই বা তাতে লক করা প্যাকেজগুলো তালিকাভুক্ত নেই, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
+    "depsNotLocked": "pubspec.yaml এমন ডিপেন্ডেন্সি ঘোষণা করেছে যা pubspec.lock-এ তালিকাভুক্ত নেই, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
+    "source": {
+      "dartSdkPath": "সেটিং dart.sdkPath",
+      "flutterSdkPath": "সেটিং dart.flutterSdkPath",
+      "fvm": "FVM পিন (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "প্রকল্পের SDK-এর কোনো প্রমাণ নেই",
-      "lockConstraint": "pubspec.lock-এর sdks সীমাবদ্ধতা"
-    },
-    "constraintUnverifiable": "pubspec.yaml-এর একটি ডিপেন্ডেন্সি pubspec.lock-এর সাথে যাচাই করা যায়নি (git, কাস্টম বা পার্স করা যায় না এমন সীমাবদ্ধতা), তাই pub ডিপেন্ডেন্সি আবার সমাধান করতে পারে।",
-    "explain": {
-      "pickFolder": "ব্যাখ্যা করার জন্য একটি প্রকল্প ফোল্ডার বেছে নিন",
-      "none": "এই সেশনে কোনো Vibrancy pub কোয়েরি এড়িয়ে যাওয়া হয়নি।",
-      "unknown": "অজানা",
-      "title": "Package Vibrancy একটি pub কোয়েরি এড়িয়ে গেছে",
-      "project": "প্রকল্পের SDK: {value} ({source} থেকে)",
-      "folder": "প্রকল্প ফোল্ডার: {cwd}",
-      "reason": "কারণ: {reason}",
-      "rule": "নিয়ম: {rule}",
-      "pathConfirmRun": "তবুও pub get চালান",
-      "runPubGet": "প্রকল্পের SDK দিয়ে pub get চালান",
-      "toolVersion": "নির্বাচিত SDK সংস্করণ: {version}",
-      "sdk": "নির্বাচিত SDK: {path} ({source} থেকে)",
-      "time": "এড়িয়ে যাওয়ার সময়: {time}",
-      "pathConfirm": "নির্বাচিত SDK PATH থেকে এসেছে, আর এই সেটআপই ভুল SDK দিয়ে pubspec.lock নতুন করে লিখেছিল। তবুও pub get চালাবেন?",
-      "pubGetFailed": "pub get ব্যর্থ হয়েছে: {error}",
-      "pubGetDone": "প্রকল্পের SDK দিয়ে pub get শেষ হয়েছে।"
-    },
-    "rule": {
-      "constraintUnverifiable": "সীমাবদ্ধতা যাচাই করা যায় না",
-      "depsNotLocked": "ডিপেন্ডেন্সি লক করা নেই",
-      "lockSdkConstraint": "লক ফাইলে SDK সীমাবদ্ধতা",
-      "constraintNotSatisfied": "লক করা সংস্করণ সীমাবদ্ধতার বাইরে",
-      "staleLock": "লক ফাইল নেই বা পড়া যায় না",
-      "pathDepNewer": "পাথ ডিপেন্ডেন্সি বদলেছে",
-      "sdkMismatch": "SDK সংস্করণ মেলেনি",
-      "staleConfig": "পুরোনো প্যাকেজ কনফিগারেশন",
-      "unknownPathSdk": "অজানা PATH SDK"
-    },
-    "source": {
-      "fvm": "FVM পিন (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "সেটিং dart.flutterSdkPath",
-      "dartSdkPath": "সেটিং dart.sdkPath"
+      "lockConstraint": "pubspec.lock-এর sdks সীমাবদ্ধতা",
+      "none": "প্রকল্পের SDK-এর কোনো প্রমাণ নেই"
     },
     "statusItem": {
-      "tooltip": "pubspec.lock যাতে নতুন করে লেখা না হয়, সেজন্য Package Vibrancy একটি pub কোয়েরি এড়িয়ে গেছে। বিস্তারিত দেখতে ক্লিক করুন।",
-      "text": "Vibrancy: pub এড়িয়ে যাওয়া হয়েছে"
+      "text": "Vibrancy: pub এড়িয়ে যাওয়া হয়েছে",
+      "tooltip": "pubspec.lock যাতে নতুন করে লেখা না হয়, সেজন্য Package Vibrancy একটি pub কোয়েরি এড়িয়ে গেছে। বিস্তারিত দেখতে ক্লিক করুন।"
     },
+    "explain": {
+      "title": "Package Vibrancy একটি pub কোয়েরি এড়িয়ে গেছে",
+      "none": "এই সেশনে কোনো Vibrancy pub কোয়েরি এড়িয়ে যাওয়া হয়নি।",
+      "unknown": "অজানা",
+      "reason": "কারণ: {reason}",
+      "rule": "নিয়ম: {rule}",
+      "sdk": "নির্বাচিত SDK: {path} ({source} থেকে)",
+      "toolVersion": "নির্বাচিত SDK সংস্করণ: {version}",
+      "project": "প্রকল্পের SDK: {value} ({source} থেকে)",
+      "folder": "প্রকল্প ফোল্ডার: {cwd}",
+      "time": "এড়িয়ে যাওয়ার সময়: {time}",
+      "runPubGet": "প্রকল্পের SDK দিয়ে pub get চালান",
+      "pubGetDone": "প্রকল্পের SDK দিয়ে pub get শেষ হয়েছে।",
+      "pubGetFailed": "pub get ব্যর্থ হয়েছে: {error}",
+      "pickFolder": "ব্যাখ্যা করার জন্য একটি প্রকল্প ফোল্ডার বেছে নিন",
+      "pathConfirm": "নির্বাচিত SDK PATH থেকে এসেছে, আর এই সেটআপই ভুল SDK দিয়ে pubspec.lock নতুন করে লিখেছিল। তবুও pub get চালাবেন?",
+      "pathConfirmRun": "তবুও pub get চালান"
+    },
+    "constraintNotSatisfied": "{name} {version}-এ লক করা আছে, যা pubspec.yaml-এর সীমাবদ্ধতা {constraint} পূরণ করে না, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
+    "constraintUnverifiable": "pubspec.yaml-এর একটি ডিপেন্ডেন্সি pubspec.lock-এর সাথে যাচাই করা যায়নি (git, কাস্টম বা পার্স করা যায় না এমন সীমাবদ্ধতা), তাই pub ডিপেন্ডেন্সি আবার সমাধান করতে পারে।",
     "pathDepNewer": "pubspec.lock লেখার পরে পাথ ডিপেন্ডেন্সি {name} বদলেছে, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
-    "depsNotLocked": "pubspec.yaml এমন ডিপেন্ডেন্সি ঘোষণা করেছে যা pubspec.lock-এ তালিকাভুক্ত নেই, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।",
-    "constraintNotSatisfied": "{name} {version}-এ লক করা আছে, যা pubspec.yaml-এর সীমাবদ্ধতা {constraint} পূরণ করে না, তাই pub ডিপেন্ডেন্সি আবার সমাধান করবে।"
+    "rule": {
+      "sdkMismatch": "SDK সংস্করণ মেলেনি",
+      "lockSdkConstraint": "লক ফাইলে SDK সীমাবদ্ধতা",
+      "unknownPathSdk": "অজানা PATH SDK",
+      "staleLock": "লক ফাইল নেই বা পড়া যায় না",
+      "staleConfig": "পুরোনো প্যাকেজ কনফিগারেশন",
+      "depsNotLocked": "ডিপেন্ডেন্সি লক করা নেই",
+      "constraintNotSatisfied": "লক করা সংস্করণ সীমাবদ্ধতার বাইরে",
+      "constraintUnverifiable": "সীমাবদ্ধতা যাচাই করা যায় না",
+      "pathDepNewer": "পাথ ডিপেন্ডেন্সি বদলেছে"
+    }
   },
   "about": {
     "ruleCountStrip": "{total} লিংট নিয়মগুলি এই সংস্করণে বর্তমান (অপরিহার্য {essential} · পরামর্শ করা যাক {recommended} · পেশাদার {professional} · সম্পূর্ণ {comprehensive} · শিক্ষামূলক {pedantic} · {stylistic} বিকল্প শৈলীগত)"
@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ অনুমোদিত হয়নি",
+    "unverifiedTooltip": "এটি যাচাই করা যায়নি — {reason}। স্ক্যান সফল হওয়া পর্যন্ত এই ওভাররাইড রাখুন।",
+    "unverifiedStatus": "অনুমোদিত নয় — {reason}",
+    "incompleteData": "অসম্পূর্ণ ডেটা",
+    "groupUnverifiedTooltip": "{count} ওভাররাইড করা যাচ্ছে না; স্ক্যান অসম্পূর্ণ ছিল।"
+  },
   "detailView": {
     "empty": {
       "selectPackage": "বিস্তারিত দেখতে একটি প্যাকেজ নির্বাচন করুন।"
@@ -2835,6 +2842,52 @@
       "title": "এই ফাইলে বাক্স করা নগন্বিত করুন"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "অ্যাক্সেপ্ট করা ফিংডিং পরীক্ষা করা হচ্ছে..."
+    },
+    "error": {
+      "checkFailed": "একটি গ্রহণযোগ্য ফাইন্ডিং পরীক্ষা করুন ব্যর্থ: {message}",
+      "badOutput": "স্ক্যান আউটপুটটি পড়া যেতে পারেনি।",
+      "noWorkspace": "কোনও Dart/Flutter ওয়ার্কস্পেস পাওয়া যায়নি। প্রথমে pubspec.yaml একটি প্রকল্প খুলুন।",
+      "missingDep": "একটি গ্রহণযোগ্য ফিংডিং ব্যবহার করার আগে আপনি saropa_lints কে pubspec.yaml এ যোগ করুন।",
+      "noFinding": "একটি Dart ফাইলে একটি Saropa Lints ফিংডিং এর জন্য লাইট বাউল ব্যবহার করুন এটি গ্রহণ করুন।",
+      "outsideProject": "এই ফাইলটি একটি Dart প্যাকেজের ভিতরে নয় (এর উপরে কোনও pubspec.yaml নেই), তাই এটি saropa_accepted.yaml এ যোগ করা যাবে না।",
+      "writeFailed": "সারোপা_অ্যাকসেপ্টেড.যেম আপডেট করা যায় না: {message}",
+      "cannotAppend": "সারোপা_অ্যাকসেপ্টেড.যেম একটি লেআউট যেটি অটোমেটিকভাবে বিস্তার করা যায় না। হাতে এন্ট্রি যোগ করুন।",
+      "entryExists": "{rule} এর জন্য {file} এ ইতিমধ্যে এন্ট্রি আছে। যদি এন্ট্রিটি একটি ম্যাক্স কাউন্ট রাখে, তবে সেটি হাতে বাড়ানো দরকার।"
+    },
+    "info": {
+      "alreadyRunning": "একটি গ্রহণযোগ্য খুঁজে পাওয়া তদন্ত বর্তমানে চালু আছে।",
+      "noList": "কোনও প্যাকেজে সারোপা_অ্যাকসেপ্টেড যামল পাওয়া যায়নি। একটি ফিংডিং নির্বাচন করে \"এই ফাইলে অ্যাকসেপ্ট করুন\" ব্যবহার করে একটি শুরু করুন।",
+      "clean": "গ্রহণযোগ্য ফাইন্ডিংস: {count} এন্ট্রি পরীক্ষা করা হয়েছে, কোনও পুরাতন বা অবৈধ নেই।",
+      "issues": "গ্রহণযোগ্য ফাইন্ডিংস: {stale} বৈধ এবং {invalid} অবৈধ, {count} এন্ট্রিতে থেকে। প্রবলেম প্যানেলটি দেখুন।",
+      "added": "{rule} নামে ফাইল {file} এ যুক্ত করা হয়েছে {list} এ। ফাইলটি আবার বিশ্লেষণ করার সময় ফিংডিংগুলি স্পষ্ট ভাবে দেখা যাবে।"
+    },
+    "action": {
+      "openList": "তালিকা খুলুন",
+      "restartAnalysis": "পুনরাবৃত্তি বিশ্লেষণ সার্ভার"
+    },
+    "diagnostic": {
+      "staleFileMissing": "স্থির প্রবেশাধিকার: {file} বর্তমানে অস্তিত্ব রাখে না, তাই {rule} এর এই প্রবেশাধিকার কিছু ছুপিয়ে রাখে না।",
+      "staleNoFinding": "স্থির প্রবেশাধিকার: {rule} এ কোন কিছু পাওয়া যায়নি {file}। কোডটি সঠিক হয়ে গেলে প্রবেশাধিকারটি অপসারণ করুন।",
+      "invalid": "অবৈধ প্রবেশ, কিছু ছুপিয়ে রাখে না: {message}"
+    },
+    "prompt": {
+      "kindTitle": "এই ফাইন্ডিংটি কেন গ্রহণযোগ্য?",
+      "kindAccepted": "গ্রহণযোগ্য: এটি সত্য এবং কোডটি এমন থাকবে কিনা",
+      "kindFalsePositive": "প্রতিকূল ফলাফল: এখানে নিয়মটি ভুল হয়েছে",
+      "reasonTitle": "{rule} গ্রহণের কারণ কী আছে এবং {file} এর জন্য কারণ কী আছে",
+      "reasonPlaceholder": "অপরিহার্য। saropa_accepted.yaml এ সংরক্ষিত হয় পরীক্ষকদের জন্য।",
+      "reasonRequired": "একটি কারণ প্রয়োজন।"
+    },
+    "quickFix": {
+      "title": "এই ফাইলে {rule} গ্রহণ করুন…"
+    },
+    "summary": {
+      "count": "{count} গ্রহণ করেছেন"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "এই রিপোর্টটি \"{status}\" ট্যাগ দিয়ে মার্ক করা হয়েছে কিন্তু এটি এখনও বাগ কম করতে হবে — বন্ধ করার আগে এটিকে প্ল্যানস/হিস্টোরি/ ফোল্ডারে আর্কাইভ করুন (দেখুন ISSUE_REPORT_GUIDE.md)।"
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "সাপ্প্রেস (উদ্দেশ্যমূলক পুরাতন SDK) /নো_থিং"
+    },
+    "staleOverride": {
+      "suppress": "বাধা দিন (অবরোধ করা হয়েছে বলে মনে হচ্ছে)"
     }
   },
   "blastRadius": {

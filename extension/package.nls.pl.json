@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File — wygeneruj raport w formacie HTML",
   "command.findStaleIgnores.title": "Saropa Lints: Znajdź nieaktualne komentarze ignorujące",
   "command.fixStaleIgnores.title": "Saropa Lints: Popraw stare komentarze ignorujące",
+  "command.checkAcceptedFindings.title": "Saropa Lints: Sprawdź Zaakceptowane Znalezione",
   "command.openViolationsWideReport.title": "Saropa Lints: Otwórz Tablicę Zarządzania Wynikami.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Otwórz pulpit wyników (zachowaj filtry)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Pakiety skanowania pakietów skanujących",
   "command.packageVibrancy.rescan.title": "Pakiety Rescan (świeże)",
   "command.packageVibrancy.openOtherProject.title": "Skanuj inny projekt...",
+  "command.packageVibrancy.explainLastSkip.title": "Wyjaśnij ostatnie pominięcie Vibrancy",
   "command.packageVibrancy.showReport.title": "Otwórz Panel Paczek (ang. Package Dashboard).",
   "command.packageVibrancy.showOpportunities.title": "Otwórz możliwości aktualizacji.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Eksportuj pełny raport możliwości",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: Synchronizacja Wersji Pluginu z pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menu Statusu",
   "command.scanWithLatestEngine.title": "Saropa Lints: Skanuj z najnowszym silnikiem (starsze projekty Dart)",
-  "config.property.externalEngine.dartSdkPath.description": "Katalog Dart SDK (zawiera bin/dart) używany przez \"Scan with Latest Engine\". Musi być Dart 3.11 lub nowszy. Opuszczenie pola pustego spowoduje użycie dart z PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "Wyjaśnij ostatnie pominięcie Vibrancy"
+  "config.property.externalEngine.dartSdkPath.description": "Katalog Dart SDK (zawiera bin/dart) używany przez \"Scan with Latest Engine\". Musi być Dart 3.11 lub nowszy. Opuszczenie pola pustego spowoduje użycie dart z PATH."
 }

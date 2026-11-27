@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Doğrulanmamış",
+    "unverifiedTooltip": "Doğrulanamadı — {reason}. Tarayıcı başarılı olana kadar bu geçiciyi koruyun.",
+    "unverifiedStatus": "Doğrulanmamış — {reason}",
+    "incompleteData": "tamamlanmamış veri",
+    "groupUnverifiedTooltip": "{count} override(s) doğrulanamadı; tarayıcı tamamlanmamıştı."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Detayları görmek için bir paket seçin."
@@ -2835,6 +2842,52 @@
       "title": "Bu dosyadaki eski atlananları düzelt"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Kabul edilen bulgular kontrol ediliyor..."
+    },
+    "error": {
+      "checkFailed": "Kabul edilen bulgular kontrol edilirken hata oluştu: {message}",
+      "badOutput": "Tarama çıktısı okunamadı.",
+      "noWorkspace": "Dart/Flutter çalışma alanı bulunamadı. İlk olarak pubspec.yaml ile bir proje açın.",
+      "missingDep": "Almak üzere kabul edilen bulguları kullanmadan önce saropa_lints'ı pubspec.yaml'a ekleyin.",
+      "noFinding": "Saropa Lints dosyasındaki Dart bulgusunda ampulü kullanarak onu kabul edin.",
+      "outsideProject": "Bu dosya bir Dart paketi içinde değil (yukarısında pubspec.yaml yok), bu nedenle saropa_accepted.yaml'ya eklenemez.",
+      "writeFailed": "saropa_accepted.yaml güncellenemedi: {message}",
+      "cannotAppend": "saropa_accepted.yaml bir layout içeriyor ki bu otomatik olarak genişletilemiyor. El ile giriş ekleyin.",
+      "entryExists": "saropa_accepted.yaml zaten {rule} için {file} içinde bir girişe sahiptir. Girişin bir max count değeri varsa, elle bunu artırın."
+    },
+    "info": {
+      "alreadyRunning": "Bir kabul edilen-bulgular kontrolü zaten çalışmaktadır.",
+      "noList": "İşlem alanındaki herhangi bir pakette saropa_accepted.yaml bulunamadı. Bir bulguyu \"Bu dosyada Kabul Et\" seçeneğiyle seçerek başlayabilirsiniz.",
+      "clean": "Kabul edilen bulgular: {count} giriş kontrol edildi, hiçbir tarihsel veya geçersiz bulgu yok.",
+      "issues": "Kabul edilen bulgular: {stale} eski ve {invalid} geçersiz, toplamda {count} girişten. Sorunlar paneline bakın.",
+      "added": "{rule} {file} dosyasına {list} eklendi. Dosya tekrar analiz edildiğinde bulgular zaten açıkça gösterildi."
+    },
+    "action": {
+      "openList": "Aç Listesi",
+      "restartAnalysis": "Analiz Sunucusunu Yeniden Başlat"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Geçersiz giriş: {file} artık mevcut değil, bu yüzden {rule} girişinin hiçbir şey gizlemesi yok.",
+      "staleNoFinding": "Stale entry: {rule}, {file}'da hiçbir şey bulunamadı. Kod düzeltilmişse girişi kaldırın.",
+      "invalid": "Geçersiz giriş, hiçbir şeyi gizlemez: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Neden bu bulgu kabul edildi?",
+      "kindAccepted": "Kabul Edildi: bulunan bir sorun var ve kod değişmeden kalır",
+      "kindFalsePositive": "Yanlış pozitif: kural burada yanlış",
+      "reasonTitle": "Kabul edilme sebebi {rule} in {file}",
+      "reasonPlaceholder": "Zorunlu. Görevlendirmeniz için saropa_accepted.yaml'da kaydedilmiştir.",
+      "reasonRequired": "Bir neden gerekli."
+    },
+    "quickFix": {
+      "title": "Bu dosyada {rule}'yi kabul et…"
+    },
+    "summary": {
+      "count": "{count} kabul etti"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Bu rapor \"{status}\" olarak işaretlenmiştir ancak hâlâ bugs/ içinde — kapattan önce plans/history/ klasörüne arşivleyin (ISSUE_REPORT_GUIDE.md'ye bakın)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Bastır (bilinçli eski SDK)"
+    },
+    "staleOverride": {
+      "suppress": "Suppress (override is intentional)"
     }
   },
   "blastRadius": {
@@ -3169,7 +3225,7 @@
   "externalEngine": {
     "noProject": "İlk olarak bir Dart proje klasörünü açın.",
     "sdkTooOld": "En son Saropa Lints motoru Dart {required} veya daha yeni sürümü gerektirir, ancak burada kullanılan Dart sürümü {found}'dir. Daha yeni bir Dart SDK'sı yükleyin ve \"saropaLints.externalEngine.dartSdkPath\" ayarını bu klasöre işaret edin.",
-    "sdkUnknown": "bilinmeyen",
+    "sdkUnknown": "bilinmiyor",
     "install": {
       "prompt": "Bu, daha yeni bir Dart SDK kullanarak en son Saropa Lints motorunu küresel olarak (dart pub global activate saropa_lints) kurar ve ardından bu projeyi taramaya başlar. Bu proje'nin pubspec.yaml ve SDK pinleri değiştirilmez.",
       "confirm": "Install ve tarama"

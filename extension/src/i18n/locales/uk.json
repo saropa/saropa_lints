@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Неперевірений",
+    "unverifiedTooltip": "Не вдалося перевірити — {reason}. Зберігайте це перезапуск до моменту успішного сканування.",
+    "unverifiedStatus": "Неперевірений — {reason}",
+    "incompleteData": "неповні дані",
+    "groupUnverifiedTooltip": "{count} override(s) не можуть бути перевірені; сканування було незавершене."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Виберіть пакет, щоб побачити деталі."
@@ -2835,6 +2842,52 @@
       "title": "Виправайте засмічені ігнори в цьому файлі"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Перевірка прийнятих знайдених проблем…"
+    },
+    "error": {
+      "checkFailed": "Перевірка прийнятих знайдених проблем завершена: {message}",
+      "badOutput": "Вихід сканування не може бути прочитаний.",
+      "noWorkspace": "Не знайдено робочого простору Dart/Flutter. Відкрийте проект з pubspec.yaml спочатку.",
+      "missingDep": "Додайте saropa_lints до pubspec.yaml перед використанням прийнятих знайдених.",
+      "noFinding": "Використовуйте світлову лампу для прийняття Saropa Lints знайки в файлі Dart.",
+      "outsideProject": "Цей файл не знаходиться всередині пакету Dart (відсутній pubspec.yaml вище), тому його не можна додати до saropa_accepted.yaml.",
+      "writeFailed": "Не вдалося оновити saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml має розташування, яке не може бути розширене автоматично. Додайте запис вручну.",
+      "entryExists": "saropa_accepted.yaml вже містить запис для {rule} у {file}. Якщо запис має максимальну кількість, збільште її вручну."
+    },
+    "info": {
+      "alreadyRunning": "Перевірка визнаних порушення є вже виконуваною.",
+      "noList": "Не знайдено saropa_accepted.yaml у жодному з пакетів робочого простору. Використовуйте \"Прийняти у цьому файлі\" для початку одного.",
+      "clean": "Прийняті знайшли: {count} записів перевірено, жодного не видалено або недійсного.",
+      "issues": "Прийняті знайшли: {stale} непотрібні та {invalid} недійсні, з {count} записів. Дивіться панель Помилок.",
+      "added": "Додано {rule} у {file} для {list}. Знайдені проблеми вже відображено чітко, коли файл аналізується знову."
+    },
+    "action": {
+      "openList": "Відкрити список",
+      "restartAnalysis": "Перезапустити сервер аналізу"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Старий запис: {file} більше не існує, тому цей запис для {rule} нічого не приховує.",
+      "staleNoFinding": "Старий запис: {rule} знайдено нічого в {file}. Видаліть запис, якщо код був виправлений.",
+      "invalid": "Недійсний запис, нічого не приховує: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Чому цей знайшований випадок прийнятий?",
+      "kindAccepted": "Прийнято: знайдено помилку, код залишається без змін",
+      "kindFalsePositive": "Помилка: правило тут неправильне",
+      "reasonTitle": "Причина прийняття {rule} в {file}",
+      "reasonPlaceholder": "Обов'язково. Збережено в saropa_accepted.yaml для рев'юерів.",
+      "reasonRequired": "Потрібна причина."
+    },
+    "quickFix": {
+      "title": "Прийміть {rule} у цьому файлі…"
+    },
+    "summary": {
+      "count": "{count} прийнято"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Цей звіт позначений \"{status}\", але все ще в bugs/ — архівуйте його в plans/history/ перед закриттям (дивіться ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Придушити (умисне старе SDK)"
+    },
+    "staleOverride": {
+      "suppress": "Прихильнити (перевизначення є призначене)"
     }
   },
   "blastRadius": {
@@ -3169,7 +3225,7 @@
   "externalEngine": {
     "noProject": "Відкрийте спочатку папку проекту Dart.",
     "sdkTooOld": "Найновіший Saropa Lints двигун потребує Dart {required} або новіший, але використовується тут Dart, який є {found}. Встановіть новіший Dart SDK та встановіть \"saropaLints.externalEngine.dartSdkPath\" на його папку.",
-    "sdkUnknown": "невідомий",
+    "sdkUnknown": "невідомо",
     "install": {
       "prompt": "Це встановлює останню версію Saropa Lints двигуна глобально (dart pub global activate saropa_lints) за допомогою нового Dart SDK, потім сканує цей проект. Версія pubspec.yaml цього проекту та пін SDK не змінюються.",
       "confirm": "Встановити та оцінити"

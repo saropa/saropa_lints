@@ -5,54 +5,54 @@
     "unknownPathSdk": "La version de Dart SDK n'a pas pu être déterminée pour le dart présent dans PATH, et le projet n'a aucune version de SDK lisible.",
     "staleLock": "pubspec.lock est absent ou illisible ; pub résoudrait donc à nouveau les dépendances.",
     "staleConfig": "La configuration des paquets est absente ou ne liste pas les paquets verrouillés ; pub résoudrait donc à nouveau les dépendances.",
+    "depsNotLocked": "pubspec.yaml déclare des dépendances que pubspec.lock ne liste pas ; pub résoudrait donc à nouveau les dépendances.",
+    "source": {
+      "dartSdkPath": "paramètre dart.sdkPath",
+      "flutterSdkPath": "paramètre dart.flutterSdkPath",
+      "fvm": "Épingle FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "aucune preuve de SDK du projet",
-      "lockConstraint": "contrainte sdks de pubspec.lock"
-    },
-    "constraintUnverifiable": "Une dépendance de pubspec.yaml n'a pas pu être vérifiée par rapport à pubspec.lock (contrainte git, personnalisée ou non analysable) ; pub risque donc de résoudre à nouveau les dépendances.",
-    "explain": {
-      "pickFolder": "Choisissez un dossier de projet à expliquer",
-      "none": "Aucune requête pub de Vibrancy n'a été ignorée durant cette session.",
-      "unknown": "inconnu",
-      "title": "Package Vibrancy a ignoré une requête pub",
-      "project": "SDK du projet : {value} (depuis {source})",
-      "folder": "Dossier du projet : {cwd}",
-      "reason": "Raison : {reason}",
-      "rule": "Règle : {rule}",
-      "pathConfirmRun": "Exécuter pub get quand même",
-      "runPubGet": "Exécuter pub get avec le SDK du projet",
-      "toolVersion": "Version de SDK sélectionnée : {version}",
-      "sdk": "SDK sélectionné : {path} (depuis {source})",
-      "time": "Ignoré à : {time}",
-      "pathConfirm": "Le SDK sélectionné provient de PATH, la configuration qui a réécrit pubspec.lock avec le mauvais SDK. Exécuter pub get quand même ?",
-      "pubGetFailed": "Échec de pub get : {error}",
-      "pubGetDone": "pub get terminé avec le SDK du projet."
-    },
-    "rule": {
-      "constraintUnverifiable": "Contrainte non vérifiable",
-      "depsNotLocked": "Dépendance non verrouillée",
-      "lockSdkConstraint": "Contrainte de SDK du verrou",
-      "constraintNotSatisfied": "Version verrouillée hors contrainte",
-      "staleLock": "Fichier de verrouillage manquant ou illisible",
-      "pathDepNewer": "Dépendance de chemin modifiée",
-      "sdkMismatch": "Version de SDK incompatible",
-      "staleConfig": "Configuration de paquets obsolète",
-      "unknownPathSdk": "SDK PATH inconnu"
-    },
-    "source": {
-      "fvm": "Épingle FVM (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "paramètre dart.flutterSdkPath",
-      "dartSdkPath": "paramètre dart.sdkPath"
+      "lockConstraint": "contrainte sdks de pubspec.lock",
+      "none": "aucune preuve de SDK du projet"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy a ignoré une requête pub afin que pubspec.lock ne soit pas réécrit. Cliquez pour plus de détails.",
-      "text": "Vibrancy : pub ignoré"
+      "text": "Vibrancy : pub ignoré",
+      "tooltip": "Package Vibrancy a ignoré une requête pub afin que pubspec.lock ne soit pas réécrit. Cliquez pour plus de détails."
     },
+    "explain": {
+      "title": "Package Vibrancy a ignoré une requête pub",
+      "none": "Aucune requête pub de Vibrancy n'a été ignorée durant cette session.",
+      "unknown": "inconnu",
+      "reason": "Raison : {reason}",
+      "rule": "Règle : {rule}",
+      "sdk": "SDK sélectionné : {path} (depuis {source})",
+      "toolVersion": "Version de SDK sélectionnée : {version}",
+      "project": "SDK du projet : {value} (depuis {source})",
+      "folder": "Dossier du projet : {cwd}",
+      "time": "Ignoré à : {time}",
+      "runPubGet": "Exécuter pub get avec le SDK du projet",
+      "pubGetDone": "pub get terminé avec le SDK du projet.",
+      "pubGetFailed": "Échec de pub get : {error}",
+      "pickFolder": "Choisissez un dossier de projet à expliquer",
+      "pathConfirm": "Le SDK sélectionné provient de PATH, la configuration qui a réécrit pubspec.lock avec le mauvais SDK. Exécuter pub get quand même ?",
+      "pathConfirmRun": "Exécuter pub get quand même"
+    },
+    "constraintNotSatisfied": "{name} est verrouillé à {version}, ce qui ne satisfait pas la contrainte {constraint} de pubspec.yaml ; pub résoudrait donc à nouveau les dépendances.",
+    "constraintUnverifiable": "Une dépendance de pubspec.yaml n'a pas pu être vérifiée par rapport à pubspec.lock (contrainte git, personnalisée ou non analysable) ; pub risque donc de résoudre à nouveau les dépendances.",
     "pathDepNewer": "La dépendance de chemin {name} a changé après l'écriture de pubspec.lock ; pub résoudrait donc à nouveau les dépendances.",
-    "depsNotLocked": "pubspec.yaml déclare des dépendances que pubspec.lock ne liste pas ; pub résoudrait donc à nouveau les dépendances.",
-    "constraintNotSatisfied": "{name} est verrouillé à {version}, ce qui ne satisfait pas la contrainte {constraint} de pubspec.yaml ; pub résoudrait donc à nouveau les dépendances."
+    "rule": {
+      "sdkMismatch": "Version de SDK incompatible",
+      "lockSdkConstraint": "Contrainte de SDK du verrou",
+      "unknownPathSdk": "SDK PATH inconnu",
+      "staleLock": "Fichier de verrouillage manquant ou illisible",
+      "staleConfig": "Configuration de paquets obsolète",
+      "depsNotLocked": "Dépendance non verrouillée",
+      "constraintNotSatisfied": "Version verrouillée hors contrainte",
+      "constraintUnverifiable": "Contrainte non vérifiable",
+      "pathDepNewer": "Dépendance de chemin modifiée"
+    }
   },
   "about": {
     "ruleCountStrip": "Règles {total} de lint sont actuellement incluses dans cette version (essentiel {essential} · recommandé {recommended} · professionnel {professional} · complet {comprehensive} · pédant {pedantic} · {stylistic} opt-in stylistique)"
@@ -291,7 +291,7 @@
       "boolean_naming": "Les Booléens doivent utiliser les préfixes est/a/peut/devrait afin que l'intention soit claire dans les conditionnels et API.",
       "code_style_preferences": "Comment sont écrits les retours, les conditionnels et les boucles — retour immédiat, for-in, getter vs méthode, et autres raccourcis similaires.",
       "function_parameter_style": "Les fonctions de flèche sont concises, contiennent tous les paramètres nommés, des rappels en ligne et aucune réaffectation de paramètre.",
-      "widget_style": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : Flutter choix de widgets — SizedBox.square, centrer sur align, espacement au lieu de SizedBox, et éviter shrinkWrap dans les scrolls. Flutter projets seulement.",
+      "widget_style": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : Flutter choix de widgets — SizedBox.square, center over align, spacing over SizedBox, et éviter shrinkWrap dans les scrolls. Flutter projets seulement.",
       "class_record_style": "Classes vs types de retour d'enregistrement, préfixes privés sous-titres et explicite ceci là où il clarifie.",
       "formatting": "Placements des lignes vides, virgules en fin de ligne, et style des littéraux et commentaires. Peut être bruyant — beaucoup de fichiers peuvent nécessiter des modifications.",
       "comments_documentation": "Le format TODO et FIXME, cas de phrase, un point après les commentaires du document, /// plus //, et aucun code sans commentaire.",
@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Non vérifié",
+    "unverifiedTooltip": "Impossible de vérifier — {reason}. Conservez cette surcharge jusqu'à ce que le scan réussisse.",
+    "unverifiedStatus": "Non vérifié — {reason}",
+    "incompleteData": "données incomplètes",
+    "groupUnverifiedTooltip": "{count} override(s) ne peuvent pas être vérifiés ; le scan était incomplet."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Sélectionnez un paquet pour voir les détails."
@@ -2835,6 +2842,52 @@
       "title": "Corriger les ignorés périmés dans ce fichier"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Vérification des problèmes acceptés…"
+    },
+    "error": {
+      "checkFailed": "Vérification des résultats acceptés échouée : {message}",
+      "badOutput": "La sortie de la scan ne peut pas être lue.",
+      "noWorkspace": "Aucun espace de travail Dart/Flutter trouvé. Ouvrez un projet avec pubspec.yaml en premier.",
+      "missingDep": "Ajoutez saropa_lints à pubspec.yaml avant d'utiliser les findings acceptés.",
+      "noFinding": "Utilisez la lampe de poche sur un finding Saropa Lints dans un fichier Dart pour l'accepter.",
+      "outsideProject": "Ce fichier n'est pas à l'intérieur d'un package Dart (aucun pubspec.yaml au-dessus de lui), donc il ne peut pas être ajouté à saropa_accepted.yaml.",
+      "writeFailed": "Impossible de mettre à jour saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml a un layout qui ne peut pas être étendu automatiquement. Ajoutez l'entrée manuellement.",
+      "entryExists": "saropa_accepted.yaml contient déjà une entrée pour {rule} dans {file}. Si l'entrée possède un maximum d'occurrences, augmentez-le manuellement."
+    },
+    "info": {
+      "alreadyRunning": "Un contrôle des éléments acceptés est déjà en cours.",
+      "noList": "Aucun fichier saropa_accepted.yaml trouvé dans aucun package du workspace. Utilisez « Accepter dans ce fichier » sur un finding pour en démarrer un.",
+      "clean": "Findings acceptés : {count} entrées vérifiées, aucune non valide ou périmée.",
+      "issues": "Findings acceptés : {stale} périmés et {invalid} invalides, sur {count} entrées. Voir le panneau Problèmes.",
+      "added": "{rule} a été ajouté dans {file} pour {list}. Les findings sont déjà clairs lorsqu'on analyse à nouveau le fichier."
+    },
+    "action": {
+      "openList": "Ouvrir la liste",
+      "restartAnalysis": "Redémarrer le serveur d'analyse"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Entrée périmée : {file} n'existe plus, donc cette entrée pour {rule} ne cache rien.",
+      "staleNoFinding": "Entrée périmée : {rule} trouvé rien dans {file}. Supprimez l'entrée si le code a été corrigé.",
+      "invalid": "Entrée invalide, cache rien : {message}"
+    },
+    "prompt": {
+      "kindTitle": "Pourquoi ce finding est-il accepté ?",
+      "kindAccepted": "Accepté : le finding est réel et le code reste tel quel",
+      "kindFalsePositive": "Faux positif : la règle est incorrecte ici",
+      "reasonTitle": "Motif d'acceptation de {rule} dans {file}",
+      "reasonPlaceholder": "Obligatoire. Sauvegardé dans saropa_accepted.yaml pour les révisionneurs.",
+      "reasonRequired": "Une raison est requise."
+    },
+    "quickFix": {
+      "title": "Acceptez {rule} dans ce fichier…"
+    },
+    "summary": {
+      "count": "{count} accepté"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Ce rapport est marqué « {status} » mais est toujours dans bugs/ — archivez-le dans plans/history/ avant de le fermer (voir ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Ignorer (SDK obsolète intentionnel)"
+    },
+    "staleOverride": {
+      "suppress": "Ignorer (l'override est intentionnel)"
     }
   },
   "blastRadius": {
@@ -2987,7 +3043,7 @@
       "offerNoDart": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. Voulez-vous migrer ?",
       "offerRenames": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. {count} règles ont été renommées depuis {installed}. Migration ?",
       "offerNoDartRenames": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. {count} règles ont été renommées depuis {installed}. Migration ?",
-      "offerRenamesUnknown": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie de la chaîne traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un d'entre eux dans la traduction EXACTEMENT tel qu'écrit, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
+      "offerRenamesUnknown": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie de la chaîne traduite.\n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.\n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un d'entre eux dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. Ne traduisez, ne supprimez, ne reformatez jamais un token.\n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.\n\nTexte : saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible et fonctionne avec votre Dart {dart}. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
       "offerNoDartRenamesUnknown": "saropa_lints : votre projet utilise {route} à {installed}. {offered} est disponible. Les règles renommées seront vérifiées après la mise à jour. Migration ?",
       "actionMigrate": "Migrer"
     },

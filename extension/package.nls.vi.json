@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File - Tạo báo cáo HTML",
   "command.findStaleIgnores.title": "Saropa Lints: Tìm Comment Bỏ qua Cũ",
   "command.fixStaleIgnores.title": "Saropa Lints: Sửa Bình luận Bỏ qua Cũ",
+  "command.checkAcceptedFindings.title": "Saropa Lints: Kiểm tra Các Vấn đề Đã Chấp Nhận",
   "command.openViolationsWideReport.title": "Saropa Lints: là người có thể Mở bảng điều khiển kết quả tìm kiếm.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: là người có thể Mở bảng điều khiển kết quả (giữ các bộ lọc)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Scan Packages (Gói quét)",
   "command.packageVibrancy.rescan.title": "Gói Rescan (tươi)",
   "command.packageVibrancy.openOtherProject.title": "Scan Another Project... (Quét lại một dự án khác)...",
+  "command.packageVibrancy.explainLastSkip.title": "Giải thích lần Vibrancy bỏ qua gần nhất",
   "command.packageVibrancy.showReport.title": "Mở bảng điều khiển gói mở",
   "command.packageVibrancy.showOpportunities.title": "Mở cơ hội nâng cấp mở",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Xuất Báo cáo Cơ hội Toàn bộ",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: Đồng bộ Bản ghi Plugin với pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menu Trạng Thái",
   "command.scanWithLatestEngine.title": "Saropa Lints: Quét bằng Engine Mới Nhất (Các Dự Án Dart Cũ)",
-  "config.property.externalEngine.dartSdkPath.description": "Thư mục Dart SDK (chứa bin/dart) được sử dụng bởi \"Quét bằng Engine Mới Nhất\". Phải là Dart 3.11 hoặc mới hơn. Để trống để sử dụng dart trên PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "Giải thích lần Vibrancy bỏ qua gần nhất"
+  "config.property.externalEngine.dartSdkPath.description": "Thư mục Dart SDK (chứa bin/dart) được sử dụng bởi \"Quét bằng Engine Mới Nhất\". Phải là Dart 3.11 hoặc mới hơn. Để trống để sử dụng dart trên PATH."
 }

@@ -5,54 +5,54 @@
     "unknownPathSdk": "Die Dart SDK-Version konnte für das dart auf PATH nicht ermittelt werden, und das Projekt hat keine lesbare SDK-Version.",
     "staleLock": "pubspec.lock fehlt oder ist nicht lesbar, daher würde pub die Abhängigkeiten erneut auflösen.",
     "staleConfig": "Die Paketkonfiguration fehlt oder listet die gesperrten Pakete nicht auf, daher würde pub die Abhängigkeiten erneut auflösen.",
+    "depsNotLocked": "pubspec.yaml deklariert Abhängigkeiten, die pubspec.lock nicht auflistet, daher würde pub die Abhängigkeiten erneut auflösen.",
+    "source": {
+      "dartSdkPath": "Einstellung dart.sdkPath",
+      "flutterSdkPath": "Einstellung dart.flutterSdkPath",
+      "fvm": "FVM-Pin (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "kein Hinweis auf ein Projekt-SDK",
-      "lockConstraint": "sdks-Einschränkung in pubspec.lock"
-    },
-    "constraintUnverifiable": "Eine Abhängigkeit in pubspec.yaml konnte nicht gegen pubspec.lock geprüft werden (Git, benutzerdefinierte oder nicht parsbare Einschränkung), daher löst pub die Abhängigkeiten möglicherweise erneut auf.",
-    "explain": {
-      "pickFolder": "Projektordner zum Erklären auswählen",
-      "none": "In dieser Sitzung wurde keine Vibrancy-pub-Abfrage übersprungen.",
-      "unknown": "unbekannt",
-      "title": "Package Vibrancy hat eine pub-Abfrage übersprungen",
-      "project": "Projekt-SDK: {value} (aus {source})",
-      "folder": "Projektordner: {cwd}",
-      "reason": "Grund: {reason}",
-      "rule": "Regel: {rule}",
-      "pathConfirmRun": "pub get trotzdem ausführen",
-      "runPubGet": "pub get mit Projekt-SDK ausführen",
-      "toolVersion": "Ausgewählte SDK-Version: {version}",
-      "sdk": "Ausgewähltes SDK: {path} (aus {source})",
-      "time": "Übersprungen um: {time}",
-      "pathConfirm": "Das ausgewählte SDK stammt aus PATH – genau die Einrichtung, die pubspec.lock mit dem falschen SDK neu geschrieben hat. pub get trotzdem ausführen?",
-      "pubGetFailed": "pub get fehlgeschlagen: {error}",
-      "pubGetDone": "pub get mit dem Projekt-SDK abgeschlossen."
-    },
-    "rule": {
-      "constraintUnverifiable": "Einschränkung nicht prüfbar",
-      "depsNotLocked": "Abhängigkeit nicht gesperrt",
-      "lockSdkConstraint": "SDK-Einschränkung der Sperrdatei",
-      "constraintNotSatisfied": "Gesperrte Version außerhalb der Einschränkung",
-      "staleLock": "Sperrdatei fehlt oder ist nicht lesbar",
-      "pathDepNewer": "Pfadabhängigkeit geändert",
-      "sdkMismatch": "SDK-Version stimmt nicht überein",
-      "staleConfig": "Veraltete Paketkonfiguration",
-      "unknownPathSdk": "Unbekanntes SDK auf PATH"
-    },
-    "source": {
-      "fvm": "FVM-Pin (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "Einstellung dart.flutterSdkPath",
-      "dartSdkPath": "Einstellung dart.sdkPath"
+      "lockConstraint": "sdks-Einschränkung in pubspec.lock",
+      "none": "kein Hinweis auf ein Projekt-SDK"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy hat eine pub-Abfrage übersprungen, damit pubspec.lock nicht neu geschrieben wird. Klicken Sie für Details.",
-      "text": "Vibrancy: pub übersprungen"
+      "text": "Vibrancy: pub übersprungen",
+      "tooltip": "Package Vibrancy hat eine pub-Abfrage übersprungen, damit pubspec.lock nicht neu geschrieben wird. Klicken Sie für Details."
     },
+    "explain": {
+      "title": "Package Vibrancy hat eine pub-Abfrage übersprungen",
+      "none": "In dieser Sitzung wurde keine Vibrancy-pub-Abfrage übersprungen.",
+      "unknown": "unbekannt",
+      "reason": "Grund: {reason}",
+      "rule": "Regel: {rule}",
+      "sdk": "Ausgewähltes SDK: {path} (aus {source})",
+      "toolVersion": "Ausgewählte SDK-Version: {version}",
+      "project": "Projekt-SDK: {value} (aus {source})",
+      "folder": "Projektordner: {cwd}",
+      "time": "Übersprungen um: {time}",
+      "runPubGet": "pub get mit Projekt-SDK ausführen",
+      "pubGetDone": "pub get mit dem Projekt-SDK abgeschlossen.",
+      "pubGetFailed": "pub get fehlgeschlagen: {error}",
+      "pickFolder": "Projektordner zum Erklären auswählen",
+      "pathConfirm": "Das ausgewählte SDK stammt aus PATH – genau die Einrichtung, die pubspec.lock mit dem falschen SDK neu geschrieben hat. pub get trotzdem ausführen?",
+      "pathConfirmRun": "pub get trotzdem ausführen"
+    },
+    "constraintNotSatisfied": "{name} ist auf {version} gesperrt, was die Einschränkung {constraint} in pubspec.yaml nicht erfüllt, daher würde pub die Abhängigkeiten erneut auflösen.",
+    "constraintUnverifiable": "Eine Abhängigkeit in pubspec.yaml konnte nicht gegen pubspec.lock geprüft werden (Git, benutzerdefinierte oder nicht parsbare Einschränkung), daher löst pub die Abhängigkeiten möglicherweise erneut auf.",
     "pathDepNewer": "Die Pfadabhängigkeit {name} wurde geändert, nachdem pubspec.lock geschrieben wurde, daher würde pub die Abhängigkeiten erneut auflösen.",
-    "depsNotLocked": "pubspec.yaml deklariert Abhängigkeiten, die pubspec.lock nicht auflistet, daher würde pub die Abhängigkeiten erneut auflösen.",
-    "constraintNotSatisfied": "{name} ist auf {version} gesperrt, was die Einschränkung {constraint} in pubspec.yaml nicht erfüllt, daher würde pub die Abhängigkeiten erneut auflösen."
+    "rule": {
+      "sdkMismatch": "SDK-Version stimmt nicht überein",
+      "lockSdkConstraint": "SDK-Einschränkung der Sperrdatei",
+      "unknownPathSdk": "Unbekanntes SDK auf PATH",
+      "staleLock": "Sperrdatei fehlt oder ist nicht lesbar",
+      "staleConfig": "Veraltete Paketkonfiguration",
+      "depsNotLocked": "Abhängigkeit nicht gesperrt",
+      "constraintNotSatisfied": "Gesperrte Version außerhalb der Einschränkung",
+      "constraintUnverifiable": "Einschränkung nicht prüfbar",
+      "pathDepNewer": "Pfadabhängigkeit geändert"
+    }
   },
   "about": {
     "ruleCountStrip": "{total} Lint-Regeln sind in dieser Version enthalten (essentiell {essential} · empfohlen {recommended} · professionell {professional} · umfassend {comprehensive} · pedantisch {pedantic} · {stylistic} opt-in stylistisch)"
@@ -105,7 +105,7 @@
       },
       "rules": {
         "label": "Regeln & Ebenen",
-        "description": "Strict Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebenden Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch korrekte Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Konfigurieren Sie, welche der über 2.350 Regeln laufen und unter welcher Schweregrad."
+        "description": "Strict Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: placeholder tokens. Kopieren Sie jeden Token genau so, wie er geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals einen Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Konfigurieren Sie, welche der über 2.350 Regeln laufen und mit welcher Schweregrad."
       },
       "catalog": {
         "label": "Befehlskatalog, der Katalog für die Kommandoführung.",
@@ -1378,7 +1378,7 @@
     "hintNoPerRule": "Diese Ausfuhr hat keine pro-Regel Ausgabe zählt. Wieder analysieren mit einem aktuellen Saropa Lints Plugin.",
     "hintBuildFailed": "konnte keine Triage aus dieser Export-Datenbank erstellen. Führen Sie eine neue Analyse durch.",
     "summaryVolume": "Regeln Triage (Volumen / müssen fixieren / stilistisch)",
-    "hintSameAsTree": "Strengere Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das richtige Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Gleiche Gruppierung wie im Triage-Aktivitätsleiste-Baum: filtern Sie Issues oder deaktivieren/aktivieren Sie Regeln in `analysis_options_custom.yaml`. Große Gruppen können eine Bestätigung erfordern."
+    "hintSameAsTree": "Strengere Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Gleiche Gruppierung wie im Triage-Aktivitätsleiste-Baum: filtern Sie Issues oder deaktivieren/aktivieren Sie Regeln in `analysis_options_custom.yaml`. Große Gruppen können eine Bestätigung erfordern."
   },
   "kbdOverlay": {
     "toggleTitle": "Zeigen Sie Tastatur-Verknüpfungen (?) an.",
@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Unverifiziert",
+    "unverifiedTooltip": "Konnte nicht überprüfen — {reason}. Behalten Sie dieses Überschreiben, bis der Scan erfolgreich ist.",
+    "unverifiedStatus": "Ungeprüft — {reason}",
+    "incompleteData": "unvollständige Daten",
+    "groupUnverifiedTooltip": "{count} override(s) konnten nicht überprüft werden; der Scan war unvollständig."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Wählen Sie ein Paket aus, um Details zu sehen."
@@ -2835,6 +2842,52 @@
       "title": "Stale Ignores in dieser Datei beheben"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Überprüfung akzeptierter Findings…"
+    },
+    "error": {
+      "checkFailed": "Prüfung akzeptierter Findings fehlgeschlagen: {message}",
+      "badOutput": "Die Scan-Ausgabe konnte nicht gelesen werden.",
+      "noWorkspace": "Kein Dart/Flutter Arbeitsbereich gefunden. Öffnen Sie zunächst ein Projekt mit pubspec.yaml.",
+      "missingDep": "Füge saropa_lints zu pubspec.yaml hinzu, bevor du akzeptierte Findings verwendest.",
+      "noFinding": "Verwenden Sie das Lichterkennlicht auf einem Saropa Lints-Finding in einer Dart-Datei, um es zu akzeptieren.",
+      "outsideProject": "Diese Datei befindet sich nicht in einem Dart Paket (kein pubspec.yaml darüber), daher kann sie nicht zur saropa_accepted.yaml hinzugefügt werden.",
+      "writeFailed": "Konnte saropa_accepted.yaml nicht aktualisieren: {message}",
+      "cannotAppend": "saropa_accepted.yaml hat ein Layout, das nicht automatisch erweitert werden kann. Füge den Eintrag manuell hinzu.",
+      "entryExists": "saropa_accepted.yaml enthält bereits einen Eintrag für {rule} in {file}. Falls der Eintrag einen Maximalwert hat, erhöhen Sie diesen manuell."
+    },
+    "info": {
+      "alreadyRunning": "Ein akzeptiertes-findings-Prüfen läuft bereits.",
+      "noList": "Keine saropa_accepted.yaml gefunden in einem beliebigen Paket des Arbeitsbereichs. Verwenden Sie „In dieser Datei akzeptieren“ auf einem Finding, um eines zu starten.",
+      "clean": "Akzeptierte Findings: {count} Einträge geprüft, keine veralteten oder ungültigen.",
+      "issues": "Akzeptierte Findings: {stale} veraltet und {invalid} ungültig, von {count} Einträgen. Siehe das Problems-Panel.",
+      "added": "{rule} wurde in {file} zur {list} hinzugefügt. Findings werden bereits deutlich, wenn die Datei erneut analysiert wird."
+    },
+    "action": {
+      "openList": "Offene Liste",
+      "restartAnalysis": "Analyse-Server neu starten"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Veraltete Eintrag: {file} existiert nicht mehr, daher verbirgt dieser Eintrag für {rule} nichts.",
+      "staleNoFinding": "Veraltete Eintrag: {rule} fand nichts in {file}. Entfernen Sie den Eintrag, wenn der Code behoben wurde.",
+      "invalid": "Ungültige Eintrag, verbirgt nichts: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Warum wird dieses Finding akzeptiert?",
+      "kindAccepted": "Akzeptiert: das Finding ist echt und der Code bleibt so wie er ist",
+      "kindFalsePositive": "False positive: die Regel ist hier falsch",
+      "reasonTitle": "Grund für die Annahme von {rule} in {file}",
+      "reasonPlaceholder": "Erforderlich. In saropa_accepted.yaml gespeichert für Rezensenten.",
+      "reasonRequired": "Ein Grund ist erforderlich."
+    },
+    "quickFix": {
+      "title": "Akzeptiere {rule} in dieser Datei…"
+    },
+    "summary": {
+      "count": "{count} akzeptiert"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Dieser Bericht ist mit „{status}“ markiert, bleibt aber in bugs/ – archivieren Sie ihn in plans/history/ bevor Sie ihn schließen (siehe ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Unterdrücken (absichtliche alte SDK)"
+    },
+    "staleOverride": {
+      "suppress": "Unterdrücken (Override ist beabsichtigt)"
     }
   },
   "blastRadius": {
@@ -3169,7 +3225,7 @@
   "externalEngine": {
     "noProject": "Zuerst öffnen Sie ein Dart Projektordner.",
     "sdkTooOld": "Die neueste Saropa Lints Engine benötigt Dart {required} oder neuer, aber die hier verwendete Dart ist {found}. Installieren Sie eine neuere Dart SDK und setzen Sie \"saropaLints.externalEngine.dartSdkPath\" auf dessen Ordner.",
-    "sdkUnknown": "unkannt",
+    "sdkUnknown": "unbekannt",
     "install": {
       "prompt": "Dies installiert die neueste Saropa Lints Engine global (dart pub global activate saropa_lints) mithilfe eines neueren Dart SDKs, scannt dann dieses Projekt damit. Die pubspec.yaml und der SDK-Pin dieses Projekts bleiben unverändert.",
       "confirm": "Installieren und scannen"

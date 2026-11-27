@@ -5,54 +5,54 @@
     "unknownPathSdk": "ไม่สามารถระบุเวอร์ชัน Dart SDK ของ dart บน PATH ได้ และโปรเจกต์ไม่มีเวอร์ชัน SDK ที่อ่านได้",
     "staleLock": "ไม่มี pubspec.lock หรืออ่านไม่ได้ pub จึงจะแก้ไข dependency ใหม่",
     "staleConfig": "ไม่มีการกำหนดค่าแพ็กเกจหรือไม่ได้ระบุแพ็กเกจที่ล็อกไว้ pub จึงจะแก้ไข dependency ใหม่",
+    "depsNotLocked": "pubspec.yaml ประกาศ dependency ที่ไม่มีอยู่ใน pubspec.lock pub จึงจะแก้ไข dependency ใหม่",
+    "source": {
+      "dartSdkPath": "การตั้งค่า dart.sdkPath",
+      "flutterSdkPath": "การตั้งค่า dart.flutterSdkPath",
+      "fvm": "ปักหมุด FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "ไม่มีหลักฐาน SDK ของโปรเจกต์",
-      "lockConstraint": "ข้อจำกัด sdks ของ pubspec.lock"
-    },
-    "constraintUnverifiable": "ไม่สามารถตรวจสอบ dependency ใน pubspec.yaml เทียบกับ pubspec.lock ได้ (git, ข้อจำกัดแบบกำหนดเอง หรือแยกวิเคราะห์ไม่ได้) pub จึงอาจแก้ไข dependency ใหม่",
-    "explain": {
-      "pickFolder": "เลือกโฟลเดอร์โปรเจกต์ที่ต้องการอธิบาย",
-      "none": "ไม่มีการข้ามคำค้น pub ของ Vibrancy ในเซสชันนี้",
-      "unknown": "ไม่ทราบ",
-      "title": "Package Vibrancy ข้ามคำค้น pub",
-      "project": "SDK ของโปรเจกต์: {value} (จาก {source})",
-      "folder": "โฟลเดอร์โปรเจกต์: {cwd}",
-      "reason": "สาเหตุ: {reason}",
-      "rule": "กฎ: {rule}",
-      "pathConfirmRun": "รัน pub get ต่อไป",
-      "runPubGet": "รัน pub get ด้วย SDK ของโปรเจกต์",
-      "toolVersion": "เวอร์ชัน SDK ที่เลือก: {version}",
-      "sdk": "SDK ที่เลือก: {path} (จาก {source})",
-      "time": "ข้ามเมื่อ: {time}",
-      "pathConfirm": "SDK ที่เลือกมาจาก PATH ซึ่งเป็นการตั้งค่าที่เคยเขียน pubspec.lock ทับด้วย SDK ที่ไม่ถูกต้อง ต้องการรัน pub get ต่อไปหรือไม่?",
-      "pubGetFailed": "pub get ล้มเหลว: {error}",
-      "pubGetDone": "pub get เสร็จสิ้นด้วย SDK ของโปรเจกต์"
-    },
-    "rule": {
-      "constraintUnverifiable": "ตรวจสอบข้อจำกัดไม่ได้",
-      "depsNotLocked": "dependency ยังไม่ได้ล็อก",
-      "lockSdkConstraint": "ข้อจำกัด SDK ในไฟล์ล็อก",
-      "constraintNotSatisfied": "เวอร์ชันที่ล็อกอยู่นอกข้อจำกัด",
-      "staleLock": "ไม่มีไฟล์ล็อกหรืออ่านไม่ได้",
-      "pathDepNewer": "path dependency เปลี่ยนแปลง",
-      "sdkMismatch": "เวอร์ชัน SDK ไม่ตรงกัน",
-      "staleConfig": "การกำหนดค่าแพ็กเกจล้าสมัย",
-      "unknownPathSdk": "SDK บน PATH ไม่ทราบเวอร์ชัน"
-    },
-    "source": {
-      "fvm": "ปักหมุด FVM (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "การตั้งค่า dart.flutterSdkPath",
-      "dartSdkPath": "การตั้งค่า dart.sdkPath"
+      "lockConstraint": "ข้อจำกัด sdks ของ pubspec.lock",
+      "none": "ไม่มีหลักฐาน SDK ของโปรเจกต์"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy ข้ามคำค้น pub เพื่อไม่ให้เขียน pubspec.lock ทับ คลิกเพื่อดูรายละเอียด",
-      "text": "Vibrancy: ข้าม pub แล้ว"
+      "text": "Vibrancy: ข้าม pub แล้ว",
+      "tooltip": "Package Vibrancy ข้ามคำค้น pub เพื่อไม่ให้เขียน pubspec.lock ทับ คลิกเพื่อดูรายละเอียด"
     },
+    "explain": {
+      "title": "Package Vibrancy ข้ามคำค้น pub",
+      "none": "ไม่มีการข้ามคำค้น pub ของ Vibrancy ในเซสชันนี้",
+      "unknown": "ไม่ทราบ",
+      "reason": "สาเหตุ: {reason}",
+      "rule": "กฎ: {rule}",
+      "sdk": "SDK ที่เลือก: {path} (จาก {source})",
+      "toolVersion": "เวอร์ชัน SDK ที่เลือก: {version}",
+      "project": "SDK ของโปรเจกต์: {value} (จาก {source})",
+      "folder": "โฟลเดอร์โปรเจกต์: {cwd}",
+      "time": "ข้ามเมื่อ: {time}",
+      "runPubGet": "รัน pub get ด้วย SDK ของโปรเจกต์",
+      "pubGetDone": "pub get เสร็จสิ้นด้วย SDK ของโปรเจกต์",
+      "pubGetFailed": "pub get ล้มเหลว: {error}",
+      "pickFolder": "เลือกโฟลเดอร์โปรเจกต์ที่ต้องการอธิบาย",
+      "pathConfirm": "SDK ที่เลือกมาจาก PATH ซึ่งเป็นการตั้งค่าที่เคยเขียน pubspec.lock ทับด้วย SDK ที่ไม่ถูกต้อง ต้องการรัน pub get ต่อไปหรือไม่?",
+      "pathConfirmRun": "รัน pub get ต่อไป"
+    },
+    "constraintNotSatisfied": "{name} ถูกล็อกที่ {version} ซึ่งไม่ตรงตามข้อจำกัด {constraint} ใน pubspec.yaml pub จึงจะแก้ไข dependency ใหม่",
+    "constraintUnverifiable": "ไม่สามารถตรวจสอบ dependency ใน pubspec.yaml เทียบกับ pubspec.lock ได้ (git, ข้อจำกัดแบบกำหนดเอง หรือแยกวิเคราะห์ไม่ได้) pub จึงอาจแก้ไข dependency ใหม่",
     "pathDepNewer": "path dependency {name} เปลี่ยนแปลงหลังจากเขียน pubspec.lock pub จึงจะแก้ไข dependency ใหม่",
-    "depsNotLocked": "pubspec.yaml ประกาศ dependency ที่ไม่มีอยู่ใน pubspec.lock pub จึงจะแก้ไข dependency ใหม่",
-    "constraintNotSatisfied": "{name} ถูกล็อกที่ {version} ซึ่งไม่ตรงตามข้อจำกัด {constraint} ใน pubspec.yaml pub จึงจะแก้ไข dependency ใหม่"
+    "rule": {
+      "sdkMismatch": "เวอร์ชัน SDK ไม่ตรงกัน",
+      "lockSdkConstraint": "ข้อจำกัด SDK ในไฟล์ล็อก",
+      "unknownPathSdk": "SDK บน PATH ไม่ทราบเวอร์ชัน",
+      "staleLock": "ไม่มีไฟล์ล็อกหรืออ่านไม่ได้",
+      "staleConfig": "การกำหนดค่าแพ็กเกจล้าสมัย",
+      "depsNotLocked": "dependency ยังไม่ได้ล็อก",
+      "constraintNotSatisfied": "เวอร์ชันที่ล็อกอยู่นอกข้อจำกัด",
+      "constraintUnverifiable": "ตรวจสอบข้อจำกัดไม่ได้",
+      "pathDepNewer": "path dependency เปลี่ยนแปลง"
+    }
   },
   "about": {
     "ruleCountStrip": "กฎการ lint {total} ปัจจุบันมีในเวอร์ชันนี้ (จำเป็น {essential} · แนะนำ {recommended} · วิชาชีพ {professional} · ครอบคลุม {comprehensive} · ละเอียด {pedantic} · {stylistic} ตัวเลือกสไตล์)"
@@ -314,7 +314,7 @@
       "state-management": "โบล็อก, Riverpod, Provider, GetX และสมุดการฉีดภาวะและความพึ่งพาที่เกี่ยวข้อง",
       "networking-apis": "คลินท์ HTTP, GraphQL, Firebase, Supabase และการเชื่อมต่อ",
       "storage-persistence": "ฐานข้อมูลท้องถิ่นและคีย์-มูลค่าของร้านค้า Drift, Hive, Isar, sqflite, shared_preferences. ความชอบที่แบ่งปันกัน",
-      "navigation-deep-links": "กฎที่เข้มงวด: \n1. ส่งเฉพาะข้อความที่แปลออกมาเท่านั้น \n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown รวมถึงเครื่องหมายอัญประกาศใด ๆ \n3. ข้อความอาจมีตัวแทนของโทเคน: โทเคนตัวแทน คัดลอกแต่ละตัวให้ตรงกับการเขียนที่ระบุไว้ อย่างเคร่งครัด ไม่แปล ลบ หรือปรับรูปแบบโทเคนใด ๆ \n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามปล่อยหรือแทนที่คำใด ๆ ด้วยตัวอักษรละติน ไทย อารบิก ไซลิลิก เกาหลี ญี่ปุ่น หรืออักษรใด ๆ ทั้งหมด ตัวอักษร ตัวเลข เครื่องหมายวรรคตอน และโทเคนตัวแทนคือข้อยกเว้นเพียงอย่างเดียว",
+      "navigation-deep-links": "กฎที่เข้มงวด: \n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว \n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown และอัญประกาศที่ครอบคลุม \n3. ข้อความอาจมีโทเคนที่ใช้แทนได้: โทเคนที่ใช้แทนได้ คัดลอกแต่ละตัวเข้าไปในการแปลแบบตรงตัว ตามตำแหน่งทางไวยากรณ์ที่ถูกต้อง ห้ามแปล ลบ หรือปรับรูปแบบโทเคน \n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามปล่อยหรือแทนที่คำใด ๆ ด้วยตัวอักษรละติน ไทย อารบิก เซอริลลิก เกาหลี ญี่ปุ่น หรืออักษรใด ๆ ทั้งหมด ตัวอักษร ตัวเลข เครื่องหมายวรรคตอน และโทเคนที่ใช้แทนได้เป็นเพียงข้อยกเว้นเดียวเท่านั้น \n\nข้อความ: การจัดการเส้นทางและการเชื่อมโยงลึก — auto_route, go_router, app_links, url_launcher, และ webview",
       "media-graphics": "ภาพ, SVG, การ์ตูนอนิเมชั่น, เสียง, แผนที่, ผู้เก็บและเครื่องยนต์ Flame.",
       "device-platform": "เซนเซอร์, ตําแหน่ง, การอนุญาต, ไบโอเมทริกส์, คําแจ้งเตือน และงานเบื้องหลัง",
       "identity-sharing": "ผู้ให้บริการ Log-in, การแบ่งปัน และ In-App Review",
@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ ยังไม่ได้รับการตรวจสอบ",
+    "unverifiedTooltip": "ไม่สามารถตรวจสอบได้ — {reason} การใช้การแทนที่นี้ให้อยู่จนกว่าการสแกนจะสำเร็จ",
+    "unverifiedStatus": "ไม่ได้รับการยืนยัน — {reason}",
+    "incompleteData": "ข้อมูลไม่ครบถ้วน",
+    "groupUnverifiedTooltip": "{count} override(s) could not be verified; the scan was incomplete."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "เลือกแพ็คเก็ตเพื่อดูรายละเอียด"
@@ -2496,7 +2503,7 @@
       "actionDisable": "Disable ปิดการใช้งาน",
       "actionEnable": "Enable enable เปิดให้ใช้ได้",
       "bulkRuleToggleConfirm": "{verb} {count} กฎกติกา? การอัพเดท analysis_options_custom.yaml.",
-      "setupPrompt": "กฎที่เข้มงวด:\n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว\n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown และอัญประกาศที่ครอบคลุม\n3. ข้อความอาจมีตัวแทนของโทเคน: โทเคนตัวแทน คัดลอกแต่ละตัวเข้าไปในการแปลแบบตรงตัว อย่างเคร่งครัด ไม่แปล ลบ หรือปรับรูปแบบโทเคน\n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามเหลือหรือแทนที่คำใด ๆ ในอักษรละติน ไทย อารบิก เซอริลลิก เกาหลี ญี่ปุ่น หรืออักษรใด ๆ ทั้งหมด ตัวอักษร ตัวเลข จุดวรรค และโทเคนตัวแทนคือข้อยกเว้นเพียงอย่างเดียว\n\nข้อความ: Saropa Lints ตรวจพบโปรเจกต์ Dart ที่ไม่ได้กำหนด saropa_lints ตั้งค่าตอนนี้เพื่อกฎการตรวจสอบ 2350+ รายการ",
+      "setupPrompt": "กฎที่เข้มงวด:\n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว\n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown รวมถึงเครื่องหมายคำพูดรอบข้อความ\n3. ข้อความอาจมีตัวแทนของโทเคน: โทเคนตัวแทน คัดลอกแต่ละตัวเข้าไปในการแปลแบบตรงตัว อย่างเคร่งครัด ไม่แปล ลบ หรือปรับรูปแบบโทเคน\n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามเหลือหรือแทนที่คำใด ๆ ในอักษรละติน ไทย อารบิก เซอริลลิก เกาหลี ญี่ปุ่น หรืออักษรใด ๆ ทั้งหมด ตัวอักษร ตัวเลข เครื่องหมายวรรคตอน และโทเคนตัวแทนคือข้อยกเว้นเดียวเท่านั้น\n\nข้อความ: Saropa Lints ตรวจพบโปรเจกต์ Dart ที่ไม่ได้กำหนด saropa_lints ตั้งค่าตอนนี้เพื่อกฎการตรวจสอบ 2350+ ข้อ",
       "actionSetUpProject": "ตั้งโครงการ Set Up Project จัดทําโครต",
       "actionNotNow": "ไม่ตอนนี้ ไม่ใช่ ตอนนี้"
     },
@@ -2835,6 +2842,52 @@
       "title": "แก้ไขการละเลยที่ไม่สมควรในไฟล์นี้"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "ตรวจสอบหาข้อผิดพลาดที่ยอมรับได้…"
+    },
+    "error": {
+      "checkFailed": "ตรวจสอบการยอมรับผลการค้นหาล้มเหลว: {message}",
+      "badOutput": "ผลการสแกนไม่สามารถอ่านได้",
+      "noWorkspace": "ไม่พบ workspace Dart/Flutter โปรดเปิดโปรเจกต์ pubspec.yaml ก่อน",
+      "missingDep": "เพิ่ม saropa_lints ไปยัง pubspec.yaml ก่อนใช้ findings ที่ยอมรับได้",
+      "noFinding": "ใช้หลอดไฟสีฟ้าในข้อผิดพลาด Saropa Lints ในไฟล์ Dart เพื่อยอมรับข้อผิดพลาดนั้น",
+      "outsideProject": "ไฟล์นี้อยู่นอกพัคเกจ Dart (ไม่มี pubspec.yaml อยู่ข้างบน) ดังนั้นจึงไม่สามารถเพิ่มเข้าไปใน saropa_accepted.yaml ได้",
+      "writeFailed": "ไม่สามารถอัปเดต saropa_accepted.yaml ได้: {message}",
+      "cannotAppend": "ไฟล์ saropa_accepted.yaml มีการจัดวางที่ไม่สามารถขยายได้อัตโนมัติ ให้เพิ่มรายการด้วยตนเอง",
+      "entryExists": "saropa_accepted.yaml ได้มีการบันทึกสำหรับ {rule} ใน {file} แล้ว หากการบันทึกนั้นมีค่าความสูงสุด ให้เพิ่มค่าด้วยมือ"
+    },
+    "info": {
+      "alreadyRunning": "การตรวจสอบหาข้อผิดพลาดที่ยอมรับได้กำลังดำเนินอยู่อยู่แล้ว",
+      "noList": "ไม่พบ saropa_accepted.yaml ในแพ็กเกจใดๆ ของงาน ใช้ \"ยอมรับในไฟล์นี้\" บน finding เพื่อเริ่มต้นการยอมรับ",
+      "clean": "พบปัญหาที่ยอมรับได้: {count} รายการถูกตรวจสอบ ไม่มีรายการที่ไม่ถูกต้องหรือมีอายุเกินไป",
+      "issues": "พบปัญหาที่ยอมรับ: {stale} ล้าสมัย และ {invalid} ไม่ถูกต้อง, นอกเหนือจาก {count} รายการทั้งหมด ดูที่ Painel Problems",
+      "added": "เพิ่ม {rule} ใน {file} เพื่อ {list} ข้อผิดพลาดที่พบได้แสดงอย่างชัดเจนเมื่อไฟล์ถูกวิเคราะห์อีกครั้ง"
+    },
+    "action": {
+      "openList": "เปิดรายการ",
+      "restartAnalysis": "รีสตาร์ทเซิร์ฟเวอร์การวิเคราะห์"
+    },
+    "diagnostic": {
+      "staleFileMissing": "ข้อมูลเก่า: {file} ไม่มีอยู่แล้ว ดังนั้นข้อมูลนี้สำหรับ {rule} จึงไม่ซ่อนอะไร",
+      "staleNoFinding": "ข้อมูลที่ไม่สมบูรณ์: {rule} ไม่พบข้อมูลใน {file} ลบข้อมูลออกหากโค้ดถูกแก้ไขแล้ว",
+      "invalid": "ข้อมูลไม่ถูกต้อง ซ่อนอะไรไม่ได้: {message}"
+    },
+    "prompt": {
+      "kindTitle": "ทำไมการค้นหาข้อนี้ถึงถูกยอมรับ?",
+      "kindAccepted": "ยอมรับ: พบปัญหาจริง และโค้ดจะไม่มีการเปลี่ยนแปลง",
+      "kindFalsePositive": "ข้อผิดพลาดที่ไม่ถูกต้อง: กฎนี้ไม่ถูกต้องในที่นี้",
+      "reasonTitle": "เหตุผลในการยอมรับ {rule} ใน {file}",
+      "reasonPlaceholder": "จำเป็น. บันทึกใน saropa_accepted.yaml สำหรับผู้รีวิว",
+      "reasonRequired": "ต้องระบุเหตุผล"
+    },
+    "quickFix": {
+      "title": "ยอมรับ {rule} ในไฟล์นี้…"
+    },
+    "summary": {
+      "count": "{count} ยอมรับ"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "รายงานนี้มีเครื่องหมายว่า \"{status}\" แต่ยังอยู่ใน bugs/ — ให้เก็บเข้าไปใน plans/history/ ก่อนปิด (ดู ISSUE_REPORT_GUIDE.md)"
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "ปิด (ตั้งใจใช้ SDK เก่า)"
+    },
+    "staleOverride": {
+      "suppress": "ปิด (การใช้ override เป็นไปตามเจตนา)"
     }
   },
   "blastRadius": {

@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File - ایجاد گزارش HTML",
   "command.findStaleIgnores.title": "Saropa Lints: یافتن نظرات ناگهانی چک کردن",
   "command.fixStaleIgnores.title": "Saropa Lints: تصحیح نظرات نادیده گرفته شده",
+  "command.checkAcceptedFindings.title": "Saropa Lints: چک کردن یافته‌های پذیرفته شده",
   "command.openViolationsWideReport.title": "Saropa Lints: باز کردن داشبورد یافته ها",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: باز کردن داشبورد یافته ها (فلترهای حفظ)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "بسته های اسکن Scan Packages",
   "command.packageVibrancy.rescan.title": "بسته های Rescan (تازه)",
   "command.packageVibrancy.openOtherProject.title": "اسکن پروژه دیگری...",
+  "command.packageVibrancy.explainLastSkip.title": "توضیح آخرین نادیده‌گرفتن Vibrancy",
   "command.packageVibrancy.showReport.title": "داشبورد بسته را باز کنید",
   "command.packageVibrancy.showOpportunities.title": "فرصت های ارتقاء باز را باز کنید",
   "command.packageVibrancy.exportOpportunitiesReport.title": "گزارش کامل فرصت ها اکسپورت",
@@ -201,7 +203,7 @@
   "config.property.issuesPageSize.description": "حداکثر تعداد تخلفات نشان داده شده در هر پرونده در یافته های گروه بندی (Findings Dashboard / لیست داخلی). باقی مانده به عنوان \"و N بیشتر ...\" نشان داده شده است.",
   "config.property.violationsGroupBy.description": "گروه بندی پیش فرض برای یافته های لنت (Findings Dashboard / لیست گروهی). \"تاثیر\" لیست های مهم و بالا را در ابتدا قرار می دهد؛ برای تغییر موقت از نوار ابزار داشبورد استفاده کنید.",
   "config.property.checkForUpdates.description": "به طور دوره ای نسخه های جدیدتر بسته saropa_lints را بررسی کنید و پیشنهاد ارتقاء دهید.",
-  "config.property.pubspecValidation.preferPinnedVersions.markdownDescription": "وقتی **فعال** است، اعتبارسنجی pubspec از نسخه‌های دقیق (1.2.3) ترجیح می‌دهد و علامت‌گذاری نسخه‌های بازه‌ای (^\\ 1.2.3) را اعلام می‌کند. وقتی **غیر فعال** است (پیش‌فرض)، از نماد نسخه‌های بازه‌ای و علامت‌گذاری نسخه‌های خالی ترجیح می‌دهد — که با رفتار دستور dart pub add مطابقت دارد. فقط یک حالت در هر زمان فعال است.",
+  "config.property.pubspecValidation.preferPinnedVersions.markdownDescription": "وقتی **on** است، اعتبارسنجی pubspec از نسخه‌های دقیق (1.2.3) ترجیح می‌دهد و علامت‌گذاری ناحیه‌های کاراکت ( ^1.2.3 ) را نمی‌کند. وقتی **off** (پیش‌فرض) است، از سینتکس کاراکت و علامت‌گذاری نسخه‌های خالی ترجیح می‌دهد — که با رفتار دستور dart pub add هم‌اکنگی دارد. فقط یک حالت در هر زمان فعال است.",
   "config.section.Severity.Filters.title": "فیلترهای جدیت",
   "config.property.severity.error.markdownDescription": "در بخش مشکلات و درخت یافته‌ها، نمایش **خطا** در سطح تشخیصات ارور را نمایش دهید و **خاموش** کنید تا همه اخطارها از Saropa Lints مخفی شوند (بر روی Dart SDK analyzer تأثیر نمی‌گذارد). در برابر مجدد اجرا `init --tier` مقاوم است.",
   "config.property.severity.warning.markdownDescription": "هشدارهای **warning** را در پنل مشکلات و درخت یافته‌ها نمایش دهید. **off** را فعال کنید تا همه هشدارها از Saropa Lints مخفی شوند.",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: نسخه افزونه هم ارزی را به pubspec.lock تنظیم کنید",
   "command.showStatusBarMenu.title": "Saropa Lints: منو وضعیت",
   "command.scanWithLatestEngine.title": "Saropa Lints: اسکن با انجن آخرین (پروژه های قدیمی Dart)",
-  "config.property.externalEngine.dartSdkPath.description": "پوشه Dart SDK (که bin/dart را شامل می‌کند) که توسط \"Scan with Latest Engine\" استفاده می‌شود. باید Dart 3.11 یا جدیدتر باشد. اگر خالی باشد، dart موجود در PATH استفاده می‌شود.",
-  "command.packageVibrancy.explainLastSkip.title": "توضیح آخرین نادیده‌گرفتن Vibrancy"
+  "config.property.externalEngine.dartSdkPath.description": "پوشه Dart SDK (که bin/dart را شامل می‌کند) که توسط \"Scan with Latest Engine\" استفاده می‌شود. باید Dart 3.11 یا جدیدتر باشد. اگر خالی باشد، dart موجود در PATH استفاده می‌شود."
 }

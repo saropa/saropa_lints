@@ -5,54 +5,54 @@
     "unknownPathSdk": "PATH पर मौजूद dart के लिए Dart SDK संस्करण निर्धारित नहीं किया जा सका, और प्रोजेक्ट में कोई पठनीय SDK संस्करण नहीं है।",
     "staleLock": "pubspec.lock अनुपस्थित या अपठनीय है, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
     "staleConfig": "पैकेज कॉन्फ़िगरेशन अनुपस्थित है या उसमें लॉक किए गए पैकेज सूचीबद्ध नहीं हैं, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
+    "depsNotLocked": "pubspec.yaml ऐसी निर्भरताएँ घोषित करती है जो pubspec.lock में सूचीबद्ध नहीं हैं, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
+    "source": {
+      "dartSdkPath": "सेटिंग dart.sdkPath",
+      "flutterSdkPath": "सेटिंग dart.flutterSdkPath",
+      "fvm": "FVM पिन (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "प्रोजेक्ट SDK का कोई प्रमाण नहीं",
-      "lockConstraint": "pubspec.lock की sdks बाधा"
-    },
-    "constraintUnverifiable": "pubspec.yaml की किसी निर्भरता की जाँच pubspec.lock के विरुद्ध नहीं की जा सकी (git, कस्टम या पार्स न होने वाली बाधा), इसलिए pub निर्भरताओं को फिर से हल कर सकता है।",
-    "explain": {
-      "pickFolder": "समझाने के लिए प्रोजेक्ट फ़ोल्डर चुनें",
-      "none": "इस सत्र में किसी Vibrancy pub क्वेरी को छोड़ा नहीं गया है।",
-      "unknown": "अज्ञात",
-      "title": "Package Vibrancy ने एक pub क्वेरी छोड़ दी",
-      "project": "प्रोजेक्ट SDK: {value} ({source} से)",
-      "folder": "प्रोजेक्ट फ़ोल्डर: {cwd}",
-      "reason": "कारण: {reason}",
-      "rule": "नियम: {rule}",
-      "pathConfirmRun": "फिर भी pub get चलाएँ",
-      "runPubGet": "प्रोजेक्ट SDK के साथ pub get चलाएँ",
-      "toolVersion": "चयनित SDK संस्करण: {version}",
-      "sdk": "चयनित SDK: {path} ({source} से)",
-      "time": "छोड़ने का समय: {time}",
-      "pathConfirm": "चयनित SDK PATH से आता है, और इसी सेटअप ने गलत SDK के साथ pubspec.lock को दोबारा लिखा था। फिर भी pub get चलाएँ?",
-      "pubGetFailed": "pub get विफल रहा: {error}",
-      "pubGetDone": "pub get प्रोजेक्ट SDK के साथ पूरा हुआ।"
-    },
-    "rule": {
-      "constraintUnverifiable": "बाधा सत्यापित नहीं की जा सकती",
-      "depsNotLocked": "निर्भरता लॉक नहीं है",
-      "lockSdkConstraint": "लॉक फ़ाइल में SDK बाधा",
-      "constraintNotSatisfied": "लॉक किया गया संस्करण बाधा से बाहर है",
-      "staleLock": "लॉक फ़ाइल अनुपस्थित या अपठनीय है",
-      "pathDepNewer": "पाथ निर्भरता बदल गई",
-      "sdkMismatch": "SDK संस्करण में असंगति",
-      "staleConfig": "पुराना पैकेज कॉन्फ़िगरेशन",
-      "unknownPathSdk": "अज्ञात PATH SDK"
-    },
-    "source": {
-      "fvm": "FVM पिन (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "सेटिंग dart.flutterSdkPath",
-      "dartSdkPath": "सेटिंग dart.sdkPath"
+      "lockConstraint": "pubspec.lock की sdks बाधा",
+      "none": "प्रोजेक्ट SDK का कोई प्रमाण नहीं"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy ने एक pub क्वेरी छोड़ दी ताकि pubspec.lock दोबारा न लिखा जाए। विवरण के लिए क्लिक करें।",
-      "text": "Vibrancy: pub छोड़ा गया"
+      "text": "Vibrancy: pub छोड़ा गया",
+      "tooltip": "Package Vibrancy ने एक pub क्वेरी छोड़ दी ताकि pubspec.lock दोबारा न लिखा जाए। विवरण के लिए क्लिक करें।"
     },
+    "explain": {
+      "title": "Package Vibrancy ने एक pub क्वेरी छोड़ दी",
+      "none": "इस सत्र में किसी Vibrancy pub क्वेरी को छोड़ा नहीं गया है।",
+      "unknown": "अज्ञात",
+      "reason": "कारण: {reason}",
+      "rule": "नियम: {rule}",
+      "sdk": "चयनित SDK: {path} ({source} से)",
+      "toolVersion": "चयनित SDK संस्करण: {version}",
+      "project": "प्रोजेक्ट SDK: {value} ({source} से)",
+      "folder": "प्रोजेक्ट फ़ोल्डर: {cwd}",
+      "time": "छोड़ने का समय: {time}",
+      "runPubGet": "प्रोजेक्ट SDK के साथ pub get चलाएँ",
+      "pubGetDone": "pub get प्रोजेक्ट SDK के साथ पूरा हुआ।",
+      "pubGetFailed": "pub get विफल रहा: {error}",
+      "pickFolder": "समझाने के लिए प्रोजेक्ट फ़ोल्डर चुनें",
+      "pathConfirm": "चयनित SDK PATH से आता है, और इसी सेटअप ने गलत SDK के साथ pubspec.lock को दोबारा लिखा था। फिर भी pub get चलाएँ?",
+      "pathConfirmRun": "फिर भी pub get चलाएँ"
+    },
+    "constraintNotSatisfied": "{name} को {version} पर लॉक किया गया है, जो pubspec.yaml की बाधा {constraint} को पूरा नहीं करता, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
+    "constraintUnverifiable": "pubspec.yaml की किसी निर्भरता की जाँच pubspec.lock के विरुद्ध नहीं की जा सकी (git, कस्टम या पार्स न होने वाली बाधा), इसलिए pub निर्भरताओं को फिर से हल कर सकता है।",
     "pathDepNewer": "pubspec.lock लिखे जाने के बाद पाथ निर्भरता {name} बदल गई, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
-    "depsNotLocked": "pubspec.yaml ऐसी निर्भरताएँ घोषित करती है जो pubspec.lock में सूचीबद्ध नहीं हैं, इसलिए pub निर्भरताओं को फिर से हल करेगा।",
-    "constraintNotSatisfied": "{name} को {version} पर लॉक किया गया है, जो pubspec.yaml की बाधा {constraint} को पूरा नहीं करता, इसलिए pub निर्भरताओं को फिर से हल करेगा।"
+    "rule": {
+      "sdkMismatch": "SDK संस्करण में असंगति",
+      "lockSdkConstraint": "लॉक फ़ाइल में SDK बाधा",
+      "unknownPathSdk": "अज्ञात PATH SDK",
+      "staleLock": "लॉक फ़ाइल अनुपस्थित या अपठनीय है",
+      "staleConfig": "पुराना पैकेज कॉन्फ़िगरेशन",
+      "depsNotLocked": "निर्भरता लॉक नहीं है",
+      "constraintNotSatisfied": "लॉक किया गया संस्करण बाधा से बाहर है",
+      "constraintUnverifiable": "बाधा सत्यापित नहीं की जा सकती",
+      "pathDepNewer": "पाथ निर्भरता बदल गई"
+    }
   },
   "about": {
     "ruleCountStrip": "{total} लिंट नियम वर्तमान में इस संस्करण में शामिल हैं (आवश्यक {essential} · अनुशंसित {recommended} · पेशेवर {professional} · व्यापक {comprehensive} · सूक्ष्म {pedantic} · {stylistic} ऐच्छिक शैलीगत)"
@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ अनुमानित",
+    "unverifiedTooltip": "प्रमाणित नहीं किया जा सकता — {reason}। इस आधिकारिक अधिग्रहण को तब तक बनाए रखें जब तक स्कैन सफल न हो।",
+    "unverifiedStatus": "अनुमानित नहीं — {reason}",
+    "incompleteData": "अपूर्ण डेटा",
+    "groupUnverifiedTooltip": "{count} override(s) के निर्धारण के लिए संभव नहीं रहे; स्कैन अधूरा था।"
+  },
   "detailView": {
     "empty": {
       "selectPackage": "विवरण देखने के लिए एक पैकेज का चयन करें।"
@@ -2835,6 +2842,52 @@
       "title": "इस फ़ाइल में विस्तारित अनदेखा करें"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "अनुमत तलाशी की जा रही है..."
+    },
+    "error": {
+      "checkFailed": "अनुमत खोजों की जांच असफल रही: {message}",
+      "badOutput": "स्कैन आउटपुट पढ़ा नहीं सका गया।",
+      "noWorkspace": "कोई Dart/Flutter वर्कस्पेस नहीं मिला। पहले pubspec.yaml से एक प्रोजेक्ट खोलें।",
+      "missingDep": "अपने अस्वीकृत खोजों का उपयोग करने से पहले saropa_lints को pubspec.yaml में जोड़ें।",
+      "noFinding": "Saropa Lints फाइल में एक Dart खोज में लाइट बल्ब का उपयोग करके इसे स्वीकार करें।",
+      "outsideProject": "इस फ़ाइल को एक भी Dart पैकेज में नहीं है (ऊपर एक भी pubspec.yaml नहीं है), इसलिए इसे saropa_accepted.yaml में जोड़ा नहीं जा सकता।",
+      "writeFailed": "सारोपा_स्वीकृत_यामल: अपडेट नहीं किया जा सका {message}",
+      "cannotAppend": "सरोपा_अक्सेप्टेड.यामल में एक लेआउट है जिसे स्वचालित रूप से बढ़ाया नहीं जा सकता। हाथ से प्रविष्टि जोड़ें।",
+      "entryExists": "सरोपा_अक्सेप्टेड.यामल पहले से {rule} के लिए {file} में प्रविष्टि है। यदि प्रविष्टि में अधिकतम संख्या है, तो हाथ से उसे बढ़ाएं।"
+    },
+    "info": {
+      "alreadyRunning": "एक स्वीकृत-ज्ञात अपराध चेक जा रहा है।",
+      "noList": "कोई भी पैकेज में सारोपा_अक्सेप्टेड.यामल नहीं मिला। एक फ़ाइल पर \"इस फ़ाइल में स्वीकृत करें\" चुनकर एक कार्य शुरू करें।",
+      "clean": "स्वीकृत खोजः {count} प्रविष्टियाँ चेक की गई, कोई भी गलत या अमान्य नहीं।",
+      "issues": "स्वीकृत खोजः {stale} अवैध और {invalid} अमान्य, {count} प्रविष्टियों में से। समस्या पैनल देखें।",
+      "added": "{rule} को {file} में {list} में जोड़ दिया गया है। फ़ाइल के फिर से विश्लेषण के दौरान पहले से ही स्पष्ट ढंग से पाए गए अंकित अंक दिखाई देते हैं।"
+    },
+    "action": {
+      "openList": "सूची खोलें",
+      "restartAnalysis": "एनालिसिस सर्वर रीस्टार्ट करें"
+    },
+    "diagnostic": {
+      "staleFileMissing": "अति विलम्बित प्रविष्टि: {file} अब अस्तित्व रहे नहीं, इसलिए इस प्रविष्टि के लिए {rule} कुछ छिपाता नहीं है।",
+      "staleNoFinding": "अतिक्रमित प्रविष्टि: {rule} में {file} में कुछ नहीं पाया गया। यदि कोड ठीक कर दिया गया हो तो प्रविष्टि हटा दें।",
+      "invalid": "अवैध प्रविष्टि, कुछ छुपाता नहीं: {message}"
+    },
+    "prompt": {
+      "kindTitle": "क्यों यह खोज ग्रहण कर लिया गया है?",
+      "kindAccepted": "स्वीकृत: खोज वास्तविक है और कोड इसके अपने रूप में रहता है",
+      "kindFalsePositive": "असत्य सूचना: यह नियम यहां गलत है",
+      "reasonTitle": "{rule} के अपनाने के कारण {file}",
+      "reasonPlaceholder": "अपेक्षित। saropa_accepted.yaml में संचित किया गया समीक्षकों के लिए।",
+      "reasonRequired": "एक कारण आवश्यक है।"
+    },
+    "quickFix": {
+      "title": "इस फ़ाइल में {rule} स्वीकृत करें…"
+    },
+    "summary": {
+      "count": "{count} स्वीकृत"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "इस रिपोर्ट को \"{status}\" के रूप में चिह्नित किया गया है लेकिन अभी भी bugs/ में है — बंद करने से पहले इसे plans/history/ में आर्काइव करें (देखें ISSUE_REPORT_GUIDE.md)।"
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "अपवाद (संकल्पनात्मक पुराना SDK)"
+    },
+    "staleOverride": {
+      "suppress": "प्रतिबंधित (अतिक्रमण उद्देश्यपूर्वक है)"
     }
   },
   "blastRadius": {

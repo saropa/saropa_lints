@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File — สร้างรายงาน HTML",
   "command.findStaleIgnores.title": "Saropa Lints: ค้นหาความคิดเห็นการละเลย",
   "command.fixStaleIgnores.title": "Saropa Lints: แก้ไขข้อความระบุให้ละเลยสิ่งที่ไม่จำเป็น",
+  "command.checkAcceptedFindings.title": "Saropa Lints: ตรวจสอบผลการค้นหาที่ยอมรับแล้ว",
   "command.openViolationsWideReport.title": "Saropa Lints: เปิดผลการค้นพบ ดัชบอร์ด",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: เปิดดัชบอร์ดผลการค้นหา (รักษาฟิลเตอร์)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "แพ็คเกจสแกน สแกน Packages",
   "command.packageVibrancy.rescan.title": "แพ็คเกจ Rescan (สด)",
   "command.packageVibrancy.openOtherProject.title": "สแกนอีกโครงการ...",
+  "command.packageVibrancy.explainLastSkip.title": "อธิบายการข้าม Vibrancy ครั้งล่าสุด",
   "command.packageVibrancy.showReport.title": "เปิด แดชบอร์ด Package Dashboard โดยเปิด",
   "command.packageVibrancy.showOpportunities.title": "เปิดโอกาสในการอัพเกรด",
   "command.packageVibrancy.exportOpportunitiesReport.title": "ส่งออกรายงานโอกาสทั้งหมด",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: ซิงค์แพลตฟอร์มเวอร์ชันไปยัง pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: เมนูสถานะ",
   "command.scanWithLatestEngine.title": "Saropa Lints: ตรวจสอบด้วยเครื่องมือล่าสุด (โครงการ Dart เก่า)",
-  "config.property.externalEngine.dartSdkPath.description": "โฟลเดอร์ Dart SDK (ประกอบด้วย bin/dart) ที่ใช้โดย \"Scan with Latest Engine\" ต้องเป็น Dart 3.11 หรือใหม่กว่า ถ้าเว้นว่างจะใช้ dart ที่อยู่ใน PATH",
-  "command.packageVibrancy.explainLastSkip.title": "อธิบายการข้าม Vibrancy ครั้งล่าสุด"
+  "config.property.externalEngine.dartSdkPath.description": "โฟลเดอร์ Dart SDK (ประกอบด้วย bin/dart) ที่ใช้โดย \"Scan with Latest Engine\" ต้องเป็น Dart 3.11 หรือใหม่กว่า ถ้าเว้นว่างจะใช้ dart ที่อยู่ใน PATH"
 }

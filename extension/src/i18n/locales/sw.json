@@ -5,54 +5,54 @@
     "unknownPathSdk": "Toleo la Dart SDK halikuweza kubainishwa kwa dart iliyo kwenye PATH, na mradi hauna toleo la SDK linalosomeka.",
     "staleLock": "pubspec.lock haipo au haisomeki, kwa hivyo pub itatatua tegemezi upya.",
     "staleConfig": "Usanidi wa kifurushi haupo au hauorodheshi vifurushi vilivyofungwa, kwa hivyo pub itatatua tegemezi upya.",
+    "depsNotLocked": "pubspec.yaml inatangaza tegemezi ambazo pubspec.lock haziorodheshi, kwa hivyo pub itatatua tegemezi upya.",
+    "source": {
+      "dartSdkPath": "mpangilio dart.sdkPath",
+      "flutterSdkPath": "mpangilio dart.flutterSdkPath",
+      "fvm": "Pini ya FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "hakuna ushahidi wa SDK ya mradi",
-      "lockConstraint": "kikwazo cha sdks cha pubspec.lock"
-    },
-    "constraintUnverifiable": "Tegemezi katika pubspec.yaml halikuweza kukaguliwa dhidi ya pubspec.lock (git, kikwazo maalum au kisichoweza kuchanganuliwa), kwa hivyo pub inaweza kutatua tegemezi upya.",
-    "explain": {
-      "pickFolder": "Chagua folda ya mradi ya kuelezea",
-      "none": "Hakuna ombi la pub la Vibrancy lililorukwa katika kipindi hiki.",
-      "unknown": "haijulikani",
-      "title": "Package Vibrancy iliruka ombi la pub",
-      "project": "SDK ya mradi: {value} (kutoka {source})",
-      "folder": "Folda ya mradi: {cwd}",
-      "reason": "Sababu: {reason}",
-      "rule": "Kanuni: {rule}",
-      "pathConfirmRun": "Endesha pub get hata hivyo",
-      "runPubGet": "Endesha pub get kwa SDK ya mradi",
-      "toolVersion": "Toleo la SDK lililochaguliwa: {version}",
-      "sdk": "SDK iliyochaguliwa: {path} (kutoka {source})",
-      "time": "Iliruka saa: {time}",
-      "pathConfirm": "SDK iliyochaguliwa inatoka PATH, ambayo ndiyo mpangilio uliosababisha pubspec.lock kuandikwa upya kwa SDK isiyo sahihi. Endesha pub get hata hivyo?",
-      "pubGetFailed": "pub get imeshindwa: {error}",
-      "pubGetDone": "pub get imekamilika kwa SDK ya mradi."
-    },
-    "rule": {
-      "constraintUnverifiable": "Kikwazo hakiwezi kuthibitishwa",
-      "depsNotLocked": "Tegemezi halijafungwa",
-      "lockSdkConstraint": "Kikwazo cha SDK katika faili ya kufunga",
-      "constraintNotSatisfied": "Toleo lililofungwa liko nje ya kikwazo",
-      "staleLock": "Faili ya kufunga haipo au haisomeki",
-      "pathDepNewer": "Tegemezi la njia limebadilika",
-      "sdkMismatch": "Toleo la SDK halilingani",
-      "staleConfig": "Usanidi wa kifurushi umepitwa na wakati",
-      "unknownPathSdk": "SDK ya PATH isiyojulikana"
-    },
-    "source": {
-      "fvm": "Pini ya FVM (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "mpangilio dart.flutterSdkPath",
-      "dartSdkPath": "mpangilio dart.sdkPath"
+      "lockConstraint": "kikwazo cha sdks cha pubspec.lock",
+      "none": "hakuna ushahidi wa SDK ya mradi"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy iliruka ombi la pub ili pubspec.lock isiandikwe upya. Bofya kwa maelezo.",
-      "text": "Vibrancy: pub imerukwa"
+      "text": "Vibrancy: pub imerukwa",
+      "tooltip": "Package Vibrancy iliruka ombi la pub ili pubspec.lock isiandikwe upya. Bofya kwa maelezo."
     },
+    "explain": {
+      "title": "Package Vibrancy iliruka ombi la pub",
+      "none": "Hakuna ombi la pub la Vibrancy lililorukwa katika kipindi hiki.",
+      "unknown": "haijulikani",
+      "reason": "Sababu: {reason}",
+      "rule": "Kanuni: {rule}",
+      "sdk": "SDK iliyochaguliwa: {path} (kutoka {source})",
+      "toolVersion": "Toleo la SDK lililochaguliwa: {version}",
+      "project": "SDK ya mradi: {value} (kutoka {source})",
+      "folder": "Folda ya mradi: {cwd}",
+      "time": "Iliruka saa: {time}",
+      "runPubGet": "Endesha pub get kwa SDK ya mradi",
+      "pubGetDone": "pub get imekamilika kwa SDK ya mradi.",
+      "pubGetFailed": "pub get imeshindwa: {error}",
+      "pickFolder": "Chagua folda ya mradi ya kuelezea",
+      "pathConfirm": "SDK iliyochaguliwa inatoka PATH, ambayo ndiyo mpangilio uliosababisha pubspec.lock kuandikwa upya kwa SDK isiyo sahihi. Endesha pub get hata hivyo?",
+      "pathConfirmRun": "Endesha pub get hata hivyo"
+    },
+    "constraintNotSatisfied": "{name} imefungwa kwenye {version}, ambayo haikidhi kikwazo {constraint} katika pubspec.yaml, kwa hivyo pub itatatua tegemezi upya.",
+    "constraintUnverifiable": "Tegemezi katika pubspec.yaml halikuweza kukaguliwa dhidi ya pubspec.lock (git, kikwazo maalum au kisichoweza kuchanganuliwa), kwa hivyo pub inaweza kutatua tegemezi upya.",
     "pathDepNewer": "Tegemezi la njia {name} lilibadilika baada ya pubspec.lock kuandikwa, kwa hivyo pub itatatua tegemezi upya.",
-    "depsNotLocked": "pubspec.yaml inatangaza tegemezi ambazo pubspec.lock haziorodheshi, kwa hivyo pub itatatua tegemezi upya.",
-    "constraintNotSatisfied": "{name} imefungwa kwenye {version}, ambayo haikidhi kikwazo {constraint} katika pubspec.yaml, kwa hivyo pub itatatua tegemezi upya."
+    "rule": {
+      "sdkMismatch": "Toleo la SDK halilingani",
+      "lockSdkConstraint": "Kikwazo cha SDK katika faili ya kufunga",
+      "unknownPathSdk": "SDK ya PATH isiyojulikana",
+      "staleLock": "Faili ya kufunga haipo au haisomeki",
+      "staleConfig": "Usanidi wa kifurushi umepitwa na wakati",
+      "depsNotLocked": "Tegemezi halijafungwa",
+      "constraintNotSatisfied": "Toleo lililofungwa liko nje ya kikwazo",
+      "constraintUnverifiable": "Kikwazo hakiwezi kuthibitishwa",
+      "pathDepNewer": "Tegemezi la njia limebadilika"
+    }
   },
   "about": {
     "ruleCountStrip": "{total} maelezo ya kusandika kwa sasa inapakia katika versi hii (mazungumzaji {essential} · mazungumzaji ya kuchangia {recommended} · mazungumzaji ya kifalme {professional} · mazungumzaji ya kifalme {comprehensive} · mazungumzaji ya kifalme {pedantic} · {stylistic} mazungumzaji ya kuchangia)"
@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Unverified",
+    "unverifiedTooltip": "Hakuna kujaribu — {reason}. Tafakari kwenye uwezo huu kwa makosa ya kujaribu.",
+    "unverifiedStatus": "Hakuna yafanyikwa — {reason}",
+    "incompleteData": "data inkompleta",
+    "groupUnverifiedTooltip": "{count} override(s) ha kubadilishwa; scan ilikuwa kifuatwa."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Chagua kifurushi ili uone maelezo ya kina."
@@ -2835,6 +2842,52 @@
       "title": "Tumeua kifungu kwenye faili hili"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Kuwasilisha matokeo ya kuchapisha..."
+    },
+    "error": {
+      "checkFailed": "Kuficha findings ya kuchapishwa alikozwa: {message}",
+      "badOutput": "Kipengele ya kuzalisha hakutambulika.",
+      "noWorkspace": "Hakuna workspace ya Dart/Flutter. Openda project na pubspec.yaml kwa kwanza.",
+      "missingDep": "Ona saropa_lints kwenye pubspec.yaml kabla ya kuzalisha matokeo ya kutoa.",
+      "noFinding": "Tuma chama cha mpya kwenye miongo wa Saropa Lints katika faili ya Dart kujifunza.",
+      "outsideProject": "Hili file haikuwa ndani ya package Dart (haikuwa pubspec.yaml kinyume na yake), kwa sababu hauwezi kubadilisha kwenye saropa_accepted.yaml.",
+      "writeFailed": "Hakikisha kushiriki saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml ina layout inayeyuka kufungua kwa mstari. Ona eneo kwa kifungua.",
+      "entryExists": "saropa_accepted.yaml ina eneo ya {rule} katika {file}. Ikiwa eneo ina idadi ya kati, tuleka kati kwa kuchagua."
+    },
+    "info": {
+      "alreadyRunning": "Tafiti ya findings ya kati ya kufungua inaonekana kwa kipindi.",
+      "noList": "Saropa_accepted.yaml inakwenda kwenye kila package ya workspace. Tafuta \"Kuamini katika faili hii\" kwenye saropa ya kuzalisha kujaribu kujaribu.",
+      "clean": "Accepted findings: {count} entries checked, none stale or invalid.",
+      "issues": "Moto ya kifedha ya kifedha: {stale} ya kifedha ya kifedha na {invalid} ya kifedha ya kifedha, kati ya {count} ya kifedha ya kifedha. Tafakari panel ya Problemas.",
+      "added": "Zilizozinga {rule} kwenye {file} kwa {list}. Findings zilizokazwa jeli kama file inyango kushangaza tena."
+    },
+    "action": {
+      "openList": "Opend List",
+      "restartAnalysis": "Tumia Analizi Server"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Moto ya kipengele: {file} hakupatikana kwa kipengele, kwa hiyo moto hili ya {rule} hakupatikana kwa kipengele.",
+      "staleNoFinding": "Matokeo ya kipengele kikubwa: {rule} haukupatikana kwenye {file}. Ongeza kipengele kikubwa kama code ilikuwa yoyote.",
+      "invalid": "Entama ya kihifadhi, inakwama kifadhi: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Sikupata sababu ya kusababisha kifungu hiki?",
+      "kindAccepted": "Makosa ya kati: makosa ina ujumbe wa kati na kodi inaonekana kama iliyo kipengele kama iliyo kipengele",
+      "kindFalsePositive": "False positive: rule inakwenda hapa",
+      "reasonTitle": "Sababu ya kujifunza {rule} katika {file}",
+      "reasonPlaceholder": "Tayari. Iliowekwa katika saropa_accepted.yaml kwa wamalizaji.",
+      "reasonRequired": "Hakika inahitajika."
+    },
+    "quickFix": {
+      "title": "Ona {rule} katika faili hii…"
+    },
+    "summary": {
+      "count": "{count} amesahani"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Raporti huu imetambulika kama \"{status}\" lakini anapata kwenye bugs/ — kushinda kwenye plans/history/ kabla ya kufungua (tazama ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Supress (intentional old SDK)"
+    },
+    "staleOverride": {
+      "suppress": "Supress (override ni matokeo)"
     }
   },
   "blastRadius": {
@@ -3169,7 +3225,7 @@
   "externalEngine": {
     "noProject": "Ondoa kifundo cha Dart kwa kuanza.",
     "sdkTooOld": "Engine ya Saropa Lints ya muda mwa sasa inahitajika Dart ya {required} au mbele, lakini engine ya Dart ya kati ina {found}. Install engine ya Dart ya mbele na set \"saropaLints.externalEngine.dartSdkPath\" kwa folder yake.",
-    "sdkUnknown": "miongoni mwa matokeo",
+    "sdkUnknown": "haijulikani",
     "install": {
       "prompt": "Hii ina install latest Saropa Lints engine kwa global (dart pub global activate saropa_lints) kwa kutumia Dart SDK ya mbele, kisha ina scan project huu kwa kwa hau. pubspec.yaml ya project huu na pin ya SDK hauonekane.",
       "confirm": "Install na scan"

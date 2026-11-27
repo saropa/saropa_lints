@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ غير المُ xác minh",
+    "unverifiedTooltip": "لم يتم التحقق — {reason}. احتفظ بهذا التجاوز حتى تنجح المسح.",
+    "unverifiedStatus": "غير مُحقق — {reason}",
+    "incompleteData": "بيانات غير كاملة",
+    "groupUnverifiedTooltip": "{count} override(s) لا يمكن التحقق منها؛ كان المسح غير كامل."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "حدد حزمة لرؤية التفاصيل."
@@ -2835,6 +2842,52 @@
       "title": "إصلاح الإهمالات القديمة في هذا الملف"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "التحقق من العناصر المقبولة..."
+    },
+    "error": {
+      "checkFailed": "التحقق من العناصر المقبولة فشل: {message}",
+      "badOutput": "لم يتم القدرة على قراءة إخراج المسح",
+      "noWorkspace": "لم يتم العثور على مساحة عمل Dart/Flutter. افتح مشروعًا باستخدام pubspec.yaml أولاً.",
+      "missingDep": "أضف saropa_lints إلى pubspec.yaml قبل استخدام العناصر المقبولة.",
+      "noFinding": "استخدم المصباح الأبيض على مسألة Saropa Lints في ملف Dart لقبولها.",
+      "outsideProject": "هذا الملف ليس داخل حزمة Dart (لا يوجد pubspec.yaml أعلاه)، لذلك لا يمكن إضافته إلى saropa_accepted.yaml.",
+      "writeFailed": "لم يتم تحديث saropa_accepted.yaml: {message}",
+      "cannotAppend": "يحتوي saropa_accepted.yaml على تخطيط لا يمكن تمديده تلقائيًا. أضف المدخل يدويًا.",
+      "entryExists": "saropa_accepted.yaml يحتوي بالفعل على إدخال ل {rule} في {file}. إذا كان الإدخال يحتوي على عدد أقصى، قم بزيادة هذا العدد يدويًا."
+    },
+    "info": {
+      "alreadyRunning": "تم بالفعل تنفيذ تحقق من الملاحظات المقبولة.",
+      "noList": "لا توجد ملف saropa_accepted.yaml في أي حزمة من حزم المشروع. استخدم \"الموافقة في هذا الملف\" على ملاحظة لبدء واحد.",
+      "clean": "النتائج المقبولة: {count} مدخلات تم التحقق منها، لا يوجد منها قديمة أو غير صالحة.",
+      "issues": "النتائج المقبولة: {stale} منتهية الصلاحية و {invalid} غير صالحة، خارج {count} مدخلات. راجع لوحة المشكلات.",
+      "added": "تم إضافة {rule} في {file} إلى {list}. تم عرض العيوب بالفعل بوضوح عند تحليل الملف مرة أخرى."
+    },
+    "action": {
+      "openList": "فتح القائمة",
+      "restartAnalysis": "إعادة تشغيل خادم التحليل"
+    },
+    "diagnostic": {
+      "staleFileMissing": "السجل القديم: {file} لا يزال موجودًا، لذا هذا السجل لـ {rule} لا يخفي شيئًا.",
+      "staleNoFinding": "السجل القديم: {rule} لم يتم العثور على شيء في {file}. قم بإزالة السجل إذا تم إصلاح الكود.",
+      "invalid": "الدخول غير صحيح، لا يخفي شيئًا: {message}"
+    },
+    "prompt": {
+      "kindTitle": "لماذا يتم قبول هذا العيب؟",
+      "kindAccepted": "مقبول: العيب موجود حقًا والكود يبقى كما هو",
+      "kindFalsePositive": "الإيجابية الزائدة: القاعدة خاطئة هنا",
+      "reasonTitle": "سبب القبول في {rule} في {file}",
+      "reasonPlaceholder": "الضروري. مخزَّن في saropa_accepted.yaml للفحص.",
+      "reasonRequired": "السبب مطلوب."
+    },
+    "quickFix": {
+      "title": "تقبل {rule} في هذا الملف…"
+    },
+    "summary": {
+      "count": "{count} مقبول"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "هذا التقرير مُarked \"{status}\" لكنه ما زال في bugs/ — أرشيفه إلى plans/history/ قبل إغلاقه (انظر ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "تثبيط (النسخة القديمة المقصودة من SDK)"
+    },
+    "staleOverride": {
+      "suppress": "تثبيت (إعادة التوجيه مقصودة)"
     }
   },
   "blastRadius": {

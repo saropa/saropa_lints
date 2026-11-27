@@ -5,54 +5,54 @@
     "unknownPathSdk": "Não foi possível determinar a versão do Dart SDK do dart no PATH, e o projeto não tem uma versão de SDK legível.",
     "staleLock": "pubspec.lock está ausente ou ilegível, portanto o pub resolveria as dependências novamente.",
     "staleConfig": "A configuração de pacotes está ausente ou não lista os pacotes travados, portanto o pub resolveria as dependências novamente.",
+    "depsNotLocked": "pubspec.yaml declara dependências que pubspec.lock não lista, portanto o pub resolveria as dependências novamente.",
+    "source": {
+      "dartSdkPath": "configuração dart.sdkPath",
+      "flutterSdkPath": "configuração dart.flutterSdkPath",
+      "fvm": "Fixação do FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "sem evidência de SDK do projeto",
-      "lockConstraint": "restrição sdks de pubspec.lock"
-    },
-    "constraintUnverifiable": "Uma dependência em pubspec.yaml não pôde ser verificada em relação a pubspec.lock (restrição git, personalizada ou não analisável), portanto o pub pode resolver as dependências novamente.",
-    "explain": {
-      "pickFolder": "Escolha uma pasta de projeto para explicar",
-      "none": "Nenhuma consulta pub do Vibrancy foi ignorada nesta sessão.",
-      "unknown": "desconhecido",
-      "title": "Package Vibrancy ignorou uma consulta pub",
-      "project": "SDK do projeto: {value} (de {source})",
-      "folder": "Pasta do projeto: {cwd}",
-      "reason": "Motivo: {reason}",
-      "rule": "Regra: {rule}",
-      "pathConfirmRun": "Executar pub get mesmo assim",
-      "runPubGet": "Executar pub get com o SDK do projeto",
-      "toolVersion": "Versão do SDK selecionado: {version}",
-      "sdk": "SDK selecionado: {path} (de {source})",
-      "time": "Ignorado em: {time}",
-      "pathConfirm": "O SDK selecionado vem do PATH, que é a configuração que reescreveu pubspec.lock com o SDK errado. Executar pub get mesmo assim?",
-      "pubGetFailed": "Falha em pub get: {error}",
-      "pubGetDone": "pub get concluído com o SDK do projeto."
-    },
-    "rule": {
-      "constraintUnverifiable": "Restrição não verificável",
-      "depsNotLocked": "Dependência não travada",
-      "lockSdkConstraint": "Restrição de SDK no lock",
-      "constraintNotSatisfied": "Versão travada fora da restrição",
-      "staleLock": "Arquivo lock ausente ou ilegível",
-      "pathDepNewer": "Dependência de caminho alterada",
-      "sdkMismatch": "Incompatibilidade de versão do SDK",
-      "staleConfig": "Configuração de pacotes desatualizada",
-      "unknownPathSdk": "SDK do PATH desconhecido"
-    },
-    "source": {
-      "fvm": "Fixação do FVM (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "configuração dart.flutterSdkPath",
-      "dartSdkPath": "configuração dart.sdkPath"
+      "lockConstraint": "restrição sdks de pubspec.lock",
+      "none": "sem evidência de SDK do projeto"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy ignorou uma consulta pub para que pubspec.lock não seja reescrito. Clique para ver detalhes.",
-      "text": "Vibrancy: pub ignorado"
+      "text": "Vibrancy: pub ignorado",
+      "tooltip": "Package Vibrancy ignorou uma consulta pub para que pubspec.lock não seja reescrito. Clique para ver detalhes."
     },
+    "explain": {
+      "title": "Package Vibrancy ignorou uma consulta pub",
+      "none": "Nenhuma consulta pub do Vibrancy foi ignorada nesta sessão.",
+      "unknown": "desconhecido",
+      "reason": "Motivo: {reason}",
+      "rule": "Regra: {rule}",
+      "sdk": "SDK selecionado: {path} (de {source})",
+      "toolVersion": "Versão do SDK selecionado: {version}",
+      "project": "SDK do projeto: {value} (de {source})",
+      "folder": "Pasta do projeto: {cwd}",
+      "time": "Ignorado em: {time}",
+      "runPubGet": "Executar pub get com o SDK do projeto",
+      "pubGetDone": "pub get concluído com o SDK do projeto.",
+      "pubGetFailed": "Falha em pub get: {error}",
+      "pickFolder": "Escolha uma pasta de projeto para explicar",
+      "pathConfirm": "O SDK selecionado vem do PATH, que é a configuração que reescreveu pubspec.lock com o SDK errado. Executar pub get mesmo assim?",
+      "pathConfirmRun": "Executar pub get mesmo assim"
+    },
+    "constraintNotSatisfied": "{name} está travado em {version}, que não satisfaz a restrição {constraint} em pubspec.yaml, portanto o pub resolveria as dependências novamente.",
+    "constraintUnverifiable": "Uma dependência em pubspec.yaml não pôde ser verificada em relação a pubspec.lock (restrição git, personalizada ou não analisável), portanto o pub pode resolver as dependências novamente.",
     "pathDepNewer": "A dependência de caminho {name} mudou depois que pubspec.lock foi gravado, portanto o pub resolveria as dependências novamente.",
-    "depsNotLocked": "pubspec.yaml declara dependências que pubspec.lock não lista, portanto o pub resolveria as dependências novamente.",
-    "constraintNotSatisfied": "{name} está travado em {version}, que não satisfaz a restrição {constraint} em pubspec.yaml, portanto o pub resolveria as dependências novamente."
+    "rule": {
+      "sdkMismatch": "Incompatibilidade de versão do SDK",
+      "lockSdkConstraint": "Restrição de SDK no lock",
+      "unknownPathSdk": "SDK do PATH desconhecido",
+      "staleLock": "Arquivo lock ausente ou ilegível",
+      "staleConfig": "Configuração de pacotes desatualizada",
+      "depsNotLocked": "Dependência não travada",
+      "constraintNotSatisfied": "Versão travada fora da restrição",
+      "constraintUnverifiable": "Restrição não verificável",
+      "pathDepNewer": "Dependência de caminho alterada"
+    }
   },
   "about": {
     "ruleCountStrip": "Regras {total} de lint estão incluídas nessa versão (essencial {essential} · recomendado {recommended} · profissional {professional} · abrangente {comprehensive} · pedante {pedantic} · {stylistic} opt-in estilístico)"
@@ -314,7 +314,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX e bibliotecas de injeção de dependência e estado relacionadas.",
       "networking-apis": "Clientes HTTP, GraphQL, Firebase, Supabase e conectividade.",
       "storage-persistence": "Bancos de dados locais e armazenamentos chave-valor — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Regras estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramatical correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua de destino; não mude para outra língua no meio da frase.\n\nTexto: Roteamento e manipulação de links profundos — auto_route, go_router, app_links, url_launcher e webview.",
+      "navigation-deep-links": "Regras estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramaticalmente correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Roteamento e manipulação de links profundos — auto_route, go_router, app_links, url_launcher e webview.",
       "media-graphics": "Imagens, SVG, animação, áudio, mapas, pickers e o motor Flame.",
       "device-platform": "Sensores, localização, permissões, biometria, notificações e trabalho de fundo.",
       "identity-sharing": "Fornecedores de login, compartilhamento e revisão no aplicativo.",
@@ -1378,7 +1378,7 @@
     "hintNoPerRule": "Esta exportação não tem contagens de emissão por regra. Reanalisar com um plug-in Saropa Lints atual.",
     "hintBuildFailed": "Não foi possível construir triagem a partir desta exportação. Faça uma nova análise.",
     "summaryVolume": "Regra triagem (volume / deve-fixar / estilística)",
-    "hintSameAsTree": "Regras Estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramatical correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Mesma agrupamento da atividade Triage barra de ferramentas: filtrar Issues, ou desativar/ativar regras em `analysis_options_custom.yaml`. Grupos grandes podem pedir confirmação."
+    "hintSameAsTree": "Regras Estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramatical correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Mesma agrupamento da atividade barra de triagem: filtrar Issues, ou desativar/ativar regras em `analysis_options_custom.yaml`. Grupos grandes podem pedir confirmação."
   },
   "kbdOverlay": {
     "toggleTitle": "Mostrar atalhos de teclado (?)",
@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Não verificado",
+    "unverifiedTooltip": "Não foi possível verificar — {reason}. Mantenha esta sobreposição até que a verificação seja bem-sucedida.",
+    "unverifiedStatus": "Não verificado — {reason}",
+    "incompleteData": "dados incompletos",
+    "groupUnverifiedTooltip": "{count} override(s) não pode(m) ser verificado(s); a varredura foi incompleta."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Selecione um pacote para ver os detalhes."
@@ -2835,6 +2842,52 @@
       "title": "Corrija ignores obsoletos neste arquivo"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Verificando os achados aceitos…"
+    },
+    "error": {
+      "checkFailed": "Verificação de findings aceitos falhou: {message}",
+      "badOutput": "A saída do escaneamento não pode ser lida.",
+      "noWorkspace": "Nenhum workspace Dart/Flutter encontrado. Abra um projeto com pubspec.yaml primeiro.",
+      "missingDep": "Adicione saropa_lints a pubspec.yaml antes de usar os findings aceitos.",
+      "noFinding": "Use a lâmpada de luz em um finding Saropa Lints em um arquivo Dart para aceitá-lo.",
+      "outsideProject": "Este arquivo não está dentro de um pacote Dart (não há pubspec.yaml acima dele), portanto não pode ser adicionado ao saropa_accepted.yaml.",
+      "writeFailed": "Não foi possível atualizar saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml tem um layout que não pode ser estendido automaticamente. Adicione a entrada manualmente.",
+      "entryExists": "saropa_accepted.yaml já tem uma entrada para {rule} em {file}. Se a entrada tiver um limite máximo, aumente-o manualmente."
+    },
+    "info": {
+      "alreadyRunning": "Um check de accepted-findings já está em execução.",
+      "noList": "Nenhum saropa_accepted.yaml encontrado em qualquer pacote do workspace. Use \"Aceitar neste arquivo\" em um finding para iniciar um.",
+      "clean": "Encontrados aceitos: {count} entradas verificadas, nenhuma estagnada ou inválida.",
+      "issues": "Encontrados aceitos: {stale} obsoletos e {invalid} inválidos, de {count} entradas. Veja o painel de Problemas.",
+      "added": "Adicionado {rule} em {file} para {list}. Os findings já foram mostrados claramente quando o arquivo é analisado novamente."
+    },
+    "action": {
+      "openList": "Abrir Lista",
+      "restartAnalysis": "Reiniciar Servidor de Análise"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Entrada obsoleta: {file} não existe mais, portanto esta entrada para {rule} não oculta nada.",
+      "staleNoFinding": "Entrada obsoleta: {rule} encontrado nada em {file}. Remova a entrada se o código foi corrigido.",
+      "invalid": "Entrada inválida, esconde nada: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Por que esse finding é aceito?",
+      "kindAccepted": "Aceito: o finding é real e o código permanece como está",
+      "kindFalsePositive": "Falso positivo: a regra está errada aqui",
+      "reasonTitle": "Motivo para aceitar {rule} em {file}",
+      "reasonPlaceholder": "Obrigatório. Salvo em saropa_accepted.yaml para revisores.",
+      "reasonRequired": "Uma razão é necessária."
+    },
+    "quickFix": {
+      "title": "Aceite {rule} neste arquivo…"
+    },
+    "summary": {
+      "count": "{count} aceitou"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Este relatório está marcado como \"{status}\" mas ainda está em bugs/ — arquive-o em plans/history/ antes de fechar (consulte ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Suprimir (SDK antigo intencional)"
+    },
+    "staleOverride": {
+      "suppress": "Ignorar (override é intencional)"
     }
   },
   "blastRadius": {

@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: क्रॉस-फाइल — HTML रिपोर्ट उत्पन्न करें",
   "command.findStaleIgnores.title": "Saropa Lints: स्टेल इग्नोर कमेंट खोए",
   "command.fixStaleIgnores.title": "Saropa Lints: स्टेल इग्नोर कमेंट फिक्स करें",
+  "command.checkAcceptedFindings.title": "Saropa Lints: अपने स्वीकृत खोजों की जांच करें",
   "command.openViolationsWideReport.title": "Saropa Lints: ओपन निष्कर्ष डैशबोर्ड खोलें",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: ओपन फाइंडिंग्स डैशबोर्ड (फ़िल्टर को संरक्षित करें)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "स्कैन पैकेज",
   "command.packageVibrancy.rescan.title": "रीस्कैन पैकेज (ताजा)",
   "command.packageVibrancy.openOtherProject.title": "स्कैन करें एक और परियोजना ...",
+  "command.packageVibrancy.explainLastSkip.title": "पिछला Vibrancy छोड़ना समझाएँ",
   "command.packageVibrancy.showReport.title": "पैकेज डैशबोर्ड खोलें",
   "command.packageVibrancy.showOpportunities.title": "ओपन अपग्रेड अवसरों को खोलें।",
   "command.packageVibrancy.exportOpportunitiesReport.title": "पूर्ण अवसर रिपोर्ट निर्यात",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock में सिंक प्लगइन संस्करण",
   "command.showStatusBarMenu.title": "Saropa Lints: स्टेटस मेनू",
   "command.scanWithLatestEngine.title": "Saropa Lints: सबसे नया इंजन स्कैन करें (पुराने Dart प्रोजेक्ट)",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK फोल्डर (bin/dart को समावेश करता है) \"Scan with Latest Engine\" द्वारा उपयोग किया जाता है। Dart 3.11 या नई वर्जन के साथ उपलब्ध होना आवश्यक है। PATH पर dart का उपयोग करने के लिए खाली छोड़ दें।",
-  "command.packageVibrancy.explainLastSkip.title": "पिछला Vibrancy छोड़ना समझाएँ"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK फोल्डर (bin/dart को समावेश करता है) \"Scan with Latest Engine\" द्वारा उपयोग किया जाता है। Dart 3.11 या नई वर्जन के साथ उपलब्ध होना आवश्यक है। PATH पर dart का उपयोग करने के लिए खाली छोड़ दें।"
 }

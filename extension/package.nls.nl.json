@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File - Genereer HTML-rapport",
   "command.findStaleIgnores.title": "Saropa Lints: Stale Ignore Comments vinden",
   "command.fixStaleIgnores.title": "Saropa Lints: Verouderde ignore-opmerkingen corrigeren",
+  "command.checkAcceptedFindings.title": "Saropa Lints: Controleer Geaccepteerde Findings",
   "command.openViolationsWideReport.title": "Saropa Lints: Open het Dashboard van de bevindingen.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Open Findings Dashboard (behoud van filters)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Scanpakketten Scannen Pakketten",
   "command.packageVibrancy.rescan.title": "Rescan pakketten (vers)",
   "command.packageVibrancy.openOtherProject.title": "Scan Een ander project...",
+  "command.packageVibrancy.explainLastSkip.title": "Laatste Vibrancy-overslag uitleggen",
   "command.packageVibrancy.showReport.title": "Open het Dashboard van de pakketten.",
   "command.packageVibrancy.showOpportunities.title": "Open Upgrade mogelijkheden",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Exporteer Volledig Opportunititen Rapport",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version met pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Statusmenu",
   "command.scanWithLatestEngine.title": "Saropa Lints: Scannen met de Laatste Engine (Oudere Dart Projecten)",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK map (bevat bin/dart) gebruikt door \"Scan met Laatste Engine\". Moet Dart 3.11 of nieuwer zijn. Laat leeg om de dart op PATH te gebruiken.",
-  "command.packageVibrancy.explainLastSkip.title": "Laatste Vibrancy-overslag uitleggen"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK map (bevat bin/dart) gebruikt door \"Scan met Laatste Engine\". Moet Dart 3.11 of nieuwer zijn. Laat leeg om de dart op PATH te gebruiken."
 }

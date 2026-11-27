@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: クロスファイル — HTML レポートの生成",
   "command.findStaleIgnores.title": "Saropa Lints: 過期した無視コメントを検索",
   "command.fixStaleIgnores.title": "Saropa Lints: 無効な無視コメントを修正",
+  "command.checkAcceptedFindings.title": "Saropa Lints: 受け入れたFindingを確認",
   "command.openViolationsWideReport.title": "Saropa Lints: オープンな結果ダッシュボード",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: 検索結果ダッシュボードを開く (フィルター保存)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "スキャンパッケージのスキャン",
   "command.packageVibrancy.rescan.title": "再スキャンパッケージ (新品)",
   "command.packageVibrancy.openOtherProject.title": "スキャン 別のプロジェクト...",
+  "command.packageVibrancy.explainLastSkip.title": "最後の Vibrancy スキップを説明",
   "command.packageVibrancy.showReport.title": "パッケージダッシュボードを開く",
   "command.packageVibrancy.showOpportunities.title": "アップグレードの機会をオープンに",
   "command.packageVibrancy.exportOpportunitiesReport.title": "フルな機会レポートのエクスポート",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock にプラグインバージョンを同期する",
   "command.showStatusBarMenu.title": "Saropa Lints: ステータスメニュー",
   "command.scanWithLatestEngine.title": "Saropa Lints: 最新エンジンでスキャン（古いDartプロジェクト）",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDKフォルダ（bin/dartを含む）は「最新エンジンでスキャン」によって使用されます。Dart 3.11以上を使用する必要があります。PATH上のdartを使用する場合は空白にします。",
-  "command.packageVibrancy.explainLastSkip.title": "最後の Vibrancy スキップを説明"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDKフォルダ（bin/dartを含む）は「最新エンジンでスキャン」によって使用されます。Dart 3.11以上を使用する必要があります。PATH上のdartを使用する場合は空白にします。"
 }

@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File – Gerar relatório HTML",
   "command.findStaleIgnores.title": "Saropa Lints: Encontrar Comentários de Ignorar Obsoletos",
   "command.fixStaleIgnores.title": "Saropa Lints: Corrigir Comentários de Ignorar Obsoletos",
+  "command.checkAcceptedFindings.title": "Saropa Lints: Verificar Findings Aceitos",
   "command.openViolationsWideReport.title": "Saropa Lints: Abra o Painel de Resultados do Painel.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Abra o Painel de Resultados (preserve filtros)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Pacotes de varredura em pacote.",
   "command.packageVibrancy.rescan.title": "Pacotes de Rescan (Frescos)",
   "command.packageVibrancy.openOtherProject.title": "Scan Outro Projeto...",
+  "command.packageVibrancy.explainLastSkip.title": "Explicar o último salto do Vibrancy",
   "command.packageVibrancy.showReport.title": "Abra o Painel de Pacote do pacote.",
   "command.packageVibrancy.showOpportunities.title": "Abrir oportunidades de atualização abertas.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Exportar Relatório de Oportunidades Completo",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: Sincronizar Versão do Plugin com pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menu de Status",
   "command.scanWithLatestEngine.title": "Saropa Lints: Escaneie com o Último Motor (Projetos Dart mais antigos)",
-  "config.property.externalEngine.dartSdkPath.description": "Pasta do SDK Dart (contém bin/dart) usada pelo \"Scan with Latest Engine\". Deve ser Dart 3.11 ou mais recente. Deixe em branco para usar o dart no PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "Explicar o último salto do Vibrancy"
+  "config.property.externalEngine.dartSdkPath.description": "Pasta do SDK Dart (contém bin/dart) usada pelo \"Scan with Latest Engine\". Deve ser Dart 3.11 ou mais recente. Deixe em branco para usar o dart no PATH."
 }

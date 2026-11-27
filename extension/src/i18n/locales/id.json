@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Tidak Terverifikasi",
+    "unverifiedTooltip": "Tidak dapat diverifikasi — {reason}. Pertahankan penggantian ini sampai pemindaian berhasil.",
+    "unverifiedStatus": "Tidak diverifikasi — {reason}",
+    "incompleteData": "data tidak lengkap",
+    "groupUnverifiedTooltip": "{count} override(s) tidak dapat diverifikasi; pemindaian tidak lengkap."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Pilih paket untuk melihat detailnya."
@@ -2835,6 +2842,52 @@
       "title": "Perbaiki ignores yang usang dalam berkas ini"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Memeriksa temuan yang diterima…"
+    },
+    "error": {
+      "checkFailed": "Pemeriksaan temuan yang diterima gagal: {message}",
+      "badOutput": "Output pemindaian tidak dapat dibaca.",
+      "noWorkspace": "Tidak ditemukan workspace Dart/Flutter. Buka proyek dengan pubspec.yaml terlebih dahulu.",
+      "missingDep": "Tambahkan saropa_lints ke pubspec.yaml sebelum menggunakan temuan yang diterima.",
+      "noFinding": "Gunakan lampu sorot pada sebuah finding Saropa Lints dalam file Dart untuk menerima perubahan tersebut.",
+      "outsideProject": "File ini tidak berada di dalam paket Dart (tidak ada pubspec.yaml di atasnya), sehingga tidak dapat ditambahkan ke saropa_accepted.yaml.",
+      "writeFailed": "Tidak dapat memperbarui saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml memiliki layout yang tidak dapat diperluas secara otomatis. Tambahkan entri secara manual.",
+      "entryExists": "saropa_accepted.yaml sudah memiliki entri untuk {rule} dalam {file}. Jika entri tersebut memiliki batas jumlah, tingkatkan secara manual."
+    },
+    "info": {
+      "alreadyRunning": "Pemeriksaan accepted-findings sudah sedang berjalan.",
+      "noList": "Tidak ditemukan saropa_accepted.yaml di dalam package manapun di workspace. Gunakan \"Terima di file ini\" pada sebuah finding untuk memulainya.",
+      "clean": "Temuan yang diterima: {count} entri diperiksa, tidak ada yang usang atau tidak valid.",
+      "issues": "Temuan yang diterima: {stale} usang dan {invalid} tidak valid, dari {count} entri. Lihat panel Problems.",
+      "added": "{rule} ditambahkan ke {file} untuk {list}. Temuan sudah jelas terlihat ketika file tersebut dianalisis kembali."
+    },
+    "action": {
+      "openList": "Buka Daftar",
+      "restartAnalysis": "Restart Analisis Server"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Entri usang: {file} tidak lagi ada, sehingga entri ini untuk {rule} tidak menyembunyikan apa pun.",
+      "staleNoFinding": "Entri usang: {rule} tidak menemukan apa-apa di {file}. Hapus entri tersebut jika kode sudah diperbaiki.",
+      "invalid": "Entri tidak valid, tidak menyembunyikan apa-apa: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Mengapa temuan ini diterima?",
+      "kindAccepted": "Diterima: temuan tersebut nyata dan kode tetap seperti semula",
+      "kindFalsePositive": "False positive: aturan ini salah di sini",
+      "reasonTitle": "Alasan menerima {rule} di {file}",
+      "reasonPlaceholder": "Wajib. Disimpan dalam saropa_accepted.yaml untuk reviewer.",
+      "reasonRequired": "Alasan diperlukan."
+    },
+    "quickFix": {
+      "title": "Terima {rule} di dalam berkas ini…"
+    },
+    "summary": {
+      "count": "{count} diterima"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Laporan ini ditandai \"{status}\" tetapi masih ada bugs/ — arsipkan ke plans/history/ sebelum ditutup (lihat ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Tindakan Penyensor (sengaja SDK lama)"
+    },
+    "staleOverride": {
+      "suppress": "Tindakan Penyensor (override adalah sengaja)"
     }
   },
   "blastRadius": {

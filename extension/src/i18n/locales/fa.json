@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ ناپذیرفته",
+    "unverifiedTooltip": "نمی‌توان اطمینان حاصل کرد — {reason}. این افراز را تا زمان موفقیت اسکن حفظ کنید.",
+    "unverifiedStatus": "نامعتبر — {reason}",
+    "incompleteData": "داده‌های ناقص",
+    "groupUnverifiedTooltip": "{count} اوربراید(ها) قابل تأیید نبودند؛ اسکن کامل نبود."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "بسته ای را انتخاب کنید تا جزئیات آن را مشاهده کنید."
@@ -2835,6 +2842,52 @@
       "title": "این فایل ایگنورهای قدیمی را رفع کنید"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "بررسی یافته‌های پذیرفته شده..."
+    },
+    "error": {
+      "checkFailed": "بررسی یافته‌های پذیرفته شده ناموفق بود: {message}",
+      "badOutput": "خروجی اسکن قابل خواندن نبود.",
+      "noWorkspace": "هیچ کارگاه Dart/Flutter یافت نشد. ابتدا یک پروژه با pubspec.yaml باز کنید.",
+      "missingDep": "saropa_lints را قبل از استفاده از یافته‌های پذیرفته‌شده به pubspec.yaml اضافه کنید.",
+      "noFinding": "از چراغ سبز روی یک یافته Saropa Lints در فایل Dart استفاده کنید تا آن را پذیرفته شود.",
+      "outsideProject": "این فایل درون یک پکیج Dart قرار ندارد (هیچ pubspec.yaml پیدا نشد)، بنابراین نمی‌تواند به saropa_accepted.yaml افزوده شود.",
+      "writeFailed": "نمی توانید saropa_accepted.yaml را به روز کنید: {message}",
+      "cannotAppend": "سروپا_accepted.yaml یک لAYOUT دارد که به طور خودکار امکان گسترش نمی‌دهد. ورودی را دستی اضافه کنید.",
+      "entryExists": "ورودی saropa_accepted.yaml قبلاً برای {rule} در {file} وجود دارد. اگر ورودی یک مقدار حداکثر داشته باشد، آن را دستی افزایش دهید."
+    },
+    "info": {
+      "alreadyRunning": "یک بررسی یافته‌های پذیرفته‌شده در حال اجراست.",
+      "noList": "هیچ فایل saropa_accepted.yaml یافت نشد. از \"پذیرفتن در این فایل\" روی یک یافته استفاده کنید تا شروع کنید.",
+      "clean": "یافته‌های پذیرفته شده: {count} ورودی بررسی شده، هیچ کدام معتبر یا مغایر نیست.",
+      "issues": "یافته های پذیرفته شده: {stale} معلق و {invalid} نامعتبر، از {count} ورودی. به پنل مشکلات مراجعه کنید.",
+      "added": "{rule} به {file} افزوده شد تا {list} نمایش داده شود. یافته‌ها همچنین به طور واضح نمایش داده می‌شوند زمانی که فایل مجدد تحلیل می‌شود."
+    },
+    "action": {
+      "openList": "لیست باز کنید",
+      "restartAnalysis": "تحلیل سرور را مجدد شروع کنید"
+    },
+    "diagnostic": {
+      "staleFileMissing": "ورودی قدیمی: {file} دیگر وجود ندارد، بنابراین ورودی {rule} چیزی را پنهان نمی‌کند.",
+      "staleNoFinding": "ورودی قدیمی: {rule} چیزی در {file} پیدا نشد. اگر کد را تصحیح کردید، ورودی را حذف کنید.",
+      "invalid": "ورودی نامعتبر، چیزی را پنهان نمی‌کند: {message}"
+    },
+    "prompt": {
+      "kindTitle": "چرا این یافته پذیرفته شده است؟",
+      "kindAccepted": "پذیرفته شده: یافته وجود دارد و کد بدون تغییر باقی می‌ماند",
+      "kindFalsePositive": "غلط مثبت: قاعده اینجا نادرست است",
+      "reasonTitle": "دلیل پذیرش {rule} در {file}",
+      "reasonPlaceholder": "ضروری است. در فایل saropa_accepted.yaml برای نگاه کشی ذخیره شده است.",
+      "reasonRequired": "دلیلی ضروری است."
+    },
+    "quickFix": {
+      "title": "Accept {rule} در این فایل..."
+    },
+    "summary": {
+      "count": "{count} پذیرفته شده است"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "این گزارش به \"{status}\" نمادین شده اما هنوز در bugs/ است — آن را قبل از بستن به plans/history/ ارکیو کنید (برای مشاهده ISSUE_REPORT_GUIDE.md ببینید)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "کنترل (مدتی پیش از این SDK)"
+    },
+    "staleOverride": {
+      "suppress": "کنترل (تغییر ارائه شده مقصود است)"
     }
   },
   "blastRadius": {
@@ -3169,7 +3225,7 @@
   "externalEngine": {
     "noProject": "ابتدا پوشه‌ی Dart پروژه را باز کنید.",
     "sdkTooOld": "آخرین موتور Saropa Lints نیاز به Dart {required} یا جدیدتر است، اما موتور Dart استفاده شده در اینجا {found} است. یک SDK جدیدتر Dart نصب کنید و \"saropaLints.externalEngine.dartSdkPath\" را به پوشه آن تنظیم کنید.",
-    "sdkUnknown": "ناشناخته",
+    "sdkUnknown": "نامشخص",
     "install": {
       "prompt": "این نسخه آخرین Saropa Lints اینتل را به صورت جهانی نصب می کند (dart pub global activate saropa_lints) با استفاده از یک SDK جدیدتر Dart، سپس این پروژه را با آن اسکن می کند. نسخه pubspec.yaml و پین SDK پروژه این پروژه تغییر نمی کند.",
       "confirm": "نصب و اسکن"

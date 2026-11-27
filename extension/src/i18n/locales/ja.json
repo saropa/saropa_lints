@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ 未検証",
+    "unverifiedTooltip": "確認できませんでした — {reason}。スキャンが成功するまでこのオーバーライドを維持してください。",
+    "unverifiedStatus": "未検証 — {reason}",
+    "incompleteData": "データが不完全です",
+    "groupUnverifiedTooltip": "{count} オーバーライドは確認できませんでした; スキャンが不完全でした。"
+  },
   "detailView": {
     "empty": {
       "selectPackage": "詳細を見るにはパッケージを選択してください."
@@ -2835,6 +2842,52 @@
       "title": "このファイルの古くなった無視設定を修正してください"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "受け入れ可能なfindingを確認中…"
+    },
+    "error": {
+      "checkFailed": "検査を受け入れたフィンディングの確認に失敗しました: {message}",
+      "badOutput": "スキャン出力が読み取れませんでした。",
+      "noWorkspace": "Dart/Flutter ワークスペースが見つかりません。まず pubspec.yaml でプロジェクトを開いてください。",
+      "missingDep": "受け入れられたfindingを使用する前にsaropa_lintsをpubspec.yamlに追加してください。",
+      "noFinding": "Saropa Lints ファイル内の Dart の finding でライトボタンを使用して受け入れます。",
+      "outsideProject": "このファイルはDartパッケージ内にありません（上記にpubspec.yamlがありません）、そのためsaropa_accepted.yamlに追加できません。",
+      "writeFailed": "saropa_accepted.yaml を更新できませんでした: {message}",
+      "cannotAppend": "saropa_accepted.yaml は自動的に拡張できないレイアウトを持っています。手動でエントリを追加してください。",
+      "entryExists": "saropa_accepted.yaml には {rule} に対するエントリが {file} にすでに存在しています。エントリに最大カウントが設定されている場合は、手動でそれを上げる必要があります。"
+    },
+    "info": {
+      "alreadyRunning": "受け入れられたfindingの確認はすでに実行中です。",
+      "noList": "ワークスペース内のどのパッケージにも saropa_accepted.yaml が見つからないです。解決策を開始するには、フィンディング上で「このファイルで受け入れる」を選択してください。",
+      "clean": "受け入れられたフィンディング: {count}件のエントリが確認され、いずれも古びたものや無効なものではありません。",
+      "issues": "受け入れられたfinding: {stale} 過期および {invalid} 無効、{count}件中。問題パネルをご確認ください。",
+      "added": "{rule}を{file}に{list}に追加しました。ファイルが再度解析されるとき、既に見つかったfindingは明確に表示されます。"
+    },
+    "action": {
+      "openList": "オープンリスト",
+      "restartAnalysis": "分析サーバーを再起動"
+    },
+    "diagnostic": {
+      "staleFileMissing": "不適切なエントリ: {file}はもはや存在しないため、{rule}のこのエントリは何もないことを隠していません。",
+      "staleNoFinding": "不適なエントリ: {rule} は {file} に何も見つかりませんでした。コードが修正された場合はエントリを削除してください。",
+      "invalid": "無効なエントリ、何もない: {message}"
+    },
+    "prompt": {
+      "kindTitle": "なぜこのfindingは承認されていますか？",
+      "kindAccepted": "承認済み: そのfindingは現実的であり、コードはそのままの状態で残ります",
+      "kindFalsePositive": "誤検出: このルールはここでは間違っています",
+      "reasonTitle": "{rule}を{file}で受け入れる理由",
+      "reasonPlaceholder": "必須です。レビュワーのために saropa_accepted.yaml に保存されています。",
+      "reasonRequired": "理由が必要です。"
+    },
+    "quickFix": {
+      "title": "このファイルで{rule}を受け入れます…"
+    },
+    "summary": {
+      "count": "{count} 承認"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "このレポートは「{status}」とマークされていますが、まだbugs/にあります — 閉じる前にplans/history/にアーカイブしてください（ISSUE_REPORT_GUIDE.mdを参照）。"
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "抑制（意図的な旧SDK）"
+    },
+    "staleOverride": {
+      "suppress": "抑制（オーバーライドは意図的）"
     }
   },
   "blastRadius": {
@@ -3169,7 +3225,7 @@
   "externalEngine": {
     "noProject": "最初にDartプロジェクトフォルダを開いてください。",
     "sdkTooOld": "最新のSaropa LintsエンジンはDart {required}または新しいバージョンが必要ですが、ここではDartの{found}が使用されています。新しいDartSDKをインストールし、\"saropaLints.externalEngine.dartSdkPath\"をそのフォルダに設定してください。",
-    "sdkUnknown": "未知",
+    "sdkUnknown": "不明",
     "install": {
       "prompt": "これは、新しいDart SDKを使用して、最新のSaropa Lintsエンジンをグローバルにインストール（dart pub global activate saropa_lints）し、このプロジェクトをスキャンします。このプロジェクトのpubspec.yamlおよびSDKピンは変更されません。",
       "confirm": "インストールしてスキャン"

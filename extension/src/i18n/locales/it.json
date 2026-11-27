@@ -5,54 +5,54 @@
     "unknownPathSdk": "Impossibile determinare la versione di Dart SDK per il dart in PATH, e il progetto non ha una versione SDK leggibile.",
     "staleLock": "pubspec.lock manca o è illeggibile, quindi pub risolverebbe di nuovo le dipendenze.",
     "staleConfig": "La configurazione dei pacchetti manca o non elenca i pacchetti bloccati, quindi pub risolverebbe di nuovo le dipendenze.",
+    "depsNotLocked": "pubspec.yaml dichiara dipendenze che pubspec.lock non elenca, quindi pub risolverebbe di nuovo le dipendenze.",
+    "source": {
+      "dartSdkPath": "impostazione dart.sdkPath",
+      "flutterSdkPath": "impostazione dart.flutterSdkPath",
+      "fvm": "Pin FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "nessuna evidenza dell'SDK del progetto",
-      "lockConstraint": "vincolo sdks di pubspec.lock"
-    },
-    "constraintUnverifiable": "Impossibile verificare una dipendenza di pubspec.yaml rispetto a pubspec.lock (vincolo git, personalizzato o non analizzabile), quindi pub potrebbe risolvere di nuovo le dipendenze.",
-    "explain": {
-      "pickFolder": "Scegli una cartella di progetto da spiegare",
-      "none": "Nessuna query pub di Vibrancy è stata saltata in questa sessione.",
-      "unknown": "sconosciuto",
-      "title": "Package Vibrancy ha saltato una query pub",
-      "project": "SDK del progetto: {value} (da {source})",
-      "folder": "Cartella del progetto: {cwd}",
-      "reason": "Motivo: {reason}",
-      "rule": "Regola: {rule}",
-      "pathConfirmRun": "Esegui comunque pub get",
-      "runPubGet": "Esegui pub get con l'SDK del progetto",
-      "toolVersion": "Versione SDK selezionata: {version}",
-      "sdk": "SDK selezionato: {path} (da {source})",
-      "time": "Saltato alle: {time}",
-      "pathConfirm": "L'SDK selezionato proviene da PATH, la configurazione che ha riscritto pubspec.lock con l'SDK sbagliato. Eseguire comunque pub get?",
-      "pubGetFailed": "pub get non riuscito: {error}",
-      "pubGetDone": "pub get completato con l'SDK del progetto."
-    },
-    "rule": {
-      "constraintUnverifiable": "Vincolo non verificabile",
-      "depsNotLocked": "Dipendenza non bloccata",
-      "lockSdkConstraint": "Vincolo SDK del lock",
-      "constraintNotSatisfied": "Versione bloccata fuori dal vincolo",
-      "staleLock": "File di lock mancante o illeggibile",
-      "pathDepNewer": "Dipendenza di percorso modificata",
-      "sdkMismatch": "Versione SDK non corrispondente",
-      "staleConfig": "Configurazione dei pacchetti obsoleta",
-      "unknownPathSdk": "SDK in PATH sconosciuto"
-    },
-    "source": {
-      "fvm": "Pin FVM (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "impostazione dart.flutterSdkPath",
-      "dartSdkPath": "impostazione dart.sdkPath"
+      "lockConstraint": "vincolo sdks di pubspec.lock",
+      "none": "nessuna evidenza dell'SDK del progetto"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy ha saltato una query pub per non riscrivere pubspec.lock. Clicca per i dettagli.",
-      "text": "Vibrancy: pub saltato"
+      "text": "Vibrancy: pub saltato",
+      "tooltip": "Package Vibrancy ha saltato una query pub per non riscrivere pubspec.lock. Clicca per i dettagli."
     },
+    "explain": {
+      "title": "Package Vibrancy ha saltato una query pub",
+      "none": "Nessuna query pub di Vibrancy è stata saltata in questa sessione.",
+      "unknown": "sconosciuto",
+      "reason": "Motivo: {reason}",
+      "rule": "Regola: {rule}",
+      "sdk": "SDK selezionato: {path} (da {source})",
+      "toolVersion": "Versione SDK selezionata: {version}",
+      "project": "SDK del progetto: {value} (da {source})",
+      "folder": "Cartella del progetto: {cwd}",
+      "time": "Saltato alle: {time}",
+      "runPubGet": "Esegui pub get con l'SDK del progetto",
+      "pubGetDone": "pub get completato con l'SDK del progetto.",
+      "pubGetFailed": "pub get non riuscito: {error}",
+      "pickFolder": "Scegli una cartella di progetto da spiegare",
+      "pathConfirm": "L'SDK selezionato proviene da PATH, la configurazione che ha riscritto pubspec.lock con l'SDK sbagliato. Eseguire comunque pub get?",
+      "pathConfirmRun": "Esegui comunque pub get"
+    },
+    "constraintNotSatisfied": "{name} è bloccato a {version}, che non soddisfa il vincolo {constraint} in pubspec.yaml, quindi pub risolverebbe di nuovo le dipendenze.",
+    "constraintUnverifiable": "Impossibile verificare una dipendenza di pubspec.yaml rispetto a pubspec.lock (vincolo git, personalizzato o non analizzabile), quindi pub potrebbe risolvere di nuovo le dipendenze.",
     "pathDepNewer": "La dipendenza di percorso {name} è cambiata dopo la scrittura di pubspec.lock, quindi pub risolverebbe di nuovo le dipendenze.",
-    "depsNotLocked": "pubspec.yaml dichiara dipendenze che pubspec.lock non elenca, quindi pub risolverebbe di nuovo le dipendenze.",
-    "constraintNotSatisfied": "{name} è bloccato a {version}, che non soddisfa il vincolo {constraint} in pubspec.yaml, quindi pub risolverebbe di nuovo le dipendenze."
+    "rule": {
+      "sdkMismatch": "Versione SDK non corrispondente",
+      "lockSdkConstraint": "Vincolo SDK del lock",
+      "unknownPathSdk": "SDK in PATH sconosciuto",
+      "staleLock": "File di lock mancante o illeggibile",
+      "staleConfig": "Configurazione dei pacchetti obsoleta",
+      "depsNotLocked": "Dipendenza non bloccata",
+      "constraintNotSatisfied": "Versione bloccata fuori dal vincolo",
+      "constraintUnverifiable": "Vincolo non verificabile",
+      "pathDepNewer": "Dipendenza di percorso modificata"
+    }
   },
   "about": {
     "ruleCountStrip": "Regole {total} di lint attualmente presenti in questa versione (essenziali {essential} · consigliate {recommended} · professionali {professional} · complete {comprehensive} · pedanti {pedantic} · {stylistic} stili opt-in)"
@@ -314,7 +314,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX e librerie di stato e iniezione delle dipendenze correlate.",
       "networking-apis": "Clienti HTTP, GraphQL, Firebase, Supabase e connettività.",
       "storage-persistence": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotto.",
-      "navigation-deep-links": "Regole rigorose:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua durante la frase.",
+      "navigation-deep-links": "Regole rigorose:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo di una frase.\n\nTesto: Routing e gestione dei deep-link — auto_route, go_router, app_links, url_launcher e webview.",
       "media-graphics": "Immagini, SVG, animazione, audio, mappe, pickers e il motore Flame.",
       "device-platform": "Sensori, posizione, autorizzazioni, biometria, notifiche e lavoro in background.",
       "identity-sharing": "Fornitori di accesso, condivisione e revisione in-app.",
@@ -2240,7 +2240,7 @@
         "ci": "Legge e scrive .github/workflows/saropa-lints.yml nel tuo albero di lavoro per abilitare o disabilitare il workflow bundled GitHub Actions. Questo riflette il file sulla tua ramo corrente — la copia del ramo di default è ciò che effettivamente gate le richieste di pull, e i due possono divergere. L'abilitazione/non abilitazione non esegue mai né elimina il workflow; tu stesso ancora revisioni e commit il cambiamento."
       },
       "recommended": {
-        "analyzerPlugin": "Regole Rigide:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzione, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare la corretta sistema di scrittura per la lingua di destinazione; non passare a un'altra lingua durante la frase.\n\nTesto: Consigliato: OFF mentre il Server LSP è acceso. Accendi (con LSP disattivato) se una regola smette di attivarsi con LSP.",
+        "analyzerPlugin": "Regole Rigide:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzione, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare la corretta rappresentazione grafica del sistema di scrittura della lingua di destinazione; non passare a un'altra lingua durante la frase.\n\nTesto: Consigliato: OFF mentre il Server LSP è acceso. Accendi (con LSP disattivato) se una regola smette di attivarsi con LSP.",
         "scanDaemon": "Raccomandato: ACCESO.",
         "lspServer": "Raccomandato: ON (predefinito, beta). Copre la diagnostica in tempo reale.",
         "ci": "Consigliato: ACCESO solo se desideri che le richieste di pull siano soggette a verifica."
@@ -2309,6 +2309,13 @@
         "pubspecHasOtherEdits": "pubspec.yaml aveva già modifiche non committate tue. Un commit riguarda interi file, quindi la pubblicazione da qui spingerà anche quelle modifiche. Committa o mettile in sospeso, quindi esegui manualmente i comandi sopra."
       }
     }
+  },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Non verificato",
+    "unverifiedTooltip": "Non è stato possibile verificare — {reason}. Mantieni questo override fino al successo dello scan.",
+    "unverifiedStatus": "Non verificato — {reason}",
+    "incompleteData": "dati incompleti",
+    "groupUnverifiedTooltip": "{count} override(s) non possono essere verificati; lo scan è incompleto."
   },
   "detailView": {
     "empty": {
@@ -2835,6 +2842,52 @@
       "title": "Correggi ignorati obsoleti in questo file"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Verifica dei finding accettati…"
+    },
+    "error": {
+      "checkFailed": "Verifica trovati accettati fallita: {message}",
+      "badOutput": "L'output dello scan non è stato letto.",
+      "noWorkspace": "Nessun workspace Dart/Flutter trovato. Apri un progetto con pubspec.yaml prima.",
+      "missingDep": "Aggiungi saropa_lints a pubspec.yaml prima di utilizzare i findings accettati.",
+      "noFinding": "Usa la lampadina sul finding Saropa Lints in un file Dart per accettarlo.",
+      "outsideProject": "Questo file non è all'interno di un package Dart (nessun pubspec.yaml sopra di esso), quindi non può essere aggiunto a saropa_accepted.yaml.",
+      "writeFailed": "Non è stato possibile aggiornare saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml ha un layout che non può essere esteso automaticamente. Aggiungi l'entry a mano.",
+      "entryExists": "saropa_accepted.yaml ha già un'entrata per {rule} in {file}. Se l'entrata ha un massimo di conteggio, aumentalo a mano."
+    },
+    "info": {
+      "alreadyRunning": "Un controllo sui finding accettati è già in esecuzione.",
+      "noList": "Nessun saropa_accepted.yaml trovato in alcun package del workspace. Utilizza \"Accetta in questo file\" su un finding per iniziare uno.",
+      "clean": "Finding accettati: {count} entry verificati, nessuno scaduto o invalido.",
+      "issues": "Finding accettati: {stale} obsoleti e {invalid} invalidi, su {count} entrata. Vedere il pannello Problemi.",
+      "added": "Aggiunto {rule} in {file} per {list}. I findings sono già visibili chiaramente quando il file viene analizzato nuovamente."
+    },
+    "action": {
+      "openList": "Apri Lista",
+      "restartAnalysis": "Riavvia Server di Analisi"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Entrata obsoleta: {file} non esiste più, quindi questa entrata per {rule} non nasconde nulla.",
+      "staleNoFinding": "Entrata obsoleta: {rule} non ha trovato nulla in {file}. Rimuovi l'entrata se il codice è stato corretto.",
+      "invalid": "Entrata non valida, nascosto nulla: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Perché questo finding è accettato?",
+      "kindAccepted": "Accettato: il finding è reale e il codice rimane com'è",
+      "kindFalsePositive": "Falso positivo: la regola è errata qui",
+      "reasonTitle": "Motivo dell'accettazione di {rule} in {file}",
+      "reasonPlaceholder": "Obbligatorio. Salvato in saropa_accepted.yaml per i revisori.",
+      "reasonRequired": "È richiesta una ragione."
+    },
+    "quickFix": {
+      "title": "Accetta {rule} in questo file…"
+    },
+    "summary": {
+      "count": "{count} accettato"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Questo rapporto è contrassegnato \"{status}\" ma è ancora in bugs/ — archiviare prima di chiudere (vedi ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Ignora (SDK obsoleto intenzionale)"
+    },
+    "staleOverride": {
+      "suppress": "Ignora (override è intenzionale)"
     }
   },
   "blastRadius": {

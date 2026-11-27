@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ 未验证",
+    "unverifiedTooltip": "无法验证 — {reason}。请保持此覆盖直至扫描成功。",
+    "unverifiedStatus": "未验证 — {reason}",
+    "incompleteData": "数据不完整",
+    "groupUnverifiedTooltip": "{count} 重写方法无法验证；扫描不完整。"
+  },
   "detailView": {
     "empty": {
       "selectPackage": "选择一个包,以查看详细信息."
@@ -2835,6 +2842,52 @@
       "title": "修复此文件中过时的忽略项"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "检查已接受的发现…"
+    },
+    "error": {
+      "checkFailed": "检查接受的发现失败：{message}",
+      "badOutput": "扫描输出无法读取。",
+      "noWorkspace": "未找到 Dart/Flutter 工作区。请先打开一个 pubspec.yaml 项目。",
+      "missingDep": "在使用接受的 finding 之前，请添加 saropa_lints 到 pubspec.yaml",
+      "noFinding": "使用 Saropa Lints 文件中 Dart 的轻量灯泡来接受该问题。",
+      "outsideProject": "此文件不在一个Dart包内（其上方没有pubspec.yaml），因此无法添加到saropa_accepted.yaml中。",
+      "writeFailed": "无法更新 saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml 的布局无法自动扩展。手动添加该条目。",
+      "entryExists": "saropa_accepted.yaml 中已经为 {rule} 在 {file} 中添加了条目。如果该条目有最大计数，请手动提高该计数。"
+    },
+    "info": {
+      "alreadyRunning": "已有一个接受的发现检查正在运行。",
+      "noList": "未在工作区的任何包中找到 saropa_accepted.yaml。在找到的 issue 上使用“在此文件中接受”以开始一个。",
+      "clean": "已接受的发现：{count}项已检查，无过期或无效项。",
+      "issues": "已接受的发现：{stale} 过期和 {invalid} 无效，共 {count} 条。请查看 Problems 面板。",
+      "added": "在 {file} 中添加了 {rule} 到 {list}。当文件再次被分析时，已显示清晰的 finding。"
+    },
+    "action": {
+      "openList": "打开列表",
+      "restartAnalysis": "重启分析服务器"
+    },
+    "diagnostic": {
+      "staleFileMissing": "过时条目：{file} 不再存在，因此此条目对 {rule} 不起任何隐藏作用。",
+      "staleNoFinding": "过时条目：在{file}中未找到{rule}。如果代码已修复，请删除该条目。",
+      "invalid": "无效条目，隐藏不了什么：{message}"
+    },
+    "prompt": {
+      "kindTitle": "为什么这个发现被接受？",
+      "kindAccepted": "已接受：该问题真实存在，代码保持原样",
+      "kindFalsePositive": "误报：此处规则不正确",
+      "reasonTitle": "接受{rule}的原因{file}",
+      "reasonPlaceholder": "必填。保存在 saropa_accepted.yaml 中供审阅者使用。",
+      "reasonRequired": "需要一个原因。"
+    },
+    "quickFix": {
+      "title": "接受此文件中的 {rule}…"
+    },
+    "summary": {
+      "count": "{count} 已接受"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "此报告标记为\"{status}\"但仍有bug/ — 在关闭前请归档到plans/history/（参见ISSUE_REPORT_GUIDE.md）。"
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "抑制（有意使用旧 SDK）"
+    },
+    "staleOverride": {
+      "suppress": "抑制（覆盖是故意的）"
     }
   },
   "blastRadius": {

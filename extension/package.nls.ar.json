@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File — إنشاء تقرير HTML",
   "command.findStaleIgnores.title": "Saropa Lints: ابحث عن التعليقات المهمّة المُهمَّلة",
   "command.fixStaleIgnores.title": "Saropa Lints: إصلاح التعليقات المهمّة غير المحدثة",
+  "command.checkAcceptedFindings.title": "Saropa Lints: تحقق من العناصر المقبولة",
   "command.openViolationsWideReport.title": "Saropa Lints: افتحوا لوحة تحكم النتائج.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: فتح لوحة تحكم النتائج (الحفاظ على الفلاتر)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "حزم مسح الملفات",
   "command.packageVibrancy.rescan.title": "حزم إعادة المسح (الجديدة)",
   "command.packageVibrancy.openOtherProject.title": "مسح مشروع آخر...",
+  "command.packageVibrancy.explainLastSkip.title": "شرح آخر تخطٍّ في Vibrancy",
   "command.packageVibrancy.showReport.title": "افتح لوحة تحكم الحزمة.",
   "command.packageVibrancy.showOpportunities.title": "فتح فرص الترقية المفتوحة.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "تقرير الفرص الكاملة للتصدير",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: تزامن إصدار الإضافة مع pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: قائمة الحالة",
   "command.scanWithLatestEngine.title": "Saropa Lints: مسح باستخدام المحرك الأحدث (مشاريع Dart القديمة)",
-  "config.property.externalEngine.dartSdkPath.description": "مجلد Dart SDK (يحتوي على bin/dart) المستخدم بواسطة \"المسح باستخدام المحرك الأحدث\". يجب أن يكون Dart 3.11 أو أحدث. تركه فارغًا لاستخدام dart الموجود في PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "شرح آخر تخطٍّ في Vibrancy"
+  "config.property.externalEngine.dartSdkPath.description": "مجلد Dart SDK (يحتوي على bin/dart) المستخدم بواسطة \"المسح باستخدام المحرك الأحدث\". يجب أن يكون Dart 3.11 أو أحدث. تركه فارغًا لاستخدام dart الموجود في PATH."
 }

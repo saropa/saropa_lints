@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: кросс-файл — создание HTML-отчета",
   "command.findStaleIgnores.title": "Saropa Lints: Найдите устаревшие комментарии Ignore",
   "command.fixStaleIgnores.title": "Saropa Lints: Исправить устаревшие комментарии Ignore",
+  "command.checkAcceptedFindings.title": "Saropa Lints: Проверьте принятые проблемы",
   "command.openViolationsWideReport.title": "Saropa Lints: Открыть панель инструментов результатов.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Открыть панель данных (сохранить фильтры)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Пакеты сканирования Scan Packages",
   "command.packageVibrancy.rescan.title": "Пакеты с повторным сканированием (свежие)",
   "command.packageVibrancy.openOtherProject.title": "Сканирование Другой проект...",
+  "command.packageVibrancy.explainLastSkip.title": "Объяснить последний пропуск Vibrancy",
   "command.packageVibrancy.showReport.title": "Откройте панель инструментов пакета.",
   "command.packageVibrancy.showOpportunities.title": "Открыть возможности для обновления.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Экспорт полного отчета о возможностях",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: Синхронизировать версию плагина с pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Меню Статуса",
   "command.scanWithLatestEngine.title": "Saropa Lints: Сканирование с использованием последней версии движка (старые проекты Dart)",
-  "config.property.externalEngine.dartSdkPath.description": "Папка Dart SDK (содержит bin/dart), используемая \"Scan with Latest Engine\". Должна быть Dart 3.11 или новее. Оставьте пустым, чтобы использовать dart из PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "Объяснить последний пропуск Vibrancy"
+  "config.property.externalEngine.dartSdkPath.description": "Папка Dart SDK (содержит bin/dart), используемая \"Scan with Latest Engine\". Должна быть Dart 3.11 или новее. Оставьте пустым, чтобы использовать dart из PATH."
 }

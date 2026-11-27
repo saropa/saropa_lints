@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File — Bumuo ng HTML Report",
   "command.findStaleIgnores.title": "Saropa Lints: Hanapin ang mga komento na walang epekto",
   "command.fixStaleIgnores.title": "Saropa Lints: Ito ay Pagbabago ng mga Komento na Ibaon sa Ignore",
+  "command.checkAcceptedFindings.title": "Saropa Lints: I-check ang mga Nakakatanggap na Finding",
   "command.openViolationsWideReport.title": "Saropa Lints: Buksan ang Findings Dashboard",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Buksan ang Mga Natuklasan ng Dashboard (ipreserba ang mga filter)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Pag-scan ng mga pakete ng scan",
   "command.packageVibrancy.rescan.title": "Mga Package ng Rescan (Fresh)",
   "command.packageVibrancy.openOtherProject.title": "Scan Ang Isa Pang Proyekto...",
+  "command.packageVibrancy.explainLastSkip.title": "Ipaliwanag ang Huling Vibrancy Skip",
   "command.packageVibrancy.showReport.title": "Buksan ang Dashboard ng Package na Packet.",
   "command.packageVibrancy.showOpportunities.title": "Buksan ang mga Oportunidad sa Pag-upgrade ng Mga Opportunity",
   "command.packageVibrancy.exportOpportunitiesReport.title": "I-export ang Full Opportunities Report",
@@ -190,7 +192,7 @@
   "config.property.enabled.markdownDescription": "**Scan sa pag-save (saropa_lints daemon).** Kapag **on** (default), itinutukoy ang pag-scan muli sa Dart mga file sa pag-save at ipapakita ang mga resulta bilang mga squiggles at mga entry sa panel ng Problems. I-off ang **off** upang mag-stop lamang sa iyon path ng scan sa pag-save—dapat hindi ang buong extension: ang LSP server (`saropaLints.lspServer.enabled`) at ang in-editor analyzer plugin ay mga mag-ibang switch na ipapakita sa row ng Engines sa sidebar (bukas ang **Saropa Lints: Show Process Health** para sa detalye). Gamitin ang **Saropa Lints: Set Up Project** kapag kailangan mo i-add ang `saropa_lints` sa pubspec at i-write ang `analysis_options`.",
   "config.property.tier.description": "Default tier kapag pinapayagan o muling pag-initialise.",
   "config.property.scanOnSave.resolveTypes.markdownDescription": "Kapag **on** (default), ang scan-on-save ay nagpapakita ng kompletong resolusyon ng bawat file's types (`--resolve`), kaya ang mga rule na base sa type ay gumagana nang tama. Mas masakit ang bawat pag-save kumpara sa mas mabilis na landas na lang syntactic; i-off lamang kung ang latency sa pag-save ay mas mahalaga kaysa sa pagkuha ng mga resulta na base sa type.",
-  "config.property.scanOnSave.timeoutSeconds.markdownDescription": "Sino ang panahon (sa segundo) na maaaring makatagal bago ang isang scan-on-save run ay iwanan at ang proseso nito ay i-kill. Ang default na **180** ay naglalabas sa pinakamabilis na legitem na run na napatunayan para sa feature na ito: isang buong 200-file batch sa ~3 files/s pati na rin ang cold `dart run` compile. Ang mga halaga na mas mababa sa **30** o mas mataas sa **1800** ay inilalarawan — isang mas mababang timeout ay maaaring magresulta sa pag-iwan ng mas mabuting unang run, at isang mas matagal na timeout ay muling magpapalagay ng hanggang ito ay nais ipaglaban.",
+  "config.property.scanOnSave.timeoutSeconds.markdownDescription": "Sino ang panahon (sa segundo) na maaaring makatagal bago ang isang scan-on-save run ay iwanan at ang proseso nito ay i-kill. Ang default na **180** ay naglalabas sa pinakamabilis na legitem na run na napatunayan para sa feature na ito: isang buong 200-file batch sa ~3 files/s plus isang cold `dart run` compile. Ang mga halaga na mas mababa sa **30** o mas mataas sa **1800** ay inilalarawan — isang mas mababang timeout ay maaaring magresulta sa pag-iwan ng mas mabuting unang run, at isang mas matagal na timeout ay muling magpapalabas ng hanggang ito ay nais ipaglaban.",
   "config.property.runAnalysisAfterConfigChange.description": "Patakbuhin ang dart analyze pagkatapos ng init o config change kapag pinagana.",
   "config.property.runAnalysisAfterDependencyChange.description": "Awtomatikong muling patakbuhin ang dart analyze kapag nagbago ang pubspec.lock (pagkatapos ng pub get / pub upgrade). Gumagamit ng 10 segundong pag-debounce para pagsama-samahin ang mga mabilis na resolusyon ng dependency.",
   "config.property.uiLanguage.description": "Ang wika ng UI para sa Saropa sidebar at dashboard. Gamitin ang 'auto' upang sundin ang VS Code display language. Ang sidebar language picker ay nag-iimbak ng halaga na ito sa mga setting ng User upang magamit ito sa bawat workspace.",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: Synchronize Plugin Version sa pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menu ng Status",
   "command.scanWithLatestEngine.title": "Saropa Lints: I-scan na may pinakabagong engine (Mga proyekto na mas matanda na Dart)",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK folder (naglalaman ng bin/dart) na ginagamit ng \"Scan with Latest Engine\". Kailangan itong Dart 3.11 o mas bagong bersyon. I-leave blank upang gamitin ang dart sa PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "Ipaliwanag ang Huling Vibrancy Skip"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK folder (naglalaman ng bin/dart) na ginagamit ng \"Scan with Latest Engine\". Kailangan itong Dart 3.11 o mas bagong bersyon. I-leave blank upang gamitin ang dart sa PATH."
 }

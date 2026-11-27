@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: ক্রস-ফাইল — HTML রিপোর্ট তৈরি করুন",
   "command.findStaleIgnores.title": "Saropa Lints: অপচয় করা অবহেলনা কমেন্ট খুঁজুন",
   "command.fixStaleIgnores.title": "Saropa Lints: ফিক্স স্টেল ইগনর কমেন্ট",
+  "command.checkAcceptedFindings.title": "Saropa Lints: গ্রহণযোগ্য খুঁজতে চেক করুন",
   "command.openViolationsWideReport.title": "Saropa Lints: ওপেন ফাইন্ডিংস ড্যাশবোর্ড খুলুন",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: ওপেন ফাইন্ডিংস ড্যাশবোর্ড (ফিল্টার সংরক্ষণ করুন)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "স্ক্যান প্যাকেজগুলি স্ক্রিন করুন",
   "command.packageVibrancy.rescan.title": "রিস্ক্যান প্যাকেজ (নতুন)",
   "command.packageVibrancy.openOtherProject.title": "স্ক্যান আরেকটি প্রকল্প ...",
+  "command.packageVibrancy.explainLastSkip.title": "সর্বশেষ Vibrancy এড়িয়ে যাওয়ার ব্যাখ্যা দিন",
   "command.packageVibrancy.showReport.title": "প্যাকেজ ড্যাশবোর্ড খুলুন",
   "command.packageVibrancy.showOpportunities.title": "ওপেন আপগ্রেড সুযোগগুলি খুলুন",
   "command.packageVibrancy.exportOpportunitiesReport.title": "পূর্ণ সুযোগ রিপোর্ট এক্সপোর্ট করুন",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock এ প্লাগিন ভার্সন সিঙ্ক করুন",
   "command.showStatusBarMenu.title": "Saropa Lints: স্ট্যাটাস মেনু",
   "command.scanWithLatestEngine.title": "Saropa Lints: সর্বশেষ ইঞ্জিন দিয়ে স্ক্যান করুন (পুরানো Dart প্রকল্প)",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK ফোল্ডার (বিন/ডার্ট কনটেইন করে) \"স্ক্যান করুন সর্বশেষ ইঞ্জিন দ্বারা\" ব্যবহার করা হয়। এটি Dart 3.11 বা নতুন হতে হবে। PATH এ ডার্ট ব্যবহার করতে খালি রাখুন।",
-  "command.packageVibrancy.explainLastSkip.title": "সর্বশেষ Vibrancy এড়িয়ে যাওয়ার ব্যাখ্যা দিন"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK ফোল্ডার (বিন/ডার্ট কনটেইন করে) \"স্ক্যান করুন সর্বশেষ ইঞ্জিন দ্বারা\" ব্যবহার করা হয়। এটি Dart 3.11 বা নতুন হতে হবে। PATH এ ডার্ট ব্যবহার করতে খালি রাখুন।"
 }

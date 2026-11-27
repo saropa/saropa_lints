@@ -5,54 +5,54 @@
     "unknownPathSdk": "No se pudo determinar la versión de Dart SDK del dart en PATH, y el proyecto no tiene una versión de SDK legible.",
     "staleLock": "pubspec.lock falta o es ilegible, por lo que pub volvería a resolver las dependencias.",
     "staleConfig": "La configuración de paquetes falta o no incluye los paquetes bloqueados, por lo que pub volvería a resolver las dependencias.",
+    "depsNotLocked": "pubspec.yaml declara dependencias que pubspec.lock no incluye, por lo que pub volvería a resolver las dependencias.",
+    "source": {
+      "dartSdkPath": "ajuste dart.sdkPath",
+      "flutterSdkPath": "ajuste dart.flutterSdkPath",
+      "fvm": "Fijación de FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "sin evidencia del SDK del proyecto",
-      "lockConstraint": "restricción sdks de pubspec.lock"
-    },
-    "constraintUnverifiable": "No se pudo comprobar una dependencia de pubspec.yaml con pubspec.lock (restricción git, personalizada o no analizable), por lo que pub podría volver a resolver las dependencias.",
-    "explain": {
-      "pickFolder": "Elija una carpeta de proyecto para explicar",
-      "none": "No se ha omitido ninguna consulta pub de Vibrancy en esta sesión.",
-      "unknown": "desconocido",
-      "title": "Package Vibrancy omitió una consulta pub",
-      "project": "SDK del proyecto: {value} (desde {source})",
-      "folder": "Carpeta del proyecto: {cwd}",
-      "reason": "Motivo: {reason}",
-      "rule": "Regla: {rule}",
-      "pathConfirmRun": "Ejecutar pub get de todos modos",
-      "runPubGet": "Ejecutar pub get con el SDK del proyecto",
-      "toolVersion": "Versión de SDK seleccionada: {version}",
-      "sdk": "SDK seleccionado: {path} (desde {source})",
-      "time": "Omitido a las: {time}",
-      "pathConfirm": "El SDK seleccionado proviene de PATH, la configuración que reescribió pubspec.lock con el SDK equivocado. ¿Ejecutar pub get de todos modos?",
-      "pubGetFailed": "pub get falló: {error}",
-      "pubGetDone": "pub get finalizó con el SDK del proyecto."
-    },
-    "rule": {
-      "constraintUnverifiable": "Restricción no verificable",
-      "depsNotLocked": "Dependencia no bloqueada",
-      "lockSdkConstraint": "Restricción de SDK del bloqueo",
-      "constraintNotSatisfied": "Versión bloqueada fuera de la restricción",
-      "staleLock": "Archivo de bloqueo ausente o ilegible",
-      "pathDepNewer": "Dependencia de ruta modificada",
-      "sdkMismatch": "Versión de SDK incompatible",
-      "staleConfig": "Configuración de paquetes obsoleta",
-      "unknownPathSdk": "SDK de PATH desconocido"
-    },
-    "source": {
-      "fvm": "Fijación de FVM (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "ajuste dart.flutterSdkPath",
-      "dartSdkPath": "ajuste dart.sdkPath"
+      "lockConstraint": "restricción sdks de pubspec.lock",
+      "none": "sin evidencia del SDK del proyecto"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy omitió una consulta pub para que pubspec.lock no se reescriba. Haga clic para ver los detalles.",
-      "text": "Vibrancy: pub omitido"
+      "text": "Vibrancy: pub omitido",
+      "tooltip": "Package Vibrancy omitió una consulta pub para que pubspec.lock no se reescriba. Haga clic para ver los detalles."
     },
+    "explain": {
+      "title": "Package Vibrancy omitió una consulta pub",
+      "none": "No se ha omitido ninguna consulta pub de Vibrancy en esta sesión.",
+      "unknown": "desconocido",
+      "reason": "Motivo: {reason}",
+      "rule": "Regla: {rule}",
+      "sdk": "SDK seleccionado: {path} (desde {source})",
+      "toolVersion": "Versión de SDK seleccionada: {version}",
+      "project": "SDK del proyecto: {value} (desde {source})",
+      "folder": "Carpeta del proyecto: {cwd}",
+      "time": "Omitido a las: {time}",
+      "runPubGet": "Ejecutar pub get con el SDK del proyecto",
+      "pubGetDone": "pub get finalizó con el SDK del proyecto.",
+      "pubGetFailed": "pub get falló: {error}",
+      "pickFolder": "Elija una carpeta de proyecto para explicar",
+      "pathConfirm": "El SDK seleccionado proviene de PATH, la configuración que reescribió pubspec.lock con el SDK equivocado. ¿Ejecutar pub get de todos modos?",
+      "pathConfirmRun": "Ejecutar pub get de todos modos"
+    },
+    "constraintNotSatisfied": "{name} está bloqueado en {version}, que no cumple la restricción {constraint} de pubspec.yaml, por lo que pub volvería a resolver las dependencias.",
+    "constraintUnverifiable": "No se pudo comprobar una dependencia de pubspec.yaml con pubspec.lock (restricción git, personalizada o no analizable), por lo que pub podría volver a resolver las dependencias.",
     "pathDepNewer": "La dependencia de ruta {name} cambió después de escribir pubspec.lock, por lo que pub volvería a resolver las dependencias.",
-    "depsNotLocked": "pubspec.yaml declara dependencias que pubspec.lock no incluye, por lo que pub volvería a resolver las dependencias.",
-    "constraintNotSatisfied": "{name} está bloqueado en {version}, que no cumple la restricción {constraint} de pubspec.yaml, por lo que pub volvería a resolver las dependencias."
+    "rule": {
+      "sdkMismatch": "Versión de SDK incompatible",
+      "lockSdkConstraint": "Restricción de SDK del bloqueo",
+      "unknownPathSdk": "SDK de PATH desconocido",
+      "staleLock": "Archivo de bloqueo ausente o ilegible",
+      "staleConfig": "Configuración de paquetes obsoleta",
+      "depsNotLocked": "Dependencia no bloqueada",
+      "constraintNotSatisfied": "Versión bloqueada fuera de la restricción",
+      "constraintUnverifiable": "Restricción no verificable",
+      "pathDepNewer": "Dependencia de ruta modificada"
+    }
   },
   "about": {
     "ruleCountStrip": "Reglas de lint {total} actualmente incluidas en esta versión (esenciales {essential} · recomendadas {recommended} · profesionales {professional} · completas {comprehensive} · pedantes {pedantic} · {stylistic} de estilo opt-in)"
@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ No verificado",
+    "unverifiedTooltip": "No se pudo verificar — {reason}. Mantén este sobreescritura hasta que la escaneo tenga éxito.",
+    "unverifiedStatus": "No verificado — {reason}",
+    "incompleteData": "datos incompletos",
+    "groupUnverifiedTooltip": "{count} override(s) no pudieron ser verificados; la escaneo fue incompleta."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Seleccione un paquete para ver los detalles."
@@ -2835,6 +2842,52 @@
       "title": "Corrige ignores obsoletos en este archivo"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Comprobando hallazgos aceptados…"
+    },
+    "error": {
+      "checkFailed": "Comprobar hallazgos aceptados falló: {message}",
+      "badOutput": "No se pudo leer la salida del escaneo.",
+      "noWorkspace": "No se encontró un workspace Dart/Flutter. Abra un proyecto con pubspec.yaml primero.",
+      "missingDep": "Agrega saropa_lints a pubspec.yaml antes de usar hallazgos aceptados.",
+      "noFinding": "Usa la bombilla de luz en un hallazgo Saropa Lints en un archivo Dart para aceptarlo.",
+      "outsideProject": "Este archivo no está dentro de un paquete Dart (no hay pubspec.yaml encima de él), por lo tanto no puede agregarse a saropa_accepted.yaml.",
+      "writeFailed": "No se pudo actualizar saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml tiene un diseño que no se puede extender automáticamente. Añade la entrada manualmente.",
+      "entryExists": "saropa_accepted.yaml ya tiene una entrada para {rule} en {file}. Si la entrada tiene un máximo de conteo, aumente manualmente ese valor."
+    },
+    "info": {
+      "alreadyRunning": "Un análisis de hallazgos aceptados ya está en ejecución.",
+      "noList": "No se encontró saropa_accepted.yaml en ningún paquete del workspace. Use \"Aceptar en este archivo\" en un finding para iniciar uno.",
+      "clean": "Hallazgos aceptados: {count} entradas verificadas, ninguna caducada o inválida.",
+      "issues": "Hallazgos aceptados: {stale} obsoletos y {invalid} inválidos, de un total de {count} entradas. Vea el panel de Problemas.",
+      "added": "Se agregó {rule} en {file} para {list}. Los hallazgos ya se muestran claramente cuando el archivo se analiza nuevamente."
+    },
+    "action": {
+      "openList": "Abrir Lista",
+      "restartAnalysis": "Reiniciar Servidor de Análisis"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Entrada obsoleta: {file} ya no existe, por lo tanto esta entrada para {rule} no oculta nada.",
+      "staleNoFinding": "Entrada obsoleta: {rule} no se encontró nada en {file}. Elimine la entrada si el código fue corregido.",
+      "invalid": "Entrada inválida, oculta nada: {message}"
+    },
+    "prompt": {
+      "kindTitle": "¿Por qué este hallazgo es aceptado?",
+      "kindAccepted": "Aceptado: el hallazgo es real y el código permanece igual",
+      "kindFalsePositive": "Falso positivo: la regla está mal aquí",
+      "reasonTitle": "Motivo para aceptar {rule} en {file}",
+      "reasonPlaceholder": "Requerido. Guardado en saropa_accepted.yaml para revisores.",
+      "reasonRequired": "Se requiere una razón."
+    },
+    "quickFix": {
+      "title": "Acepta {rule} en este archivo…"
+    },
+    "summary": {
+      "count": "{count} aceptado"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Este informe está marcado como \"{status}\" pero aún está en bugs/ — archivélo en plans/history/ antes de cerrarlo (ver ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Suprimir (SDK antiguo intencional)"
+    },
+    "staleOverride": {
+      "suppress": "Suprimir (el override es intencional)"
     }
   },
   "blastRadius": {

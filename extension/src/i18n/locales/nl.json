@@ -5,54 +5,54 @@
     "unknownPathSdk": "De Dart SDK-versie van de dart op PATH kon niet worden bepaald en het project heeft geen leesbare SDK-versie.",
     "staleLock": "pubspec.lock ontbreekt of is onleesbaar, dus pub zou de afhankelijkheden opnieuw oplossen.",
     "staleConfig": "De pakketconfiguratie ontbreekt of vermeldt de vergrendelde pakketten niet, dus pub zou de afhankelijkheden opnieuw oplossen.",
+    "depsNotLocked": "pubspec.yaml declareert afhankelijkheden die pubspec.lock niet vermeldt, dus pub zou de afhankelijkheden opnieuw oplossen.",
+    "source": {
+      "dartSdkPath": "instelling dart.sdkPath",
+      "flutterSdkPath": "instelling dart.flutterSdkPath",
+      "fvm": "FVM-pin (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "geen bewijs van project-SDK",
-      "lockConstraint": "sdks-beperking in pubspec.lock"
-    },
-    "constraintUnverifiable": "Een afhankelijkheid in pubspec.yaml kon niet worden gecontroleerd tegen pubspec.lock (git-, aangepaste of niet te parseren beperking), dus pub kan de afhankelijkheden opnieuw oplossen.",
-    "explain": {
-      "pickFolder": "Kies een projectmap om uit te leggen",
-      "none": "In deze sessie is geen Vibrancy pub-query overgeslagen.",
-      "unknown": "onbekend",
-      "title": "Package Vibrancy heeft een pub-query overgeslagen",
-      "project": "Project-SDK: {value} (van {source})",
-      "folder": "Projectmap: {cwd}",
-      "reason": "Reden: {reason}",
-      "rule": "Regel: {rule}",
-      "pathConfirmRun": "Toch pub get uitvoeren",
-      "runPubGet": "pub get uitvoeren met project-SDK",
-      "toolVersion": "Geselecteerde SDK-versie: {version}",
-      "sdk": "Geselecteerde SDK: {path} (van {source})",
-      "time": "Overgeslagen op: {time}",
-      "pathConfirm": "De geselecteerde SDK komt van PATH, de configuratie die pubspec.lock met de verkeerde SDK herschreef. Toch pub get uitvoeren?",
-      "pubGetFailed": "pub get mislukt: {error}",
-      "pubGetDone": "pub get is voltooid met de project-SDK."
-    },
-    "rule": {
-      "constraintUnverifiable": "Beperking niet controleerbaar",
-      "depsNotLocked": "Afhankelijkheid niet vergrendeld",
-      "lockSdkConstraint": "SDK-beperking in lock",
-      "constraintNotSatisfied": "Vergrendelde versie buiten beperking",
-      "staleLock": "Lock-bestand ontbreekt of is onleesbaar",
-      "pathDepNewer": "Padafhankelijkheid gewijzigd",
-      "sdkMismatch": "SDK-versie komt niet overeen",
-      "staleConfig": "Verouderde pakketconfiguratie",
-      "unknownPathSdk": "Onbekende PATH-SDK"
-    },
-    "source": {
-      "fvm": "FVM-pin (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "instelling dart.flutterSdkPath",
-      "dartSdkPath": "instelling dart.sdkPath"
+      "lockConstraint": "sdks-beperking in pubspec.lock",
+      "none": "geen bewijs van project-SDK"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy heeft een pub-query overgeslagen zodat pubspec.lock niet wordt herschreven. Klik voor details.",
-      "text": "Vibrancy: pub overgeslagen"
+      "text": "Vibrancy: pub overgeslagen",
+      "tooltip": "Package Vibrancy heeft een pub-query overgeslagen zodat pubspec.lock niet wordt herschreven. Klik voor details."
     },
+    "explain": {
+      "title": "Package Vibrancy heeft een pub-query overgeslagen",
+      "none": "In deze sessie is geen Vibrancy pub-query overgeslagen.",
+      "unknown": "onbekend",
+      "reason": "Reden: {reason}",
+      "rule": "Regel: {rule}",
+      "sdk": "Geselecteerde SDK: {path} (van {source})",
+      "toolVersion": "Geselecteerde SDK-versie: {version}",
+      "project": "Project-SDK: {value} (van {source})",
+      "folder": "Projectmap: {cwd}",
+      "time": "Overgeslagen op: {time}",
+      "runPubGet": "pub get uitvoeren met project-SDK",
+      "pubGetDone": "pub get is voltooid met de project-SDK.",
+      "pubGetFailed": "pub get mislukt: {error}",
+      "pickFolder": "Kies een projectmap om uit te leggen",
+      "pathConfirm": "De geselecteerde SDK komt van PATH, de configuratie die pubspec.lock met de verkeerde SDK herschreef. Toch pub get uitvoeren?",
+      "pathConfirmRun": "Toch pub get uitvoeren"
+    },
+    "constraintNotSatisfied": "{name} is vergrendeld op {version}, wat niet voldoet aan de beperking {constraint} in pubspec.yaml, dus pub zou de afhankelijkheden opnieuw oplossen.",
+    "constraintUnverifiable": "Een afhankelijkheid in pubspec.yaml kon niet worden gecontroleerd tegen pubspec.lock (git-, aangepaste of niet te parseren beperking), dus pub kan de afhankelijkheden opnieuw oplossen.",
     "pathDepNewer": "De padafhankelijkheid {name} is gewijzigd nadat pubspec.lock was geschreven, dus pub zou de afhankelijkheden opnieuw oplossen.",
-    "depsNotLocked": "pubspec.yaml declareert afhankelijkheden die pubspec.lock niet vermeldt, dus pub zou de afhankelijkheden opnieuw oplossen.",
-    "constraintNotSatisfied": "{name} is vergrendeld op {version}, wat niet voldoet aan de beperking {constraint} in pubspec.yaml, dus pub zou de afhankelijkheden opnieuw oplossen."
+    "rule": {
+      "sdkMismatch": "SDK-versie komt niet overeen",
+      "lockSdkConstraint": "SDK-beperking in lock",
+      "unknownPathSdk": "Onbekende PATH-SDK",
+      "staleLock": "Lock-bestand ontbreekt of is onleesbaar",
+      "staleConfig": "Verouderde pakketconfiguratie",
+      "depsNotLocked": "Afhankelijkheid niet vergrendeld",
+      "constraintNotSatisfied": "Vergrendelde versie buiten beperking",
+      "constraintUnverifiable": "Beperking niet controleerbaar",
+      "pathDepNewer": "Padafhankelijkheid gewijzigd"
+    }
   },
   "about": {
     "ruleCountStrip": "{total} lint regels zijn momenteel beschikbaar in deze versie (essentieel {essential} · aanbevolen {recommended} · professioneel {professional} · comprehensief {comprehensive} · pedant {pedantic} · {stylistic} opt-in stylistisch)"
@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Onbevestigd",
+    "unverifiedTooltip": "Kon niet verifiëren — {reason}. Bewaar deze overschrijving totdat de scan slaagt.",
+    "unverifiedStatus": "Onbevestigd — {reason}",
+    "incompleteData": "onvolledige gegevens",
+    "groupUnverifiedTooltip": "{count} override(s) kon(nen) niet worden geverifieerd; de scan was onvolledig."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Selecteer een pakket om de details te bekijken."
@@ -2835,6 +2842,52 @@
       "title": "Vermijd verouderde ignores in deze bestand"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Aan het controleren van geaccepteerde findings…"
+    },
+    "error": {
+      "checkFailed": "Controleer geaccepteerde findings mislukt: {message}",
+      "badOutput": "De scanuitvoer kon niet worden gelezen.",
+      "noWorkspace": "Geen Dart/Flutter workspace gevonden. Open een project met pubspec.yaml eerst.",
+      "missingDep": "Voeg saropa_lints toe aan pubspec.yaml voordat je de geaccepteerde findings gebruikt.",
+      "noFinding": "Gebruik de lampje op een Saropa Lints finding in een Dart bestand om het te accepteren.",
+      "outsideProject": "Deze bestand is niet binnen een Dart pakket (geen pubspec.yaml hierboven), dus het kan niet worden toegevoegd aan saropa_accepted.yaml.",
+      "writeFailed": "Kon saropa_accepted.yaml niet bijwerken: {message}",
+      "cannotAppend": "saropa_accepted.yaml heeft een lay-out die niet automatisch kan worden uitgebreid. Voeg de entry handmatig toe.",
+      "entryExists": "saropa_accepted.yaml bevat al een entry voor {rule} in {file}. Als de entry een max count heeft, verhoog dan handmatig."
+    },
+    "info": {
+      "alreadyRunning": "Een accepted-findings check wordt al uitgevoerd.",
+      "noList": "Geen saropa_accepted.yaml gevonden in welke package dan ook van het werkruimte. Gebruik \"Accept in this file\" op een finding om er een te starten.",
+      "clean": "Geaccepteerde findings: {count} entries gecontroleerd, geen verouderde of ongeldige items.",
+      "issues": "Geaccepteerde findings: {stale} verouderd en {invalid} ongeldig, uit {count} entries. Zie het Problems-paneel.",
+      "added": "Toegevoegd {rule} in {file} voor {list}. Findings zijn al duidelijk geweest toen het bestand opnieuw is geanalyseerd."
+    },
+    "action": {
+      "openList": "Open Lijst",
+      "restartAnalysis": "Analyseer Server opnieuw"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Verouderde entry: {file} bestaat niet meer, dus deze entry voor {rule} verbergt niets.",
+      "staleNoFinding": "Verouderde entry: {rule} is niets gevonden in {file}. Verwijder de entry als de code is hersteld.",
+      "invalid": "Ongeldige entry, verbergt niets: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Waarom is deze finding geaccepteerd?",
+      "kindAccepted": "Geaccepteerd: het finding is echt en de code blijft zoals hij is",
+      "kindFalsePositive": "False positive: de regel is fout hier",
+      "reasonTitle": "Reden voor het accepteren van {rule} in {file}",
+      "reasonPlaceholder": "Verplicht. Opgeslagen in saropa_accepted.yaml voor beoordelaars.",
+      "reasonRequired": "Een reden is vereist."
+    },
+    "quickFix": {
+      "title": "Accepteer {rule} in deze bestand…"
+    },
+    "summary": {
+      "count": "{count} geaccepteerd"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Deze rapport is gemarkeerd \"{status}\" maar is nog steeds in bugs/ — archiveer het naar plans/history/ voordat u het sluit (zie ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Dempen (bewuste oude SDK)"
+    },
+    "staleOverride": {
+      "suppress": "Dempen (override is opzettelijk)"
     }
   },
   "blastRadius": {

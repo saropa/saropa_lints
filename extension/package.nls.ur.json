@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: کراس فائل — HTML رپورٹ بنائیں",
   "command.findStaleIgnores.title": "Saropa Lints: چھوڑے گئے تخلیقی تبصرے تلاش کریں",
   "command.fixStaleIgnores.title": "Saropa Lints: چھوڑ دیئے گئے تبصرے ترمیم کریں",
+  "command.checkAcceptedFindings.title": "Saropa Lints: چیک اکسیپٹڈ فنڈنگس",
   "command.openViolationsWideReport.title": "Saropa Lints:۔ نتائج ڈیش بورڈ کھولیں",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints:۔ نتائج ڈیش بورڈ کھولیں (فلٹرز کو محفوظ رکھیں)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "اسکین پیکجز سکین پیکیج",
   "command.packageVibrancy.rescan.title": "ری اسکین پیکجز (تازہ)",
   "command.packageVibrancy.openOtherProject.title": "اسکین کریں ایک اور پروجیکٹ...",
+  "command.packageVibrancy.explainLastSkip.title": "Vibrancy کے آخری چھوڑنے کی وضاحت",
   "command.packageVibrancy.showReport.title": "کھولیں پیکیج ڈیش بورڈ",
   "command.packageVibrancy.showOpportunities.title": "اپ گریڈ کے مواقع کھولیں",
   "command.packageVibrancy.exportOpportunitiesReport.title": "رپورٹ کامل مواقع کی اخراج",
@@ -201,7 +203,7 @@
   "config.property.issuesPageSize.description": "گروپ شدہ نتائج میں فی فائل دکھائی جانے والی خلاف ورزیوں کی زیادہ سے زیادہ تعداد (فائنڈنگ ڈیش بورڈ / اندرونی فہرست) ۔ باقی کے طور پر دکھایا جاتا ہے \"اور N مزید ...\".",
   "config.property.violationsGroupBy.description": "ٹنڈ نتائج کے لئے ڈیفالٹ گروپنگ (نتائج ڈیش بورڈ / گروہ بندی کی فہرست). \"اثر\" فہرستوں میں سب سے پہلے اہم اور اعلی درجے کی ہے۔ عارضی طور پر تبدیل کرنے کے لئے ڈیش بورڈ ٹول بار کا استعمال کریں۔",
   "config.property.checkForUpdates.description": "وقتا فوقتا saropa_lints پیکیج کے نئے ورژن کی جانچ کریں اور اپ گریڈ کرنے کی پیش کش کریں۔",
-  "config.property.pubspecValidation.preferPinnedVersions.markdownDescription": "جب **آن** ہو، pubspec تصدیق اکسACT version pins (1.2.3) کو ترجیح دیتی ہے اور caret ranges (^1.2.3) کو نشان دیتی ہے۔ جب **آف** ہو (پیش فریض)، اس کی ترجیح caret سینٹکس اور bare versions کو نشان دیتی ہے — dart pub add کی روایت کے مطابق۔ ایک ہی مڈ ایک وقت میں فعال ہوتا ہے۔",
+  "config.property.pubspecValidation.preferPinnedVersions.markdownDescription": "جب **آن** ہو، pubspec تصدیق اکسACT version pins (1.2.3) کو ترجیح دیتی ہے اور caret ranges (^1.2.3) کو فلیگ کرتی ہے۔ جب **اُف** ہو (پیشہ ورانہ)، اس کی ترجیح caret سینٹکس اور بے ساختہ ورژن کو فلیگ کرنا ہے — dart pub add کی سلوک کے مطابق۔ ایک ہی مڈ کا نشان ہر وقت فعال ہوتا ہے۔",
   "config.section.Severity.Filters.title": "گریویٹی فیلٹر",
   "config.property.severity.error.markdownDescription": "**error**-سطح تجزیہ کو مسائل پنل اور تلاش درخت میں دکھائیں۔ **off** کرکے دکھائی گئی تمام غلطیوں کو چھپا دیجیے Saropa Lints سے (Dart SDK تجزیہ کو متاثر نہیں کرتا)۔ `init --tier` دوبارہ چالن کے باوجود بھی برقرار رہتا ہے۔",
   "config.property.severity.warning.markdownDescription": "**تحذیر**-سطح تشخیصات کو مسائل پنل اور تلاش درخت میں دکھائیں۔ **اُتار** کر تمام تحذیرات Saropa Lints سے چھپائی جائیں۔",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: پلاگن ورژن کو pubspec.lock کے ساتھ ہم آہنگ کریں",
   "command.showStatusBarMenu.title": "Saropa Lints: ایکسٹنشن کی حالت منو",
   "command.scanWithLatestEngine.title": "Saropa Lints: آخری انجن سے اسکن کریں (قدیم Dart پروجیکٹس)",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK فولڈر (bin/dart کو شامل کرتا ہے) \"Latest Engine سکن کریں\" کے ذریعے استعمال ہوتا ہے۔ Dart 3.11 یا نئی ترکیب کا استعمال کرنا ضروری ہے۔ PATH پر dart استعمال کرنے کے لیے خالی رکھیں۔",
-  "command.packageVibrancy.explainLastSkip.title": "Vibrancy کے آخری چھوڑنے کی وضاحت"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK فولڈر (bin/dart کو شامل کرتا ہے) \"Latest Engine سکن کریں\" کے ذریعے استعمال ہوتا ہے۔ Dart 3.11 یا نئی ترکیب کا استعمال کرنا ضروری ہے۔ PATH پر dart استعمال کرنے کے لیے خالی رکھیں۔"
 }

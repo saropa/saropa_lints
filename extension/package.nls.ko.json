@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: 파일 간 — HTML 보고서 생성",
   "command.findStaleIgnores.title": "Saropa Lints: 무효한 무시 주석 찾기",
   "command.fixStaleIgnores.title": "Saropa Lints: 무시 주석 수정",
+  "command.checkAcceptedFindings.title": "Saropa Lints: 수락된 발견 사항 확인",
   "command.openViolationsWideReport.title": "Saropa Lints: 오픈 결과 대시보드",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: 결과 대시보드를 열고 (필터 보존)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "스캔 패키지",
   "command.packageVibrancy.rescan.title": "재스캔 패키지 (신제)",
   "command.packageVibrancy.openOtherProject.title": "스캔 다른 프로젝트...",
+  "command.packageVibrancy.explainLastSkip.title": "마지막 Vibrancy 건너뜀 설명",
   "command.packageVibrancy.showReport.title": "패키지 대시보드를 열고 패키지 패치보드 (Dashboard)",
   "command.packageVibrancy.showOpportunities.title": "오픈 업그레이드 기회",
   "command.packageVibrancy.exportOpportunitiesReport.title": "전체 기회 보고서 내보내기",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: pubspec.lock로 플러그인 버전 동기화",
   "command.showStatusBarMenu.title": "Saropa Lints: 상태 메뉴",
   "command.scanWithLatestEngine.title": "Saropa Lints: 최신 엔진으로 스캔 (구형 Dart 프로젝트)",
-  "config.property.externalEngine.dartSdkPath.description": "Dart SDK 폴더( bin/dart 포함)는 \"최신 엔진으로 스캔\" 기능에서 사용됩니다. Dart 3.11 이상이어야 합니다. PATH에 있는 dart를 사용하려면 빈칸으로 두세요.",
-  "command.packageVibrancy.explainLastSkip.title": "마지막 Vibrancy 건너뜀 설명"
+  "config.property.externalEngine.dartSdkPath.description": "Dart SDK 폴더( bin/dart 포함)는 \"최신 엔진으로 스캔\" 기능에서 사용됩니다. Dart 3.11 이상이어야 합니다. PATH에 있는 dart를 사용하려면 빈칸으로 두세요."
 }

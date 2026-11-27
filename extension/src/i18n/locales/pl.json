@@ -5,54 +5,54 @@
     "unknownPathSdk": "Nie udało się ustalić wersji Dart SDK dla dart w PATH, a projekt nie ma czytelnej wersji SDK.",
     "staleLock": "pubspec.lock nie istnieje lub nie można go odczytać, więc pub ponownie rozwiązałby zależności.",
     "staleConfig": "Konfiguracja pakietów nie istnieje lub nie zawiera zablokowanych pakietów, więc pub ponownie rozwiązałby zależności.",
+    "depsNotLocked": "pubspec.yaml deklaruje zależności, których pubspec.lock nie zawiera, więc pub ponownie rozwiązałby zależności.",
+    "source": {
+      "dartSdkPath": "ustawienie dart.sdkPath",
+      "flutterSdkPath": "ustawienie dart.flutterSdkPath",
+      "fvm": "Przypięcie FVM (.fvm/flutter_sdk)",
+      "path": "PATH"
+    },
     "projectSource": {
       "dartToolVersion": ".dart_tool/version",
-      "none": "brak dowodu na SDK projektu",
-      "lockConstraint": "ograniczenie sdks w pubspec.lock"
-    },
-    "constraintUnverifiable": "Nie można sprawdzić zależności w pubspec.yaml względem pubspec.lock (ograniczenie git, niestandardowe lub niemożliwe do sparsowania), więc pub może ponownie rozwiązać zależności.",
-    "explain": {
-      "pickFolder": "Wybierz folder projektu do wyjaśnienia",
-      "none": "W tej sesji nie pominięto żadnego zapytania pub Vibrancy.",
-      "unknown": "nieznane",
-      "title": "Package Vibrancy pominął zapytanie pub",
-      "project": "SDK projektu: {value} (z {source})",
-      "folder": "Folder projektu: {cwd}",
-      "reason": "Powód: {reason}",
-      "rule": "Reguła: {rule}",
-      "pathConfirmRun": "Mimo to uruchom pub get",
-      "runPubGet": "Uruchom pub get z SDK projektu",
-      "toolVersion": "Wybrana wersja SDK: {version}",
-      "sdk": "Wybrany SDK: {path} (z {source})",
-      "time": "Pominięto: {time}",
-      "pathConfirm": "Wybrany SDK pochodzi z PATH, czyli z konfiguracji, która przepisała pubspec.lock z niewłaściwym SDK. Mimo to uruchomić pub get?",
-      "pubGetFailed": "pub get nie powiódł się: {error}",
-      "pubGetDone": "pub get zakończył się z SDK projektu."
-    },
-    "rule": {
-      "constraintUnverifiable": "Ograniczenia nie można zweryfikować",
-      "depsNotLocked": "Zależność niezablokowana",
-      "lockSdkConstraint": "Ograniczenie SDK w lock",
-      "constraintNotSatisfied": "Zablokowana wersja poza ograniczeniem",
-      "staleLock": "Brak pliku lock lub nie można go odczytać",
-      "pathDepNewer": "Zmieniono zależność ścieżkową",
-      "sdkMismatch": "Niezgodność wersji SDK",
-      "staleConfig": "Nieaktualna konfiguracja pakietów",
-      "unknownPathSdk": "Nieznany SDK z PATH"
-    },
-    "source": {
-      "fvm": "Przypięcie FVM (.fvm/flutter_sdk)",
-      "path": "PATH",
-      "flutterSdkPath": "ustawienie dart.flutterSdkPath",
-      "dartSdkPath": "ustawienie dart.sdkPath"
+      "lockConstraint": "ograniczenie sdks w pubspec.lock",
+      "none": "brak dowodu na SDK projektu"
     },
     "statusItem": {
-      "tooltip": "Package Vibrancy pominął zapytanie pub, aby nie przepisywać pubspec.lock. Kliknij, aby zobaczyć szczegóły.",
-      "text": "Vibrancy: pominięto pub"
+      "text": "Vibrancy: pominięto pub",
+      "tooltip": "Package Vibrancy pominął zapytanie pub, aby nie przepisywać pubspec.lock. Kliknij, aby zobaczyć szczegóły."
     },
+    "explain": {
+      "title": "Package Vibrancy pominął zapytanie pub",
+      "none": "W tej sesji nie pominięto żadnego zapytania pub Vibrancy.",
+      "unknown": "nieznane",
+      "reason": "Powód: {reason}",
+      "rule": "Reguła: {rule}",
+      "sdk": "Wybrany SDK: {path} (z {source})",
+      "toolVersion": "Wybrana wersja SDK: {version}",
+      "project": "SDK projektu: {value} (z {source})",
+      "folder": "Folder projektu: {cwd}",
+      "time": "Pominięto: {time}",
+      "runPubGet": "Uruchom pub get z SDK projektu",
+      "pubGetDone": "pub get zakończył się z SDK projektu.",
+      "pubGetFailed": "pub get nie powiódł się: {error}",
+      "pickFolder": "Wybierz folder projektu do wyjaśnienia",
+      "pathConfirm": "Wybrany SDK pochodzi z PATH, czyli z konfiguracji, która przepisała pubspec.lock z niewłaściwym SDK. Mimo to uruchomić pub get?",
+      "pathConfirmRun": "Mimo to uruchom pub get"
+    },
+    "constraintNotSatisfied": "{name} jest zablokowany na {version}, co nie spełnia ograniczenia {constraint} w pubspec.yaml, więc pub ponownie rozwiązałby zależności.",
+    "constraintUnverifiable": "Nie można sprawdzić zależności w pubspec.yaml względem pubspec.lock (ograniczenie git, niestandardowe lub niemożliwe do sparsowania), więc pub może ponownie rozwiązać zależności.",
     "pathDepNewer": "Zależność ścieżkowa {name} zmieniła się po zapisaniu pubspec.lock, więc pub ponownie rozwiązałby zależności.",
-    "depsNotLocked": "pubspec.yaml deklaruje zależności, których pubspec.lock nie zawiera, więc pub ponownie rozwiązałby zależności.",
-    "constraintNotSatisfied": "{name} jest zablokowany na {version}, co nie spełnia ograniczenia {constraint} w pubspec.yaml, więc pub ponownie rozwiązałby zależności."
+    "rule": {
+      "sdkMismatch": "Niezgodność wersji SDK",
+      "lockSdkConstraint": "Ograniczenie SDK w lock",
+      "unknownPathSdk": "Nieznany SDK z PATH",
+      "staleLock": "Brak pliku lock lub nie można go odczytać",
+      "staleConfig": "Nieaktualna konfiguracja pakietów",
+      "depsNotLocked": "Zależność niezablokowana",
+      "constraintNotSatisfied": "Zablokowana wersja poza ograniczeniem",
+      "constraintUnverifiable": "Ograniczenia nie można zweryfikować",
+      "pathDepNewer": "Zmieniono zależność ścieżkową"
+    }
   },
   "about": {
     "ruleCountStrip": "Zasady {total} lint w tej wersji (podstawowe {essential} · zalecane {recommended} · profesjonalne {professional} · kompleksowe {comprehensive} · pedantyczne {pedantic} · {stylistic} opcjonalne stylowe)"
@@ -314,7 +314,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX i powiązane biblioteki stanu i wstrzykiwania zależności.",
       "networking-apis": "Klienci HTTP, GraphQL, Firebase, Supabase i łączność.",
       "storage-persistence": "Bazy danych lokalne i magazyny klucz-wartość — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Zasady ścisłe:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zamiennikowe: tokeny zamiennikowe. Skopiuj każdy z nich do tłumaczenia IDEALNIE jak napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumacza, usuwaj ani zmienia format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisania dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Routing i obsługa głębokiego linkowania — auto_route, go_router, app_links, url_launcher, oraz webview.",
+      "navigation-deep-links": "Zasady ścisłe:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zamiennikowe: tokeny zamiennikowe. Skopiuj każdy z nich do tłumaczenia IDEALNIE jak napisany, w poprawnej gramatycznie pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.\n4. Wyjście MUSI używać poprawnego systemu pisania dla języka docelowego; nie zmieniaj się do innego języka w środku zdania.\n\nTekst: Routing i obsługa głębokiego linkowania — auto_route, go_router, app_links, url_launcher, i webview.",
       "media-graphics": "Obrazy, SVG, animacje, dźwięk, mapy, zbieracze i silnik Flame.",
       "device-platform": "Czujniki, lokalizacja, uprawnienia, dane biometryczne, powiadomienia i prace w tle.",
       "identity-sharing": "Dostawcy usług logowania, udostępnianie i przegląd aplikacji.",
@@ -2014,7 +2014,7 @@
       "progress": "{percent}% — {done}/{total} pliki"
     },
     "reports": {
-      "intro": "Zasady ścisłe:\n1. Zwróć TŁYMOŚĆ przetłumaczonych ciągów.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumaczy, usuwaj ani zmienia format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Raport CLI w jednym kliknięciu, który wcześniej wymagał terminala. Każdy przycisk „Uruchom” przesyła w czasie rzeczywistym wyjście narzędzia poniżej jego karty i zapisuje kopię pod reports/.saropa_lints/reports-tab/",
+      "intro": "Zasady ścisłe:\n1. Zwróć TŁYMOŚĆ przetłumaczonych ciągów.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie przekładasz, usuwasz ani zmieniasz format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Raport CLI w jednym kliknięciu, który wcześniej wymagał terminala. Każdy przycisk „Uruchom” przesyła w czasie rzeczywistym wyjście narzędzia poniżej jego karty i zapisuje kopię pod folderem reports/.saropa_lints/reports-tab/",
       "runButton": "Uruchom",
       "notRunYet": "Nie uruchomiono jeszcze",
       "running": "Uruchamianie…",
@@ -2309,6 +2309,13 @@
         "pubspecHasOtherEdits": "pubspec.yaml już wcześniej miało niezatwierdzone edycje Twoich plików. Commit dotyczy całości plików, więc publikacja z tego miejsca wypchnie również te edycje. Zatwierdź lub zatmierz je, a następnie samodzielnie uruchom powyższe polecenia."
       }
     }
+  },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Niepotwierdzony",
+    "unverifiedTooltip": "Nie można zweryfikować — {reason}. Zachowaj tę nadpisanie do momentu, gdy skan zakończy się powodzeniem.",
+    "unverifiedStatus": "Nie zweryfikowany — {reason}",
+    "incompleteData": "dane niekompletne",
+    "groupUnverifiedTooltip": "{count} override(s) nie mogą być zweryfikowane; skan był niekompletny."
   },
   "detailView": {
     "empty": {
@@ -2835,6 +2842,52 @@
       "title": "Popraw nieaktualne ignorowane w tym pliku"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Sprawdzanie akceptowanych znalezisk…"
+    },
+    "error": {
+      "checkFailed": "Sprawdź zaakceptowane findings niepowiodło się: {message}",
+      "badOutput": "Wyjście skanera nie można odczytać.",
+      "noWorkspace": "Brak przestrzeni roboczej Dart/Flutter. Otwórz najpierw projekt pubspec.yaml.",
+      "missingDep": "Dodaj saropa_lints do pubspec.yaml przed użyciem zaakceptowanych znalezisk.",
+      "noFinding": "Użyj kolorowej latarnej w przypadku znalezienia Saropa Lints w pliku Dart, aby zaakceptować je.",
+      "outsideProject": "Ten plik nie znajduje się w pakiecie Dart (brak pubspec.yaml powyżej niego), więc nie może zostać dodany do saropa_accepted.yaml.",
+      "writeFailed": "Nie można zaktualizować saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml ma układ, który nie może być automatycznie rozszerzony. Dodaj wpis ręcznie.",
+      "entryExists": "saropa_accepted.yaml zawiera już wpis dla {rule} w {file}. Jeśli wpis ma maksymalną liczbę, zwiększ ją ręcznie."
+    },
+    "info": {
+      "alreadyRunning": "Sprawdzanie przyjętych znalezisk jest już w trakcie.",
+      "noList": "Nie znaleziono pliku saropa_accepted.yaml w żadnym pakiecie przestrzeni roboczej. Użyj „Akceptuj w tym pliku” na znalezieniu, aby rozpocząć jedno.",
+      "clean": "Znalezione problemy: {count} wpisów sprawdzanych, żaden nie jest nieaktualny ani nieprawidłowy.",
+      "issues": "Zaakceptowane znaleziska: {stale} nieaktualne i {invalid} nieprawidłowe, spośród {count} wpisów. Zobacz panel Problems.",
+      "added": "Dodano {rule} w {file} do {list}. Znalezione błędy są już jasne, gdy plik zostanie ponownie analizowany."
+    },
+    "action": {
+      "openList": "Otwórz Listę",
+      "restartAnalysis": "Restart serwera analizy"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Wsteczna wpis: {file} nie istnieje już, więc ten wpis dla {rule} niczego nie ukrywa.",
+      "staleNoFinding": "Wsteczna wpis: {rule} nie znaleziono niczego w {file}. Usuń wpis, jeśli kod został naprawiony.",
+      "invalid": "Nieprawidłowy wpis, nic nie ukrywa: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Dlaczego to znalezienie jest akceptowane?",
+      "kindAccepted": "Akceptowane: znalezienie jest prawdziwe, a kod pozostaje takim, jakim jest",
+      "kindFalsePositive": "Fałszywy pozytyw: reguła jest niepoprawna tutaj",
+      "reasonTitle": "Powód zaakceptowania {rule} w {file}",
+      "reasonPlaceholder": "Wymagane. Zapisane w saropa_accepted.yaml dla recenzentów.",
+      "reasonRequired": "Wymagana jest przyczyna."
+    },
+    "quickFix": {
+      "title": "Akceptuj {rule} w tym pliku…"
+    },
+    "summary": {
+      "count": "{count} zaakceptowano"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Ten raport oznaczony jest jako \"{status}\", ale nadal znajduje się w bugs/ — zarchiwuj go do plans/history/ przed zamknięciem (patrz ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Zapobiegaj (zamiernie stary SDK)"
+    },
+    "staleOverride": {
+      "suppress": "Zapobiegaj (zastępowanie jest celowe)"
     }
   },
   "blastRadius": {
@@ -3169,7 +3225,7 @@
   "externalEngine": {
     "noProject": "Otwórz najpierw folder projektu Dart.",
     "sdkTooOld": "Ostatnia wersja silnika Saropa Lints wymaga Dart {required} lub nowszej, ale użyty tu Dart to {found}. Zainstaluj nowszy zestaw SDK Dart i ustaw \"saropaLints.externalEngine.dartSdkPath\" na jego folder.",
-    "sdkUnknown": "nieznany",
+    "sdkUnknown": "nieznane",
     "install": {
       "prompt": "To zainstaluje najnowszy Saropa Lints engine globalnie (dart pub global activate saropa_lints) przy użyciu nowszego Dart SDK, a następnie skanuje ten projekt za pomocą niego. Zainstalowane w tym projekcie pubspec.yaml i pin SDK nie zostaną zmienione.",
       "confirm": "Zainstaluj i skanuj"

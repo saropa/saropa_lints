@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File - Tengeneza Ripoti ya HTML",
   "command.findStaleIgnores.title": "Saropa Lints: Tazama Kipengele Kifupi Kwa Kibinafsi",
   "command.fixStaleIgnores.title": "Saropa Lints: Tuzalisha Ujumbe wa Kufunga Kifungua",
+  "command.checkAcceptedFindings.title": "Saropa Lints: Tafuta Matokeo Ya Kupungua",
   "command.openViolationsWideReport.title": "Saropa Lints: Fungua Dashibodi ya Matokeo ya Utaftaji.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Fungua Dashibodi ya Matokeo (hifadhi vichungi)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Scan Packages Scans Paketi za skanning",
   "command.packageVibrancy.rescan.title": "Pakiti za Rescan (Zipya)",
   "command.packageVibrancy.openOtherProject.title": "Scan Project nyingine...",
+  "command.packageVibrancy.explainLastSkip.title": "Eleza Kuruka Mwisho kwa Vibrancy",
   "command.packageVibrancy.showReport.title": "Fungua Dashibodi ya Kifurushi cha Package Dashboard.",
   "command.packageVibrancy.showOpportunities.title": "Fungua Fursa za Upgrades za Ufuatiliaji.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Unganisha Raporti ya Vipengele Vya Kutoa Kwa Binafsi",
@@ -331,10 +333,10 @@
   "walkthrough.step.walkthrough.triage.title": "Uainishaji",
   "walkthrough.step.walkthrough.triage.description": "Sifa zinazozungumzwa kwa uwezo — makosa, kipindi ya kipindi, na mazungumzaji. Kila kipengele ina **moto ya kipengele** ya kipengele.\n\nKutumia **Manage Rule Packs** kutaktwa au kutumika kwa kipengele na kipengele ya kipengele; mabadiliko yana kushiriki kwa YAML na kushiriki kwa analisisi.\n\n[Open Manage Rule Packs](command:saropaLints.openConfigDashboard)",
   "walkthrough.step.walkthrough.trends.title": "Hatari ya Faili na Mwelekeo wa Mtazamo",
-  "walkthrough.step.walkthrough.trends.description": "**File Risk** kushangaza faili kwa kuzunguka kwa kipindi - kipindi kikubwa kwa kipindi.",
+  "walkthrough.step.walkthrough.trends.description": "**File Risk** inakarisha faili kwa kuzunguka kwa kipindi ya kipindi — kipindi kikubwa kwa kipindi kwa kipindi.",
   "walkthrough.step.walkthrough.packageVibrancy.title": "Kifurushi cha Afya ya Package Health",
   "walkthrough.step.walkthrough.packageVibrancy.description": "Tafuta mpira ya kujifunza kwa kuzunguka kwa kipindi, kujifunza kwa kipindi, na kipindi ya kipindi. Ona **CycloneDX SBOM** kwa kujifunza kwa kipindi ya kipindi.\n\nNafasi ya matokeo inaonekana kama CodeLens badges na kwenye kipindi ya **Package Dashboard** ya kipindi.\n\n[Scan Package Vibrancy](command:saropaLints.packageVibrancy.scan)",
-  "walkthrough.step.walkthrough.todosAndHacks.description": "Tazama kila `TODO`, `HACK`, na `FIXME` comment kwenye workspace. Jagua kwa kundi ya tag au folder, na klikua kujua jumla ya wakati.",
+  "walkthrough.step.walkthrough.todosAndHacks.description": "Tazama kila `TODO`, `HACK`, na `FIXME` comment kote katika workspace. Jumle kwa kundi ya tag au folder, na klikua kujua jumla ya wakati.",
   "walkthrough.step.walkthrough.crossFile.title": "Cross-File Analysis Uchambuzi wa faili.",
   "walkthrough.step.walkthrough.crossFile.description": "Tekeleza ukaguzi wa mradi mzima ambao uchanganuzi wa faili moja hauwezi kufanya: faili ambazo hazijatumika, utegemezi wa mduara, takwimu za kuagiza, vitegemezi vya vipengele, uagizaji uliokufa, alama ambazo hazijatumika, vitufe vya l10n ambavyo havijatumika, vizuizi rudufu, muhtasari wa JSON, usafirishaji wa grafu na ripoti ya HTML.\n\n[Tafuta Faili Zisizotumika](command:saropaLints.crossFile.unusedFiles) · [Tengeneza Ripoti ya HTML Mtambuka](command:saropaLints.crossFile.report)",
   "walkthrough.step.walkthrough.commandCatalog.title": "Browse All Commands Tafuta amri zote",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: Tafuta Versi ya Plugin kwa pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menu ya Uhusiano",
   "command.scanWithLatestEngine.title": "Saropa Lints: Tafuta na Engine Mpya (Projekto ya Dart ya Mwaka Mwa Kili)",
-  "config.property.externalEngine.dartSdkPath.description": "Jumla ya Dart SDK (inakaribisha bin/dart) inayozalishwa na \"Scan na Engine Mwaka Mwa Kati\". Must be Dart 3.11 au mwingi. Pungua kuu kwa kuzalishwa dart katika PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "Eleza Kuruka Mwisho kwa Vibrancy"
+  "config.property.externalEngine.dartSdkPath.description": "Jumla ya Dart SDK (inakaribisha bin/dart) inayozalishwa na \"Scan na Engine Mwaka Mwa Kati\". Must be Dart 3.11 au mwingi. Pungua kuu kwa kuzalishwa dart katika PATH."
 }

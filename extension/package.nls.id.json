@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File — Menghasilkan Laporan HTML",
   "command.findStaleIgnores.title": "Saropa Lints: Cari Komentar Ignore yang Tidak Aktif",
   "command.fixStaleIgnores.title": "Saropa Lints: Perbaiki Komentar Ignore yang Tidak Aktif",
+  "command.checkAcceptedFindings.title": "Saropa Lints: Periksa Temuan yang Diterima",
   "command.openViolationsWideReport.title": "Saropa Lints: Buka Dasbor Temuan Dashboard.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Buka Dasbor Temuan (menyimpan filter)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Scan Paket paket pemindaian.",
   "command.packageVibrancy.rescan.title": "Rescan Paket (Fresh)",
   "command.packageVibrancy.openOtherProject.title": "Scan Proyek Lain...",
+  "command.packageVibrancy.explainLastSkip.title": "Jelaskan Pelewatan Vibrancy Terakhir",
   "command.packageVibrancy.showReport.title": "Buka Dashboard Paket yang terbuka.",
   "command.packageVibrancy.showOpportunities.title": "Buka Peluang Upgrade yang Dibuka.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Ekspor Laporan Kesempatan Penuh",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints: Sinkronkan Versi Plugin ke pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints: Menu Status",
   "command.scanWithLatestEngine.title": "Saropa Lints: Scan dengan Engine Terbaru (Proyek Dart Lama)",
-  "config.property.externalEngine.dartSdkPath.description": "Folder Dart SDK (mengandung bin/dart) yang digunakan oleh \"Scan dengan Engine Terbaru\". Harus Dart 3.11 atau lebih baru. Biarkan kosong untuk menggunakan dart pada PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "Jelaskan Pelewatan Vibrancy Terakhir"
+  "config.property.externalEngine.dartSdkPath.description": "Folder Dart SDK (mengandung bin/dart) yang digunakan oleh \"Scan dengan Engine Terbaru\". Harus Dart 3.11 atau lebih baru. Biarkan kosong untuk menggunakan dart pada PATH."
 }

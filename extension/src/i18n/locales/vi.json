@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ Chưa xác minh",
+    "unverifiedTooltip": "Không thể xác minh — {reason}. Hãy giữ lại tùy chọn này cho đến khi quét thành công.",
+    "unverifiedStatus": "Chưa xác minh — {reason}",
+    "incompleteData": "dữ liệu chưa đầy đủ",
+    "groupUnverifiedTooltip": "{count} override(s) không thể được xác minh; quét không hoàn tất."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "Chọn một gói để xem chi tiết."
@@ -2835,6 +2842,52 @@
       "title": "Sửa các ignore lỗi thời trong tệp này"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "Đang kiểm tra các vấn đề được chấp nhận…"
+    },
+    "error": {
+      "checkFailed": "Kiểm tra các vấn đề được chấp nhận thất bại: {message}",
+      "badOutput": "Kết quả quét không thể được đọc.",
+      "noWorkspace": "Không tìm thấy workspace Dart/Flutter. Mở một dự án với pubspec.yaml trước.",
+      "missingDep": "Thêm saropa_lints vào pubspec.yaml trước khi sử dụng các findings được chấp nhận.",
+      "noFinding": "Sử dụng đèn nhấp nháy trên một finding Saropa Lints trong tệp Dart để chấp nhận nó.",
+      "outsideProject": "Tập tin này không nằm trong một gói Dart (không có pubspec.yaml phía trên nó), do đó không thể được thêm vào saropa_accepted.yaml.",
+      "writeFailed": "Không thể cập nhật saropa_accepted.yaml: {message}",
+      "cannotAppend": "saropa_accepted.yaml có bố cục không thể mở rộng tự động. Thêm mục vào bằng tay.",
+      "entryExists": "saropa_accepted.yaml đã có một mục cho {rule} trong {file}. Nếu mục đó có giới hạn số lượng, hãy tăng nó thủ công."
+    },
+    "info": {
+      "alreadyRunning": "Một kiểm tra phát hiện đã được chấp nhận đang chạy.",
+      "noList": "Không tìm thấy saropa_accepted.yaml trong bất kỳ gói nào của workspace. Sử dụng \"Chấp nhận trong tệp này\" trên một finding để bắt đầu.",
+      "clean": "Các vấn đề được chấp nhận: {count} mục đã kiểm tra, không có mục nào lỗi thời hoặc không hợp lệ.",
+      "issues": "Các vấn đề được chấp nhận: {stale} lỗi và {invalid} không hợp lệ, ngoài {count} mục nhập. Xem bảng điều khiển Problems.",
+      "added": "Đã thêm {rule} vào {file} để {list}. Các findings đã hiển thị rõ ràng khi tệp được phân tích lại."
+    },
+    "action": {
+      "openList": "Mở Danh sách",
+      "restartAnalysis": "Khởi động lại Máy chủ Phân tích"
+    },
+    "diagnostic": {
+      "staleFileMissing": "Đăng nhập lỗi: {file} không còn tồn tại, do đó mục nhập này cho {rule} không ẩn điều gì.",
+      "staleNoFinding": "Nhập sai: {rule} không tìm thấy gì trong {file}. Xóa mục nhập nếu mã đã được sửa.",
+      "invalid": "Nhập không hợp lệ, không ẩn gì: {message}"
+    },
+    "prompt": {
+      "kindTitle": "Tại sao vấn đề này được chấp nhận?",
+      "kindAccepted": "Chấp nhận: lỗi được phát hiện là thật và mã không thay đổi",
+      "kindFalsePositive": "False positive: quy tắc này sai ở đây",
+      "reasonTitle": "Lý do chấp nhận {rule} trong {file}",
+      "reasonPlaceholder": "Bắt buộc. Lưu trong saropa_accepted.yaml cho người xem xét.",
+      "reasonRequired": "Một lý do là bắt buộc."
+    },
+    "quickFix": {
+      "title": "Chấp nhận {rule} trong tệp này…"
+    },
+    "summary": {
+      "count": "{count} chấp nhận"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "Báo cáo này được đánh dấu \"{status}\" nhưng vẫn còn lỗi — lưu vào plans/history/ trước khi đóng (xem ISSUE_REPORT_GUIDE.md)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "Tắt (ý định sử dụng SDK cũ)"
+    },
+    "staleOverride": {
+      "suppress": "Tắt (chọn là cố ý)"
     }
   },
   "blastRadius": {
@@ -3169,7 +3225,7 @@
   "externalEngine": {
     "noProject": "Mở trước một thư mục dự án Dart.",
     "sdkTooOld": "Engine Saropa Lints mới nhất cần Dart {required} hoặc mới hơn, nhưng phiên bản Dart được sử dụng ở đây là {found}. Cài đặt một phiên bản mới hơn của SDK Dart và thiết lập \"saropaLints.externalEngine.dartSdkPath\" đến thư mục của nó.",
-    "sdkUnknown": "không xác định",
+    "sdkUnknown": "không rõ",
     "install": {
       "prompt": "Đây sẽ cài đặt động cơ Saropa Lints mới nhất toàn cục (dart pub global activate saropa_lints) bằng một SDK mới hơn Dart, sau đó quét dự án này bằng động cơ đó. Các phiên bản pubspec.yaml và SDK của dự án này không được thay đổi.",
       "confirm": "Cài đặt và quét"

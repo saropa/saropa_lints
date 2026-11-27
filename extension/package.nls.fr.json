@@ -49,6 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints : Cross-File – Générer un rapport HTML",
   "command.findStaleIgnores.title": "Saropa Lints : Trouver les commentaires d'ignorance périmés",
   "command.fixStaleIgnores.title": "Saropa Lints : Corriger les commentaires d'ignorance périmés",
+  "command.checkAcceptedFindings.title": "Saropa Lints : Vérifier les problèmes acceptés",
   "command.openViolationsWideReport.title": "Saropa Lints: ouvrir le tableau de bord des résultats.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: ouvrir le tableau de bord des résultats (conserver les filtres)",
@@ -119,6 +120,7 @@
   "command.packageVibrancy.scan.title": "Les paquets de scan sont des paquets d'analyse.",
   "command.packageVibrancy.rescan.title": "Les paquets de re-scan (frais) ont été remplacés.",
   "command.packageVibrancy.openOtherProject.title": "Scanner un autre projet...",
+  "command.packageVibrancy.explainLastSkip.title": "Expliquer la dernière omission de Vibrancy",
   "command.packageVibrancy.showReport.title": "Ouvrez le tableau de bord du paquet.",
   "command.packageVibrancy.showOpportunities.title": "Ouvrir les opportunités de mise à niveau.",
   "command.packageVibrancy.exportOpportunitiesReport.title": "Exporter le rapport complet des opportunités",
@@ -379,6 +381,5 @@
   "command.syncPluginVersion.title": "Saropa Lints : Synchroniser la version du plugin avec pubspec.lock",
   "command.showStatusBarMenu.title": "Saropa Lints : Menu Statut",
   "command.scanWithLatestEngine.title": "Saropa Lints : Analyse avec le dernier moteur (Projets Dart plus anciens)",
-  "config.property.externalEngine.dartSdkPath.description": "Dossier Dart SDK (contient bin/dart) utilisé par « Scan with Latest Engine ». Doit être Dart 3.11 ou plus récent. Laisser vide pour utiliser dart sur PATH.",
-  "command.packageVibrancy.explainLastSkip.title": "Expliquer la dernière omission de Vibrancy"
+  "config.property.externalEngine.dartSdkPath.description": "Dossier Dart SDK (contient bin/dart) utilisé par « Scan with Latest Engine ». Doit être Dart 3.11 ou plus récent. Laisser vide pour utiliser dart sur PATH."
 }

@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ 미검증",
+    "unverifiedTooltip": "확인할 수 없습니다 — {reason}. 스캔이 성공할 때까지 이 오버라이드를 유지하세요.",
+    "unverifiedStatus": "검증되지 않음 — {reason}",
+    "incompleteData": "데이터 불완전",
+    "groupUnverifiedTooltip": "{count} 오버라이드(s)가 확인되지 않았습니다; 스캔이 불완전했습니다."
+  },
   "detailView": {
     "empty": {
       "selectPackage": "패키지를 선택하여 세부 정보를 확인하세요."
@@ -2835,6 +2842,52 @@
       "title": "이 파일의 오래된 무시 목록 수정"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "검사 중인 수용 가능한 발견 사항…"
+    },
+    "error": {
+      "checkFailed": "검사된 결과가 수락되지 않았습니다: {message}",
+      "badOutput": "스캔 출력을 읽을 수 없습니다.",
+      "noWorkspace": "Dart/Flutter 워크스페이스가 없습니다. 먼저 pubspec.yaml 프로젝트를 열어 주세요.",
+      "missingDep": "수용 가능한 finding을 사용하기 전에 saropa_lints를 pubspec.yaml에 추가하세요.",
+      "noFinding": "Saropa Lints 파일의 Dart finding에서 라이트볼브를 사용하여 수락합니다.",
+      "outsideProject": "이 파일은 Dart 패키지 안에 있지 않으며(위에 pubspec.yaml가 없음), 따라서 saropa_accepted.yaml에 추가할 수 없습니다.",
+      "writeFailed": "saropa_accepted.yaml을 업데이트할 수 없습니다: {message}",
+      "cannotAppend": "saropa_accepted.yaml은 자동으로 확장할 수 없는 레이아웃을 가지고 있습니다. 수동으로 항목을 추가하세요.",
+      "entryExists": "saropa_accepted.yaml은 이미 {rule}에 대한 항목을 {file}에 포함하고 있습니다. 항목에 최대 개수가 있다면 수동으로 증가시켜야 합니다."
+    },
+    "info": {
+      "alreadyRunning": "수락된 발견 사항 검사를 이미 실행 중입니다.",
+      "noList": "워크스페이스의 어떤 패키지에도 saropa_accepted.yaml이 없습니다. 찾은 항목에서 \"이 파일에서 수락\"을 선택하여 시작하십시오.",
+      "clean": "수락된 진단 결과: {count} 항목 검사됨, 오래된 또는 잘못된 항목 없음.",
+      "issues": "수락된 진단 결과: {stale} 오래된 및 {invalid} 유효하지 않은, 총 {count} 개 중. 문제 패널을 확인하세요.",
+      "added": "{rule}을 {file}에 {list}에 추가했습니다. 파일을 다시 분석할 때 이미 문제점이 명확하게 표시됩니다."
+    },
+    "action": {
+      "openList": "열린 목록",
+      "restartAnalysis": "분석 서버 재시작"
+    },
+    "diagnostic": {
+      "staleFileMissing": "기존 항목이 유효하지 않음: {file}는 더 이상 존재하지 않으므로 {rule} 항목은 아무것도 숨기지 않습니다.",
+      "staleNoFinding": "기존 항목이 만료되었습니다: {rule}는 {file}에서 아무것도 찾을 수 없습니다. 코드가 수정되었다면 항목을 제거하십시오.",
+      "invalid": "잘못된 항목, 아무것도 숨기지 않음: {message}"
+    },
+    "prompt": {
+      "kindTitle": "이 finding이 수락된 이유는 무엇인가요?",
+      "kindAccepted": "수락됨: 코드는 현재 상태로 유지되고 해당 finding은 실제 존재함",
+      "kindFalsePositive": "거짓 양성: 여기서 규칙이 잘못되었습니다",
+      "reasonTitle": "{rule}을 {file}에서 수락하는 이유",
+      "reasonPlaceholder": "필수. 검토자용으로 saropa_accepted.yaml에 저장됨.",
+      "reasonRequired": "필수 사유를 입력해야 합니다."
+    },
+    "quickFix": {
+      "title": "이 파일에서 {rule}를 수락합니다…"
+    },
+    "summary": {
+      "count": "{count} 수락"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "이 보고서는 \"{status}\"로 표시되어 있지만 여전히 bugs/에 있습니다 — 닫기 전에 plans/history/에 보관하세요 (ISSUE_REPORT_GUIDE.md 참조)."
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "경고 무시 (의도된 오래된 SDK)"
+    },
+    "staleOverride": {
+      "suppress": "경고 무시 (오버라이드 의도)"
     }
   },
   "blastRadius": {

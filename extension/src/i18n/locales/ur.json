@@ -2310,6 +2310,13 @@
       }
     }
   },
+  "vibrancyOverride": {
+    "unverifiedLabel": "❓ غیر مصدق",
+    "unverifiedTooltip": "درجہ بارہ تصدیق نہیں ہوسکی — {reason}۔ اس اوردر کو اسکن کامیاب ہونے تک رکھیں۔",
+    "unverifiedStatus": "غیر تصدیق شدہ — {reason}",
+    "incompleteData": "نامکمل دیتا",
+    "groupUnverifiedTooltip": "{count} override(s) کو تصدیق نہیں کیا جا سکتا؛ اسکن کامل نہیں تھا۔"
+  },
   "detailView": {
     "empty": {
       "selectPackage": "تفصیلات دیکھنے کے لئے ایک پیکیج منتخب کریں."
@@ -2835,6 +2842,52 @@
       "title": "اس فائل میں گھبرائی ہوئی نظریات ترمیم کریں"
     }
   },
+  "acceptedFindings": {
+    "progress": {
+      "checking": "تفصیلی نتائج کی تلاش کر رہے ہیں..."
+    },
+    "error": {
+      "checkFailed": "تفصیلی نتائج کی تائید ناکام رہی: {message}",
+      "badOutput": "اسکن آؤٹ پوٹ کو پڑھنا ناممکن تھا",
+      "noWorkspace": "کوئی Dart/Flutter ورک سپیس نہیں ملا۔ پہلے pubspec.yaml سے ایک پروجیکٹ کھولیں۔",
+      "missingDep": "saropa_lints کو pubspec.yaml کے پہلے استعمال کے لیے قبول کردہ ڈھونڈنے کے نتائج میں شامل کریں۔",
+      "noFinding": "Saropa Lints فائل میں Dart تلاش پر لیٹ ہیڈ کو استعمال کریں تاکہ اسے قبول کریں۔",
+      "outsideProject": "یہ فائل Dart پیکیج کے اندر نہیں ہے (اس کے اوپر pubspec.yaml نہیں ہے)، اس لیے اسے saropa_accepted.yaml میں شامل نہیں کیا جا سکتا۔",
+      "writeFailed": "سروپا_اکسپیڈیڈ_یییم اپڈیٹ نہ ہوسکا: {message}",
+      "cannotAppend": "سروپا_اکسپیڈڈ.yaml کی ترتیب اتومیٹیکس طور پر امتداد نہیں کی جا سکتی۔ دستی طور پر آئٹم شامل کریں۔",
+      "entryExists": "سروپا_اکسپیکٹڈ.یی ام ہر {rule} کے لیے {file} میں ایک آئٹم ہے۔ اگر آئٹم کی مکس کاؤنٹ ہے تو ہاتھ سے اسے بڑھائیں۔"
+    },
+    "info": {
+      "alreadyRunning": "ایک قبول ہونے والے مسائل کی جانچ جاری ہے",
+      "noList": "کسی بھی پैकیج میں ساروپا_اکسپیکٹڈ.یی ام ڈی فائل نہیں ملا۔ ایک فنڈنگ پر \"اس فائل میں قبول کریں\" کرکے شروع کریں۔",
+      "clean": "تسلیم شدہ مسائل: {count} مداخلات جانچے گئے، کوئی بھی پیشگی یا غلط نہیں۔",
+      "issues": "تسلیم شدہ مسائل: {stale} ناکارہ اور {invalid} غلط، {count} میں سے۔ مسائل پنل کو دیکھیں۔",
+      "added": "{rule} کو {file} میں {list} میں شامل کر دیا گیا ہے۔ فائل کی دوبارہ تحلیل کی جانے پر پہلے ہی واضح ہو چکے ہیں۔"
+    },
+    "action": {
+      "openList": "لیسٹ کھولیں",
+      "restartAnalysis": "تحلیل سرور دوبارہ شروع کریں"
+    },
+    "diagnostic": {
+      "staleFileMissing": "غیر فعال ورودی: {file} نہیں موجود ہے، اس لیے {rule} کی ورودی کچھ چھپاتی ہے۔",
+      "staleNoFinding": "غیر فعال ورودی: {rule} {file} میں کچھ نہیں ملا۔ اگر کوڈ ترمیم کر دیا گیا ہے تو ورودی کو ہٹا دیجیے۔",
+      "invalid": "غلط داخلی، کچھ چھپتا نہیں: {message}"
+    },
+    "prompt": {
+      "kindTitle": "کیوں یہ ڈھونڈنا قبول ہے؟",
+      "kindAccepted": "منظور: تلاش درست ہے اور کوڈ اس طرح رہے گا",
+      "kindFalsePositive": "غلطی: قاعدہ یہاں غلط ہے",
+      "reasonTitle": "تسلیم {rule} کی وجہ {file} میں",
+      "reasonPlaceholder": "ضروري. ریویئرز کے لیے saropa_accepted.yaml میں ذخیرہ کیا گیا۔",
+      "reasonRequired": "ایک سبب ضروری ہے۔"
+    },
+    "quickFix": {
+      "title": "اس فائل میں {rule} قبول کریں…"
+    },
+    "summary": {
+      "count": "{count} قبول کر لیا"
+    }
+  },
   "bugArchival": {
     "diagnostic": {
       "message": "یہ رپورٹ \"{status}\" کے نشان دار ہے لیکن ابھی بھی bugs/ میں ہے — بند کرنے سے پہلے اسے plans/history/ میں ارکیو کریں (دیکھیے ISSUE_REPORT_GUIDE.md)"
@@ -2918,6 +2971,9 @@
   "vibrancy": {
     "sdkConstraint": {
       "suppressOldSdk": "سکریپس (مقصودہ قدیم SDK) /نوبت_تھک"
+    },
+    "staleOverride": {
+      "suppress": "سکریپس (اونرائیڈ ہے) /نومٹھک"
     }
   },
   "blastRadius": {
