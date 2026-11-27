@@ -15,6 +15,7 @@
  */
 import * as path from 'node:path';
 import { ACCEPTED_FILE_NAME } from './acceptedFindingsModel';
+import { INTEGRATION_OFF_SENTINEL } from './integrationOffSentinel';
 
 /** File probes the planner needs; production passes fs-backed versions. */
 export interface CheckRootProbes {
@@ -37,14 +38,20 @@ export interface CheckRun {
 /**
  * True when [root] is worth a resolved scan without listing saropa_lints in
  * its pubspec: it has a list beside its pubspec, or its analysis options
- * enable the saropa_lints plugin. Without this gate every unrelated folder in
+ * enable the saropa_lints plugin (live, or commented out by this extension).
+ * Without this gate every unrelated folder in
  * a multi-root workspace would cost a full scan that can find nothing.
  */
 function usesSaropa(root: string, probes: CheckRootProbes): boolean {
   if (probes.exists(path.join(root, ACCEPTED_FILE_NAME))) return true;
   const options = probes.read(path.join(root, 'analysis_options.yaml'));
+  if (options === undefined) return false;
   // Indented key: the plugin entry under `plugins:`.
-  return options !== undefined && /^\s+saropa_lints\s*:/m.test(options);
+  if (/^\s+saropa_lints\s*:/m.test(options)) return true;
+  // With the language server on (the default) the extension comments that
+  // block out; the project still uses the plugin's rules. Requires the marker
+  // so a hand-written commented example does not cost a scan.
+  return options.includes(INTEGRATION_OFF_SENTINEL) && /^#\s+saropa_lints\s*:/m.test(options);
 }
 
 /**

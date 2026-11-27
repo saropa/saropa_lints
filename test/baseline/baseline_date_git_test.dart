@@ -254,6 +254,67 @@ void main() {
     });
   }
 
+  // Regression: `scan .` loaded no configuration at all, because the project
+  // root lookup never examined `.` itself, so no baseline applied.
+  for (final target in ['.', 'lib/..']) {
+    test(
+      'a relative target applies date and file baselines: $target',
+      () async {
+        const body = "void old() {\n  print('old');\n}\n";
+        write(
+          'pubspec.yaml',
+          "name: t\nenvironment:\n  sdk: '>=3.0.0 <4.0.0'\n",
+        );
+        write('lib/main.dart', body);
+        commit('main');
+        // Line 5 stays a finding; line 8 is hidden only by the baseline file.
+        write(
+          'lib/main.dart',
+          "${body}void added() {\n  print('new');\n}\n"
+              "void listed() {\n  print('listed');\n}\n",
+        );
+        write(
+          kBaselineConfigFileName,
+          'baseline:\n  date: "2022-01-01"\n  file: "saropa_baseline.json"\n',
+        );
+        write(
+          'saropa_baseline.json',
+          jsonEncode({
+            'version': 1,
+            'generated': '2022-01-01T00:00:00Z',
+            'violations': {
+              'lib/main.dart': {
+                'prefer_logger_over_print': [8],
+              },
+            },
+          }),
+        );
+
+        final root = Directory.current.path;
+        final result = await Process.run(Platform.resolvedExecutable, [
+          '--packages=${p.join(root, '.dart_tool', 'package_config.json')}',
+          p.join(root, 'bin', 'scan.dart'),
+          target,
+          '--tier',
+          'pedantic',
+          '--format',
+          'json',
+        ], workingDirectory: repo);
+        final out = '${result.stdout}';
+        expect(out, contains('{'), reason: '${result.stderr}');
+        final json = jsonDecode(out.substring(out.indexOf('{'))) as Map;
+        expect(
+          [
+            for (final d in json['diagnostics'] as List)
+              if ((d as Map)['ruleName'] == 'prefer_logger_over_print')
+                d['line'],
+          ],
+          [5],
+        );
+      },
+    );
+  }
+
   // The real `bin/lsp_server.dart` over JSON-RPC: its startup workspace scan
   // must publish the new finding and not the old one.
   test('the language server hides old findings only', () async {

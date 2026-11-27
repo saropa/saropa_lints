@@ -871,12 +871,16 @@ class ScanRunner {
     if (raw == null || raw.isEmpty) {
       // Pass noExclude so --no-exclude skips hardcoded path exclusions
       // (example/, .dart_tool/, build/, etc.) during directory discovery.
+      // Absolute, because project lookup, baselines, `// ignore:` matching and
+      // path-shaped rules all compare against absolute roots: `scan .` used to
+      // hand them `./lib/a.dart` and apply none of them. Done after discovery
+      // so exclusions still judge the path as the caller gave it.
       return _findDartFiles(
         targetPath,
         _excludePatterns,
         _includePatterns,
         noExclude,
-      );
+      ).map((f) => p.normalize(p.absolute(f))).toList();
     }
     final root = p.absolute(targetPath);
     var list = raw

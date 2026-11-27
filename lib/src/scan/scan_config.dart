@@ -22,9 +22,10 @@ class ScanConfig {
 }
 
 /// True when the project's `analysis_options.yaml` carries the marker the
-/// VS Code extension writes when "Lint integration" is turned off (the
-/// `plugins:` block is commented out). The scan CLI then reports "disabled"
-/// and exits 0 instead of failing with "no configuration found".
+/// VS Code extension writes when it comments out the `plugins:` block ("Lint
+/// integration" off, or the language server replacing the analyzer plugin).
+/// A plain scan without `--tier` then reports "disabled" and exits 0, so hooks
+/// do not fail on a switched-off project. `--check-accepted` runs anyway.
 bool isScanIntegrationDisabled(String projectRoot) {
   final content = _readFile(projectRoot, 'analysis_options.yaml');
   return content != null && content.contains(kIntegrationOffSentinel);
@@ -35,7 +36,16 @@ bool isScanIntegrationDisabled(String projectRoot) {
 /// Returns `null` if no `analysis_options.yaml` exists or it has no
 /// `diagnostics:` section. Uses the same regex patterns as the native
 /// plugin's config loader.
-ScanConfig? loadScanConfig(String projectRoot) {
+///
+/// A `plugins:` block the extension commented out still holds the project's
+/// rule list, so it is read by default: the language server (on by default)
+/// replaces the plugin by commenting the block out, and without this every CLI
+/// scan lost the user's rules. Pass [includeDisabledBlock] false to ask only
+/// about the live configuration.
+ScanConfig? loadScanConfig(
+  String projectRoot, {
+  bool includeDisabledBlock = true,
+}) {
   final enabled = <String>{};
   final disabled = <String>{};
 
@@ -43,8 +53,11 @@ ScanConfig? loadScanConfig(String projectRoot) {
   _loadSeverityOverrides(projectRoot, enabled, disabled);
 
   // Read diagnostics section (analysis_options.yaml)
-  final configContent = _readFile(projectRoot, 'analysis_options.yaml');
+  var configContent = _readFile(projectRoot, 'analysis_options.yaml');
   if (configContent == null) return null;
+  if (includeDisabledBlock) {
+    configContent = _uncommentDisabledBlock(configContent);
+  }
 
   final sectionMatch = RegExp(
     r'^\s+diagnostics:\s*$',
@@ -74,6 +87,34 @@ ScanConfig? loadScanConfig(String projectRoot) {
 
   if (enabled.isEmpty && disabled.isEmpty) return null;
   return ScanConfig(enabledRules: enabled, disabledRules: disabled);
+}
+
+/// A live (column 0) `plugins:` header.
+final RegExp _livePluginsHeader = RegExp(r'^plugins:\s*$', multiLine: true);
+
+/// [content] with the extension's commented-out block restored, in memory
+/// only. Returned unchanged when a live `plugins:` block exists (it outranks a
+/// leftover marker, as in the extension's own state check) or when either
+/// marker line is missing, so ordinary comments are never read as config.
+String _uncommentDisabledBlock(String content) {
+  if (_livePluginsHeader.hasMatch(content)) return content;
+  final lines = content.split('\n');
+  // Marker lines match `DISABLE_BEGIN_MARKER` / `DISABLE_END_MARKER` in
+  // extension/src/setup.ts.
+  final begin = lines.indexWhere(
+    (l) => l.startsWith('# >>> ') && l.contains(kIntegrationOffSentinel),
+  );
+  if (begin == -1) return content;
+  final end = lines.indexWhere(
+    (l) => l.startsWith('# <<< saropa_lints end of disabled'),
+    begin + 1,
+  );
+  if (end == -1) return content;
+  for (var i = begin + 1; i < end; i++) {
+    // The extension prefixes exactly `# ` onto every non-blank line.
+    if (lines[i].startsWith('# ')) lines[i] = lines[i].substring(2);
+  }
+  return lines.join('\n');
 }
 
 /// Parse severity overrides from `analysis_options_custom.yaml`.

@@ -8,6 +8,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { logReport, logSection, flushReport, findLatestAnalysisReport } from './reportWriter';
+import { INTEGRATION_OFF_SENTINEL } from './integrationOffSentinel';
 import { getProjectRoot } from './projectRoot';
 import { readViolations, writeViolationsData, type ViolationsData } from './violationsReader';
 import { readLiveViolations, readLiveViolationsForFiles } from './liveViolationsData';
@@ -813,7 +814,7 @@ const ANALYSIS_OPTIONS_FILENAME = 'analysis_options.yaml';
 // Changing the marker text would orphan previously-disabled blocks so
 // runEnable could never find and restore them.
 const DISABLE_BEGIN_MARKER =
-  '# >>> saropa_lints integration turned OFF by the VS Code extension — toggle "Lint integration" On to restore >>>';
+  `# >>> ${INTEGRATION_OFF_SENTINEL} — toggle "Lint integration" On to restore >>>`;
 const DISABLE_END_MARKER =
   '# <<< saropa_lints end of disabled integration block <<<';
 

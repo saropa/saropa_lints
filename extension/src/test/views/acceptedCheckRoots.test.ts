@@ -106,6 +106,29 @@ describe('planCheckRuns', () => {
     assert.deepStrictEqual(runs, [{ host: inner, target: a }]);
   });
 
+  it('runs a plugin-only folder whose plugin block this extension commented out', () => {
+    // The language server (on by default) comments the block out.
+    const a = ws('a');
+    const b = ws('b');
+    const disabled = [
+      '# >>> saropa_lints integration turned OFF by the VS Code extension >>>',
+      '# plugins:',
+      '#   saropa_lints:',
+      '# <<< saropa_lints end of disabled integration block <<<',
+    ].join('\n');
+    const files = { [path.join(b, 'analysis_options.yaml')]: disabled };
+    const runs = planCheckRuns([a, b], probes({ [a]: a, [b]: b }, [a], files));
+    assert.deepStrictEqual(runs, [{ host: a, target: a }, { host: a, target: b }]);
+  });
+
+  it('ignores a commented saropa_lints entry that carries no marker', () => {
+    const a = ws('a');
+    const b = ws('b');
+    const files = { [path.join(b, 'analysis_options.yaml')]: '# plugins:\n#   saropa_lints:\n' };
+    const runs = planCheckRuns([a, b], probes({ [a]: a, [b]: b }, [a], files));
+    assert.deepStrictEqual(runs, [{ host: a, target: a }]);
+  });
+
   it('returns nothing when no folder can host the CLI or none has a pubspec', () => {
     const a = ws('a');
     const files = { [path.join(a, 'saropa_accepted.yaml')]: '' };

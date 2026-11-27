@@ -69,9 +69,15 @@ class ProjectContext {
   /// Returns `null` if no project root is found or [filePath] is null/empty.
   static String? findProjectRoot(String? filePath) {
     if (filePath == null || filePath.isEmpty) return null;
-    final normalized = normalizePath(filePath);
+    var normalized = normalizePath(filePath);
     if (normalized.isEmpty) return null;
     try {
+      // A relative path must be anchored first: the walk below stops before
+      // `.`, so a pubspec.yaml in the working directory was never found, and
+      // cached answers keyed by relative folders would change with the cwd.
+      if (p.isRelative(normalized)) {
+        normalized = normalizePath(p.normalize(p.absolute(normalized)));
+      }
       var dir = Directory(normalized).parent;
 
       // Fast path: the file's own directory was resolved before. containsKey

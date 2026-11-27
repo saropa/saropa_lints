@@ -14,8 +14,8 @@ Completed work: `plans/history/2026.11/2026.11.26/accepted_findings_list_open_it
 | Plugin with several project roots in a live analysis server (accepted list and per-project baseline) | A person running the IDE or `dart analyze` with the plugin |
 | `dart run saropa_lints:baseline` against a real project with real `dart analyze` output | A run of `dart analyze` with the plugin |
 | `--explain` has no VS Code surface; the project rule asks for visible UI as well as CLI | Extension work (command, strings, translation run) and an F5 check |
-| Defect: with the language server on (the default), "Check Accepted Findings" fails. The extension comments out the plugin block; the check command then prints "scan skipped", exits 0 and writes no result file | Code fix. The command-line half was reproduced 2026-11-27; the message in VS Code is step 25 |
-| Defect: `dart run saropa_lints:scan .` (relative path) ignored the `date:` and file baselines; the same folder given as a full path applied them (observed 2026-11-27) | Code fix |
+| Defect: `scan --find-stale-ignores` reports a live `// ignore:` as stale when the rule drops the finding at report time (observed 2026-11-27 with `// ignore: prefer_logger_over_print` above a `print`, relative and full path); `--fix-stale-ignores` would delete it | Code fix |
+| With the plugin block commented out (language server on), a plain `scan` without `--tier`, `--find-stale-ignores` and `--fix-stale-ignores` still print "scan skipped" and exit 0, so the extension's stale-ignore commands do nothing there | Owner decision for plain `scan`; the stale-ignore modes wait for the defect above |
 | "Summary tree shows N accepted" cannot be seen: the Summary tree is not registered as a view | Owner decision: drop the item or show the count elsewhere (step 29 checks the Manage Rule Packs strip) |
 
 ## Checklist to run
@@ -142,7 +142,7 @@ Set-Content D:\tmp\accepted_check\baseline\analysis_options_custom.yaml 'lane: f
 22. Replace `main\saropa_accepted.yaml` with the `max: 1` list from step 14, then type a space in `a.dart` and save. Pass: the `saropa_lints` entries show `avoid_catch_all` on line 13 only.
 23. Open `D:\tmp\accepted_check\accepted.code-workspace`, change `"saropaLints.lspServer.enabled"` to `true`, save, then run **Developer: Reload Window**. Pass: `main\analysis_options.yaml` now has its plugin section commented out (expected).
 24. Open `main\lib\a.dart` and wait. Pass: `avoid_catch_all` appears on line 13 and not on line 5.
-25. Run **Saropa Lints: Check Accepted Findings**. Known defect: it is expected to say `Check accepted findings failed: …` (a missing result file). Record the exact message. A pass, once fixed, is a normal result message.
+25. Run **Saropa Lints: Check Accepted Findings**. Pass: a normal result message (`… entries checked, none stale or invalid.`, or a stale/invalid count with **Open List**), not `Check accepted findings failed: …` and not a missing-list message. If it fails, record the exact message.
 26. Change the setting back to `false` and save. Pass: within a few seconds the plugin section in `main\analysis_options.yaml` is no longer commented out.
 
 ### E. Light and dark

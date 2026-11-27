@@ -87,11 +87,16 @@ Future<void> main(List<String> args) async {
     exit(result.hasMismatch ? 1 : 0);
   }
 
-  // Lint integration turned off (plugin block commented out by the VS Code
-  // extension) and no explicit tier: report "disabled" and succeed so hooks
-  // and CI do not show a failure for a deliberate off switch.
+  // Plugin block commented out by the VS Code extension and no explicit tier:
+  // report "disabled" and succeed so hooks and CI do not show a failure for a
+  // switched-off project. Not for --check-accepted: the extension also
+  // comments the block out when the language server replaces the plugin, and
+  // skipping there exited 0 without the result file the caller reads. The
+  // stale-ignore modes still skip: they report live ignores as stale (see the
+  // open items in bugs/), and --fix-stale-ignores would delete them.
   if (tier == null &&
-      loadScanConfig(p.absolute(path)) == null &&
+      !parsed.checkAccepted &&
+      loadScanConfig(p.absolute(path), includeDisabledBlock: false) == null &&
       isScanIntegrationDisabled(p.absolute(path))) {
     print('saropa_lints is disabled in analysis_options.yaml; scan skipped.');
     exit(0);
