@@ -92,6 +92,17 @@ INVENTED_PHRASES_PATH = HERE / "invented_phrases.json"
 _invented_cache: dict[str, list[tuple[str, re.Pattern | None]]] | None = None
 
 
+# Sindhi shares the Arabic script with Urdu, so the wrong-script check passes it, and
+# NLLB wrote Sindhi into ur values ("Remove" shipped as a Sindhi word). These code
+# points belong to Sindhi (some also to Saraiki or Pashto) and none is in the Urdu
+# alphabet, whose own retroflex and nasal letters are U+0679, U+0688, U+0691, U+06BA.
+# Sindhi text that uses only shared letters still passes.
+_SINDHI_ONLY_RE = re.compile(
+    "[ٺٻٽٿڀڃڄڇڊڌڍڏ"
+    "ڙڦڪڱڳڻ۽۾]"
+)
+
+
 def _brand_terms() -> tuple[str, ...]:
     """Do-not-translate terms, imported lazily so the CLI works without mt_fallback."""
     try:
@@ -147,6 +158,12 @@ def detect(en: str, loc: str, locale: str, blocklist: list[dict]) -> list[tuple[
     # made prune delete it on every run so the pending count never settled.
     if rx and loc != en and len(letters) >= 2 and not rx.search(loc):
         out.append(("hard", "wrong-script"))
+
+    # Sindhi in an Urdu value. Excused only if English itself carries the letter.
+    if locale == "ur":
+        sindhi = _SINDHI_ONLY_RE.search(loc)
+        if sindhi and sindhi.group(0) not in en:
+            out.append(("hard", f"sindhi:U+{ord(sindhi.group(0)):04X}"))
 
     # Hallucinated continuation: output vastly longer than the source.
     # Compare PROSE to PROSE: placeholders/brands are stripped from both sides, or a

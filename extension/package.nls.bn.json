@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: স্টেল ইগনর কমেন্ট খুঁজুন",
   "command.fixStaleIgnores.title": "Saropa Lints: ফিক্স স্টেল ইগনর কমেন্ট",
   "command.checkAcceptedFindings.title": "Saropa Lints: গৃহীত ফলাফল পরীক্ষা করুন",
+  "command.explainBaseline.title": "Saropa Lints: এই ফাইলের বেসলাইন ব্যাখ্যা করুন",
   "command.openViolationsWideReport.title": "Saropa Lints: ফলাফল ড্যাশবোর্ড খুলুন",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: ওপেন ফাইন্ডিংস ড্যাশবোর্ড (ফিল্টার সংরক্ষণ করুন)",

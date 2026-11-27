@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: Buscar comentarios de ignorar obsoletos",
   "command.fixStaleIgnores.title": "Saropa Lints: Corrige comentarios de ignorar obsoletos",
   "command.checkAcceptedFindings.title": "Saropa Lints: Revisar Hallazgos Aceptados",
+  "command.explainBaseline.title": "Saropa Lints: Explicar la línea base de este archivo",
   "command.openViolationsWideReport.title": "Saropa Lints: Abrir el panel de resultados",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Abrir el panel de resultados (conservar filtros)",

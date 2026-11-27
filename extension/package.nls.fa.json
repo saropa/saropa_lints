@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: یافتن تعلیقه‌های ignore منسوخ",
   "command.fixStaleIgnores.title": "Saropa Lints: رفع تعلیقه‌های ignore منسوخ",
   "command.checkAcceptedFindings.title": "Saropa Lints: چک کردن یافته‌های پذیرفته شده",
+  "command.explainBaseline.title": "Saropa Lints: توضیح خط مبنای این فایل",
   "command.openViolationsWideReport.title": "Saropa Lints: باز کردن داشبورد یافته ها",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: باز کردن داشبورد یافته‌ها (حفظ فیلترها)",

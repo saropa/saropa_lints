@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: Verouderde ignore-opmerkingen zoeken",
   "command.fixStaleIgnores.title": "Saropa Lints: Verouderde ignore-opmerkingen corrigeren",
   "command.checkAcceptedFindings.title": "Saropa Lints: Controleer Geaccepteerde Findings",
+  "command.explainBaseline.title": "Saropa Lints: Baseline voor dit bestand uitleggen",
   "command.openViolationsWideReport.title": "Saropa Lints: Dashboard met bevindingen openen",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Dashboard met bevindingen openen (filters behouden)",

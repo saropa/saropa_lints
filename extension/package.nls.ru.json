@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: Найти устаревшие комментарии ignore",
   "command.fixStaleIgnores.title": "Saropa Lints: Исправить устаревшие комментарии ignore",
   "command.checkAcceptedFindings.title": "Saropa Lints: Проверить принятые находки",
+  "command.explainBaseline.title": "Saropa Lints: Объяснить базовую линию этого файла",
   "command.openViolationsWideReport.title": "Saropa Lints: Открыть панель находок",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Открыть панель находок (сохранить фильтры)",

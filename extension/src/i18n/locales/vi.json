@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(chỉ đọc; mở các kết quả để duyệt và hành động.)",
     "openFindings": "Mở bảng điều khiển phát hiện"
   },
+  "baselineExplain": {
+    "progress": "Đang giải thích đường cơ sở của {file}…",
+    "info": {
+      "alreadyRunning": "Một báo cáo đường cơ sở đang chạy."
+    },
+    "error": {
+      "noFile": "Mở hoặc chọn một tệp Dart để giải thích đường cơ sở của tệp.",
+      "noProject": "Không tìm thấy gói nào phụ thuộc vào saropa_lints cho tệp này.",
+      "failed": "Không thể giải thích đường cơ sở: {message}",
+      "unsafePath": "Ở đây chỉ có thể khởi chạy Dart qua shell của Windows, và đường dẫn tệp này chứa ký tự mà shell không thể truyền đi an toàn (% ! \" ^ hoặc ngắt dòng). Đổi tên tệp hoặc thư mục rồi thử lại."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "Không phân tích rủi ro theo từng hồ sơ (không có vi phạm trong phạm vi).",
+    "suppressionTotal": "Tổng số bị ẩn trong bản xuất: {total}",
     "suppressionNote": "Khớp với bản tóm tắt violations.json, không phải các nút bật/tắt ẩn trực tiếp trên thanh bên.",
     "noSuppression": "Không có tổng hợp ức chế trong xuất khẩu này (cơ phân tích cũ hoặc không bị ức hiếp).",
     "owaspSignal": "{count} vi phạm trong bản xuất này mang ánh xạ di động/web OWASP — mở Tư thế bảo mật để xem ma trận đầy đủ và xuất.",

@@ -1,6 +1,6 @@
 # BUG: `require_error_widget` — Fires when the future catches every failure itself
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-11-26
 Rule: `require_error_widget`
@@ -110,3 +110,15 @@ Add to the `require_error_widget` fixture:
 
 - saropa_lints: 17.9.1
 - Consumer: Flutter app, three sites (one cross-library controller future, two same-file futures)
+
+## Finish Report (2026-11-27)
+
+Fixed in rule version v6. A `FutureBuilder` is exempt when `future:` traces to a same-file `async` method or top-level function whose whole body is one `try` with a catch-all (`catch (e)` or `on Object catch`) that lets nothing escape. Tracing lives in `lib/src/future_source_utils.dart`, `future_source_scope.dart`, `future_override_utils.dart`, `future_catch_all_utils.dart` and `future_escape_visitor.dart`.
+
+Still reported (conservative): a method or field that can be overridden (a same-file subclass, directly or through a class alias, declares the same member; a public member of a public class that is not `final`, `sealed` or `interface`; any mixin's public member; any library with `part` files); calls inside an enum, extension or extension type; handlers with loops, `switch`, nested `try`, casts, `!`, `++`/`--`, index expressions, non-const constructors, or calls whose result is kept. A call used as a whole statement in a handler (`log(error, stack);`) is trusted not to throw.
+
+The second shape in the report (a controller getter in another library) still reports. The report itself allows this: "that shape can stay reported unless element resolution is used". Not an unmet requirement.
+
+Tests: `test/rules/widget/require_error_widget_future_cannot_error_test.dart` (38 cases: OK, can-still-error, untraceable, overridable producer, throwing handler). Fixture: `example/lib/widget_patterns/require_error_widget_fixture.dart` (one OK, two LINT).
+
+Hardening (2026-11-27): the `try` body may also return a local with an explicit `bool`, `double`, `int`, `num`, `String`, `List`, `Map` or `Set` type (`lib/src/future_local_value_utils.dart`); the test file now has 44 cases. Rule run (syntactic, on temporary copies with the ignore comments removed) against four consumer files: the two same-file sites and a third same-file loader that returns a typed local are silent; the cross-library controller getter still reports.

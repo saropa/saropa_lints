@@ -437,6 +437,14 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'checklist',
   },
   {
+    // Read-only CLI report for the active Dart file; menus pass the clicked file.
+    command: 'saropaLints.explainBaseline',
+    title: 'Explain Baseline for This File',
+    description: 'Show which baseline settings hide findings in the active Dart file, in the Output channel.',
+    category: 'Analysis',
+    icon: 'question',
+  },
+  {
     // Analysis Optimizer dashboard — tuning and performance.
     command: 'saropaLints.openAnalysisOptimizer',
     title: 'Analysis Optimizer',

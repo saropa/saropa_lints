@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(mababasa lamang; buksan ang mga Natuklasan upang mag-browse at kumilos.)",
     "openFindings": "Buksan ang Dashboard ng mga Natuklasan"
   },
+  "baselineExplain": {
+    "progress": "Ipinapaliwanag ang baseline para sa {file}…",
+    "info": {
+      "alreadyRunning": "May tumatakbo nang ulat ng baseline."
+    },
+    "error": {
+      "noFile": "Magbukas o pumili ng Dart file para ipaliwanag ang baseline nito.",
+      "noProject": "Walang nakitang package na umaasa sa saropa_lints para sa file na ito.",
+      "failed": "Hindi maipaliwanag ang baseline: {message}",
+      "unsafePath": "Dito, masisimulan lang ang Dart sa pamamagitan ng Windows shell, at may character ang path ng file na ito na hindi ligtas na maipapasa ng shell (% ! \" ^ o line break). Palitan ang pangalan ng file o folder, pagkatapos ay subukang muli."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "Walang paglabag sa panganib bawat file (walang mga pagsalangsang sa saklaw).",
+    "suppressionTotal": "Kabuuang na-suppress sa export: {total}",
     "suppressionNote": "Tumutugma sa buod ng violations.json, hindi sa mga live na toggle ng suppression sa sidebar.",
     "noSuppression": "Walang suppression aggregate sa pag-export na ito (mas lumang analyzer o zero suppressions).",
     "owaspSignal": "{count} na paglabag sa export na ito ay may dalang OWASP mobile/web mapping — buksan ang Security Posture para sa buong matrix at pag-export.",

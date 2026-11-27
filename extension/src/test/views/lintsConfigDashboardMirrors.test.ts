@@ -29,6 +29,27 @@ describe('lintsConfigDashboardMirrors', () => {
     assert.ok(html.includes('Suppressions (export snapshot)'));
   });
 
+  // The strip is the only visible surface for accepted findings.
+  it('lists the accepted kind beside the other suppression kinds', () => {
+    const html = buildSidebarMirrorPanelsHtml({
+      violations: [],
+      summary: {
+        suppressions: { total: 7, byKind: { ignore: 2, ignoreForFile: 1, baseline: 1, accepted: 3 } },
+      },
+    });
+    assert.ok(html.includes('Total suppressed in export: <strong>7</strong>'));
+    assert.ok(html.includes('(ignore 2, ignore_for_file 1, baseline 1, accepted 3)'));
+  });
+
+  // Exports written before the accepted kind existed must read as zero, not "undefined".
+  it('shows accepted 0 when the export has no accepted kind', () => {
+    const html = buildSidebarMirrorPanelsHtml({
+      violations: [],
+      summary: { suppressions: { total: 1, byKind: { ignore: 1 } } },
+    });
+    assert.ok(html.includes('accepted 0'));
+  });
+
   it('lists top file risk paths', () => {
     const data: ViolationsData = {
       violations: [

@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(kusoma tu; fungua Matokeo ya kuvinjari na kutenda.)",
     "openFindings": "Fungua Dashibodi ya Matokeo"
   },
+  "baselineExplain": {
+    "progress": "Inaeleza msingi wa {file}…",
+    "info": {
+      "alreadyRunning": "Ripoti ya msingi tayari inaendeshwa."
+    },
+    "error": {
+      "noFile": "Fungua au chagua faili ya Dart ili kueleza msingi wake.",
+      "noProject": "Hakuna kifurushi kinachotegemea saropa_lints kilichopatikana kwa faili hii.",
+      "failed": "Imeshindwa kueleza msingi: {message}",
+      "unsafePath": "Hapa Dart ingeweza kuanzishwa tu kupitia shell ya Windows, na njia ya faili hii ina herufi ambayo shell haiwezi kuipitisha kwa usalama (% ! \" ^ au mkato wa mstari). Badilisha jina la faili au folda, kisha ujaribu tena."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "Hakuna mgawanyiko wa hatari kwa kila faili (hakuna ukiukaji katika wigo).",
+    "suppressionTotal": "Jumla ya vilivyonyamazishwa katika usafirishaji: {total}",
     "suppressionNote": "Mechi violations.json muhtasari, si kuishi sidebar kukandamiza toggles.",
     "noSuppression": "Hakuna kiwanja cha kukandamiza katika usafirishaji huu (kibadilishaji cha zamani au ukandamizaji wa sifuri).",
     "owaspSignal": "ukiukaji {count} katika usafirishaji huu umebeba ramani ya simu/wavuti ya OWASP — fungua Mkao wa Usalama kwa matrix kamili na usafirishaji.",

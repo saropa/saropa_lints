@@ -264,3 +264,73 @@ class _ExternalTearOffState extends State<StatefulWidget> {
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Futures that cannot complete with an error.
+// See: plans/history/2026.11/2026.11.27/require_error_widget_false_positive_future_that_cannot_error.md
+// ---------------------------------------------------------------------------
+
+Future<String?> _fetchName() async => null;
+
+// GOOD: the producing method catches everything and returns a fallback.
+class _GoodFallbackFutureState extends State<StatefulWidget> {
+  late final Future<String?> _future = _load();
+
+  Future<String?> _load() async {
+    try {
+      return await _fetchName();
+    } on Object catch (error) {
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: _future,
+      builder: (context, snapshot) => Text(snapshot.data ?? 'none'),
+    );
+  }
+}
+
+// BAD: the catch rethrows, so the future can still fail.
+class _BadRethrowFutureState extends State<StatefulWidget> {
+  late final Future<String?> _future = _load();
+
+  Future<String?> _load() async {
+    try {
+      return await _fetchName();
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: require_error_widget
+    return FutureBuilder<String?>(
+      future: _future,
+      builder: (context, snapshot) => Text(snapshot.data ?? 'none'),
+    );
+  }
+}
+
+// BAD: `return` without `await` lets the error bypass the catch.
+class _BadUnawaitedReturnState extends State<StatefulWidget> {
+  Future<String?> _load() async {
+    try {
+      return _fetchName();
+    } catch (error) {
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: require_error_widget
+    return FutureBuilder<String?>(
+      future: _load(),
+      builder: (context, snapshot) => Text(snapshot.data ?? 'none'),
+    );
+  }
+}

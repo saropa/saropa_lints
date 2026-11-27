@@ -229,6 +229,7 @@ import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
 import { registerAcceptedFindingsCommands } from './accepted-findings-commands';
+import { registerBaselineExplainCommand } from './baselineExplainCommand';
 import { registerBugArchivalCheck } from './extensionChecks/bugArchivalCheck';
 import { registerDocPlacementCheck } from './extensionChecks/docPlacementCheck';
 import { registerAnalyzerExclusions } from './analyzerExclusions';
@@ -806,6 +807,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Accepted-findings list (saropa_accepted.yaml): "Check Accepted Findings"
   // command plus the "Accept <rule> in this file…" lightbulb on findings.
   context.subscriptions.push(registerAcceptedFindingsCommands(context));
+  // "Which baseline settings hide findings in this file?" (editor/explorer menus).
+  context.subscriptions.push(registerBaselineExplainCommand());
   registerAuditCommand(context);
   // Live l10n key validation — squiggles on missing keys / param mismatches.
   registerL10nDiagnostics(context);

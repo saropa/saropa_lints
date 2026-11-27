@@ -347,7 +347,7 @@
     "common": {
       "rule": "آرٹیکل آرٹیک رول",
       "add": "شامل کریں",
-      "remove": "هٽايو"
+      "remove": "ہٹائیں"
     },
     "sdk": {
       "summary": "{total} SDK مائیگریشن پیک(ز) اس پروجیکٹ پر لاگو ہوتے ہیں — {breaking} بریکنگ، {deprecation} فرسودگی۔",
@@ -674,7 +674,7 @@
     }
   },
   "toolbar": {
-    "runAnalysis": "تجزيي هلائو",
+    "runAnalysis": "تجزیہ چلائیں",
     "copyJson": "JSON کاپی کریں",
     "saveReport": "رپورٹ محفوظ کریں",
     "moreActions": "مزید اقدامات",
@@ -689,18 +689,18 @@
     "analysisFailedDetail": "تجزیہ ناکام ہوگیا۔ تفصیلات کے لئے آؤٹ پٹ چیک کریں۔"
   },
   "filter": {
-    "activeLabel": "فعال فلٽر:",
-    "chipRemove": "هٽايو"
+    "activeLabel": "فعال فلٹرز:",
+    "chipRemove": "ہٹائیں"
   },
   "a11y": {
     "toggleFullWidth": "پوری چوڑائی والا لے آؤٹ ٹوگل کریں",
-    "expandRow": "قطار وڌايو",
+    "expandRow": "قطار پھیلائیں",
     "comparisonDimension": "میٹرک"
   },
   "uiLanguage": {
     "pick": {
       "title": "Saropa Lints UI زبان",
-      "placeholder": "سائڊ بار ۽ ڊيش بورڊز جي زبان چونڊيو",
+      "placeholder": "سائڈ بار اور ڈیش بورڈز کے لیے زبان منتخب کریں",
       "auto": "خودکار (VS Code کی ڈسپلے زبان کے مطابق)",
       "coverage": "{pct}% ترجمہ کیا گیا — باقی انگریزی میں دکھائی دیتا ہے"
     },
@@ -722,7 +722,7 @@
     },
     "tooltip": {
       "section": {
-        "status": "اسٽيٽس",
+        "status": "حیثیت",
         "project": "پروجیکٹ",
         "problems": "مسائل",
         "memory": "یاد",
@@ -863,7 +863,7 @@
       "processes": "پروسیسز",
       "totalRss": "کل RSS",
       "orphaned": "چھوڑا ہوا",
-      "refresh": "ريفريش",
+      "refresh": "ریفریش کریں",
       "colPid": "PID",
       "colParent": "والد",
       "colRss": "RSS",
@@ -918,7 +918,7 @@
   },
   "machineDashboard": {
     "title": "ماشین ہیلتھ",
-    "refresh": "ريفريش",
+    "refresh": "ریفریش کریں",
     "systemUnknown": "سسٹم یادگیری کو اس پلیٹ فارم پر پڑھنا ناممکن ہے",
     "platformUnsupported": "مشین ہیلتھ اس پلیٹ فارم پر دستیاب نہیں ہے — پروسیس کوئریز Windows، macOS اور Linux کو سپورٹ کرتی ہیں۔",
     "freeOf": "آزاد",
@@ -1266,7 +1266,7 @@
       "headingConnected": "Drift Advisor",
       "metaConnected": "منسلک",
       "noIssues": "{label} سے منسلک — کوئی موجودہ مسئلہ نہیں۔",
-      "refresh": "ريفريش",
+      "refresh": "ریفریش کریں",
       "openBrowser": "براؤزر میں کھولیں",
       "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor کو غیر فعال کریں"
@@ -1319,8 +1319,8 @@
       "announceStarted": "تجزیہ شروع ہوا",
       "announceComplete": "تجزیہ مکمل",
       "announceFailed": "تجزیہ ناکام ہوگیا",
-      "removeRecentAria": "هٽايو",
-      "removeRecentTitle": "هٽايو",
+      "removeRecentAria": "ہٹائیں",
+      "removeRecentTitle": "ہٹائیں",
       "bulkSelectedTpl": "{n} منتخب کردہ",
       "announceSearchVerb": "تلاش کر رہے ہیں",
       "severitiesNoun": "سیوریٹیز",
@@ -1417,7 +1417,7 @@
       "knownIssuesDesc": "آپ کے انحصار کے خلاف اطلاع دی گئی معلوم کمزوریوں اور مشورے کو براؤز کریں۔",
       "compare": "موازنہ کریں Compare",
       "compareDesc": "اسکور، سائز اور سرگرمی کے لحاظ سے دو یا زیادہ پیکجوں کا ساتھ ساتھ موازنہ کریں۔",
-      "settings": "سيٽنگز",
+      "settings": "ترتیبات",
       "openButton": "{tab} کھولیں"
     },
     "settingsTab": {
@@ -1556,7 +1556,7 @@
       "presetDirectOnly": "صرف براہ راست",
       "devToggleTitle": "ٹیبل اور مجموعی طور پر ڈیو وابستگیوں کو شامل کریں.",
       "includeDev": "شامل کریں dev",
-      "activeFiltersLabel": "فعال فلٽر:",
+      "activeFiltersLabel": "فعال فلٹرز:",
       "clearAllFilters": "سب صاف کریں"
     },
     "columns": {
@@ -1629,7 +1629,7 @@
         "tooltip": "فیچرز جو اس پیکیج کے چینج لوج میں ہیں لیکن ابھی تک آپ کے کوڈ میں استعمال نہیں ہوئے ہیں — سوٹ کریں تاکہ سب سے زیادہ کم استعمال کیے گئے پیکیجز پر توجہ مرکوز کی جا سکے"
       },
       "status": {
-        "label": "اسٽيٽس",
+        "label": "حیثیت",
         "tooltip": "استعمال کی حیثیت: کیا آپ کے کوڈ میں پیکیج غیر استعمال شدہ دکھائی دیتا ہے یا نہیں۔"
       },
       "description": {
@@ -1773,7 +1773,7 @@
     },
     "filterChips": {
       "ariaRegion": "فعال فلٹرز",
-      "activeLabel": "فعال فلٽر:",
+      "activeLabel": "فعال فلٹرز:",
       "clearAll": "سب صاف کریں"
     },
     "bands": {
@@ -1984,7 +1984,7 @@
       "showOverlay": "یہ شارٹ کٹ اوورلے دکھائیں"
     },
     "script": {
-      "activeFiltersLabel": "فعال فلٽر:",
+      "activeFiltersLabel": "فعال فلٹرز:",
       "clearAll": "سب صاف کریں",
       "neverRun": "کبھی نہیں چلایا گیا"
     },
@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(صرف پڑھنے کے قابل؛ براؤز کرنے اور عمل کرنے کے لئے نتائج کھولیں۔)",
     "openFindings": "نتائج ڈیش بورڈ کھولیں"
   },
+  "baselineExplain": {
+    "progress": "{file} کی بیس لائن کی وضاحت کی جا رہی ہے…",
+    "info": {
+      "alreadyRunning": "بیس لائن رپورٹ پہلے ہی چل رہی ہے۔"
+    },
+    "error": {
+      "noFile": "بیس لائن کی وضاحت کے لیے کوئی Dart فائل کھولیں یا منتخب کریں۔",
+      "noProject": "اس فائل کے لیے saropa_lints پر منحصر کوئی پیکیج نہیں ملا۔",
+      "failed": "بیس لائن کی وضاحت نہیں ہو سکی: {message}",
+      "unsafePath": "یہاں Dart صرف Windows شیل کے ذریعے شروع کیا جا سکتا تھا، اور اس فائل کے پاتھ میں ایسا حرف ہے جسے شیل محفوظ طریقے سے آگے نہیں بھیج سکتا (% ! \" ^ یا لائن بریک)۔ فائل یا فولڈر کا نام بدلیں، پھر دوبارہ کوشش کریں۔"
+    }
+  },
   "configMirrors": {
     "noFileRisk": "فی فائل رسک کی کوئی خرابی نہیں (کوئی خلاف ورزی کا دائرہ کار نہیں۔)",
+    "suppressionTotal": "برآمد میں کل دبائے گئے: {total}",
     "suppressionNote": "میچز violations.json خلاصہ ، براہ راست سائڈبار دبانے والے ٹوگل نہیں ہیں۔",
     "noSuppression": "اس برآمد میں کوئی دباؤ مجموعی نہیں (پرانے تجزیہ کار یا صفر کی دباؤں) ۔",
     "owaspSignal": "اس ایکسپورٹ میں {count} خلاف ورزیاں OWASP موبائل/ویب میپنگ رکھتی ہیں — مکمل میٹرکس اور ایکسپورٹ کے لیے سیکیورٹی پوسچر کھولیں۔",
@@ -2101,7 +2114,7 @@
     "noCountersTitle": "ری سیٹ کرنے کے لئے کوئی کاؤنٹر نہیں ہے۔",
     "resetTitle": "تمام کاؤنٹرز ری سیٹ کریں",
     "refreshTitle": "ڈسک سے ٹیلی میٹری کاؤنٹرز کو دوبارہ لوڈ کریں۔",
-    "refresh": "ريفريش",
+    "refresh": "ریفریش کریں",
     "copyTitle": "اسنیپ شاٹ کو JSON کے طور پر کاپی کریں",
     "copyJson": "JSON کاپی کریں",
     "resetCounters": "کاؤنٹرز ری سیٹ کریں",
@@ -2414,7 +2427,7 @@
     },
     "enableRule": {
       "done": "فعال کردہ قاعدہ {ruleId}. دوبارہ چلانے کا تجزیہ لاگو کرنے کے لئے.",
-      "runAnalysis": "تجزيي هلائو",
+      "runAnalysis": "تجزیہ چلائیں",
       "noWorkspace": "کسی اصول کو فعال کرنے کے لئے ورک اسپیس فولڈر کھولیں۔"
     },
     "openFinding": {
@@ -2655,7 +2668,7 @@
       "registryRemoveFailed": "رجسٹری کو ہٹانے میں ناکام: {message}",
       "registryTokenUpdated": "✓ ٹوکن اپ ڈیٹ ہو گیا",
       "registryTokenUpdateFailed": "ٹوکن کو اپ ڈیٹ کرنے میں ناکام: {message}",
-      "actionRemove": "هٽايو",
+      "actionRemove": "ہٹائیں",
       "removeAuthPrompt": "{name} کے لئے توثیق کو ہٹا دیں؟",
       "annotateInProgress": "تشریح پہلے سے جاری ہے",
       "noPubspecInWorkspace": "کام کی جگہ میں کوئی pubspec.yaml نہیں ملا۔",
@@ -2744,7 +2757,7 @@
     "applyAll": "تمام کریں",
     "applySelected": "منتخب کریں",
     "apply": "آپلیکیٹ",
-    "remove": "هٽايو",
+    "remove": "ہٹائیں",
     "selectAll": "اختار کریں",
     "defaultLabel": "ڈیفالٹ",
     "sortHint": "کلک کریں تاکہ ترتیب دی جائے",
@@ -2752,7 +2765,7 @@
     "previewLine": "preview کردیں جو اضافہ ہوگا",
     "previewApprox": "نزدیک ترین — اکثر اوقات ایک فائل کی صحیح انڈنٹیشن اور کامنٹ کی پوزیشن سے مطابقت ہوتا ہے جب اس کا استعمال کیا جاتا ہے",
     "col": {
-      "status": "اسٽيٽس",
+      "status": "حیثیت",
       "pattern": "پٹرن",
       "files": "فائلیں",
       "cost": "تخمینہ ہرگز نہیں",
@@ -2924,7 +2937,7 @@
   },
   "sidebar": {
     "actions": {
-      "runAnalysisLabel": "تجزيي هلائو",
+      "runAnalysisLabel": "تجزیہ چلائیں",
       "runAnalysisDescription": "ڈیٹا اینالائیزr دوبارہ کریں",
       "latestEngineLabel": "اپڈیٹ انجن سے اسکن کریں",
       "latestEngineDescription": "اس پروجیکٹ کی Dart SDK زندگی کے تجزیہ کے لیے بہت پرانی ہے",

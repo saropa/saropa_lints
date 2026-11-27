@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints : Trouver les commentaires d'ignorance périmés",
   "command.fixStaleIgnores.title": "Saropa Lints : Corriger les commentaires d'ignorance périmés",
   "command.checkAcceptedFindings.title": "Saropa Lints : Vérifier les problèmes acceptés",
+  "command.explainBaseline.title": "Saropa Lints: Expliquer la ligne de base de ce fichier",
   "command.openViolationsWideReport.title": "Saropa Lints : Ouvrir le tableau de bord des résultats",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints : Ouvrir le tableau de bord des résultats (conserver les filtres)",

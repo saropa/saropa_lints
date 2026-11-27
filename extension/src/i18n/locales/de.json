@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(nur-lesen; öffnen Sie Findings zum Durchsuchen und Handeln.)",
     "openFindings": "Befund-Dashboard öffnen"
   },
+  "baselineExplain": {
+    "progress": "Baseline für {file} wird erklärt…",
+    "info": {
+      "alreadyRunning": "Ein Baseline-Bericht läuft bereits."
+    },
+    "error": {
+      "noFile": "Öffnen oder wählen Sie eine Dart-Datei, um ihre Baseline zu erklären.",
+      "noProject": "Für diese Datei wurde kein Paket gefunden, das von saropa_lints abhängt.",
+      "failed": "Die Baseline konnte nicht erklärt werden: {message}",
+      "unsafePath": "Dart konnte hier nur über die Windows-Shell gestartet werden, und dieser Dateipfad enthält ein Zeichen, das die Shell nicht sicher weitergeben kann (% ! \" ^ oder Zeilenumbruch). Benennen Sie die Datei oder den Ordner um und versuchen Sie es erneut."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "Keine Risiko-Aufschlüsselung pro Akte (keine Verstöße im Umfang).",
+    "suppressionTotal": "Im Export insgesamt unterdrückt: {total}",
     "suppressionNote": "Passt zu violations.json Zusammenfassung, nicht zum Live-Sidebar Suppression Toggles.",
     "noSuppression": "Kein Unterdrückungsgegensatz in diesem Export (älterer Analyzer oder Nullunterdrückungen).",
     "owaspSignal": "{count} Verstoß/Verstöße in diesem Export enthalten OWASP Mobile/Web-Zuordnung — öffnen Sie Security Posture für die vollständige Matrix und den Export.",

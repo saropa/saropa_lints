@@ -70,6 +70,32 @@ class TestInventedNegative(unittest.TestCase):
         self.assertGreater(sum(len(v) for v in table.values()), 0)
 
 
+class TestSindhiInUrdu(unittest.TestCase):
+    """Sindhi letters are a defect in ur only."""
+
+    SINDHI = "هٽايو"  # old ur value for "Remove"
+    URDU = "ٹڈڑںھہے"  # Urdu's own letters
+
+    def sindhi_flags(self, loc: str, locale: str) -> list[str]:
+        return [r for _, r in bt.detect("Remove", loc, locale, []) if r.startswith("sindhi:")]
+
+    def test_flagged_in_ur(self) -> None:
+        self.assertEqual(self.sindhi_flags(self.SINDHI, "ur"), ["sindhi:U+067D"])
+
+    def test_urdu_letters_and_other_locales_pass(self) -> None:
+        self.assertEqual(self.sindhi_flags(self.URDU, "ur"), [])
+        self.assertEqual(self.sindhi_flags(self.SINDHI, "ar"), [])
+
+    def test_curated_and_shipped_ur_are_clean(self) -> None:
+        # Curated entries win over every repair file, so they are checked directly.
+        from dictionaries import TRANSLATIONS
+
+        curated = [s for s, v in TRANSLATIONS["ur"].items() if bt._SINDHI_ONLY_RE.search(v)]
+        self.assertEqual(curated, [])
+        shipped = bt.scan_shipped(Path(__file__).resolve().parents[3])["ur"]
+        self.assertEqual([i["key"] for i in shipped if i["reason"].startswith("sindhi:")], [])
+
+
 class TestShippedAndRepairs(unittest.TestCase):
     """No shipped value may carry these flags; the repairs must win and be clean."""
 

@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: איתור הערות התעלמות מיושנות",
   "command.fixStaleIgnores.title": "Saropa Lints: תיקון הערות ignore מיושנות",
   "command.checkAcceptedFindings.title": "Saropa Lints: בדוק ממצאים מתקבלים",
+  "command.explainBaseline.title": "Saropa Lints: הסבר את קו הבסיס של קובץ זה",
   "command.openViolationsWideReport.title": "Saropa Lints: פתיחת לוח המחוונים של הממצאים",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: פתיחת לוח המחוונים של הממצאים (שמירת המסננים)",

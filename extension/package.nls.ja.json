@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: 過期した無視コメントを検索",
   "command.fixStaleIgnores.title": "Saropa Lints: 無効な無視コメントを修正",
   "command.checkAcceptedFindings.title": "Saropa Lints: 受け入れたFindingを確認",
+  "command.explainBaseline.title": "Saropa Lints: このファイルのベースラインを説明",
   "command.openViolationsWideReport.title": "Saropa Lints: 検出結果ダッシュボードを開く",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: 検索結果ダッシュボードを開く (フィルター保存)",

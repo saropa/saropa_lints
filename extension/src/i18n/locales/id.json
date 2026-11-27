@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(hanya dibaca; buka Temuan untuk menelusuri dan bertindak.)",
     "openFindings": "Buka Dasbor Temuan"
   },
+  "baselineExplain": {
+    "progress": "Menjelaskan baseline untuk {file}…",
+    "info": {
+      "alreadyRunning": "Laporan baseline sedang berjalan."
+    },
+    "error": {
+      "noFile": "Buka atau pilih file Dart untuk menjelaskan baseline-nya.",
+      "noProject": "Tidak ditemukan paket yang bergantung pada saropa_lints untuk file ini.",
+      "failed": "Tidak dapat menjelaskan baseline: {message}",
+      "unsafePath": "Di sini Dart hanya dapat dijalankan melalui shell Windows, dan jalur file ini berisi karakter yang tidak dapat diteruskan shell dengan aman (% ! \" ^ atau jeda baris). Ganti nama file atau folder, lalu coba lagi."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "Tidak ada rincian risiko per-file (tidak ada pelanggaran dalam lingkup).",
+    "suppressionTotal": "Total yang disembunyikan dalam ekspor: {total}",
     "suppressionNote": "Sesuai dengan ringkasan violations.json, bukan dengan pengalih penyembunyian langsung di sidebar.",
     "noSuppression": "Tidak ada agregat penindasan dalam ekspor ini (penganalisis yang lebih tua atau nol penindas).",
     "owaspSignal": "{count} pelanggaran dalam ekspor ini membawa pemetaan mobile/web OWASP — buka Postur Keamanan untuk matriks penuh dan ekspor.",

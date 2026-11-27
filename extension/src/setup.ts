@@ -359,9 +359,14 @@ export async function runInWorkspaceAsync(
     // Extra environment variables merged onto `process.env` for this spawn.
     // Use to isolate the child from analytics, devtools, or pub side-effects.
     env?: Record<string, string>;
+    // Arguments for the ENOENT retry through a shell, already quoted for it.
+    // Needed when an argument is a user's file path: a shell would split it on
+    // spaces and run its metacharacters. `null` forbids the retry; omitted
+    // retries with `args` unchanged.
+    shellFallbackArgs?: string[] | null;
   } = {},
 ): Promise<{ ok: boolean; stderr: string; stdout: string; cancelled: boolean }> {
-  const { logToOutput = true, token, shell = true, env } = options;
+  const { logToOutput = true, token, shell = true, env, shellFallbackArgs = args } = options;
   const ch = logToOutput ? getOutputChannel() : undefined;
   ch?.appendLine(`$ ${command} ${args.join(' ')}`);
 
@@ -378,9 +383,9 @@ export async function runInWorkspaceAsync(
 
   // Wrapper that wires up stdout/stderr streaming, cancellation, and
   // exit-code resolution for a single spawn attempt.
-  const doSpawn = (useShell: boolean): Promise<{ ok: boolean; stderr: string; stdout: string; cancelled: boolean }> =>
+  const doSpawn = (useShell: boolean, spawnArgs: string[]): Promise<{ ok: boolean; stderr: string; stdout: string; cancelled: boolean }> =>
     new Promise((resolve) => {
-      const child = spawn(command, args, {
+      const child = spawn(command, spawnArgs, {
         cwd: workspaceRoot,
         shell: useShell,
         ...(spawnEnv ? { env: spawnEnv } : {}),
@@ -438,13 +443,13 @@ export async function runInWorkspaceAsync(
   // CreateProcessW can't execute .bat files without a shell), retry once with
   // shell: true so the cmd.exe wrapper handles .bat resolution. This keeps
   // shell: false as the preferred path while degrading gracefully.
-  const result = await doSpawn(shell);
-  if (!shell && !result.ok && result.stderr.includes('ENOENT')) {
+  const result = await doSpawn(shell, args);
+  if (!shell && !result.ok && shellFallbackArgs && result.stderr.includes('ENOENT')) {
     // Don't retry if the user already cancelled — avoids a pointless
     // spawn-then-immediate-kill cycle between the ENOENT and the retry.
     if (token?.isCancellationRequested) return result;
     ch?.appendLine('[shell: false failed with ENOENT — retrying with shell: true]');
-    return doSpawn(true);
+    return doSpawn(true, shellFallbackArgs);
   }
   return result;
 }

@@ -351,6 +351,8 @@ dart run saropa_lints:baseline --explain lib/legacy/old.dart
 
 Read-only; it does not run analysis. For that file it reports the governing project, the `only_impacts` filter, the matching `paths` patterns, the baseline JSON entries (rule and line), and the number of lines older than `date`. It describes what the baseline covers, not which findings the file currently has. A relative file path resolves against the project directory argument (default: the current directory).
 
+In VS Code: right-click a `.dart` file (editor or Explorer) and pick **Saropa Lints: Explain Baseline for This File**, or run it from the Command Palette with the file active. The same report appears in the Saropa Lints Output channel.
+
 ### Path Pattern Examples
 
 | Pattern | Matches |

@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: Tìm Comment Bỏ qua Cũ",
   "command.fixStaleIgnores.title": "Saropa Lints: Sửa Bình luận Bỏ qua Cũ",
   "command.checkAcceptedFindings.title": "Saropa Lints: Kiểm tra Các Vấn đề Đã Chấp Nhận",
+  "command.explainBaseline.title": "Saropa Lints: Giải thích đường cơ sở của tệp này",
   "command.openViolationsWideReport.title": "Saropa Lints: Mở bảng điều khiển phát hiện",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Mở bảng điều khiển phát hiện (giữ bộ lọc)",

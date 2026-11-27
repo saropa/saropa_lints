@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: ค้นหาความคิดเห็น ignore ที่ล้าสมัย",
   "command.fixStaleIgnores.title": "Saropa Lints: แก้ไขความคิดเห็น ignore ที่ล้าสมัย",
   "command.checkAcceptedFindings.title": "Saropa Lints: ตรวจสอบผลการค้นหาที่ยอมรับแล้ว",
+  "command.explainBaseline.title": "Saropa Lints: อธิบายเบสไลน์ของไฟล์นี้",
   "command.openViolationsWideReport.title": "Saropa Lints: เปิดแดชบอร์ดผลที่พบ",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: เปิดแดชบอร์ดผลที่พบ (คงตัวกรองไว้)",

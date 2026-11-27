@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(仅供阅读;只有在线) 打开发现以浏览和行动.)",
     "openFindings": "打开发现仪表板"
   },
+  "baselineExplain": {
+    "progress": "正在解释 {file} 的基线…",
+    "info": {
+      "alreadyRunning": "已有基线报告正在运行。"
+    },
+    "error": {
+      "noFile": "请打开或选择一个 Dart 文件以解释其基线。",
+      "noProject": "未找到适用于此文件且依赖 saropa_lints 的包。",
+      "failed": "无法解释基线：{message}",
+      "unsafePath": "此处只能通过 Windows shell 启动 Dart，而此文件路径包含 shell 无法安全传递的字符（% ! \" ^ 或换行符）。请重命名文件或文件夹，然后重试。"
+    }
+  },
   "configMirrors": {
     "noFileRisk": "没有每档案风险分类 (范围不存在违规行为).",
+    "suppressionTotal": "导出中被抑制的总数：{total}",
     "suppressionNote": "匹配violations.json摘要，而不是实时侧边栏抑制切换。",
     "noSuppression": "在此出口中没有抑制聚合物 (较旧的分析仪或零抑制).",
     "owaspSignal": "此导出的 {count} 个违规带有 OWASP 移动/Web 映射 — 打开“安全态势”以获取完整矩阵并导出。",

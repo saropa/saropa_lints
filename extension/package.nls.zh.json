@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints：查找过期忽略注释",
   "command.fixStaleIgnores.title": "Saropa Lints: 修复过期的忽略注释",
   "command.checkAcceptedFindings.title": "Saropa Lints：检查已接受的发现",
+  "command.explainBaseline.title": "Saropa Lints: 解释此文件的基线",
   "command.openViolationsWideReport.title": "Saropa Lints：打开发现仪表板",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints：打开结果仪表板（保留过滤器）",

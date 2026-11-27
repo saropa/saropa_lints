@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: Eskimiş Ignore Yorumlarını Bul",
   "command.fixStaleIgnores.title": "Saropa Lints: Eskimiş Ignore Yorumlarını Düzelt",
   "command.checkAcceptedFindings.title": "Saropa Lints: Kabul Edilen Bulguları Kontrol Et",
+  "command.explainBaseline.title": "Saropa Lints: Bu Dosyanın Temel Çizgisini Açıkla",
   "command.openViolationsWideReport.title": "Saropa Lints: Bulgular Kontrol Panelini Aç",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Bulgular Kontrol Panelini Aç (filtreleri koru)",

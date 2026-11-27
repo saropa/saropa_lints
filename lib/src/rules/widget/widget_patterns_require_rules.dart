@@ -17,6 +17,7 @@ import 'package:analyzer/source/source_range.dart';
 
 import '../../android_manifest_utils.dart';
 import '../../fixes/widget/wrap_text_in_expanded_fix.dart';
+import '../../future_source_utils.dart';
 import '../../info_plist_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../widget_ancestor_utils.dart';
@@ -1137,28 +1138,34 @@ class RequireLongPressCallbackRule extends SaropaLintRule {
   }
 }
 
-/// Warns when findChildIndexCallback is called in build method.
+/// Warns when a FutureBuilder or StreamBuilder never handles the error state.
 ///
-/// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v4
+/// Since: v1.4.2 | Updated: v17.10.1 | Rule version: v6
 ///
-/// Creating a new callback in build causes unnecessary rebuilds.
+/// A builder that only reads `snapshot.data` shows a blank or misleading UI
+/// when the source fails. A `FutureBuilder` is exempt when its `future:` is
+/// traced to a same-file `async` method whose whole body is a `try` with a
+/// catch-all that lets nothing escape, because `hasError` is then unreachable.
+/// The method must not be overridable (private, or on a type other libraries
+/// cannot extend, with no same-file override), and its handler may only log
+/// and return plain values.
 ///
 /// **BAD:**
 /// ```dart
-/// ListView.builder(
-///   findChildIndexCallback: (key) => items.indexWhere(...),
-///   itemBuilder: ...,
+/// FutureBuilder<String>(
+///   future: fetchName(),
+///   builder: (context, snapshot) => Text(snapshot.data ?? 'none'),
 /// )
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// // Define callback outside build or use memoization
-/// final _findChildIndex = (Key key) => ...;
-///
-/// ListView.builder(
-///   findChildIndexCallback: _findChildIndex,
-///   itemBuilder: ...,
+/// FutureBuilder<String>(
+///   future: fetchName(),
+///   builder: (context, snapshot) {
+///     if (snapshot.hasError) return const Text('Could not load');
+///     return Text(snapshot.data ?? 'none');
+///   },
 /// )
 /// ```
 class RequireErrorWidgetRule extends SaropaLintRule {
@@ -1182,7 +1189,7 @@ class RequireErrorWidgetRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_error_widget',
-    '[require_error_widget] FutureBuilder/StreamBuilder must handle error state to prevent silent failures, blank screens, or cryptic UI. Without error handling, users may see no feedback when data fails to load, leading to confusion, poor UX, and support burden. This can also mask backend or network issues during development. {v5}',
+    '[require_error_widget] FutureBuilder/StreamBuilder must handle error state to prevent silent failures, blank screens, or cryptic UI. Without error handling, users may see no feedback when data fails to load, leading to confusion, poor UX, and support burden. This can also mask backend or network issues during development. {v6}',
     correctionMessage:
         'Add error handling: if (snapshot.hasError) show a user-friendly error message or fallback UI. Log errors for diagnostics and provide actionable feedback to users. Audit all async builders for error handling coverage.',
     severity: DiagnosticSeverity.WARNING,
@@ -1196,6 +1203,11 @@ class RequireErrorWidgetRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'FutureBuilder' && typeName != 'StreamBuilder') return;
+
+      // A future that catches every failure itself can never set `hasError`,
+      // so demanding an error branch would only add unreachable code.
+      // Streams are not traced: `stream:` can emit errors in other ways.
+      if (typeName == 'FutureBuilder' && _hasUnfailingFuture(node)) return;
 
       // Find the builder argument
       for (final Argument arg in node.argumentList.arguments) {
@@ -1235,6 +1247,17 @@ class RequireErrorWidgetRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Whether [node] has a `future:` argument that is traceably unable to
+  /// complete with an error. No argument at all keeps the normal check.
+  static bool _hasUnfailingFuture(InstanceCreationExpression node) {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'future') {
+        return futureCannotError(arg.argumentExpression);
+      }
+    }
+    return false;
   }
 
   /// Whether [builder] (the `(ctx, snapshot) { ... }` argument) demonstrates

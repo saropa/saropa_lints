@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: Hanapin ang mga Lumang Ignore Comment",
   "command.fixStaleIgnores.title": "Saropa Lints: Ayusin ang mga Lumang Ignore Comment",
   "command.checkAcceptedFindings.title": "Saropa Lints: Suriin ang mga Tinanggap na Natuklasan",
+  "command.explainBaseline.title": "Saropa Lints: Ipaliwanag ang Baseline para sa File na Ito",
   "command.openViolationsWideReport.title": "Saropa Lints: Buksan ang Findings Dashboard",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Buksan ang Mga Natuklasan ng Dashboard (ipreserba ang mga filter)",

@@ -339,7 +339,13 @@
     "src/accepted-findings-commands.ts",
     "src/test/views/acceptedFindings.test.ts",
     "src/acceptedCheckRoots.ts",
-    "src/test/views/acceptedCheckRoots.test.ts"
+    "src/test/views/acceptedCheckRoots.test.ts",
+    "src/baselineExplainCommand.ts",
+    "src/test/baselineExplainCommand.test.ts",
+    "src/owaspExport.ts",
+    "src/test/owaspExport.test.ts",
+    "src/views/lintsConfigDashboardMirrors.ts",
+    "src/test/views/lintsConfigDashboardMirrors.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

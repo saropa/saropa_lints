@@ -127,6 +127,8 @@ function appendSuppressionGovernance(
   lines.push(`- ignore: ${byKind.ignore ?? 0}`);
   lines.push(`- ignoreForFile: ${byKind.ignoreForFile ?? 0}`);
   lines.push(`- baseline: ${byKind.baseline ?? 0}`);
+  // saropa_accepted.yaml hides findings too; without this row the kinds do not add up to the total.
+  lines.push(`- accepted: ${byKind.accepted ?? 0}`);
   lines.push('');
   if (topRules.length > 0) {
     lines.push('### Top Suppressed Rules');

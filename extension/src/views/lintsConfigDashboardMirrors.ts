@@ -3,7 +3,7 @@
  * (suppressions export totals, OWASP-mapped violation signal, riskiest files) in the editor tab.
  */
 
-import type { Violation, ViolationsData } from '../violationsReader';
+import type { SuppressionsSummary, Violation, ViolationsData } from '../violationsReader';
 import { buildFileRisks, type FileRisk } from './fileRiskTree';
 import { l10n } from '../i18n/runtime';
 
@@ -42,18 +42,36 @@ function buildFileRiskLines(risks: readonly FileRisk[]): string {
 }
 
 /**
+ * Suppression total with its per-kind breakdown. This strip is the only visible
+ * surface for the `accepted` count, so every kind the analyzer exports is listed.
+ */
+function buildSuppressionBlock(sup: SuppressionsSummary | undefined): string {
+  // Older analyzers write no aggregate; say so instead of showing zeros.
+  if (!sup || typeof sup.total !== 'number') {
+    return `<p class="hint">${escapeHtml(l10n('configMirrors.noSuppression'))}</p>`;
+  }
+  // The kind names are the identifiers used in violations.json and source comments,
+  // so they stay literal; only the sentence around them is translated.
+  const kinds = sup.byKind
+    ? ` (ignore ${sup.byKind.ignore ?? 0}, ignore_for_file ${sup.byKind.ignoreForFile ?? 0}, ` +
+      `baseline ${sup.byKind.baseline ?? 0}, accepted ${sup.byKind.accepted ?? 0})`
+    : '';
+  // {total} is left unfilled by l10n so the translated sentence can be escaped first
+  // and the bold number placed wherever the language puts it.
+  const sentence = escapeHtml(l10n('configMirrors.suppressionTotal')).replace(
+    '{total}',
+    `<strong>${escapeHtml(String(sup.total))}</strong>`,
+  );
+  return `<p class="hint">${sentence}${escapeHtml(kinds)}</p><p class="hint">${escapeHtml(l10n('configMirrors.suppressionNote'))}</p>`;
+}
+
+/**
  * Collapsible panels mirroring **Suppressions**, **Security posture** (OWASP signal), and **File risk**
  * from the current `violations.json` slice (after YAML-disabled-rule filter, same violations array
  * as the violations dashboard disk read — not live view-suppression toggles).
  */
 export function buildSidebarMirrorPanelsHtml(data: ViolationsData): string {
-  const sup = data.summary?.suppressions;
-  const supBlock =
-    sup && typeof sup.total === 'number'
-      ? `<p class="hint">Total suppressed in export: <strong>${escapeHtml(String(sup.total))}</strong>${sup.byKind
-        ? ` — ignore ${escapeHtml(String(sup.byKind.ignore ?? 0))}, ignore_for_file ${escapeHtml(String(sup.byKind.ignoreForFile ?? 0))}, baseline ${escapeHtml(String(sup.byKind.baseline ?? 0))}`
-        : ''}.</p><p class="hint">${escapeHtml(l10n('configMirrors.suppressionNote'))}</p>`
-      : `<p class="hint">${escapeHtml(l10n('configMirrors.noSuppression'))}</p>`;
+  const supBlock = buildSuppressionBlock(data.summary?.suppressions);
 
   const owaspN = countOwaspMappedViolations(data.violations);
   const secBlock = `<p class="hint">${escapeHtml(l10n('configMirrors.owaspSignal', { count: String(owaspN) }))}</p>`;

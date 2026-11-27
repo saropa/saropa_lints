@@ -21,7 +21,7 @@ describe('generateOwaspReport', () => {
         totalViolations: 1,
         suppressions: {
           total: 6,
-          byKind: { ignore: 3, ignoreForFile: 2, baseline: 1 },
+          byKind: { ignore: 3, ignoreForFile: 2, baseline: 1, accepted: 5 },
           byRule: {
             insecure_transport: 4,
             prefer_final_locals_with_fix: 2,
@@ -45,6 +45,8 @@ describe('generateOwaspReport', () => {
     const report = generateOwaspReport(data, '/workspace');
     assert.ok(report.includes('## Suppression Governance'));
     assert.ok(report.includes('- Total suppressions: **6**'));
+    // Accepted findings (saropa_accepted.yaml) are a suppression kind and must be listed.
+    assert.ok(report.includes('- accepted: 5'));
     assert.ok(report.includes('- Security-related suppressions: **4**'));
     assert.ok(report.includes('| insecure_transport | 4 | Yes |'));
     assert.ok(report.includes('| prefer_final_locals_with_fix | 2 | No |'));

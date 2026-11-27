@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: البحث عن تعليقات التجاهل القديمة",
   "command.fixStaleIgnores.title": "Saropa Lints: إصلاح تعليقات التجاهل القديمة",
   "command.checkAcceptedFindings.title": "Saropa Lints: تحقق من العناصر المقبولة",
+  "command.explainBaseline.title": "Saropa Lints: شرح خط الأساس لهذا الملف",
   "command.openViolationsWideReport.title": "Saropa Lints: فتح لوحة تحكم النتائج",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: فتح لوحة تحكم النتائج (الحفاظ على الفلاتر)",

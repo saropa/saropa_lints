@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(sadece okunur; göz atmak ve hareket etmek için Bulgular'ı aç.)",
     "openFindings": "Açık Bulgular Tablosu (Dashboard)"
   },
+  "baselineExplain": {
+    "progress": "{file} için temel çizgi açıklanıyor…",
+    "info": {
+      "alreadyRunning": "Bir temel çizgi raporu zaten çalışıyor."
+    },
+    "error": {
+      "noFile": "Temel çizgisini açıklamak için bir Dart dosyası açın veya seçin.",
+      "noProject": "Bu dosya için saropa_lints'e bağımlı bir paket bulunamadı.",
+      "failed": "Temel çizgi açıklanamadı: {message}",
+      "unsafePath": "Burada Dart yalnızca Windows kabuğu üzerinden başlatılabildi ve bu dosya yolu, kabuğun güvenle aktaramayacağı bir karakter içeriyor (% ! \" ^ veya satır sonu). Dosyayı veya klasörü yeniden adlandırıp tekrar deneyin."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "Dosya başına risk ayrımı yok (mühtemede ihlaller yok).",
+    "suppressionTotal": "Dışa aktarımda toplam bastırılan: {total}",
     "suppressionNote": "violations.json özetini eşleştirir, canlı yan çubuğunun baskı altındaki geçişleri değil.",
     "noSuppression": "Bu ihracatta hiçbir baskınlama agregatı bulunmamaktadır (eski analiz cihazı veya sıfır baskı).",
     "owaspSignal": "Bu dışa aktarımdaki {count} ihlal OWASP mobil/web eşlemesini içerir — tam matris ve dışa aktarım için Güvenlik Duruşu'nu açın.",

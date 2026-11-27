@@ -4,6 +4,7 @@
  * Values still identical to English fail too, unless allowlisted in scripts/i18n/english_allowed.json.
  * Leaked MT prompts, looped words (spaced or CJK), overlong values and known invented
  * phrases (scripts/i18n/invented_phrases.json) fail as "mt-echo" (see mtEchoProblems).
+ * Sindhi-only letters in an ur value fail too (see SINDHI_ONLY).
  * Full audit lives in scripts/i18n/verify_locales.py.
  */
 import * as assert from 'node:assert';
@@ -129,6 +130,11 @@ function loadInvented(): Record<string, InventedPhrase[]> {
 
 const INVENTED = loadInvented();
 
+// Sindhi shares the Arabic script, and NLLB wrote it into ur values. None of these
+// code points is in the Urdu alphabet. Same set as _SINDHI_ONLY_RE in
+// bad_translations.py.
+const SINDHI_ONLY = /[ٺٻٽٿڀڃڄڇڊڌڍڏڙڦڪڱڳڻ۽۾]/;
+
 function mtEchoProblems(en: string, loc: string, locale: string): string[] {
   const out: string[] = [];
   if (PROMPT_LIST.test(loc) && !PROMPT_LIST.test(en)) { out.push('prompt-leak'); }
@@ -140,6 +146,8 @@ function mtEchoProblems(en: string, loc: string, locale: string): string[] {
   const low = loc.toLowerCase();
   const hit = (INVENTED[locale] ?? []).find((p) => low.includes(p.phrase) && !(p.excuse && p.excuse.test(en)));
   if (hit) { out.push(`invented:${hit.phrase.slice(0, 30)}`); }
+  // Only ur: the check says "this is Sindhi, not Urdu", which means nothing elsewhere.
+  if (locale === 'ur' && SINDHI_ONLY.test(loc)) { out.push('sindhi'); }
   return out;
 }
 
@@ -157,6 +165,15 @@ const families: { name: string; en: string; file: (l: string) => string }[] = [
 describe('locale parity', () => {
   it('discovers the expected locales', () => {
     assert.ok(localeCodes.length >= 24, `found ${localeCodes.length} locales`);
+  });
+
+  // The shipped catalogs are clean, so without this a broken pattern would pass unnoticed.
+  it('flags Sindhi letters in ur only, and passes Urdu', () => {
+    const sindhi = 'هٽايو';
+    const urdu = 'ٹڈڑںھہے';
+    assert.ok(mtEchoProblems('Remove', sindhi, 'ur').includes('sindhi'));
+    assert.ok(!mtEchoProblems('Remove', urdu, 'ur').includes('sindhi'));
+    assert.ok(!mtEchoProblems('Remove', sindhi, 'ar').includes('sindhi'));
   });
 
   for (const fam of families) {

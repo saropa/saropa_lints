@@ -68,12 +68,29 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [17.10.1] — Unreleased
 
+`require_error_widget` stops asking for an error branch that can never run, and the VS Code extension can now explain which baseline settings hide findings in a file. Accepted findings are now counted wherever suppressions are broken down by kind. [log](https://github.com/saropa/saropa_lints/blob/v17.10.1/CHANGELOG.md)
+
 ### Fixed
 
+- `require_error_widget` no longer reports a `FutureBuilder` whose future comes from a same-file async method that catches every error and only logs and returns a fallback, since its error state is unreachable; futures from other files, overridable methods and handlers that can still throw are still reported. No action required.
 - The scan CLI, scan daemon and language server now apply each package's own baseline when one run covers a folder with several packages; before, only the first analyzed package's baseline was used for every file. No action required.
+
+### Added (Extension)
+
+- New "Explain Baseline for This File" command in the editor and Explorer context menus for Dart files shows which baseline settings hide findings in that file, in the Output panel. On Windows, if the file path holds a character the shell cannot pass safely, the error message says so. No action required.
+
+### Changed (Extension)
+
+- The Rule Packs "Suppressions (export)" strip and the exported OWASP report now list findings hidden by `saropa_accepted.yaml` next to the ignore and baseline counts, so the kinds add up to the total. No action required.
+
+### Fixed (Extension)
+
+- Urdu text that had been written with Sindhi-only letters is corrected. No action required.
 
 ### Internal
 
+- A translation guard and the locale parity test now fail when an Urdu value contains a Sindhi-only letter.
+- New process-level tests run the scan daemon and the language server on a temporary package to check that `max:` in `saropa_accepted.yaml` hides only the first findings and that ignored findings do not count toward it.
 - Diagnosed why `dart analyze` on a folder holding two packages reports plugin findings for only one: the analysis server tracks one shared "plugin analyzing" flag for all plugin isolates, so it reports idle once the first isolate finishes, before a slower second isolate starts. Upstream; the limit is documented in the configuration guide.
 
 ---

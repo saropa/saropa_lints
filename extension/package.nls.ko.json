@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: 무효한 무시 주석 찾기",
   "command.fixStaleIgnores.title": "Saropa Lints: 무시 주석 수정",
   "command.checkAcceptedFindings.title": "Saropa Lints: 수락된 발견 사항 확인",
+  "command.explainBaseline.title": "Saropa Lints: 이 파일의 기준선 설명",
   "command.openViolationsWideReport.title": "Saropa Lints: 발견 사항 대시보드 열기",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: 발견 사항 대시보드 열기(필터 유지)",

@@ -494,13 +494,17 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Dashboards": "ڈیش بورڈز",
         # Manual: the old value was Sindhi script, not Urdu.
         "Actions": "اقدامات",
-        "Status": "اسٽيٽس",
-        "Settings": "سيٽنگز",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Status": "حیثیت",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Settings": "ترتیبات",
         "Help": "مدد",
-        "Run analysis": "تجزيي هلائو",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Run analysis": "تجزیہ چلائیں",
         # Manual: the old value was Sindhi script, not Urdu.
         "Rescan": "دوبارہ اسکین کریں",
-        "Refresh": "ريفريش",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Refresh": "ریفریش کریں",
         # Manual: the old value was Sindhi script, not Urdu.
         "Copy JSON": "JSON کاپی کریں",
         # Manual: the old value was Sindhi script, not Urdu.
@@ -518,29 +522,37 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Retry": "دوبارہ کوشش کریں",
         # Manual: the old value was Sindhi script, not Urdu.
         "Clear search": "تلاش صاف کریں",
-        "Active filters:": "فعال فلٽر:",
-        "Remove": "هٽايو",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Active filters:": "فعال فلٹرز:",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Remove": "ہٹائیں",
         # Manual: the old value was Sindhi script, not Urdu.
         "Toggle full-width layout": "پوری چوڑائی والا لے آؤٹ ٹوگل کریں",
-        "Expand row": "قطار وڌايو",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Expand row": "قطار پھیلائیں",
         # Manual: the old value was Sindhi script, not Urdu.
         "Keyboard shortcuts": "کی بورڈ شارٹ کٹس",
         # Manual: the old value was Sindhi script, not Urdu.
         "Saropa Lints: Set Up Project (pubspec + config)": "Saropa Lints: پروجیکٹ سیٹ اپ کریں (pubspec + config)",
         # Manual: the old value was Sindhi script, not Urdu.
         "Saropa Lints: Turn Off Lint Integration": "Saropa Lints: Lint انٹیگریشن بند کریں",
-        "Saropa Lints: Run Analysis": "Saropa Lints: تجزيو هلائو",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Saropa Lints: Run Analysis": "Saropa Lints: تجزیہ چلائیں",
         # Manual: the old value was Sindhi script, not Urdu.
         "Saropa Lints: Verify Plugin Is Running (liveness check)": "Saropa Lints: تصدیق کریں کہ پلگ اِن چل رہا ہے (liveness check)",
         # Manual: the old value was Sindhi script, not Urdu.
         "Saropa Lints: Initialize / Update Analysis Options": "Saropa Lints: تجزیے کے اختیارات شروع / اپ ڈیٹ کریں",
-        "Saropa Lints: Create Composite Analyzer Plugin (scaffold)": "Saropa Lints: Composite Analyzer Plugin ٺاهيو (scaffold)",
-        "Saropa Lints: Open Analysis Options": "Saropa Lints: تجزيي جا آپشنز کوليو",
-        "Saropa Lints: Open pubspec.yaml": "Saropa Lints: pubspec.yaml کوليو",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Saropa Lints: Create Composite Analyzer Plugin (scaffold)": "Saropa Lints: Composite Analyzer Plugin بنائیں (scaffold)",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Saropa Lints: Open Analysis Options": "Saropa Lints: تجزیے کے اختیارات کھولیں",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Saropa Lints: Open pubspec.yaml": "Saropa Lints: pubspec.yaml کھولیں",
         # Manual: the old value was Sindhi script, not Urdu.
         "Saropa Lints: Toggle Run Analysis After Config Change": "Saropa Lints: config تبدیلی کے بعد تجزیہ چلانا ٹوگل کریں",
         "Saropa Lints UI language": "Saropa Lints UI زبان",
-        "Choose language for sidebar and dashboards": "سائڊ بار ۽ ڊيش بورڊز جي زبان چونڊيو",
+        # Manual: the old value was Sindhi, not Urdu.
+        "Choose language for sidebar and dashboards": "سائڈ بار اور ڈیش بورڈز کے لیے زبان منتخب کریں",
         # Manual: the old value was Sindhi script, not Urdu.
         "Auto (follow VS Code display language)": "خودکار (VS Code کی ڈسپلے زبان کے مطابق)",
         "#": "#",
@@ -3318,8 +3330,13 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 # any older curated entry for the same source string still wins.
 from manual_translations import build as _build_manual  # noqa: E402
 from manual_translations_gaps import build as _build_gaps  # noqa: E402
+from manual_translations_surfaces import build as _build_surfaces  # noqa: E402
 
-for _loc, _entries in [*_build_manual().items(), *_build_gaps().items()]:
+for _loc, _entries in [
+    *_build_manual().items(),
+    *_build_gaps().items(),
+    *_build_surfaces().items(),
+]:
     for _src, _tr in _entries.items():
         TRANSLATIONS.setdefault(_loc, {}).setdefault(_src, _tr)
 

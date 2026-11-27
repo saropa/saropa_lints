@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(read-only; open Findings to browse and act.)",
     "openFindings": "Open Findings Dashboard"
   },
+  "baselineExplain": {
+    "progress": "Explaining the baseline for {file}…",
+    "info": {
+      "alreadyRunning": "A baseline report is already running."
+    },
+    "error": {
+      "noFile": "Open or select a Dart file to explain its baseline.",
+      "noProject": "No package that depends on saropa_lints was found for this file.",
+      "failed": "Could not explain the baseline: {message}",
+      "unsafePath": "Dart could only be started through the Windows shell here, and this file path contains a character the shell cannot pass safely (% ! \" ^ or a line break). Rename the file or folder, then try again."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "No per-file risk breakdown (no violations in scope).",
+    "suppressionTotal": "Total suppressed in export: {total}",
     "suppressionNote": "Matches violations.json summary, not live sidebar suppression toggles.",
     "noSuppression": "No suppression aggregate in this export (older analyzer or zero suppressions).",
     "owaspSignal": "{count} violation(s) in this export carry OWASP mobile/web mapping — open Security Posture for the full matrix and export.",

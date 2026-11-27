@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(alleen lezen; open Findings om te bladeren en op te treden.)",
     "openFindings": "Bevindingendashboard openen"
   },
+  "baselineExplain": {
+    "progress": "Baseline voor {file} wordt uitgelegd…",
+    "info": {
+      "alreadyRunning": "Er wordt al een baselinerapport uitgevoerd."
+    },
+    "error": {
+      "noFile": "Open of selecteer een Dart-bestand om de baseline ervan uit te leggen.",
+      "noProject": "Voor dit bestand is geen pakket gevonden dat van saropa_lints afhankelijk is.",
+      "failed": "Kan de baseline niet uitleggen: {message}",
+      "unsafePath": "Dart kon hier alleen via de Windows-shell worden gestart, en dit bestandspad bevat een teken dat de shell niet veilig kan doorgeven (% ! \" ^ of een regeleinde). Wijzig de naam van het bestand of de map en probeer het opnieuw."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "Geen uitsplitsing van het risico per dossier (geen overtredingen in omvang).",
+    "suppressionTotal": "Totaal onderdrukt in de export: {total}",
     "suppressionNote": "Voldoet aan violations.json samenvatting, niet live sidebar onderdrukking schakelaars.",
     "noSuppression": "Geen onderdrukkingsaggregat in deze export (ouder analysator of nul-onderdrukking).",
     "owaspSignal": "{count} overtreding(en) in deze export bevatten OWASP mobiele/web mapping — open Security Posture voor de volledige matrix en export.",

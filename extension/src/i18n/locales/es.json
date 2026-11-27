@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(sólo lectura; abre los hallazgos para navegar y actuar.)",
     "openFindings": "Abrir el panel de resultados"
   },
+  "baselineExplain": {
+    "progress": "Explicando la línea base de {file}…",
+    "info": {
+      "alreadyRunning": "Ya se está ejecutando un informe de línea base."
+    },
+    "error": {
+      "noFile": "Abra o seleccione un archivo Dart para explicar su línea base.",
+      "noProject": "No se encontró para este archivo ningún paquete que dependa de saropa_lints.",
+      "failed": "No se pudo explicar la línea base: {message}",
+      "unsafePath": "Aquí Dart solo se podía iniciar a través del shell de Windows, y la ruta de este archivo contiene un carácter que el shell no puede transmitir de forma segura (% ! \" ^ o un salto de línea). Cambie el nombre del archivo o la carpeta e inténtelo de nuevo."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "No hay desglose del riesgo por expediente (no hay violaciones en el alcance).",
+    "suppressionTotal": "Total suprimido en la exportación: {total}",
     "suppressionNote": "Coincide con el resumen violations.json, no con los interruptores de supresión en la barra lateral.",
     "noSuppression": "No hay agregado de supresión en esta exportación (analisador más antiguo o cero suprimiciones).",
     "owaspSignal": "{count} infracción/infracciones en esta exportación incluyen mapeo móvil/web de OWASP — abre Postura de Seguridad para la matriz completa y la exportación.",

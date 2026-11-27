@@ -2082,8 +2082,21 @@
     "readOnlyNote": "(tylko do odczytu; otwórz Wyniki, aby przeglądać i działać.)",
     "openFindings": "Otwórz panel wyników"
   },
+  "baselineExplain": {
+    "progress": "Objaśnianie linii bazowej dla {file}…",
+    "info": {
+      "alreadyRunning": "Raport linii bazowej jest już uruchomiony."
+    },
+    "error": {
+      "noFile": "Otwórz lub zaznacz plik Dart, aby objaśnić jego linię bazową.",
+      "noProject": "Nie znaleziono dla tego pliku pakietu zależnego od saropa_lints.",
+      "failed": "Nie udało się objaśnić linii bazowej: {message}",
+      "unsafePath": "Tutaj Dart można było uruchomić tylko przez powłokę systemu Windows, a ścieżka tego pliku zawiera znak, którego powłoka nie może bezpiecznie przekazać (% ! \" ^ lub podział wiersza). Zmień nazwę pliku lub folderu i spróbuj ponownie."
+    }
+  },
   "configMirrors": {
     "noFileRisk": "Brak podziału ryzyka na dane (brak naruszeń w zakresie).",
+    "suppressionTotal": "Łącznie wyciszonych w eksporcie: {total}",
     "suppressionNote": "Odpowiada podsumowaniu violations.json, nie jest to aktywny przekształcacz tłumienia paska bocznego.",
     "noSuppression": "Brak agregatu supresyjnego w tym eksporcie (starszy analizator lub zerowe supresje).",
     "owaspSignal": "{count} naruszeń w tym eksporcie zawiera mapowanie OWASP dla urządzeń mobilnych/sieci Web — otwórz pozycję bezpieczeństwa, aby wyświetlić pełną matrycę i eksport.",

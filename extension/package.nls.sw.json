@@ -50,6 +50,7 @@
   "command.findStaleIgnores.title": "Saropa Lints: Tafuta Maoni ya Ignore Yaliyopitwa na Wakati",
   "command.fixStaleIgnores.title": "Saropa Lints: Rekebisha Maoni ya Ignore Yaliyopitwa na Wakati",
   "command.checkAcceptedFindings.title": "Saropa Lints: Kagua Matokeo Yaliyokubaliwa",
+  "command.explainBaseline.title": "Saropa Lints: Eleza Msingi wa Faili Hii",
   "command.openViolationsWideReport.title": "Saropa Lints: Fungua Dashibodi ya Matokeo",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Fungua Dashibodi ya Matokeo (hifadhi vichungi)",
