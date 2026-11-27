@@ -70,6 +70,7 @@
   "No": "ไม่",
   "No readable violations export. Run Saropa Lints analysis first.": "ไม่มีไฟล์ส่งออกการละเมิดที่อ่านได้ เรียกใช้การวิเคราะห์ Saropa Lints ก่อน",
   "No workspace folder open.": "ไม่มีโฟลเดอร์ workspace ที่เปิดอยู่",
+  "Not run yet": "ยังไม่ได้เรียกใช้",
   "On": "เปิด",
   "Open Code Health": "เปิด Code Health",
   "Open File": "เปิดไฟล์",

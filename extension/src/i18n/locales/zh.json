@@ -149,7 +149,7 @@
       "colRule": "规则 规章制度 在",
       "colSeverity": "严重性",
       "colTier": "资本级别的其他类型",
-      "colMessage": "信息的消息是什么?",
+      "colMessage": "消息",
       "empty": "没有发现结果 — 项目干净。",
       "filteredEmpty": "当前筛选条件没有匹配的结果。",
       "loadMore": "显示更多",
@@ -233,7 +233,7 @@
       "colScore": "评分"
     },
     "packages": {
-      "title": "包装包裹是什么意思?"
+      "title": "软件包"
     },
     "empty": {
       "body": "没有包被扫描，因此没有功能可以列出。"
@@ -307,7 +307,7 @@
     "allPackages": "所有软件包",
     "allPackagesHint": "每个可用的包装,包括在这个项目中没有检测到的. 让一群人选择遵守它的规则.",
     "versionGroup": {
-      "tag": "选择一个版本.",
+      "tag": "选择一个版本",
       "tooltip": "这些包针对同一依赖的不同主要版本。每次只启用其中一个——启用一个会关闭其他所有。"
     },
     "domainDesc": {
@@ -462,7 +462,7 @@
     "shortcuts": {
       "jumpToTab": "跳转到标签 1-7（层级，规则集，覆盖，SDK 发布，配置文件，自动化，扩展）",
       "prevNextTab": "上一个标签 / 下一个标签",
-      "showOverlay": "显示这个快捷键覆盖."
+      "showOverlay": "显示此快捷键浮层"
     }
   },
   "dashboards": {
@@ -498,13 +498,13 @@
     "noScan": "首先运行一个包扫描,以找到升级机会.",
     "openFileFailed": "无法打开 {file} — 它可能自上次扫描后已移动。",
     "card": {
-      "versionUpgrade": "更新可用于 {latest} .",
+      "versionUpgrade": "可更新到 {latest}",
       "versionCurrent": "关于最新的新闻",
-      "featuresTitle": "功能尚未使用.",
+      "featuresTitle": "尚未使用的功能",
       "locationsTitle": "您的项目使用此包在哪里?",
       "noLocations": "未在项目源码中导入 —— 很可能是开发依赖或间接依赖。",
-      "moreFiles": "和 {count} 更多的文件.",
-      "openInDashboard": "在包装仪表板中打开.",
+      "moreFiles": "以及另外 {count} 个文件",
+      "openInDashboard": "在软件包仪表板中打开",
       "writeReport": "编写报告"
     },
     "actions": {
@@ -563,7 +563,7 @@
       "constrained": "受到限制,受制于",
       "constrainedBy": "你的{constraint}约束限制了这个 ({resolvable}可解决, {latest}最新)",
       "pinHeld": "暂缓",
-      "pinDoNotUse": "不要使用.",
+      "pinDoNotUse": "请勿使用",
       "drift": "跨项目推移的漂流",
       "driftBehind": "后面：{siblings}（你有{own}）",
       "driftDiffers": "不同：{siblings}（您有 {own}）",
@@ -589,7 +589,7 @@
       "openPrs": "未关闭的 PR",
       "activity": "活动 (90d)",
       "activityValue": "已关闭 {closed} 个问题，已合并 {merged} 个 PR",
-      "noActivity": "最近没有活动.",
+      "noActivity": "最近没有活动",
       "lastCommit": "最后一个承诺",
       "pubPoints": "酒吧点的时间",
       "verified": "（已验证）",
@@ -629,7 +629,7 @@
       "noDates": "无法确定此包的版本日期.",
       "noItems": "在这些版本之间没有发现PR或问题.",
       "prsMerged": "聚焦公关公司合并后的",
-      "issuesClosed": "已关闭的问题已经关闭.",
+      "issuesClosed": "已关闭的问题",
       "searchLabel": "搜索 PR 和问题",
       "searchPlaceholder": "搜索公关和问题...",
       "filterAria": "按类别筛选",
@@ -637,7 +637,7 @@
       "filterUnreviewed": "未审查",
       "filterPrs": "PR",
       "filterIssues": "问题",
-      "typePr": "在 PR 里,你会看到PR.",
+      "typePr": "拉取请求",
       "typeIssue": "问题",
       "reviewReviewed": "已审查",
       "reviewApplicable": "适用性 有关的",
@@ -669,7 +669,7 @@
       "skipToDetails": "跳到软件包详情"
     },
     "shortcuts": {
-      "showOverlay": "显示这个快捷键覆盖.",
+      "showOverlay": "显示此快捷键浮层",
       "closeOverlay": "关闭键盘快捷方式覆盖层."
     }
   },
@@ -693,7 +693,7 @@
     "chipRemove": "删除 去掉 移除"
   },
   "a11y": {
-    "toggleFullWidth": "切换全宽布局的配置.",
+    "toggleFullWidth": "切换全宽布局",
     "expandRow": "展开行",
     "comparisonDimension": "指标"
   },
@@ -705,7 +705,7 @@
       "coverage": "{pct}% 翻译 — 其余内容以英文显示"
     },
     "reloadPrompt": "语言设置为 {locale}。重新加载窗口以更新侧边栏和命令标签。",
-    "reloadNow": "现在重新加载.",
+    "reloadNow": "立即重新加载",
     "reloadLater": "稍后"
   },
   "statusBar": {
@@ -715,7 +715,7 @@
     },
     "menu": {
       "openViolations": "公开违规报告",
-      "openPackageDashboard": "打开一个包仪表板.",
+      "openPackageDashboard": "打开软件包仪表板",
       "openProcessHealth": "开放进程健康状况",
       "commandCatalog": "命令目录",
       "about": "关于"
@@ -1006,7 +1006,7 @@
   "findingsDash": {
     "pageTitle": "Saropa 发现仪表板",
     "documentTitle": "Saropa 发现仪表板",
-    "skipToFindings": "跳到发现.",
+    "skipToFindings": "跳到发现",
     "secondaryAsideLabel": "次要诊断",
     "hero": {
       "gaugeTitle": "卫生分数 {score} (等级是 {grade}). 错误的重量是最沉重的.",
@@ -1061,7 +1061,7 @@
       "toggleSeverityTitle": "切换 {v} 严重级别"
     },
     "kpi": {
-      "visibleLabel": "可见的发现可见的结果.",
+      "visibleLabel": "可见的发现",
       "allMatched": "全部匹配",
       "ofTotal": "共 {total} 个",
       "clearFiltersTitle": "单击以清除所有过滤器",
@@ -1079,7 +1079,7 @@
       "infoTitle": "将结果过滤为信息（仅供参考 - 风格和建议）",
       "filesLabel": "受影响的文件",
       "filesSubAcross": "在整个出口过程中,",
-      "filesSubNone": "没有任何文件受到影响.",
+      "filesSubNone": "没有文件受到影响",
       "filesTitle": "独立的文件至少有助于一个发现.",
       "topRuleLabel": "首要规则",
       "topRuleTitle": "过滤结果以规则 {name}",
@@ -1099,7 +1099,7 @@
       "clearRecentTitle": "清除所有最近的过滤器",
       "clearRecentButton": "清除",
       "recentFiltersListAria": "最近的过滤器",
-      "runAnalysisTitle": "运行 Saropa Lints 的分析.",
+      "runAnalysisTitle": "运行 Saropa Lints 分析",
       "severityGroupAria": "严重性过滤器",
       "severityLabel": "严重性",
       "moreSummary": "更多",
@@ -1152,13 +1152,13 @@
       "clearFilters": "清除过滤器",
       "clearSuppressions": "清除抑制",
       "clearFileFocus": "清除文件聚焦",
-      "matchActiveEditor": "匹配活动编辑器.",
+      "matchActiveEditor": "匹配活动编辑器",
       "copyTreeJson": "复制树 JSON",
       "refreshExtension": "更新扩展程序的刷新",
       "openPackageDashboard": "打开\"包装仪表板\",可以使用",
       "openCodeHealth": "开放代码健康的公共卫生",
       "openLintsConfig": "管理规则包的管理",
-      "reloadFromDisk": "从磁盘重新加载.",
+      "reloadFromDisk": "从磁盘重新加载",
       "reloadFromDiskTitle": "重新从最后一个violations.json渲染仪表板，而无需重新运行分析器。",
       "reEnableDisabledRules": "重新启用禁用的规则...",
       "reEnableDisabledRulesTitle": "在 analysis_options_custom.yaml 中快速选择目前禁用的规则,并重新启用已选中的规则.",
@@ -1181,7 +1181,7 @@
       "hideButton": "隐藏",
       "disableTitle": "禁用整个项目 - 写入analysis_options_custom.yaml并重新运行分析",
       "disableButton": "禁用 禁止 使用",
-      "workspaceOnlyShort": "只有工作空间.",
+      "workspaceOnlyShort": "仅工作区",
       "projectConfigShort": "项目配置文件 (写 analysis_options_custom.yaml) 的一个字符",
       "topRulesOne": "最顶的 {count} 规则",
       "topRulesOther": "顶级 {count} 规则",
@@ -1205,12 +1205,12 @@
       "expandAll": "扩展所有",
       "collapseAll": "全部折叠",
       "bulkSelected": "已选择 {count} 个",
-      "bulkCopy": "复制选中的 JSON.",
-      "selectAllTitle": "选择所有可见的发现.",
-      "selectAllAria": "选择所有可见的发现.",
+      "bulkCopy": "将所选内容复制为 JSON",
+      "selectAllTitle": "选择所有可见的发现",
+      "selectAllAria": "选择所有可见的发现",
       "colSeverity": "严重性",
       "colRule": "规则 规章制度 在",
-      "colMessage": "信息的消息是什么?",
+      "colMessage": "消息",
       "colLine": "线条 线路 线上",
       "colActionsAria": "排行行动 行列动作",
       "selectRowAria": "选择此发现行",
@@ -1220,9 +1220,9 @@
       "metaShown": "显示 {filtered} 个",
       "metaAfterDisable": "过滤禁用规则后共 {total} 个",
       "metaSourceCap": "为保证性能，来源数据上限为 {max}",
-      "metaGroupedBy": "通过 {mode} 分组.",
+      "metaGroupedBy": "按 {mode} 分组",
       "overflowNote": "为了渲染性能，源列表在 {max} 处被截断。",
-      "runAgain": "再次运行分析.",
+      "runAgain": "再次运行分析",
       "emptyNoViolations": "在最后一次分析中没有违规行为.",
       "emptyNoMatch": "没有与当前过滤器匹配的违规行为。",
       "emptyHintNoData": "运行分析以填充 `reports/.saropa_lints/violations.json`，然后刷新。",
@@ -1267,7 +1267,7 @@
       "metaConnected": "已连接",
       "noIssues": "已连接到 {label} — 当前没有问题。",
       "refresh": "刷新",
-      "openBrowser": "在浏览器中打开.",
+      "openBrowser": "在浏览器中打开",
       "headingIssues": "Drift Advisor",
       "disable": "禁用 Drift Advisor 的功能"
     },
@@ -1335,7 +1335,7 @@
       "clearTextFilter": "清除焦点文本过滤器",
       "activateKpi": "激活专注的KPI卡或图表条",
       "activateKpiSpace": "激活专注的KPI卡或图表条",
-      "showOverlay": "显示这个快捷键覆盖."
+      "showOverlay": "显示此快捷键浮层"
     },
     "unknownAnalyzerKind": "不知不晓 没有人知道",
     "supplementary": {
@@ -1361,7 +1361,7 @@
     }
   },
   "triageDash": {
-    "showInIssues": "显示问题中的问题.",
+    "showInIssues": "在 Issues 中显示",
     "disableRules": "禁用规则",
     "enableRules": "启用规则",
     "issues": "问题",
@@ -1469,7 +1469,7 @@
     },
     "gaugeTitle": "项目包评级：{grade}",
     "summary": {
-      "packages": "包装包裹是什么意思?",
+      "packages": "软件包",
       "projectGrade": "项目包级别 项目组合等级",
       "totalSize": "总体尺寸* 在线",
       "gradeTooltip": "工程等级{avgGrade}\n平均分：{avgScore}/100\n套餐：{pkgCount}\nA：{a} B：{b} C：{c} E：{e} F：{f}",
@@ -1493,9 +1493,9 @@
       "distributionHeading": "发行经销商 分享",
       "signalsHeading": "拉低评分的风险信号",
       "signalFlagged": "{count}标记 (废弃/使用寿命结束)",
-      "signalVulnerable": "{count}具有已知的漏洞.",
-      "signalUpdates": "{count} 有可用的更新.",
-      "bottomHeading": "获得最低分数的包裹.",
+      "signalVulnerable": "{count} 个存在已知漏洞",
+      "signalUpdates": "{count} 个有可用更新",
+      "bottomHeading": "得分最低的软件包",
       "thresholdsHeading": "如何将分数映射到成绩中",
       "thresholdA": "70+ — 充满活力：积极维护，最近发布",
       "thresholdB": "40–69 — 稳定：仍保持不变，但速度放缓",
@@ -1512,10 +1512,10 @@
       "sizeDistribution": "尺寸分布 大小分配",
       "sizeDistributionCaption": "排除 dev_dependencies — 它们从不向 APK / IPA / web bundle 发货。",
       "filters": "过滤器",
-      "packages": "包装包裹是什么意思?"
+      "packages": "软件包"
     },
     "toolbar": {
-      "openPubspecTitle": "打开一个 pubspec.yaml .",
+      "openPubspecTitle": "打开 pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "复制报告JSON (所有行+详细信息)",
       "copyAllLabel": "复制",
@@ -1594,7 +1594,7 @@
       },
       "prs": {
         "label": "PR",
-        "tooltip": "打开 GitHub 的拉取请求."
+        "tooltip": "打开 GitHub 拉取请求"
       },
       "size": {
         "label": "大小",
@@ -1638,8 +1638,8 @@
       }
     },
     "cells": {
-      "noGithub": "没有找到 GitHub 的存储库.",
-      "devBadge": "没有了,我会发出 dev dev.",
+      "noGithub": "未找到 GitHub 存储库",
+      "devBadge": "开发",
       "transitiveBadge": "传递依赖",
       "opportunitiesTooltip": "未使用的功能：{features}",
       "publishDateUnavailable": "发布日期从 pub.dev 不提供.",
@@ -1650,14 +1650,14 @@
       "downloadsUnavailable": "pub.dev 30天下载不可使用.",
       "downloadsCount": "过去 30 天内 {count} 次下载",
       "sizeUnavailable": "尺寸从 pub.dev 不提供.",
-      "noVulnerabilities": "没有已知的漏洞.",
+      "noVulnerabilities": "没有已知漏洞",
       "licenseUnspecified": "在 pub.dev 上未指定许可证.",
       "unusedBadge": "未使用",
-      "packageInUse": "包装正在使用中."
+      "packageInUse": "软件包正在使用中"
     },
     "row": {
       "expandDetails": "扩展详细信息的内容",
-      "copyRowJson": "将行拷贝为JSON,然后将其转换成 JSON."
+      "copyRowJson": "将行复制为 JSON"
     },
     "shortcuts": {
       "focusSearch": "聚焦搜索字段的注意力",
@@ -1666,7 +1666,7 @@
       "toggleDetail": "切换突出显示的包装细节扩展器.",
       "escapeSearch": "明确的重点搜索；第二个 Esc 折叠所有展开的行",
       "historyBack": "回到包的导航历史记录,重新查看.",
-      "showOverlay": "显示这个快捷键覆盖.",
+      "showOverlay": "显示此快捷键浮层",
       "jumpToTab": "跳转至选项卡 1-6（概述、升级、完整报告、已知问题、比较、设置）"
     },
     "versionTooltip": {
@@ -1701,13 +1701,13 @@
       "openFileReferences": "打开文件引用的内容"
     },
     "deps": {
-      "noTransitives": "没有过渡性依赖关系.",
-      "showTransitives": "显示过渡性依赖关系.",
+      "noTransitives": "没有传递依赖",
+      "showTransitives": "显示传递依赖",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (共享) 的一个",
       "tooltipHeader": "{total} 过渡式的下降",
       "tooltipHeaderShared": "{total} 传递依赖（{shared} 共享）",
-      "sharedBadgeTitle": "{count}与其他包共享."
+      "sharedBadgeTitle": "{count} 个与其他软件包共享"
     },
     "dormancy": {
       "noActivity6mo": "在6个多月内没有提交和发布.",
@@ -1767,7 +1767,7 @@
     },
     "recentPopover": {
       "title": "最近搜索",
-      "clearTitle": "清除所有最近的搜索.",
+      "clearTitle": "清除所有最近的搜索",
       "clearButton": "清除",
       "listAria": "最近搜索"
     },
@@ -1800,18 +1800,18 @@
       "homeEnd": "跳到第一个或最后一行可见的列.",
       "enterRun": "运行当前聚焦的命令",
       "escClear": "清除搜索并重置过滤器",
-      "showOverlay": "显示这个快捷键覆盖."
+      "showOverlay": "显示此快捷键浮层"
     },
     "script": {
       "moreSuffix": "+{count}更多的",
-      "showLess": "显示少一些.",
+      "showLess": "收起",
       "runSingular": "跑,跑,走的是一直在",
       "runPlural": " 次运行",
       "recentWord": "近期",
       "expandAll": "扩展所有",
       "collapseAll": "全部折叠",
       "searchChip": "搜索：“{query}”",
-      "internalChip": "显示上下文菜单命令.",
+      "internalChip": "正在显示上下文菜单命令",
       "removeFilterPrefix": "移除过滤器",
       "matchOne": "{count} 个匹配项",
       "matchOther": "{count} 个匹配项"
@@ -1897,7 +1897,7 @@
       "stubTested": "经过存根测试",
       "stubTestedSub": "测试存在,但几乎没有断言.",
       "suspiciousCoverage": "涉嫌的报道覆盖范围",
-      "suspiciousCoverageSub": "覆盖范围看起来是伪造的.",
+      "suspiciousCoverageSub": "覆盖率数据疑似伪造",
       "testDrift": "测试漂移的过程中,",
       "testDriftSub": "测试滞后于函数"
     },
@@ -1927,11 +1927,11 @@
       "noMatch": "没有与当前过滤器匹配的功能。",
       "resetFiltersTitle": "清除搜索和任何活动标志过滤器。",
       "resetFilters": "重置过滤器",
-      "expanderAriaCollapsed": "显示问题详情.",
+      "expanderAriaCollapsed": "显示问题详情",
       "expanderAriaExpanded": "隐藏问题详情",
       "detailHeading": "为什么这个函数得分为 {score}",
       "detailNoIssues": "此行上没有标志 - 分数由上面的列值（使用情况、覆盖范围、复杂性、年龄、文档）驱动。",
-      "suppressLabel": "在文件中压制.",
+      "suppressLabel": "在文件中抑制",
       "suppressTooltip": "在此文件中写入 `// ignore_for_file: code_health:<flag>`，以便未来的扫描操作将此标志忽略整个文件。"
     },
     "flag": {
@@ -1967,7 +1967,7 @@
       },
       "suspicious_coverage": {
         "label": "覆盖率可疑",
-        "evidence": "{pct}%没有测试.",
+        "evidence": "{pct}% 没有测试",
         "rule": "当LCOV报告高覆盖率但没有测试引用该功能时,会标记."
       },
       "fresh_code": {
@@ -1981,7 +1981,7 @@
       "clearFilter": "清除聚焦的行过滤器",
       "activateKpi": "激活专注的KPI卡片",
       "activateKpiSpace": "激活专注的KPI卡片",
-      "showOverlay": "显示这个快捷键覆盖."
+      "showOverlay": "显示此快捷键浮层"
     },
     "script": {
       "activeFiltersLabel": "有源滤波器：",
@@ -2061,12 +2061,12 @@
       "colLineNum": "线条 线路 线上",
       "colRule": "规则 规章制度 在",
       "colSeverity": "严重性",
-      "colMessage": "信息的消息是什么?",
+      "colMessage": "消息",
       "colKey": "关键"
     },
     "shortcuts": {
       "jumpToTab": "跳转到标签页1-2（地图，报告）",
-      "showOverlay": "显示这个快捷键覆盖."
+      "showOverlay": "显示此快捷键浮层"
     },
     "hero": {
       "files": "文件",
@@ -2095,18 +2095,18 @@
     "heroTitle": "相关规则远程测量 有关规则",
     "skipToCounters": "跳转到遥测计数器上",
     "lastEvent": "最后一个事件 {relative}",
-    "noEvents": "没有记录任何事件.",
+    "noEvents": "没有记录任何事件",
     "totalEventOne": "共计 {count} 个事件",
     "totalEventOther": "共计 {count} 个事件",
     "noCountersTitle": "没有计数器可以重置.",
     "resetTitle": "重置所有计数器",
     "refreshTitle": "从磁盘重新加载遥测计数器.",
     "refresh": "刷新",
-    "copyTitle": "将快照拷贝成JSON,然后将其转换为 JSON.",
+    "copyTitle": "将快照复制为 JSON",
     "copyJson": "复制 JSON",
     "resetCounters": "重置计数器",
     "countersAria": "计数器 在线",
-    "countersHeading": "事件计数器发生了什么?",
+    "countersHeading": "事件计数器",
     "thEvent": "事件",
     "thCount": "数量",
     "emptyMessage": "尚未记录遥测事件 - 从结果仪表板打开规则以开始捕获计数器。",
@@ -2170,25 +2170,25 @@
       "ariaLabel": "没有软件包",
       "message": "没有选择的包装进行比较. 在\"包装仪表板\"中右键单击两个或更多的软件包,然后选择 {compare}.",
       "compareWord": "比较",
-      "openDashboard": "打开一个包仪表板.",
+      "openDashboard": "打开软件包仪表板",
       "openDashboardTitle": "打开 Saropa 的包装仪表板."
     },
     "a11y": {
-      "skipToTable": "跳到比较表.",
+      "skipToTable": "跳到比较表",
       "recommendation": "推荐",
       "addingToProject": "添加{name}到项目中"
     },
     "shortcuts": {
-      "showOverlay": "显示这个快捷键覆盖.",
+      "showOverlay": "显示此快捷键浮层",
       "closeOverlay": "关闭键盘快捷方式覆盖层."
     },
     "kpi": {
-      "ariaLabel": "进行比较的总结.",
+      "ariaLabel": "比较摘要",
       "leading": "领先的领导力",
       "leadingTitle": "包装以最多的维度领先.",
       "dimensionWinsOne": "{count} 个维度胜出",
       "dimensionWinsOther": "{count}维度赢得了胜利",
-      "packages": "包装包裹是什么意思?",
+      "packages": "软件包",
       "packagesTitle": "包装数量与并排比较.",
       "inComparison": "比较中",
       "dimensions": "尺寸 大小 维度",
@@ -2196,7 +2196,7 @@
       "ranked": "已排名"
     },
     "toolbar": {
-      "ariaLabel": "进行比较的行动.",
+      "ariaLabel": "比较操作",
       "packageDashboard": "包装仪表板 这些是",
       "packageDashboardTitle": "打开包装仪表板,可以比较更多的包."
     }
@@ -2410,7 +2410,7 @@
   },
   "suite": {
     "fix": {
-      "explainRule": "解释一下这个规则."
+      "explainRule": "解释此规则"
     },
     "enableRule": {
       "done": "已启用规则 {ruleId}。请重新运行分析以应用。",
@@ -2441,12 +2441,12 @@
   },
   "notify": {
     "activation": {
-      "cacheCleared": "清除了 Vibrancy 的缓存.",
-      "copiedInfo": "将 {package} 信息复制到剪贴板.",
+      "cacheCleared": "已清除 Vibrancy 缓存",
+      "copiedInfo": "已将 {package} 信息复制到剪贴板",
       "noPubspecOrLock": "在工作空间中没有发现 pubspec.yaml/pubspec.lock.",
       "backfillComplete": "包装活力:充满活力的 一次性历史记录备份完成 ({count}快照被导入).",
-      "runScanFirst": "首先运行扫描,然后进行检查.",
-      "noUpgradable": "没有找到可升级的包.",
+      "runScanFirst": "请先运行扫描",
+      "noUpgradable": "未找到可升级的软件包",
       "proceedUpgrades": "继续进行 {count}升级? 失败的步骤倒退,计划继续.",
       "actionExecute": "执行",
       "actionCancel": "取消",
@@ -2454,16 +2454,16 @@
       "upgradeAllComplete": "所有的 {count} 升级都成功完成.",
       "notPubspec": "选择的文件不是一个 pubspec.yaml.",
       "suppressedPackage": "已抑制 \"{package}\" —— 诊断信息将被隐藏",
-      "noPackagesToSuppress": "没有包装可以压制.",
+      "noPackagesToSuppress": "没有可抑制的软件包",
       "suppressedCount": "压抑的 {count} 包 (s)",
       "noUnhealthyToSuppress": "没有不健康的包装可以抑制.",
       "suppressAllConfirm": "抑制所有{count}不健康的包？这将隐藏所有诊断信息。",
-      "noSuppressedPackages": "没有压抑的包裹.",
+      "noSuppressedPackages": "没有已抑制的软件包",
       "unsuppressedCount": "没有被压抑的 {count} 包裹 (s)",
       "noPubspecWorkspace": "在工作空间中没有发现 pubspec.yaml .",
-      "depsAlreadySorted": "已经排序的依赖关系.",
+      "depsAlreadySorted": "依赖项已排序",
       "depsSorted": "{sections} 中的 {detail}",
-      "noPubspec": "没有发现 pubspec.yaml .",
+      "noPubspec": "未找到 pubspec.yaml",
       "updatePrereleaseConfirm": "更新 {package} 以预先发布 {version}? 预发可能包含突破性变化.",
       "packageNotFound": "包装 {package} 在 pubspec.yaml 中没有找到.",
       "updatedTo": "将 {package} 更新为 {version}",
@@ -2472,8 +2472,8 @@
       "ciOverwriteConfirm": "{path} 已存在。是否覆盖？",
       "actionOverwrite": "覆盖写入的重写",
       "ciGenerated": "已生成 CI 流水线：{path}",
-      "compareSelectCount": "选择2-3个包装进行比较.",
-      "compareMax": "最多3个包装用于比较.",
+      "compareSelectCount": "选择 2-3 个软件包进行比较",
+      "compareMax": "最多比较 3 个软件包",
       "compareFetchFailed": "无法获取足够多的包数据."
     },
     "main": {
@@ -2578,7 +2578,7 @@
       "crossFileHtmlReportFailed": "跨文件 HTML 报告生成失败：{message}",
       "crossFileReportNoIndex": "交叉文件报告完成,但没有找到index.html.",
       "crossFileHtmlReportGenerated": "交叉文件HTML报告生成.",
-      "actionOpenInBrowser": "在浏览器中打开.",
+      "actionOpenInBrowser": "在浏览器中打开",
       "actionOpenFile": "打开文件",
       "crossFileSnapshotFailed": "跨文件快照失败：{message}",
       "crossFileSnapshotNoJson": "交叉文件快照完成,但没有找到JSON文件.",
@@ -2634,32 +2634,32 @@
       "couldNotOpenFileRef": "无法打开文件引用：{filePath}",
       "savedReportJson": "已保存报告 JSON：{path}",
       "couldNotSaveReportJson": "无法保存报告 JSON。",
-      "noPubspecFound": "没有发现 pubspec.yaml .",
+      "noPubspecFound": "未找到 pubspec.yaml",
       "noDependenciesSection": "找不到依赖关系部分",
       "addedToPubspec": "添加了 {name}：{constraint} 至 pubspec.yaml",
       "failedToAddToPubspec": "无法将 {name} 加到 pubspec.yaml 中.",
       "needsPackageRow": "{actionLabel}需要从包仪表板 (编辑器选项卡) 中找到一个套件行.",
       "couldNotLocateConstraint": "无法找到 {name} 的版本约束.",
       "deletedFromPubspec": "从 pubspec.yaml 中删除了 {name}（备份：{backupName}）",
-      "runScanFirst": "首先运行扫描,然后进行检查.",
+      "runScanFirst": "请先运行扫描",
       "couldNotFindPubspec": "找不到 pubspec.yaml 的任何信息.",
       "updatedPackage": "将 {name} 更新为 {constraint}",
       "failedToUpdate": "更新 {name} 失败",
-      "selectPackagesToCompare": "选择2-3个包装进行比较.",
-      "maxPackagesToCompare": "最多3个包装用于比较.",
+      "selectPackagesToCompare": "选择 2-3 个软件包进行比较",
+      "maxPackagesToCompare": "最多比较 3 个软件包",
       "couldNotFindLocalSource": "无法找到 {name} 的本地源.",
-      "registryAuthAdded": "✓为 {name} 新增了身份验证.",
+      "registryAuthAdded": "✓ 已为 {name} 添加身份验证",
       "registryAddFailed": "添加注册表失败：{message}",
-      "noConfiguredRegistries": "没有配置的注册表.",
-      "registryAuthRemoved": "✓删除了对 {name} 的身份验证.",
+      "noConfiguredRegistries": "没有已配置的注册表",
+      "registryAuthRemoved": "✓ 已移除 {name} 的身份验证",
       "registryRemoveFailed": "移除注册表失败：{message}",
       "registryTokenUpdated": "✓令牌更新了,可以使用",
       "registryTokenUpdateFailed": "更新令牌失败：{message}",
       "actionRemove": "删除 去掉 移除",
       "removeAuthPrompt": "要移除 {name} 的身份验证吗？",
-      "annotateInProgress": "已经在进行中的注释.",
+      "annotateInProgress": "注释添加已在进行中",
       "noPubspecInWorkspace": "在工作空间中没有发现 pubspec.yaml .",
-      "noDependenciesToAnnotate": "没有依赖关系可以注释.",
+      "noDependenciesToAnnotate": "没有可添加注释的依赖项",
       "failedToApplyAnnotations": "无法将注释应用到 pubspec.yaml 中.",
       "annotatedSummary": "{basename} 中注释为 {parts}",
       "upgradeInProgress": "一个升级已经在进行中.",
@@ -2708,11 +2708,11 @@
       "reportViewSuppressed": "在 {file} 中压抑了'{flag}'.",
       "reportViewCouldNotSuppress": "无法在 {file} 中抑制 '{flag}'：{error}",
       "actionRescan": "重新扫描",
-      "bulkUpdateNoUpdates": "没有可用的更新.",
-      "bulkUpdateNoUpdatesFiltered": "没有可用的 {filter} 更新.",
+      "bulkUpdateNoUpdates": "没有可用的更新",
+      "bulkUpdateNoUpdatesFiltered": "没有可用的 {filter} 更新",
       "bulkUpdateFailed": "批量更新失败：{error}",
-      "bulkUpdateUpdatedOne": "更新了 {count} 的包装.",
-      "bulkUpdateUpdatedOther": "更新了 {count} 的包.",
+      "bulkUpdateUpdatedOne": "已更新 {count} 个软件包",
+      "bulkUpdateUpdatedOther": "已更新 {count} 个软件包",
       "detailViewConstraintNotFound": "无法找到 {package} 的版本约束.",
       "detailViewUpdated": "将 {package} 更新为 {version}"
     }

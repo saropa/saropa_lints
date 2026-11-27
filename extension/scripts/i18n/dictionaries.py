@@ -492,39 +492,57 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Search packages": "تلاش",
         "Search packages…": "تلاش",
         "Dashboards": "ڈیش بورڈز",
-        "Actions": "ايڪشنز",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Actions": "اقدامات",
         "Status": "اسٽيٽس",
         "Settings": "سيٽنگز",
         "Help": "مدد",
         "Run analysis": "تجزيي هلائو",
-        "Rescan": "ٻيهر اسڪين",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Rescan": "دوبارہ اسکین کریں",
         "Refresh": "ريفريش",
-        "Copy JSON": "JSON ڪاپي ڪريو",
-        "Save report": "رپورٽ محفوظ ڪريو",
-        "More actions": "وڌيڪ ايڪشنز",
-        "Clear all": "سڀ صاف ڪريو",
-        "Reset view": "ويئو ري سيٽ ڪريو",
-        "Reset filters": "فلٽر ري سيٽ ڪريو",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Copy JSON": "JSON کاپی کریں",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Save report": "رپورٹ محفوظ کریں",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "More actions": "مزید اقدامات",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Clear all": "سب صاف کریں",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Reset view": "منظر ری سیٹ کریں",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Reset filters": "فلٹر ری سیٹ کریں",
         "Cancel": "منسوخ",
-        "Retry": "ٻيهر ڪوشش",
-        "Clear search": "ڳولا صاف ڪريو",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Retry": "دوبارہ کوشش کریں",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Clear search": "تلاش صاف کریں",
         "Active filters:": "فعال فلٽر:",
         "Remove": "هٽايو",
-        "Toggle full-width layout": "پوري ويڪر واري لي آئوٽ ٽوگل ڪريو",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Toggle full-width layout": "پوری چوڑائی والا لے آؤٹ ٹوگل کریں",
         "Expand row": "قطار وڌايو",
-        "Keyboard shortcuts": "ڪي بورڊ شارٽ ڪٽس",
-        "Saropa Lints: Set Up Project (pubspec + config)": "Saropa Lints: پروجيڪٽ سيٽ اپ ڪريو (pubspec + config)",
-        "Saropa Lints: Turn Off Lint Integration": "Saropa Lints: Lint انٽيگريشن بند ڪريو",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Keyboard shortcuts": "کی بورڈ شارٹ کٹس",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Saropa Lints: Set Up Project (pubspec + config)": "Saropa Lints: پروجیکٹ سیٹ اپ کریں (pubspec + config)",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Saropa Lints: Turn Off Lint Integration": "Saropa Lints: Lint انٹیگریشن بند کریں",
         "Saropa Lints: Run Analysis": "Saropa Lints: تجزيو هلائو",
-        "Saropa Lints: Verify Plugin Is Running (liveness check)": "Saropa Lints: تصديق ڪريو ته پلگ ان هلندڙ آهي (liveness check)",
-        "Saropa Lints: Initialize / Update Analysis Options": "Saropa Lints: تجزيي جا آپشنز شروعات / اپڊيٽ ڪريو",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Saropa Lints: Verify Plugin Is Running (liveness check)": "Saropa Lints: تصدیق کریں کہ پلگ اِن چل رہا ہے (liveness check)",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Saropa Lints: Initialize / Update Analysis Options": "Saropa Lints: تجزیے کے اختیارات شروع / اپ ڈیٹ کریں",
         "Saropa Lints: Create Composite Analyzer Plugin (scaffold)": "Saropa Lints: Composite Analyzer Plugin ٺاهيو (scaffold)",
         "Saropa Lints: Open Analysis Options": "Saropa Lints: تجزيي جا آپشنز کوليو",
         "Saropa Lints: Open pubspec.yaml": "Saropa Lints: pubspec.yaml کوليو",
-        "Saropa Lints: Toggle Run Analysis After Config Change": "Saropa Lints: config تبديلي کان پوءِ تجزيو هلائڻ ٽوگل ڪريو",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Saropa Lints: Toggle Run Analysis After Config Change": "Saropa Lints: config تبدیلی کے بعد تجزیہ چلانا ٹوگل کریں",
         "Saropa Lints UI language": "Saropa Lints UI زبان",
         "Choose language for sidebar and dashboards": "سائڊ بار ۽ ڊيش بورڊز جي زبان چونڊيو",
-        "Auto (follow VS Code display language)": "خودڪار (VS Code جي ڊسپلي زبان جي پيروي ڪريو)",
+        # Manual: the old value was Sindhi script, not Urdu.
+        "Auto (follow VS Code display language)": "خودکار (VS Code کی ڈسپلے زبان کے مطابق)",
         "#": "#",
         "OWASP": "OWASP",
         "PRs": "پل ریکویسٹس",

@@ -131,7 +131,7 @@
       "title": "Saropa Lints 감사",
       "heading": "점검 보고서",
       "errorHeading": "감사 실패",
-      "canceledHeading": "감사가 취소되었습니다.",
+      "canceledHeading": "감사 취소됨",
       "subtitle": "{count} 결과 · {timestamp}",
       "baselineSubtitle": "기준선과 비교하여 {date}에서",
       "searchPlaceholder": "규칙, 파일, 또는 메시지로 필터링…",
@@ -142,7 +142,7 @@
       "baselineNew": "새",
       "baselineUnchanged": "변경되지 않음",
       "saveBaseline": "기준으로 저장",
-      "copyJson": "JSON을 복사하여 작성합니다.",
+      "copyJson": "JSON 복사",
       "toggleGroup": "그룹핑 토글",
       "colFile": "파일",
       "colLine": "줄",
@@ -280,7 +280,7 @@
     "title": "스타일 및 선호 규칙",
     "intro": "의견형 스타일 규칙, 기본적으로 비활성화. 팀에서 동의하는 것만을 켜십시오. 충돌하는 선택들은 그룹화되어 있어, 당신은 하나를 선택할 수 있습니다.",
     "searchPlaceholder": "스타일 규칙 검색…",
-    "pickOne": "하나를 선택하십시오.",
+    "pickOne": "하나 선택",
     "none": "아무도, 누구도",
     "enableAll": "모두 활성화",
     "disableAll": "모두 비활성화",
@@ -462,7 +462,7 @@
     "shortcuts": {
       "jumpToTab": "탭 1-7로 이동(Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
       "prevNextTab": "이전 / 다음 탭",
-      "showOverlay": "이 단축키 오버레이를 표시합니다."
+      "showOverlay": "이 단축키 오버레이 표시"
     }
   },
   "dashboards": {
@@ -504,7 +504,7 @@
       "locationsTitle": "프로젝트에서 이 패키지를 사용하는 경우",
       "noLocations": "프로젝트 소스에서 가져오지 않음 — 개발용 또는 전이 의존성일 가능성이 큽니다.",
       "moreFiles": "외 {count}개 파일",
-      "openInDashboard": "패키지 대시보드에서 열립니다.",
+      "openInDashboard": "패키지 대시보드에서 열기",
       "writeReport": "보고 작성"
     },
     "actions": {
@@ -516,7 +516,7 @@
       "failed": "기회 보고서를 작성하지 못했습니다: {error}"
     },
     "empty": {
-      "title": "채택할 것이 아무것도 없다.",
+      "title": "도입할 항목 없음",
       "body": "스캔된 모든 패키지의 기능은 이미 프로젝트에서 사용되었거나, 변경록을 작성할 기회가 발견되지 않았습니다."
     }
   },
@@ -563,7 +563,7 @@
       "constrained": "제약됨",
       "constrainedBy": "당신의 제약 {constraint}는 이것을 제한합니다 ({resolvable} 해결 가능, {latest} 최신)",
       "pinHeld": "개최되었다 Held",
-      "pinDoNotUse": "사용하지 마십시오.",
+      "pinDoNotUse": "사용 금지",
       "drift": "프로젝트 간 차이",
       "driftBehind": "뒤쪽: 뒤에 있는 사람 {siblings} (당신은 {own}를 가지고 있습니다)",
       "driftDiffers": "차이: {siblings} (현재 {own})",
@@ -589,7 +589,7 @@
       "openPrs": "열린 PR",
       "activity": "활동 (90d)",
       "activityValue": "이슈 {closed}개 종료, PR {merged}개 병합",
-      "noActivity": "최근 활동이 없습니다.",
+      "noActivity": "최근 활동 없음",
       "lastCommit": "마지막 커밋",
       "pubPoints": "파브 포인트",
       "verified": "(진정한)",
@@ -669,13 +669,13 @@
       "skipToDetails": "패키지 세부 정보로 건너뛰기"
     },
     "shortcuts": {
-      "showOverlay": "이 단축키 오버레이를 표시합니다.",
+      "showOverlay": "이 단축키 오버레이 표시",
       "closeOverlay": "키보드 단축키 오버레이를 닫습니다."
     }
   },
   "toolbar": {
     "runAnalysis": "분석 실행",
-    "copyJson": "JSON을 복사하여 작성합니다.",
+    "copyJson": "JSON 복사",
     "saveReport": "보고서 저장",
     "moreActions": "추가 작업",
     "clearAll": "모두 지우기"
@@ -705,7 +705,7 @@
       "coverage": "{pct}% 번역 — 나머지는 영어로 표시"
     },
     "reloadPrompt": "언어는 {locale}로 설정되어 있습니다. 사이드바와 명령어 레이블을 업데이트하기 위해 창을 다시 로드하십시오.",
-    "reloadNow": "지금 다시 로드하십시오.",
+    "reloadNow": "지금 다시 로드",
     "reloadLater": "나중에"
   },
   "statusBar": {
@@ -1021,7 +1021,7 @@
     "status": {
       "updatedPrefix": "업데이트됨",
       "refreshHint": "클릭하여 분석기에서 새로 고침",
-      "lastRunUnknown": "마지막 실행은 알려지지 않았습니다.",
+      "lastRunUnknown": "마지막 실행 알 수 없음",
       "noTimestampTitle": "violations.json에 타임 스탬프가 없습니다.",
       "findingsAfterFilterTitle": "비활성화 규칙 필터링 후 전체 발견",
       "findingOne": "{count}개 결과",
@@ -1066,7 +1066,7 @@
       "ofTotal": "총 {total} 중",
       "clearFiltersTitle": "클릭하여 모든 필터를 삭제합니다.",
       "errorsLabel": "오류",
-      "errorsSubFix": "반드시 고쳐야 한다.",
+      "errorsSubFix": "반드시 수정 필요",
       "errorsSubClear": "없음 - 분명",
       "errorsTitle": "결과를 오류로 필터링합니다(수정해야 함 - 손상됨/충돌 발생/악용 가능)",
       "warningsLabel": "경고",
@@ -1079,7 +1079,7 @@
       "infoTitle": "결과를 정보로 필터링합니다(참고 — 스타일 및 제안)",
       "filesLabel": "영향을 받은 파일은",
       "filesSubAcross": "수출 전체에서 수출을 통해",
-      "filesSubNone": "영향을 받은 파일은 없습니다.",
+      "filesSubNone": "영향받은 파일 없음",
       "filesTitle": "적어도 하나의 발견에 기여하는 구별 된 파일.",
       "topRuleLabel": "최다 규칙",
       "topRuleTitle": "{name} 규칙의 발견 사항만 보기",
@@ -1096,10 +1096,10 @@
       "clearTextFilterTitle": "맑은 텍스트 필터",
       "clearTextFilterAria": "맑은 텍스트 필터",
       "recentFiltersTitle": "최근 필터링",
-      "clearRecentTitle": "최근 필터링을 모두 삭제합니다.",
+      "clearRecentTitle": "최근 필터 모두 지우기",
       "clearRecentButton": "지우기",
       "recentFiltersListAria": "최근 필터링",
-      "runAnalysisTitle": "Saropa Lints 분석을 실행합니다.",
+      "runAnalysisTitle": "Saropa Lints 분석 실행",
       "severityGroupAria": "심각도 필터",
       "severityLabel": "심각성 정도 중증상태",
       "moreSummary": "더 보기",
@@ -1138,9 +1138,9 @@
       "notRunYet": "위에서 범위를 선택한 후 실행 auditing"
     },
     "chip": {
-      "contains": "\"{q}\"를 포함하고 있습니다.",
+      "contains": "\"{q}\" 포함",
       "severityOff": "심각도 ≠ {v}",
-      "resetAllTitle": "모든 필터를 리셋하십시오."
+      "resetAllTitle": "모든 필터 재설정"
     },
     "menuPalette": {
       "help": "도움말",
@@ -1157,13 +1157,13 @@
       "refreshExtension": "확장 프로그램 새로 고침",
       "openPackageDashboard": "패키지 대시보드를 열기",
       "openCodeHealth": "오픈 코드 건강",
-      "openLintsConfig": "규칙 팩을 관리하십시오.",
-      "reloadFromDisk": "디스크에서 다시 로드하십시오.",
+      "openLintsConfig": "규칙 팩 관리",
+      "reloadFromDisk": "디스크에서 다시 로드",
       "reloadFromDiskTitle": "분석기를 다시 실행하지 않고 마지막 violations.json에서 대시보드를 재 렌더링하십시오.",
       "reEnableDisabledRules": "비활성화 된 규칙을 다시 활성화하십시오 ...",
       "reEnableDisabledRulesTitle": "analysis_options_custom.yaml에서 현재 비활성화 된 규칙을 빠르게 선택하여 선택한 규칙들을 다시 활성화하십시오.",
       "reEnableNoneMessage": "analysis_options_custom.yaml.를 통해 현재 규칙이 비활성화되어 있지 않습니다.",
-      "reEnableQuickPickTitle": "비활성화 된 규칙을 다시 활성화하십시오.",
+      "reEnableQuickPickTitle": "비활성화된 규칙 다시 활성화",
       "reEnableQuickPickPlaceholder": "하나 또는 여러 개의 규칙을 선택하여 다시 활성화하십시오.",
       "menuGroupExport": "내보내기",
       "menuGroupBulk": "대량 작업",
@@ -1205,9 +1205,9 @@
       "expandAll": "모두 펼치기",
       "collapseAll": "모두 접기",
       "bulkSelected": "{count}개 선택됨",
-      "bulkCopy": "JSON으로 선택한 것을 복사합니다.",
-      "selectAllTitle": "모든 가시적 발견을 선택합니다.",
-      "selectAllAria": "모든 가시적 발견을 선택합니다.",
+      "bulkCopy": "선택 항목을 JSON으로 복사",
+      "selectAllTitle": "표시 중인 발견 사항 모두 선택",
+      "selectAllAria": "표시 중인 발견 사항 모두 선택",
       "colSeverity": "심각성 정도 중증상태",
       "colRule": "규칙",
       "colMessage": "메시지",
@@ -1220,9 +1220,9 @@
       "metaShown": "{filtered}개 표시됨",
       "metaAfterDisable": "비활성화된 규칙 필터 적용 후 {total}개",
       "metaSourceCap": "성능에 대해 {max}로 제한된 소스",
-      "metaGroupedBy": "{mode}로 그룹화되어 있습니다.",
+      "metaGroupedBy": "{mode} 기준으로 그룹화됨",
       "overflowNote": "렌더링 성능을 위해 {max}에서 단축된 소스 목록.",
-      "runAgain": "분석을 다시 실행하여 분석을 수행하십시오.",
+      "runAgain": "분석 다시 실행",
       "emptyNoViolations": "마지막 분석에서 위반이 없었습니다.",
       "emptyNoMatch": "현재 필터와 일치하는 위반 사항은 없습니다.",
       "emptyHintNoData": "분석을 실행하여 `reports/.saropa_lints/violations.json`을 채운 다음 새로 고칩니다.",
@@ -1236,7 +1236,7 @@
       "heading": "구성",
       "metaClickSlice": "조각을 클릭하여 필터링",
       "severityMix": "심각성의 혼합물",
-      "filterBarTitle": "{key}에만 필터를 합니다.",
+      "filterBarTitle": "{key}만 필터링",
       "donutTotal": "전체"
     },
     "todoHack": {
@@ -1244,7 +1244,7 @@
       "headingDisabled": "TODO 및 HACK",
       "metaDisabled": "스캔 비활성화",
       "scanOff": "작업 공간 스캔이 꺼져 있습니다. 프로젝트 파일에서 마커를 표시하려면 활성화하세요.",
-      "enableScan": "스캔을 활성화하십시오.",
+      "enableScan": "스캔 활성화",
       "heading": "TODO 및 HACK",
       "subsectionNone": "{title}: 스캔 범위에 없습니다.",
       "capNote": "스캔은 파일 제한에 도달했기 때문에 일부 파일이 건너 뛸 수 있습니다.",
@@ -1267,9 +1267,9 @@
       "metaConnected": "연결됨",
       "noIssues": "{label}에 연결됨 — 현재 문제는 없습니다.",
       "refresh": "새로 고침",
-      "openBrowser": "브라우저에서 열립니다.",
+      "openBrowser": "브라우저에서 열기",
       "headingIssues": "Drift Advisor",
-      "disable": "Drift Advisor를 비활성화하십시오."
+      "disable": "Drift Advisor 비활성화"
     },
     "suppressedFindings": {
       "heading": "억제된 진단 결과",
@@ -1314,11 +1314,11 @@
       "perFileRulesSample": "파일별 규칙 ( 샘플)"
     },
     "script": {
-      "announceCleared": "모든 필터가 청소되었습니다.",
+      "announceCleared": "모든 필터가 해제됨",
       "announceFiltersPrefix": "필터:",
-      "announceStarted": "분석이 시작되었습니다.",
+      "announceStarted": "분석 시작됨",
       "announceComplete": "분석 완료, 분석을 완료",
-      "announceFailed": "분석이 실패했습니다.",
+      "announceFailed": "분석 실패",
       "removeRecentAria": "제거",
       "removeRecentTitle": "제거",
       "bulkSelectedTpl": "{n}개 선택됨",
@@ -1328,20 +1328,20 @@
     },
     "emptyState": {
       "hintAfterMessage": "violations.json를 생성하기 위해 Saropa Lints 분석을 실행한 다음, 여기에 Refresh 를 사용하거나 이 대시보드를 다시 열으십시오.",
-      "refreshDisk": "디스크에서 업데이트를 갱신하십시오."
+      "refreshDisk": "디스크에서 새로 고침"
     },
     "shortcuts": {
-      "focusTextFilter": "텍스트 필터에 초점을 맞추십시오.",
+      "focusTextFilter": "텍스트 필터로 포커스 이동",
       "clearTextFilter": "초점이 된 텍스트 필터를 닦으십시오.",
       "activateKpi": "집중된 KPI 카드 또는 차트 바를 활성화하십시오.",
       "activateKpiSpace": "집중된 KPI 카드 또는 차트 바를 활성화하십시오.",
-      "showOverlay": "이 단축키 오버레이를 표시합니다."
+      "showOverlay": "이 단축키 오버레이 표시"
     },
     "unknownAnalyzerKind": "알 수 없음",
     "supplementary": {
-      "scannerPromo": "TODO/HACK 스캐너를 활성화하십시오.",
+      "scannerPromo": "TODO/HACK 스캐너 활성화",
       "tooltipScanner": "Saropa 파일 시스템 스캐너 — 소스에서 열려 있는 TODO/HACK 마커를 계산합니다.",
-      "tooltipPromoClickToOn": "클릭하여 활성화합니다."
+      "tooltipPromoClickToOn": "클릭하여 활성화"
     }
   },
   "ruleExplain": {
@@ -1381,10 +1381,10 @@
     "hintSameAsTree": "동일한 그룹핑이 Triage 활동 바 트리에서 제공되며: 필터링 Issues, 또는 `analysis_options_custom.yaml`에서 disable/enable 규칙을 설정할 수 있습니다. 큰 그룹은 확인을 요청할 수 있습니다."
   },
   "kbdOverlay": {
-    "toggleTitle": "키보드 단축키 (?) 를 표시하세요.",
-    "toggleAria": "키보드 단축키를 표시합니다.",
+    "toggleTitle": "키보드 단축키 표시 (?)",
+    "toggleAria": "키보드 단축키 표시",
     "dialogTitle": "키보드 단축키",
-    "closeAria": "키보드 단축키를 닫습니다.",
+    "closeAria": "키보드 단축키 닫기",
     "footer": "에스크를 누르거나 외부에 클릭하여 닫습니다."
   },
   "wideReport": {
@@ -1396,7 +1396,7 @@
     "driftNotConnected": "Drift Advisor 서버가 연결되지 않았습니다.",
     "copiedBulkFindings": "복사 {count} 선택된 발견들 (~) JSON으로.",
     "noMatchingFindingsCopy": "복사할 일치하는 결과가 없습니다.",
-    "couldNotOpenFile": "파일: {path}를 열 수 없습니다.",
+    "couldNotOpenFile": "파일을 열 수 없음: {path}",
     "saveReportNoWorkspace": "보고서를 저장하기 전에 작업 영역 폴더를 열으십시오.",
     "savedFindings": "저장된 {count} 발견: {path}",
     "couldNotSaveReportJson": "보고서 JSON을 저장할 수 없습니다."
@@ -1446,7 +1446,7 @@
       "gradeLine": "등급 {grade} · {avg}/100",
       "flaggedCount": "{count}개 플래그됨",
       "flaggedTitle": "버려진 또는 수명이 다한 동물",
-      "lastScanLabel": "{when}를 스캔했습니다.",
+      "lastScanLabel": "{when} 스캔됨",
       "lastScanTitle": "이 대시보드 데이터가 가져올 때 — {timestamp}. 다시 스캔하여 패키지 업데이트를 확인하려면 클릭하세요.",
       "lastScanUnknown": "스캔 (시간이 알 수 없다)",
       "lastScanUnknownTitle": "이 스캔은 대시보드가 시간표를 추적하기 전에 실행되었습니다. 다시 스캔하고 패키지 업데이트를 확인하기 위해 클릭하십시오."
@@ -1495,7 +1495,7 @@
       "signalFlagged": "{count} 플래그 (버림 / 수명 종료)",
       "signalVulnerable": "{count} 알려진 취약점이 있는",
       "signalUpdates": "{count}개에 업데이트 있음",
-      "bottomHeading": "가장 낮은 점수를 받은 패키지들이었습니다.",
+      "bottomHeading": "점수가 가장 낮은 패키지",
       "thresholdsHeading": "점수가 어떻게 성적을 매핑하는지에 대한 설명",
       "thresholdA": "70+ — 활기: 적극적으로 유지 관리되고 최근 게시됨",
       "thresholdB": "40–69 — 안정적: 여전히 유지되지만 속도가 느려지고 있음",
@@ -1524,7 +1524,7 @@
       "saveAllTitle": "보고서 JSON을 reports/YYYYMMDD/...에 저장",
       "saveAllLabel": "저장",
       "saveUpgradeTitle": "보고서에 대한 업데이트가 가능한 패키지들만 포함된 보고서를 저장합니다/YYY YMMDD/...",
-      "saveUpgradeLabel": "업그레이드 보고서를 저장하십시오.",
+      "saveUpgradeLabel": "업그레이드 보고서 저장",
       "resetViewTitle": "필터를 재설정하고, 정렬하며, 저장된 뷰 상태를 표시합니다.",
       "resetViewLabel": "리셋 뷰를 다시 설정하는 방법",
       "rescanTitle": "패키지 재검색 — pub.dev 캐시를 지우고 버전을 다시 가져옵니다.",
@@ -1547,7 +1547,7 @@
       "ageFilterTitle": "연령에 따라 필터링 출판 나이",
       "publishedAgeLabel": "게시 후 경과 시간",
       "ageMaxAll": "모두, 전부, 다",
-      "presetFilterTitle": "빠른 필터 미리 설정을 적용하십시오.",
+      "presetFilterTitle": "빠른 필터 프리셋 적용",
       "presetLabel": "프리셋",
       "presetNone": "아무도, 누구도",
       "presetModernization": "현대화 현황을 살펴보면",
@@ -1638,7 +1638,7 @@
       }
     },
     "cells": {
-      "noGithub": "GitHub 저장소가 발견되지 않았습니다.",
+      "noGithub": "GitHub 저장소를 찾을 수 없음",
       "devBadge": "dev",
       "transitiveBadge": "전이",
       "opportunitiesTooltip": "사용되지 않는 기능: {features}",
@@ -1650,23 +1650,23 @@
       "downloadsUnavailable": "pub.dev 30일 다운로드가 불가능하다.",
       "downloadsCount": "{count} 지난 30일 동안 다운로드한 것",
       "sizeUnavailable": "크기는 pub.dev에서 사용할 수 없습니다.",
-      "noVulnerabilities": "알려진 취약점은 없습니다.",
+      "noVulnerabilities": "알려진 취약점 없음",
       "licenseUnspecified": "pub.dev에 명시되지 않은 라이선스",
       "unusedBadge": "미사용",
-      "packageInUse": "패키지가 사용중입니다."
+      "packageInUse": "패키지 사용 중"
     },
     "row": {
       "expandDetails": "세부 정보 펼치기",
-      "copyRowJson": "행을 JSON으로 복사하십시오."
+      "copyRowJson": "행을 JSON으로 복사"
     },
     "shortcuts": {
-      "focusSearch": "검색 필드에 초점을 맞추십시오.",
+      "focusSearch": "검색 필드로 포커스 이동",
       "nextRow": "다음 패키지 행을 강조하십시오.",
       "prevRow": "이전 패키지 행을 강조하십시오.",
       "toggleDetail": "강조된 패키지 세부 사항 확장을 탭하여 전환하십시오.",
       "escapeSearch": "명확한 집중 검색; 두 번째 Esc는 모든 확장 행을 붕괴시킵니다.",
       "historyBack": "패키지 내비게이션 히스토리를 다시 살펴보세요.",
-      "showOverlay": "이 단축키 오버레이를 표시합니다.",
+      "showOverlay": "이 단축키 오버레이 표시",
       "jumpToTab": "탭 1-6으로 이동 (개요, 업그레이드, 전체 보고서, 알려진 문제, 비교, 설정)"
     },
     "versionTooltip": {
@@ -1686,7 +1686,7 @@
       "activitySignal": "활동 신호: {signal}"
     },
     "size": {
-      "codeSize": "코드 크기는 {size}입니다.",
+      "codeSize": "코드 크기: {size}",
       "archiveSize": "아카이브 크기: {size}",
       "onDisk": "디스크 상: {size}",
       "withUniqueTransitives": "독특한 트랜지티브를 가진: {size}",
@@ -1701,13 +1701,13 @@
       "openFileReferences": "파일 참조를 열기"
     },
     "deps": {
-      "noTransitives": "과도한 의존성이 없는 상태입니다.",
-      "showTransitives": "과도적 의존성을 표시합니다.",
+      "noTransitives": "전이 종속성 없음",
+      "showTransitives": "전이 종속성 표시",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (공유)",
       "tooltipHeader": "{total} 과도기적 기하급수",
       "tooltipHeaderShared": "{total} 과도기적 deps ({shared} 공유)",
-      "sharedBadgeTitle": "{count}는 다른 패키지와 공유됩니다."
+      "sharedBadgeTitle": "{count}개를 다른 패키지와 공유"
     },
     "dormancy": {
       "noActivity6mo": "6개월 이상 커밋도, 릴리스도 없었다.",
@@ -1762,14 +1762,14 @@
       "hintLine2End": "점 제외)."
     },
     "toolbar": {
-      "showInternal": "컨텍스트 메뉴 명령어를 표시합니다.",
+      "showInternal": "컨텍스트 메뉴 명령 표시",
       "collapseAll": "모두 접기"
     },
     "recentPopover": {
-      "title": "최근 검색 결과입니다.",
-      "clearTitle": "최근 검색한 모든 내용을 삭제합니다.",
+      "title": "최근 검색어",
+      "clearTitle": "최근 검색어 모두 지우기",
       "clearButton": "지우기",
-      "listAria": "최근 검색 결과입니다."
+      "listAria": "최근 검색어"
     },
     "filterChips": {
       "ariaRegion": "액티브 필터",
@@ -1790,17 +1790,17 @@
     "entry": {
       "internalBadgeTitle": "컨텍스트 메뉴에서만 트리거됩니다.",
       "internalBadge": "메뉴",
-      "copyTitle": "명령 아이디 ({id}) 를 복사합니다.",
-      "copyAria": "명령어 id를 복사합니다."
+      "copyTitle": "명령 ID 복사 ({id})",
+      "copyAria": "명령 ID 복사"
     },
-    "categoryJumpTitle": "{category}로 넘어갑니다.",
+    "categoryJumpTitle": "{category}(으)로 이동",
     "shortcuts": {
-      "focusSearch": "검색 필드에 초점을 맞추십시오.",
-      "navRows": "눈에 보이는 명령줄을 탐색합니다.",
+      "focusSearch": "검색 필드로 포커스 이동",
+      "navRows": "표시 중인 명령 행 탐색",
       "homeEnd": "첫 번째 또는 마지막 눈에 보이는 행으로 점프하십시오.",
-      "enterRun": "집중 명령어를 실행하십시오.",
+      "enterRun": "포커스된 명령 실행",
       "escClear": "검색 및 재설정 필터를 삭제합니다.",
-      "showOverlay": "이 단축키 오버레이를 표시합니다."
+      "showOverlay": "이 단축키 오버레이 표시"
     },
     "script": {
       "moreSuffix": "+{count} 더 많은",
@@ -1811,7 +1811,7 @@
       "expandAll": "모두 펼치기",
       "collapseAll": "모두 접기",
       "searchChip": "검색: \"{query}\"",
-      "internalChip": "컨텍스트 메뉴 명령어를 표시합니다.",
+      "internalChip": "컨텍스트 메뉴 명령 표시 중",
       "removeFilterPrefix": "필터 제거 ",
       "matchOne": "{count}개 일치",
       "matchOther": "{count}개 일치"
@@ -1829,7 +1829,7 @@
       "collect": "파일 검색 중…",
       "firstRunHint": "첫 번째 실행은 스캐너를 컴파일합니다; 큰 프로젝트에는 파일이 나타나기 전에 잠시 걸릴 수 있습니다.",
       "paused": "일시 중지 중단",
-      "stopped": "스캔이 중단되었습니다.",
+      "stopped": "스캔 중지됨",
       "elapsed": "경과 시간",
       "phase": {
         "parse": "파싱 파일의 분석",
@@ -1841,7 +1841,7 @@
       "counter": {
         "files": "파일",
         "functions": "함수",
-        "problems": "문제가 발견되었습니다."
+        "problems": "발견된 문제"
       },
       "counters": {
         "aria": "실시간 스캔 카운터"
@@ -1867,7 +1867,7 @@
     },
     "runReportFirst": "보고서를 다시 실행하고 JSON을 복사합니다.",
     "copiedJson": "코드 건강 JSON이 클립보드에 복사되었습니다.",
-    "couldNotOpenFile": "파일: {path}를 열 수 없습니다.",
+    "couldNotOpenFile": "파일을 열 수 없음: {path}",
     "panelTitle": "Saropa 코드 건강 대시보드",
     "hero": {
       "title": "Saropa 코드 건강 대시보드",
@@ -1893,11 +1893,11 @@
       "unused": "미사용",
       "unusedSub": "어디에도 언급되지 않은 기능",
       "uncovered": "미커버",
-      "uncoveredSub": "LCOV 커버리지가 없습니다.",
+      "uncoveredSub": "LCOV 커버리지 없음",
       "stubTested": "스터브 테스트를 거친 후",
       "stubTestedSub": "테스트는 존재하지만 거의 주장하지 않습니다.",
-      "suspiciousCoverage": "의심스러운 커버리지가 있습니다.",
-      "suspiciousCoverageSub": "커버리지는 허구로 만들어진 것처럼 보입니다.",
+      "suspiciousCoverage": "의심스러운 커버리지",
+      "suspiciousCoverageSub": "커버리지가 조작된 것으로 보임",
       "testDrift": "테스트 지연",
       "testDriftSub": "테스트가 함수 변경을 따라가지 못함"
     },
@@ -1906,7 +1906,7 @@
       "rescanTitle": "코드 건강 스캔을 다시 실행하고 이 대시보드를 새로 고쳐주세요.",
       "rescan": "다시 스캔",
       "copyJsonTitle": "원시 코드 건강 JSON을 클립보드에 복사하십시오.",
-      "copyJson": "JSON을 복사하여 작성합니다.",
+      "copyJson": "JSON 복사",
       "settingsTitle": "코드 건강 설정을 열으십시오.",
       "settingsButton": "코드 건강 설정 보건 환경",
       "filterTitle": "이름, 파일 또는 플래그에 따라 줄을 필터링하십시오.",
@@ -1927,7 +1927,7 @@
       "noMatch": "현재 필터와 일치하는 기능은 없습니다.",
       "resetFiltersTitle": "검색을 삭제하고 모든 활성 플래그 필터를 제거합니다.",
       "resetFilters": "필터 재설정",
-      "expanderAriaCollapsed": "문제 세부 정보를 표시합니다.",
+      "expanderAriaCollapsed": "문제 세부 정보 표시",
       "expanderAriaExpanded": "이슈 세부 정보 숨기기",
       "detailHeading": "왜 이 함수가 {score}를 득점했는지",
       "detailNoIssues": "이 행에는 플래그가 없습니다. 점수는 위의 열 값(사용량, 적용 범위, 복잡성, 연령, 문서)에 따라 결정됩니다.",
@@ -1966,7 +1966,7 @@
         "rule": "연결된 테스트가 존재하지만 거의 아무것도 주장하지 않을 때 표시됩니다."
       },
       "suspicious_coverage": {
-        "label": "의심스러운 커버리지를 포함합니다.",
+        "label": "의심스러운 커버리지",
         "evidence": "{pct}% 테스트가 없는 상태에서",
         "rule": "LCOV가 높은 커버리지를 보고하지만 테스트에서 해당 기능을 참조하지 않을 때 표시됩니다."
       },
@@ -1977,11 +1977,11 @@
       }
     },
     "shortcuts": {
-      "focusFilter": "줄 필터에 초점을 맞추십시오.",
+      "focusFilter": "행 필터로 포커스 이동",
       "clearFilter": "초점 행 필터를 닦으십시오.",
-      "activateKpi": "집중된 KPI 카드 활성화를 수행합니다.",
-      "activateKpiSpace": "집중된 KPI 카드 활성화를 수행합니다.",
-      "showOverlay": "이 단축키 오버레이를 표시합니다."
+      "activateKpi": "포커스된 KPI 카드 활성화",
+      "activateKpiSpace": "포커스된 KPI 카드 활성화",
+      "showOverlay": "이 단축키 오버레이 표시"
     },
     "script": {
       "activeFiltersLabel": "활성 필터: 액티브 필터",
@@ -2066,7 +2066,7 @@
     },
     "shortcuts": {
       "jumpToTab": "탭 1-2로 이동 (지도, 보고서)",
-      "showOverlay": "이 단축키 오버레이를 표시합니다."
+      "showOverlay": "이 단축키 오버레이 표시"
     },
     "hero": {
       "files": "파일",
@@ -2093,17 +2093,17 @@
   },
   "telemetry": {
     "heroTitle": "관련 규칙 텔레메트리",
-    "skipToCounters": "텔레메트리 카운터로 이동하십시오.",
+    "skipToCounters": "텔레메트리 카운터로 건너뛰기",
     "lastEvent": "마지막 이벤트 {relative}",
-    "noEvents": "기록된 사건은 없습니다.",
+    "noEvents": "기록된 이벤트 없음",
     "totalEventOne": "총 {count}개 이벤트",
     "totalEventOther": "총 {count}개 이벤트",
     "noCountersTitle": "카운터가 재설정되지 않습니다.",
-    "resetTitle": "모든 카운터를 재설정하십시오.",
+    "resetTitle": "모든 카운터 재설정",
     "refreshTitle": "디스크에서 텔레메트리 카운터를 다시 로드하십시오.",
     "refresh": "새로 고침",
-    "copyTitle": "스냅샷을 JSON으로 복사하십시오.",
-    "copyJson": "JSON을 복사하여 작성합니다.",
+    "copyTitle": "스냅샷을 JSON으로 복사",
+    "copyJson": "JSON 복사",
     "resetCounters": "카운터 재설정",
     "countersAria": "카운터",
     "countersHeading": "이벤트 카운터",
@@ -2131,7 +2131,7 @@
   "comparison": {
     "title": "패키지 비교 - 패키지 대비",
     "actions": {
-      "addToProject": "프로젝트에 추가하십시오."
+      "addToProject": "프로젝트에 추가"
     },
     "table": {
       "row": {
@@ -2163,7 +2163,7 @@
       "packagesSelected": "패키지 {count}개 선택됨",
       "packagesCompared": "{count} 패키지 비교",
       "dimensionsRankedOne": "{count} 차원의 순위",
-      "dimensionsRankedOther": "{count} 차원의 순위가 매겨져 있습니다.",
+      "dimensionsRankedOther": "{count}개 평가 항목 순위 지정됨",
       "morePackages": "+{count} 더 많은"
     },
     "empty": {
@@ -2174,12 +2174,12 @@
       "openDashboardTitle": "Saropa 패키지 대시보드를 열으십시오."
     },
     "a11y": {
-      "skipToTable": "비교 테이블로 건너뛰십시오.",
+      "skipToTable": "비교 표로 건너뛰기",
       "recommendation": "권장 사항",
-      "addingToProject": "프로젝트에 {name}를 추가합니다."
+      "addingToProject": "프로젝트에 {name} 추가 중"
     },
     "shortcuts": {
-      "showOverlay": "이 단축키 오버레이를 표시합니다.",
+      "showOverlay": "이 단축키 오버레이 표시",
       "closeOverlay": "키보드 단축키 오버레이를 닫습니다."
     },
     "kpi": {
@@ -2343,7 +2343,7 @@
     "update": {
       "upgrade": "업그레이드",
       "changelog": "변경 로그",
-      "blockedBy": "{package}에 의해 차단되었습니다."
+      "blockedBy": "{package}에 의해 차단됨"
     },
     "suggestion": {
       "migrateTo": "{package}로 마이그레이션을 고려하십시오.",
@@ -2356,7 +2356,7 @@
       "prs": "{count} PRs는",
       "activity90d": "90일: 이슈 {closed}개 종료, PR {merged}개 병합",
       "lastCommit": "마지막 커밋: {time}",
-      "archived": "저장소는 보관되어 있습니다.",
+      "archived": "보관 처리된 저장소",
       "pubPoints": "{points}/160 술집 포인트",
       "latestRelease": "최신 릴리스: {age} 전",
       "dependents": "{count} 의존하는 사람"
@@ -2410,7 +2410,7 @@
   },
   "suite": {
     "fix": {
-      "explainRule": "이 규칙을 설명해 주세요."
+      "explainRule": "이 규칙 설명"
     },
     "enableRule": {
       "done": "{ruleId} 규칙을 활성화했습니다. 적용하려면 분석을 다시 실행하세요.",
@@ -2430,23 +2430,23 @@
     },
     "nudge": {
       "message": "이 프로젝트는 Drift Advisor를 사용합니다. Saropa Log Capture 확장 프로그램을 설치하여 실행 SQL을 이러한 정적 결과와 상관관계를 설정합니다.",
-      "install": "로그 캡처를 설치하십시오.",
+      "install": "Log Capture 설치",
       "dismiss": "해고 처분"
     },
     "driftRecommend": {
       "message": "드립 어드바이저 서버가 연결되었습니다. 전체 문제 패널 경험을 위해 독립된 Saropa Drift Advisor 확장 프로그램을 설치하십시오.",
-      "install": "Drift Advisor를 설치합니다.",
+      "install": "Drift Advisor 설치",
       "dismiss": "해고 처분"
     }
   },
   "notify": {
     "activation": {
-      "cacheCleared": "Vibrancy 캐시 클리어 되었습니다.",
-      "copiedInfo": "{package} 정보를 클립보드에 복사했습니다.",
+      "cacheCleared": "Vibrancy 캐시 삭제됨",
+      "copiedInfo": "{package} 정보를 클립보드에 복사함",
       "noPubspecOrLock": "작업 공간에서 pubspec.yaml/pubspec.lock가 발견되지 않았습니다.",
       "backfillComplete": "패키지 진동성: 박진감 일회성 역사 백필 완료 ({count} 스냅샷을 가져왔다).",
-      "runScanFirst": "먼저 스캔을 실행하십시오.",
-      "noUpgradable": "업그레이드 가능한 패키지는 발견되지 않았습니다.",
+      "runScanFirst": "먼저 스캔 실행",
+      "noUpgradable": "업그레이드 가능한 패키지 없음",
       "proceedUpgrades": "{count} 업그레이드를 진행해 볼까요? 실패한 단계들이 뒤집혀서 계획이 계속된다.",
       "actionExecute": "실행",
       "actionCancel": "취소",
@@ -2461,19 +2461,19 @@
       "noSuppressedPackages": "억제된 패키지가 없습니다.",
       "unsuppressedCount": "압축되지 않은 {count} 패키지 (들)",
       "noPubspecWorkspace": "작업 공간에서 pubspec.yaml가 발견되지 않았습니다.",
-      "depsAlreadySorted": "이미 정렬된 의존성.",
+      "depsAlreadySorted": "종속성이 이미 정렬됨",
       "depsSorted": "{sections}에서 {detail}로",
-      "noPubspec": "pubspec.yaml는 발견되지 않았습니다.",
+      "noPubspec": "pubspec.yaml을 찾을 수 없음",
       "updatePrereleaseConfirm": "{version}를 미리 공개하기 위해 {package} 업데이트? 사전 출시에는 중요한 변경 사항이 포함될 수 있습니다.",
       "packageNotFound": "패키지 {package}는 pubspec.yaml에서 발견되지 않았습니다.",
-      "updatedTo": "{package}를 {version}로 업데이트했습니다.",
+      "updatedTo": "{package}을(를) {version}(으)로 업데이트함",
       "ciRunScanFirst": "먼저 스캔을 실행하여 적절한 임계값으로 CI config를 생성합니다.",
-      "noWorkspace": "작업 공간 폴더가 열리지 않은 상태에서 오픈합니다.",
+      "noWorkspace": "열린 작업 영역 폴더 없음",
       "ciOverwriteConfirm": "{path}는 이미 존재합니다. 대체하는 건가?",
       "actionOverwrite": "덮어쓰기",
       "ciGenerated": "CI 파이프라인 생성: {path}",
-      "compareSelectCount": "비교하기 위해 2-3개의 패키지를 선택하여 비교하십시오.",
-      "compareMax": "비교를 위해 최대 3개의 패키지를 사용할 수 있습니다.",
+      "compareSelectCount": "비교할 패키지 2-3개 선택",
+      "compareMax": "최대 3개 패키지까지 비교 가능",
       "compareFetchFailed": "충분한 패키지 데이터를 가져오기에는 실패했습니다."
     },
     "main": {
@@ -2578,7 +2578,7 @@
       "crossFileHtmlReportFailed": "크로스 파일 HTML 보고서 실패: {message}",
       "crossFileReportNoIndex": "크로스 파일 보고가 완료되었지만 index.html은 발견되지 않았습니다.",
       "crossFileHtmlReportGenerated": "크로스 파일 HTML 보고서를 생성했습니다.",
-      "actionOpenInBrowser": "브라우저에서 열립니다.",
+      "actionOpenInBrowser": "브라우저에서 열기",
       "actionOpenFile": "파일 열기",
       "crossFileSnapshotFailed": "크로스 파일 스냅샷 실패: {message}",
       "crossFileSnapshotNoJson": "크로스 파일 스냅샷 완료되었지만 JSON 파일이 발견되지 않았습니다.",
@@ -2634,34 +2634,34 @@
       "couldNotOpenFileRef": "파일 참조를 열 수 없습니다: {filePath}",
       "savedReportJson": "저장된 보고서 JSON: {path}",
       "couldNotSaveReportJson": "보고서 JSON을 저장할 수 없습니다.",
-      "noPubspecFound": "pubspec.yaml는 발견되지 않았습니다.",
+      "noPubspecFound": "pubspec.yaml을 찾을 수 없음",
       "noDependenciesSection": "dependencies 섹션을 찾을 수 없습니다.",
       "addedToPubspec": "{name}가 추가되었습니다: {constraint}에서 pubspec.yaml로",
       "failedToAddToPubspec": "pubspec.yaml에 {name}를 추가하는 데 실패했습니다.",
       "needsPackageRow": "{actionLabel}는 패키지 대시보드 (편집자 탭) 에서 패키지 행을 필요로 합니다.",
       "couldNotLocateConstraint": "{name}의 버전 제약을 찾을 수 없습니다.",
       "deletedFromPubspec": "pubspec.yaml에서 {name}을(를) 삭제했습니다(백업: {backupName})",
-      "runScanFirst": "먼저 스캔을 실행하십시오.",
+      "runScanFirst": "먼저 스캔 실행",
       "couldNotFindPubspec": "pubspec.yaml를 찾을 수 없습니다.",
-      "updatedPackage": "{name}를 {constraint}로 업데이트했습니다.",
-      "failedToUpdate": "{name}를 업데이트하는 데 실패했습니다.",
-      "selectPackagesToCompare": "비교하기 위해 2-3개의 패키지를 선택하여 비교하십시오.",
-      "maxPackagesToCompare": "비교를 위해 최대 3개의 패키지를 사용할 수 있습니다.",
+      "updatedPackage": "{name}을(를) {constraint}(으)로 업데이트함",
+      "failedToUpdate": "{name} 업데이트 실패",
+      "selectPackagesToCompare": "비교할 패키지 2-3개 선택",
+      "maxPackagesToCompare": "최대 3개 패키지까지 비교 가능",
       "couldNotFindLocalSource": "{name}의 로컬 소스를 찾을 수 없습니다.",
-      "registryAuthAdded": "✓ {name}에 대한 인증 기능이 추가되었습니다.",
+      "registryAuthAdded": "✓ {name}의 인증 추가됨",
       "registryAddFailed": "레지스터 추가 실패: {message}",
-      "noConfiguredRegistries": "구성된 레지스트리가 없습니다.",
-      "registryAuthRemoved": "✓ {name}의 인증이 제거되었습니다.",
+      "noConfiguredRegistries": "구성된 레지스트리 없음",
+      "registryAuthRemoved": "✓ {name}의 인증 제거됨",
       "registryRemoveFailed": "등록을 제거하는 데 실패했습니다: {message}",
-      "registryTokenUpdated": "✓ 토큰이 업데이트되었습니다.",
+      "registryTokenUpdated": "✓ 토큰 업데이트됨",
       "registryTokenUpdateFailed": "토큰 업데이트 실패: {message}",
       "actionRemove": "제거",
       "removeAuthPrompt": "{name}의 인증을 제거하시겠습니까?",
       "annotateInProgress": "이미 진행 중인 주석",
       "noPubspecInWorkspace": "작업 공간에서 pubspec.yaml가 발견되지 않았습니다.",
-      "noDependenciesToAnnotate": "주석으로 표시할 의존성이 없습니다.",
+      "noDependenciesToAnnotate": "주석을 달 종속성 없음",
       "failedToApplyAnnotations": "pubspec.yaml에 주석을 적용하는 데 실패했습니다.",
-      "annotatedSummary": "{basename}에서 {parts}를 주석으로 표시했습니다.",
+      "annotatedSummary": "{basename}에 {parts} 주석 추가됨",
       "upgradeInProgress": "이미 업그레이드가 진행 중입니다.",
       "couldNotReadConstraint": "{name}의 제약을 읽을 수 없습니다.",
       "upgradeSuccess": "{name}가 {constraint}로 업그레이드 되었습니다. 모든 테스트를 통과합니다.",
@@ -2708,13 +2708,13 @@
       "reportViewSuppressed": "{file}.에서 '{flag}'를 억제했습니다.",
       "reportViewCouldNotSuppress": "{file}에서 '{flag}'를 억제할 수 없습니다: {error}는",
       "actionRescan": "다시 스캔",
-      "bulkUpdateNoUpdates": "업데이트가 없습니다.",
-      "bulkUpdateNoUpdatesFiltered": "{filter} 업데이트가 없습니다.",
+      "bulkUpdateNoUpdates": "사용 가능한 업데이트 없음",
+      "bulkUpdateNoUpdatesFiltered": "사용 가능한 {filter} 업데이트 없음",
       "bulkUpdateFailed": "대규모 업데이트 실패: {error}",
       "bulkUpdateUpdatedOne": "업데이트 된 {count} 패키지",
-      "bulkUpdateUpdatedOther": "{count} 패키지를 업데이트했습니다.",
+      "bulkUpdateUpdatedOther": "패키지 {count}개 업데이트됨",
       "detailViewConstraintNotFound": "{package}의 버전 제약을 찾을 수 없습니다.",
-      "detailViewUpdated": "{package}를 {version}로 업데이트했습니다."
+      "detailViewUpdated": "{package}을(를) {version}(으)로 업데이트함"
     }
   },
   "analysisOptimizer": {

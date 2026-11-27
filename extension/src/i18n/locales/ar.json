@@ -264,7 +264,7 @@
       "usagesUnknown": "استخدام غير قابل للقياس",
       "apiHeading": "{symbol} ({count})",
       "viewCode": "عرض رمز العرض",
-      "viewDocs": "عرض المستندات.",
+      "viewDocs": "عرض المستندات",
       "noUsages": "لم يتم العثور على استخدام في مصدر المشروع.",
       "moreUsages": "{count} أكثر استخدامات",
       "moreUsagesOne": "{count} أكثر استخدام"
@@ -280,7 +280,7 @@
     "title": "الأسلوب والآراء",
     "intro": "قواعد الأسلوب المختلفة ، غير فعالة افتراضيًا. قم بتشغيل ما يوافق فريقك عليه فقط. يتم تجميع الخيارات المتضاربة حتى تختار واحدة.",
     "searchPlaceholder": "قواعد أسلوب البحث...",
-    "pickOne": "اختر واحدة من بينها.",
+    "pickOne": "اختر واحدًا",
     "none": "لا شيء",
     "enableAll": "تمكين كل شيء",
     "disableAll": "تعطيل كل شيء",
@@ -301,13 +301,13 @@
     }
   },
   "packs": {
-    "forYourProject": "لمشروعك الخاص.",
+    "forYourProject": "لمشروعك",
     "forYourProjectHint": "حزم تعتمد عليها أو SDK تطابق مواصفات pub الخاصة بك. تنطبق هذه القواعد على الشفرة التي تقوم بشحنها فعلياً.",
     "noneDetected": "لا توجد حزم تطابق معاييرك بعد. إضافة حزمة مدعومة، أو فتح جميع الحزم أدناه.",
     "allPackages": "جميع العبوات",
     "allPackagesHint": "كل حزمة متاحة، بما في ذلك تلك التي لم يتم الكشف عنها في هذا المشروع. تمكين القطيع من الاختيار في قواعده.",
     "versionGroup": {
-      "tag": "اختر نسخة واحدة.",
+      "tag": "اختر إصدارًا واحدًا",
       "tooltip": "هذه الحزم تستهدف إصدارات مختلفة من نفس الاعتماد. فقط واحدة منها تُفعَّل في وقت واحد — تفعيل واحدة تُطفئ الأخرى."
     },
     "domainDesc": {
@@ -462,7 +462,7 @@
     "shortcuts": {
       "jumpToTab": "الانتقال إلى التبويب 1-7 (الدرجة، حزم القواعد، التجاوزات، نشر SDK، ملف التكوين، الأتمتة، التمديد)",
       "prevNextTab": "التاب السابق / التاب التالي",
-      "showOverlay": "عرض هذا الاختصار التراكب الرقمي."
+      "showOverlay": "عرض تراكب الاختصارات هذا"
     }
   },
   "dashboards": {
@@ -500,11 +500,11 @@
     "card": {
       "versionUpgrade": "تحديث متاح لـ {latest}",
       "versionCurrent": "على أحدث إصدار",
-      "featuresTitle": "ميزات لم تستخدم بعد.",
+      "featuresTitle": "ميزات لم تُستخدم بعد",
       "locationsTitle": "حيث يستخدم مشروعك هذه الحزمة.",
       "noLocations": "غير مستورد في مصادر المشروع — من المحتمل أن يكون اعتمادًا تطوريًا أو اعتمادًا غير مباشر.",
-      "moreFiles": "و {count} المزيد من الملفات.",
-      "openInDashboard": "افتح في لوحة تحكم الحزمة.",
+      "moreFiles": "و{count} ملفات أخرى",
+      "openInDashboard": "افتح في لوحة تحكم الحزمة",
       "writeReport": "اكتب تقرير"
     },
     "actions": {
@@ -541,10 +541,10 @@
       "partReadme": "README والشعار",
       "partGap": "PRs ونسخة الفجوة والقضايا.",
       "partReverseDeps": "عدد التبعيات العكسية",
-      "listTwo": "{first} و {second}.",
-      "listMany": "{head}، و {last}.",
+      "listTwo": "{first} و {second}",
+      "listMany": "{head}، و {last}",
       "message": "بعض الأقسام لم تتمكن من تحميل: {list}.",
-      "retry": "حاول إعادة المحاولة.",
+      "retry": "إعادة المحاولة",
       "retrying": "إعادة المحاولة...",
       "retryTitle": "حاول مرة أخرى الوصول إلى الملفات الفاشلة."
     },
@@ -564,7 +564,7 @@
       "constrainedBy": "قيودك {constraint} تُحدِّد هذا ({resolvable} قابلة للحل، {latest} أحدث)",
       "pinHeld": "عقدت عقد",
       "pinDoNotUse": "لا تستخدم",
-      "drift": "الانجراف عبر المشاريع.",
+      "drift": "الانجراف عبر المشاريع",
       "driftBehind": "خلف: {siblings} (لديك {own})",
       "driftDiffers": "يختلف: {siblings} (لديك {own})",
       "codeSize": "حجم الشيفرة",
@@ -589,7 +589,7 @@
       "openPrs": "طلبات السحب المفتوحة",
       "activity": "النشاط (90د)",
       "activityValue": "أُغلقت {closed} من المشكلات، ودُمجت {merged} من طلبات السحب",
-      "noActivity": "لا نشاطات حديثة.",
+      "noActivity": "لا يوجد نشاط حديث",
       "lastCommit": "الالتزام الأخير",
       "pubPoints": "نقاط Pub",
       "verified": "(تم التحقق منه)",
@@ -608,14 +608,14 @@
       "exportNoteTitle": "استخدام واحد على الأقل هو توجيه تصدير.",
       "publicApiSurface": "سطح API العامة",
       "header": "استخدامات الملف ({label})",
-      "commentedReexportTitle": "إعادة التصدير مع التعليقات خارجها.",
+      "commentedReexportTitle": "إعادة تصدير معطّلة بتعليق",
       "reexportTitle": "إعادة تصديرها - جزء من واجهة برمجة التطبيقات العامة لهذه المكتبة",
       "reexportBadge": "إعادة تصدير"
     },
     "opportunities": {
       "header": "الفرص ({count})",
       "viewCode": "عرض رمز العرض",
-      "viewDocs": "عرض المستندات."
+      "viewDocs": "عرض المستندات"
     },
     "alerts": {
       "archived": "مؤرشف - المستودع للقراءة فقط",
@@ -625,21 +625,21 @@
     },
     "versionGap": {
       "versionTitle": "نسخة الفجوة Gap Version",
-      "overrideTitle": "تجاوز ثغرة الفجوة.",
+      "overrideTitle": "فجوة التجاوز",
       "noDates": "لم يتمكن من تحديد تواريخ الإصدارات لهذا الحزمة.",
       "noItems": "لم يتم العثور على أي PR أو قضايا بين هذه الإصدارات.",
       "prsMerged": "طلبات السحب المدمجة",
-      "issuesClosed": "قضايا مغلقة.",
+      "issuesClosed": "المشكلات المغلقة",
       "searchLabel": "البحث في طلبات السحب والمشكلات",
       "searchPlaceholder": "البحث عن العلاقات العامة والقضايا...",
-      "filterAria": "مرشح حسب الفئة.",
+      "filterAria": "تصفية حسب الفئة",
       "filterAll": "الكل",
       "filterUnreviewed": "لم تتم مراجعته",
       "filterPrs": "طلبات السحب",
       "filterIssues": "المشكلات",
       "typePr": "طلب سحب",
       "typeIssue": "موضوع القضية",
-      "reviewReviewed": "تمت مراجعتها.",
+      "reviewReviewed": "تمت المراجعة",
       "reviewApplicable": "المطبق المناسبة",
       "reviewNotApplicable": "N/A",
       "notesPlaceholder": "ملاحظات...",
@@ -666,10 +666,10 @@
       "reportIssue": "تقرير مسألة القضية"
     },
     "a11y": {
-      "skipToDetails": "تخطي تفاصيل الحزمة."
+      "skipToDetails": "انتقل إلى تفاصيل الحزمة"
     },
     "shortcuts": {
-      "showOverlay": "عرض هذا الاختصار التراكب الرقمي.",
+      "showOverlay": "عرض تراكب الاختصارات هذا",
       "closeOverlay": "أغلق التراكب المختصر للكمبيوتر."
     }
   },
@@ -693,7 +693,7 @@
     "chipRemove": "إزالة"
   },
   "a11y": {
-    "toggleFullWidth": "قم بتبديل تخطيط عرض العرض الكامل.",
+    "toggleFullWidth": "تبديل تخطيط العرض الكامل",
     "expandRow": "توسيع صف الصف",
     "comparisonDimension": "المقياس"
   },
@@ -705,7 +705,7 @@
       "coverage": "تمت ترجمة {pct}% — بقية العروض باللغة الإنجليزية"
     },
     "reloadPrompt": "تم تعيين اللغة إلى {locale}. أعد تحميل النافذة لتحديث الشريط الجانبي وملصقات الأوامر.",
-    "reloadNow": "أعد تحميل الآن.",
+    "reloadNow": "أعد التحميل الآن",
     "reloadLater": "لاحقًا"
   },
   "statusBar": {
@@ -715,7 +715,7 @@
     },
     "menu": {
       "openViolations": "فتح تقرير المخالفات",
-      "openPackageDashboard": "افتح لوحة تحكم الحزمة.",
+      "openPackageDashboard": "افتح لوحة تحكم الحزمة",
       "openProcessHealth": "فتح حالة الصحة",
       "commandCatalog": "قائمة القيادة كتالوج الأوامر",
       "about": "حول"
@@ -1006,8 +1006,8 @@
   "findingsDash": {
     "pageTitle": "Saropa لوحة تحكم النتائج",
     "documentTitle": "Saropa لوحة تحكم النتائج",
-    "skipToFindings": "قفز إلى النتائج.",
-    "secondaryAsideLabel": "التشخيص الثانوي للتشخيذ الثانوية.",
+    "skipToFindings": "انتقل إلى النتائج",
+    "secondaryAsideLabel": "التشخيصات الثانوية",
     "hero": {
       "gaugeTitle": "درجة الصحة {score} (درجة {grade}). الأخطاء هي الأثقل وزناً.",
       "gaugePending": "…"
@@ -1021,7 +1021,7 @@
     "status": {
       "updatedPrefix": "تم تحديثه",
       "refreshHint": "انقر لتحديث من المحلل.",
-      "lastRunUnknown": "آخر تشغيل غير معروف.",
+      "lastRunUnknown": "آخر تشغيل غير معروف",
       "noTimestampTitle": "لا يوجد ختم زمني على violations.json",
       "findingsAfterFilterTitle": "إجمالي النتائج بعد تصفية قاعدة تعطيل.",
       "findingOne": "{count} نتيجة",
@@ -1058,11 +1058,11 @@
       "pack": "حزمة (s)"
     },
     "seg": {
-      "toggleSeverityTitle": "التبديل {v} شدة الحالة."
+      "toggleSeverityTitle": "تبديل شدة {v}"
     },
     "kpi": {
       "visibleLabel": "النتائج الظاهرة",
-      "allMatched": "كل متطابقة مطابقة.",
+      "allMatched": "تمت مطابقة الكل",
       "ofTotal": "من إجمالي {total}",
       "clearFiltersTitle": "انقر فوق لإزالة جميع المرشحات.",
       "errorsLabel": "الأخطاء",
@@ -1079,28 +1079,28 @@
       "infoTitle": "تصفية النتائج إلى معلومات (لمعلوماتك - الأسلوب والاقتراحات)",
       "filesLabel": "الملفات المتأثرة",
       "filesSubAcross": "في عملية التصدير بأكملها",
-      "filesSubNone": "لا توجد ملفات متأثرة.",
+      "filesSubNone": "لا توجد ملفات متأثرة",
       "filesTitle": "ملفات متميزة تساهم في اكتشاف واحد على الأقل.",
       "topRuleLabel": "القاعدة الأكثر تكرارًا",
-      "topRuleTitle": "تصفية النتائج إلى قاعدة {name}.",
+      "topRuleTitle": "تصفية النتائج حسب القاعدة {name}",
       "sectionHeading": "نظرة عامة",
       "sectionAria": "إحصائيات موجزة"
     },
     "toolbar": {
-      "ariaFiltersActions": "المرشحات والإجراءات.",
+      "ariaFiltersActions": "المرشحات والإجراءات",
       "groupByFieldTitle": "نتائج المجموعة حسب البعد المختار.",
       "groupByLabel": "المجموعة حسب المجموعات",
       "textFilterTitle": "تصفية النتائج حسب مسار الملف أو القاعدة أو نص الرسالة.",
       "textFilterPlaceholder": "تصفية حسب الملف، القاعدة أو الرسالة...",
-      "textFilterAria": "مرشح نصي للفلتر.",
+      "textFilterAria": "مرشح النص",
       "clearTextFilterTitle": "مسح مرشح النص",
       "clearTextFilterAria": "مسح مرشح النص",
       "recentFiltersTitle": "مرشحات الأخيرة المرشحون الحديثون",
-      "clearRecentTitle": "مسح جميع المرشحات الأخيرة.",
+      "clearRecentTitle": "مسح جميع المرشحات الأخيرة",
       "clearRecentButton": "مسح",
       "recentFiltersListAria": "مرشحات الأخيرة المرشحون الحديثون",
       "runAnalysisTitle": "تشغيل تحليل Saropa Lints",
-      "severityGroupAria": "فلتر شدة الحالة.",
+      "severityGroupAria": "مرشح الشدة",
       "severityLabel": "شدة الحالة:",
       "moreSummary": "أكثر",
       "moreChevron": "▾",
@@ -1140,7 +1140,7 @@
     "chip": {
       "contains": "تحتوي على \"{q}\"",
       "severityOff": "شدة الحالة ≠ {v}",
-      "resetAllTitle": "إعادة تعيين جميع المرشحات."
+      "resetAllTitle": "إعادة تعيين جميع المرشحات"
     },
     "menuPalette": {
       "help": "مساعدة",
@@ -1152,23 +1152,23 @@
       "clearFilters": "مسح المرشحات",
       "clearSuppressions": "مسح عمليات الكتم",
       "clearFileFocus": "إلغاء التركيز على الملف",
-      "matchActiveEditor": "مطابقة محرر النشط.",
+      "matchActiveEditor": "مطابقة المحرر النشط",
       "copyTreeJson": "شجرة النسخ JSON",
       "refreshExtension": "تمديد تحديث التجديد",
-      "openPackageDashboard": "افتح لوحة تحكم الحزمة.",
+      "openPackageDashboard": "افتح لوحة تحكم الحزمة",
       "openCodeHealth": "فتح صحة الشيفرة",
       "openLintsConfig": "إدارة حزم القواعد",
-      "reloadFromDisk": "إعادة تحميل من القرص.",
+      "reloadFromDisk": "إعادة التحميل من القرص",
       "reloadFromDiskTitle": "أعد عرض لوحة القيادة من آخر violations.json دون إعادة تشغيل المحلل.",
       "reEnableDisabledRules": "إعادة تمكين قواعد المعطلة...",
       "reEnableDisabledRulesTitle": "افتح مجموعة سريعة من القواعد المعطلة حاليًا في analysis_options_custom.yaml وأعيد تمكين المختارة.",
       "reEnableNoneMessage": "لا توجد قواعد معطلة حاليًا عبر analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "إعادة تمكين قواعد المعطلة معطلًا.",
+      "reEnableQuickPickTitle": "إعادة تمكين القواعد المعطلة",
       "reEnableQuickPickPlaceholder": "حدد قاعدة واحدة أو أكثر لإعادة تمكينها.",
       "menuGroupExport": "تصدير",
       "menuGroupBulk": "إجراءات كتلة",
-      "menuGroupFilter": "فلتر & التركيز.",
-      "menuGroupOpen": "افتح لوحة القيادة.",
+      "menuGroupFilter": "التصفية والتركيز",
+      "menuGroupOpen": "افتح لوحة التحكم",
       "menuGroupSystem": "نظام النظام System"
     },
     "progress": {
@@ -1205,15 +1205,15 @@
       "expandAll": "توسيع الكل",
       "collapseAll": "طي الكل",
       "bulkSelected": "{count} محدد",
-      "bulkCopy": "نسخ المحدد كـ JSON.",
-      "selectAllTitle": "حدد جميع النتائج المرئية.",
-      "selectAllAria": "حدد جميع النتائج المرئية.",
+      "bulkCopy": "نسخ المحدد كـ JSON",
+      "selectAllTitle": "حدد جميع النتائج المرئية",
+      "selectAllAria": "حدد جميع النتائج المرئية",
       "colSeverity": "شدة الحالة:",
       "colRule": "القاعدة",
       "colMessage": "الرسالة",
       "colLine": "السطر",
       "colActionsAria": "إجراءات الصف",
-      "selectRowAria": "حدد هذا الصف العثور.",
+      "selectRowAria": "حدد صف هذه النتيجة",
       "copyRowTitle": "قم بنسخ هذه النتيجة كـ JSON.",
       "suppressedBadge": "تم تعطيل",
       "suppressedByTitle": "مخفى عن رؤيتك العادية بواسطة {kind} — فقط مرئي هنا لأن \"تضمين المكبوت\" مفعل",
@@ -1222,7 +1222,7 @@
       "metaSourceCap": "مصدر محدد عند {max} للأداء.",
       "metaGroupedBy": "يتم تجميعها بواسطة {mode}",
       "overflowNote": "تم تقليص قائمة المصادر في {max} لأداء الترجمة.",
-      "runAgain": "قم بتشغيل التحليل مرة أخرى.",
+      "runAgain": "شغّل التحليل مرة أخرى",
       "emptyNoViolations": "لا يوجد انتهاكات في آخر عملية تحليل.",
       "emptyNoMatch": "لا يوجد انتهاكات تتطابق مع المرشحات الحالية.",
       "emptyHintNoData": "قم بتشغيل التحليل لملء `reports/.saropa_lints/violations.json`، ثم قم بالتحديث.",
@@ -1235,8 +1235,8 @@
       "sectionAria": "مخططات المزيج",
       "heading": "المزيج",
       "metaClickSlice": "انقر فوق شريحة لتصفية.",
-      "severityMix": "مزيج من شدة الاختلاط.",
-      "filterBarTitle": "تصفية إلى {key} فقط.",
+      "severityMix": "توزيع الشدة",
+      "filterBarTitle": "تصفية إلى {key} فقط",
       "donutTotal": "الإجمالي"
     },
     "todoHack": {
@@ -1262,7 +1262,7 @@
       "headingNoServer": "Drift Advisor",
       "metaNoServer": "لا يوجد خادم",
       "noServerBlurb": "لم يتم العثور على خادم Drift Advisor في المنافذ المهيئة.",
-      "retry": "حاول إعادة المحاولة.",
+      "retry": "إعادة المحاولة",
       "headingConnected": "Drift Advisor",
       "metaConnected": "متصل",
       "noIssues": "متصل بـ {label} — لا توجد مشكلات حالية.",
@@ -1314,11 +1314,11 @@
       "perFileRulesSample": "قواعد لكل ملف (عينة)"
     },
     "script": {
-      "announceCleared": "تم مسح جميع المرشحات.",
+      "announceCleared": "تم مسح جميع المرشحات",
       "announceFiltersPrefix": "المرشحات:",
-      "announceStarted": "بدأت التحليلات.",
+      "announceStarted": "بدأ التحليل",
       "announceComplete": "اكتمل التحليل",
-      "announceFailed": "فشلت التحليلات الفاشلة.",
+      "announceFailed": "فشل التحليل",
       "removeRecentAria": "إزالة",
       "removeRecentTitle": "إزالة",
       "bulkSelectedTpl": "تم تحديد {n}",
@@ -1328,18 +1328,18 @@
     },
     "emptyState": {
       "hintAfterMessage": "قم بتشغيل تحليل Saropa Lints لتوليد violations.json ، ثم استخدم \"تحديث هنا\" أو إعادة فتح لوحة التحكم هذه.",
-      "refreshDisk": "تحديث من القرص."
+      "refreshDisk": "تحديث من القرص"
     },
     "shortcuts": {
-      "focusTextFilter": "ركز على مرشح النص.",
+      "focusTextFilter": "ركّز على مرشح النص",
       "clearTextFilter": "قم بتصفية مرشح النص المُركّز.",
       "activateKpi": "تنشيط بطاقة KPI المتركزة أو شريط الرسم البياني.",
       "activateKpiSpace": "تنشيط بطاقة KPI المتركزة أو شريط الرسم البياني.",
-      "showOverlay": "عرض هذا الاختصار التراكب الرقمي."
+      "showOverlay": "عرض تراكب الاختصارات هذا"
     },
     "unknownAnalyzerKind": "غير معروف",
     "supplementary": {
-      "scannerPromo": "تمكين ماسح الماسحة الضوئية TODO / HACK.",
+      "scannerPromo": "تمكين ماسح TODO/HACK",
       "tooltipScanner": "الماسح الضوئي لنظام الملفات Saropa - يقوم بإحصاء علامات TODO/HACK المفتوحة في المصدر.",
       "tooltipPromoClickToOn": "انقر للتمكين"
     }
@@ -1361,7 +1361,7 @@
     }
   },
   "triageDash": {
-    "showInIssues": "أظهر في القضايا.",
+    "showInIssues": "إظهار في المشكلات",
     "disableRules": "تعطيل قواعد إيقاف التشغيل",
     "enableRules": "تمكين القواعد",
     "issues": "المشكلات",
@@ -1384,7 +1384,7 @@
     "toggleTitle": "عرض اختصارات لوحة المفاتيح (?)",
     "toggleAria": "عرض اختصارات لوحة المفاتيح",
     "dialogTitle": "اختصارات لوحة المفاتيح",
-    "closeAria": "أغلق اختصارات لوحة المفاتيح.",
+    "closeAria": "أغلق اختصارات لوحة المفاتيح",
     "footer": "اضغط على Esc أو انقر فوق خارج لإغلاق."
   },
   "wideReport": {
@@ -1480,7 +1480,7 @@
       "eolTitle": "نهاية العمر",
       "updates": "تحديثات التحديثات",
       "unused": "غير مستخدم",
-      "singleUse": "استخدام واحد فقط للاستخدام الواحد.",
+      "singleUse": "استخدام واحد",
       "vulnerable": "ضعيفه الضعيفة",
       "overrides": "التجاوزات",
       "caveatLine1": "*أحجام الأكواد المعروضة (lib + الأصول المعلنة)، تعود إلى حجم أرشيف pub.dev عندما لا يكون حجم الأكواد متاحًا. باستثناء dev_dependencies (build_runner، وlints، وsaropa_lints، وما إلى ذلك) - فهي لا يتم شحنها مطلقًا إلى حزمة APK / IPA / web. سيكون الحجم الفعلي للتطبيق أصغر بعد اهتزاز الشجرة.",
@@ -1489,13 +1489,13 @@
     },
     "breakdown": {
       "title": "لماذا الصف {grade}؟ - متوسط ​​{avgScore}/100 عبر حزم {pkgCount}",
-      "hint": "انقر لتوسيع النسخة.",
-      "distributionHeading": "التوزيع والتوزيع.",
+      "hint": "انقر للتوسيع",
+      "distributionHeading": "التوزيع",
       "signalsHeading": "إشارات المخاطر تسحب النتيجة إلى أسفل.",
       "signalFlagged": "{count} معلّمة (مهمولة / نهاية العمر)",
-      "signalVulnerable": "{count} مع نقاط الضعف المعروفة.",
-      "signalUpdates": "{count} لديها تحديثات متاحة.",
-      "bottomHeading": "حزم أقل درجات النقاط.",
+      "signalVulnerable": "{count} مع نقاط ضعف معروفة",
+      "signalUpdates": "{count} لديها تحديثات متاحة",
+      "bottomHeading": "الحزم الأقل درجة",
       "thresholdsHeading": "كيف تربط الدرجات النتائج بالصفوف الدراسية.",
       "thresholdA": "70+ — نابضة بالحياة: تمت صيانتها بنشاط، وتم نشرها مؤخرًا",
       "thresholdB": "40–69 — مستقر: لا يزال موجودًا ولكنه يتباطأ",
@@ -1531,13 +1531,13 @@
       "rescanLabel": "إعادة الفحص",
       "openOtherTitle": "افتح مشروع pubspec.yaml آخر في نافذة جديدة للفحص Vibrancy.",
       "openOtherLabel": "مشروع مفتوح...",
-      "footprintGroupAria": "وضع البصمة القدمية لعمود الحجم.",
+      "footprintGroupAria": "وضع البصمة لعمود الحجم",
       "footprintGroupTitle": "ما يظهر عمود الحجم: حجم الكود الخاص فقط ، بالإضافة إلى الترانزيتيف الفريد (التكلفة إذا تم إزالته) ، أو بالإضافة إلى جميع الترانزيتف (المكس النظري). يعود إلى حجم الأرشيف عندما لا يكون حجم الكود متاحًا.",
       "footprintLabel": "البصمة:",
       "footprintOwnTitle": "حجم الرمز الخاص فقط (lib + declared assets) ؛ يعود إلى pub.dev حجم الأرشيف عندما لا يكون متاحًا.",
       "footprintOwn": "الذاتي",
       "footprintUniqueTitle": "الحجم الخاص + العابرات المستخدمة فقط من قبل هذا dep (الوفورات إذا قمت بإزالتها)",
-      "footprintUnique": "+ فريدة من نوعها.",
+      "footprintUnique": "+ فريدة",
       "footprintTotalTitle": "حجمها الخاص + جميع المواد العابرة ، بما في ذلك تلك التي يتم مشاركتها مع الإدارات الأخرى.",
       "footprintTotal": "+ كل + جميع",
       "searchLabel": "حزم البحث عن الحزم",
@@ -1545,14 +1545,14 @@
       "clearSearchTitle": "مسح البحث",
       "clearSearchAria": "مسح البحث",
       "ageFilterTitle": "تصفية حسب عمر النشر نشر",
-      "publishedAgeLabel": "نشر العمر السنوي.",
+      "publishedAgeLabel": "عمر النشر",
       "ageMaxAll": "الكل",
-      "presetFilterTitle": "تطبيق إعدادات الفلتر السريعة المسبقة.",
+      "presetFilterTitle": "تطبيق إعدادات التصفية السريعة المسبقة",
       "presetLabel": "إعداد مسبق",
       "presetNone": "لا شيء",
       "presetModernization": "التحديث",
-      "presetRiskHotspots": "نقاط الاحتباس الحراري للمخاطر.",
-      "presetCleanup": "المرشحون لتنظيف المنطقة.",
+      "presetRiskHotspots": "بؤر المخاطر",
+      "presetCleanup": "عناصر مرشحة للتنظيف",
       "presetDirectOnly": "المباشرة فقط",
       "devToggleTitle": "تضمين التبعيات dev في الجدول والإجمالي.",
       "includeDev": "تضمين dev",
@@ -1594,7 +1594,7 @@
       },
       "prs": {
         "label": "طلبات السحب",
-        "tooltip": "فتح GitHub طلبات سحب."
+        "tooltip": "افتح طلبات السحب في GitHub"
       },
       "size": {
         "label": "الحجم",
@@ -1638,7 +1638,7 @@
       }
     },
     "cells": {
-      "noGithub": "لم يتم العثور على مستودع GitHub.",
+      "noGithub": "لم يتم العثور على مستودع GitHub",
       "devBadge": "تطوير",
       "transitiveBadge": "غير مباشرة",
       "opportunitiesTooltip": "الميزات غير المستخدمة: {features}",
@@ -1650,23 +1650,23 @@
       "downloadsUnavailable": "pub.dev تحميلات 30 يوم غير متوفرة",
       "downloadsCount": "{count} التنزيلات في آخر 30 يوما.",
       "sizeUnavailable": "الحجم غير متوفر من pub.dev",
-      "noVulnerabilities": "لا يوجد نقاط ضعف معروفة.",
+      "noVulnerabilities": "لا توجد نقاط ضعف معروفة",
       "licenseUnspecified": "ترخيص غير محدد في pub.dev",
       "unusedBadge": "غير مستخدم",
-      "packageInUse": "الحزمة قيد الاستخدام."
+      "packageInUse": "الحزمة قيد الاستخدام"
     },
     "row": {
-      "expandDetails": "توسيع تفاصيل التفاصيل.",
+      "expandDetails": "توسيع التفاصيل",
       "copyRowJson": "نسخ الصف كـ JSON"
     },
     "shortcuts": {
-      "focusSearch": "ركز على حقل البحث.",
+      "focusSearch": "ركّز على حقل البحث",
       "nextRow": "قم بتسليط الضوء على صف الحزمة التالي.",
       "prevRow": "قم بتسليط الضوء على صف الحزمة السابق.",
       "toggleDetail": "قم بتبديل توسيع تفاصيل الحزمة المتميزة.",
       "escapeSearch": "البحث المتركز واضح ؛ الثانية Esc تنهار جميع الصفوف المتوسعة.",
       "historyBack": "عد إلى تاريخ التنقل في الحزمة.",
-      "showOverlay": "عرض هذا الاختصار التراكب الرقمي.",
+      "showOverlay": "عرض تراكب الاختصارات هذا",
       "jumpToTab": "الانتقال إلى اللوحة 1-6 (نظرة عامة، التحديثات، التقرير الكامل، المشكلات المعروفة، المقارنة، الإعدادات)"
     },
     "versionTooltip": {
@@ -1682,7 +1682,7 @@
       "popularity": "الشعبية: {value}",
       "publisherTrust": "ثقة الناشر: {value}",
       "codeCommits": "إيداعات الشيفرة: منذ {age}",
-      "latestRelease": "آخر إصدار: {age} منذ فترة طويلة.",
+      "latestRelease": "آخر إصدار: منذ {age}",
       "activitySignal": "إشارة النشاط: {signal}"
     },
     "size": {
@@ -1691,23 +1691,23 @@
       "onDisk": "على القرص: {size}",
       "withUniqueTransitives": "مع المتحولات الفريدة: {size}",
       "withSharedTransitives": "مع المشتركة transitives: {size}",
-      "openFolder": "افتح مجلد الحزمة المحلية."
+      "openFolder": "افتح مجلد الحزمة المحلية"
     },
     "references": {
       "noImports": "لم يتم الكشف عن أي ملف مصدر للصادرات.",
       "reExportLine": "{location} (إعادة التصدير)",
       "publicApiSurface": "سطح API العام — استخدام واحد على الأقل هو إعادة تصدير.",
-      "reExportedBadge": "أعيد تصديرها.",
-      "openFileReferences": "فتح الملفات التي تشير إلى ملفات مفتوحة."
+      "reExportedBadge": "أُعيد تصديرها",
+      "openFileReferences": "افتح مراجع الملف"
     },
     "deps": {
-      "noTransitives": "لا توجد تعتمدات انتقالية.",
-      "showTransitives": "أظهر التبعيات الانتقالية.",
+      "noTransitives": "لا توجد تبعيات انتقالية",
+      "showTransitives": "أظهر التبعيات الانتقالية",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (مشتركة)",
       "tooltipHeader": "{total} من التبعيات غير المباشرة",
       "tooltipHeaderShared": "عمليات الإنزال المتعدية {total} (مشاركة {shared})",
-      "sharedBadgeTitle": "{count} المشتركة مع حزم أخرى من الحزم."
+      "sharedBadgeTitle": "{count} مشتركة مع حزم أخرى"
     },
     "dormancy": {
       "noActivity6mo": "لا توجد إلتزامات ولا إصدارات في 6 أشهر أو أكثر.",
@@ -1723,7 +1723,7 @@
       "codeCommitActivity": "نشاط إيداعات الشيفرة",
       "releaseActivity": "نشاط الإصدارات",
       "dormancySignal": "مؤشر الخمول",
-      "ago": "{age} منذ فترة طويلة.",
+      "ago": "منذ {age}",
       "qualityExample": "+مثال",
       "qualityExampleTitle": "تتضمن عرضًا توضيحيًا قابلاً للتشغيل",
       "qualityTests": "+ الاختبارات",
@@ -1753,7 +1753,7 @@
       "placeholder": "عنوان البحث أو الوصف أو معرف الأوامر...",
       "ariaLabel": "الأوامر البحثية أوامر البحوث",
       "clearAria": "مسح البحث",
-      "hintLine1": "يتطابق مع كل أمر من القيادة.",
+      "hintLine1": "يطابق كل أمر",
       "hintStrongTitle": "العنوان",
       "hintStrongDesc": "وصف الوصف التوضيح",
       "hintStrongId": "المعرّف",
@@ -1762,17 +1762,17 @@
       "hintLine2End": "بدون نقاط)."
     },
     "toolbar": {
-      "showInternal": "عرض أوامر قائمة السياق.",
+      "showInternal": "عرض أوامر قائمة السياق",
       "collapseAll": "طي الكل"
     },
     "recentPopover": {
       "title": "عمليات البحث الأخيرة",
-      "clearTitle": "مسح جميع عمليات البحث الأخيرة.",
+      "clearTitle": "مسح جميع عمليات البحث الأخيرة",
       "clearButton": "مسح",
       "listAria": "عمليات البحث الأخيرة"
     },
     "filterChips": {
-      "ariaRegion": "فلاتر نشطة الفلاتر النشطة.",
+      "ariaRegion": "الفلاتر النشطة",
       "activeLabel": "المرشحات النشطة:",
       "clearAll": "مسح الكل"
     },
@@ -1793,33 +1793,33 @@
       "copyTitle": "نسخ هوية الأمر ({id})",
       "copyAria": "نسخ هوية الأمر (Command ID)"
     },
-    "categoryJumpTitle": "قفز إلى {category}.",
+    "categoryJumpTitle": "انتقل إلى {category}",
     "shortcuts": {
-      "focusSearch": "ركز على حقل البحث.",
-      "navRows": "التنقل في صفوف الأوامر المرئية.",
+      "focusSearch": "ركّز على حقل البحث",
+      "navRows": "التنقل في صفوف الأوامر المرئية",
       "homeEnd": "قفز إلى الصف الأول أو الأخير المرئي.",
-      "enterRun": "قم بتشغيل الأمر المركز.",
+      "enterRun": "تشغيل الأمر المُركَّز عليه",
       "escClear": "قم بتنظيف فلاتر البحث وإعادة ضبط.",
-      "showOverlay": "عرض هذا الاختصار التراكب الرقمي."
+      "showOverlay": "عرض تراكب الاختصارات هذا"
     },
     "script": {
-      "moreSuffix": "+{count} أكثر من ذلك.",
-      "showLess": "أظهر أقل من ذلك.",
+      "moreSuffix": "+{count} أخرى",
+      "showLess": "عرض أقل",
       "runSingular": "تشغيل",
       "runPlural": "يُنفذ",
       "recentWord": "الأخيرة",
       "expandAll": "توسيع الكل",
       "collapseAll": "طي الكل",
       "searchChip": "البحث: \"{query}\"",
-      "internalChip": "عرض أوامر قائمة السياق.",
-      "removeFilterPrefix": "إزالة فلتر الفلتر.",
+      "internalChip": "عرض أوامر قائمة السياق",
+      "removeFilterPrefix": "إزالة الفلتر ",
       "matchOne": "{count} تطابق",
       "matchOther": "{count} تطابقات"
     }
   },
   "codeHealth": {
     "documentTitle": "Saropa رمز لوحة المعلومات الصحية",
-    "skipToTable": "تخطي إلى وظائف جدول الجدول.",
+    "skipToTable": "انتقل إلى جدول الوظائف",
     "openWorkspaceFirst": "افتح مساحة عمل Dart/Flutter أولاً.",
     "scan": {
       "title": "جارٍ فحص صحة المشروع",
@@ -1829,13 +1829,13 @@
       "collect": "اكتشاف الملفات...",
       "firstRunHint": "يجمع التشغيل الأول الماسح الضوئي؛ تستغرق المشاريع الكبيرة لحظة قبل ظهور الملفات.",
       "paused": "متوقف مؤقتًا",
-      "stopped": "توقفت عملية المسح.",
+      "stopped": "توقف الفحص",
       "elapsed": "الوقت المنقضي",
       "phase": {
-        "parse": "تحليل ملفات التفصيل.",
+        "parse": "تحليل الملفات",
         "history": "قراءة تاريخ جيت",
         "blame": "عمر شفرة الحوسبة Age",
-        "usage": "عد المراجع.",
+        "usage": "عدّ المراجع",
         "score": "وظائف تسجيل النقاط"
       },
       "counter": {
@@ -1856,7 +1856,7 @@
         "cancel": "إلغاء الإلغاء"
       },
       "preview": {
-        "heading": "المشاكل التي تم العثور عليها حتى الآن.",
+        "heading": "المشاكل التي تم العثور عليها حتى الآن",
         "empty": "لم يتم العثور على أي مشاكل حتى الآن..."
       },
       "version": {
@@ -1876,7 +1876,7 @@
       "functionOther": "{count} دوال",
       "avgFormat": "فيغ {score} ({grade})",
       "gatesFailing": "البوابات تفشل",
-      "gatesPassing": "بوابات تمر عبر البوابات."
+      "gatesPassing": "بوابات ناجحة"
     },
     "gate": {
       "fallback": "فشلت بوابات الجودة — قم بمراجعة الحدود في إعدادات Code Health.",
@@ -1891,15 +1891,15 @@
       "clickToFilter": "انقر لترشيح الجدول إلى الوظائف التي تم وضع علامة {flag}.",
       "noFlagged": "لا توجد وظائف معلّمة {flag}.",
       "unused": "غير مستخدم",
-      "unusedSub": "وظائف لا يشار إليها في أي مكان.",
+      "unusedSub": "وظائف لا يشار إليها في أي مكان",
       "uncovered": "غير مغطى",
-      "uncoveredSub": "لا تغطية LCOV.",
+      "uncoveredSub": "لا توجد تغطية LCOV",
       "stubTested": "اختبارات صورية",
       "stubTestedSub": "اختبارات موجودة ولكن تؤكد القليل.",
       "suspiciousCoverage": "تغطية مشبوهة",
-      "suspiciousCoverageSub": "تغطية تبدو مصنوعة من البداية.",
+      "suspiciousCoverageSub": "التغطية تبدو مختلقة",
       "testDrift": "تأخر الاختبارات",
-      "testDriftSub": "اختبارات تأخر وظيفة التشغيل."
+      "testDriftSub": "الاختبارات متأخرة عن الوظيفة"
     },
     "toolbar": {
       "ariaLabel": "القانون الإجراءات الصحية",
@@ -1910,7 +1910,7 @@
       "settingsTitle": "افتح إعدادات الصحة الخاصة بالرمز.",
       "settingsButton": "إعدادات صحة الشيفرة",
       "filterTitle": "تصفية الصفوف حسب الاسم أو الملف أو العلم.",
-      "filterLabel": "صفوف مرشحات الفلتر.",
+      "filterLabel": "تصفية الصفوف",
       "filterPlaceholder": "صفوف الفلترات..."
     },
     "table": {
@@ -1927,8 +1927,8 @@
       "noMatch": "لا توجد وظائف مطابقة للفلاتر الحالية.",
       "resetFiltersTitle": "قم بإزالة البحث وأي فلتر أعلام نشط.",
       "resetFilters": "إعادة تعيين المرشحات",
-      "expanderAriaCollapsed": "عرض تفاصيل القضية.",
-      "expanderAriaExpanded": "إخفاء تفاصيل القضية.",
+      "expanderAriaCollapsed": "عرض تفاصيل المشكلة",
+      "expanderAriaExpanded": "إخفاء تفاصيل المشكلة",
       "detailHeading": "لماذا حصلت هذه الوظيفة على {score}",
       "detailNoIssues": "لا توجد علامات في هذا الصف - تعتمد النتيجة على قيم الأعمدة أعلاه (الاستخدام، والتغطية، والتعقيد، والعمر، والوثائق).",
       "suppressLabel": "كتم في الملف",
@@ -1941,7 +1941,7 @@
         "rule": "تم وضع علامة عليها عندما لا يوجد ملف آخر يشير إلى هذا اسم الوظيفة."
       },
       "uncovered": {
-        "label": "غير مغطى بالكشف.",
+        "label": "غير مغطى",
         "evidence": "{pct}% اختبارات الاختبار",
         "rule": "يتم وضع علامة عليها عندما يبلغ LCOV عن تغطية خط 0٪."
       },
@@ -1952,12 +1952,12 @@
       },
       "undocumented": {
         "label": "غير موثق",
-        "evidence": "CC {cc}، لا توجد وثيقة.",
+        "evidence": "CC {cc}، لا توجد وثائق",
         "rule": "يتم وضع علامة على عندما تكون الوظيفة المعقدة (CC > 10) ليس لديها تعليق doc."
       },
       "test_drift": {
         "label": "اختبار الانجراف drift test",
-        "evidence": "اختبارات تأخر وظيفة التشغيل.",
+        "evidence": "الاختبارات متأخرة عن الوظيفة",
         "rule": "يتم وضع علامة عليها عندما يكون أحدث ملف اختبار مرتبط أكبر سناً بكثير من الملف المصدر للدالة."
       },
       "stub_tested": {
@@ -1966,22 +1966,22 @@
         "rule": "يتم وضع علامة عليها عندما يكون هناك اختبار مرتبط ولكن بالكاد يؤكد أي شيء."
       },
       "suspicious_coverage": {
-        "label": "تغطية مشبوهة للتغطية.",
-        "evidence": "{pct}% بدون أي اختبار.",
+        "label": "تغطية مشبوهة",
+        "evidence": "{pct}% بدون اختبار",
         "rule": "يتم وضع علامة عليها عندما يبلغ LCOV عن تغطية عالية ولكن لا يوجد اختبار يشير إلى الوظيفة."
       },
       "fresh_code": {
         "label": "كود نظيف",
-        "evidence": "CC {cc}، أعيد كتابتها مؤخرًا.",
+        "evidence": "CC {cc}، أعيدت كتابتها مؤخرًا",
         "rule": "يُعلم عند تجاوز معقدة الدورة 10 والجسم الدالة تم كتابته أو إعادة كتابته في آخر 90 يوم. كود معقد تم إعادة كتابته مؤخراً أدى إلى الحوادث بشكل أكثر تكراراً من الكود القديم في التحقق."
       }
     },
     "shortcuts": {
-      "focusFilter": "ركز على مرشح الصف.",
+      "focusFilter": "ركّز على مرشح الصف",
       "clearFilter": "قم بتطهير مرشح الصف المُركّز.",
-      "activateKpi": "تنشيط بطاقة KPI المركزة.",
-      "activateKpiSpace": "تنشيط بطاقة KPI المركزة.",
-      "showOverlay": "عرض هذا الاختصار التراكب الرقمي."
+      "activateKpi": "تنشيط بطاقة KPI المركّز عليها",
+      "activateKpiSpace": "تنشيط بطاقة KPI المركّز عليها",
+      "showOverlay": "عرض تراكب الاختصارات هذا"
     },
     "script": {
       "activeFiltersLabel": "المرشحات النشطة:",
@@ -2066,7 +2066,7 @@
     },
     "shortcuts": {
       "jumpToTab": "الانتقال إلى اللوحة 1-2 (الخريطة، التقارير)",
-      "showOverlay": "عرض هذا الاختصار التراكب الرقمي."
+      "showOverlay": "عرض تراكب الاختصارات هذا"
     },
     "hero": {
       "files": "الملفات",
@@ -2093,16 +2093,16 @@
   },
   "telemetry": {
     "heroTitle": "قاعدة ذات صلة بـ Telemetry",
-    "skipToCounters": "انتقل إلى عدادات القياس عن بعد.",
+    "skipToCounters": "انتقل إلى عدادات القياس عن بُعد",
     "lastEvent": "آخر حدث {relative}",
-    "noEvents": "لم يتم تسجيل أي أحداث.",
+    "noEvents": "لم يتم تسجيل أي أحداث",
     "totalEventOne": "{count} حدث إجمالي",
     "totalEventOther": "{count} أحداث إجمالية",
     "noCountersTitle": "لا يوجد عدادات لإعادة ضبط.",
     "resetTitle": "إعادة تعيين كل العدادات",
     "refreshTitle": "إعادة تحميل عدادات القياس عن بعد من قرص.",
     "refresh": "تحديث",
-    "copyTitle": "نسخ الصورة الفورية كـ JSON.",
+    "copyTitle": "نسخ اللقطة كـ JSON",
     "copyJson": "نسخ JSON",
     "resetCounters": "إعادة تعيين العدادات",
     "countersAria": "العدادات",
@@ -2123,8 +2123,8 @@
   "securityPosture": {
     "issueOne": "{count} مشكلة",
     "issueOther": "{count} مشاكل",
-    "noIssues": "لا توجد قضايا.",
-    "showIssues": "عرض القضايا المسألة.",
+    "noIssues": "لا توجد مشكلات",
+    "showIssues": "عرض المشكلات",
     "violationTooltip": "{count} انتهاك(انتهاكات) عبر {ruleCount} قاعدة (قواعد). انقر للإظهار في المشاكل.",
     "noViolationsTooltip": "لا يوجد انتهاكات تم وضعها في هذه الفئة."
   },
@@ -2144,10 +2144,10 @@
         "githubStars": "GitHub نجوم النجوم",
         "openIssues": "المشكلات المفتوحة",
         "codeSize": "حجم الشيفرة",
-        "bloatRating": "تقييم Bloat التورم.",
+        "bloatRating": "تقييم التضخم",
         "license": "الترخيص",
         "platforms": "منصات المنصات",
-        "inThisProject": "في هذا المشروع."
+        "inThisProject": "في هذا المشروع"
       },
       "value": {
         "unverified": "— (لم يتم التحقق)",
@@ -2162,24 +2162,24 @@
     "status": {
       "packagesSelected": "تم تحديد {count} من الحزم",
       "packagesCompared": "تمت مقارنة {count} من الحزم",
-      "dimensionsRankedOne": "{count} البعد المرتبة في الترتيب.",
-      "dimensionsRankedOther": "{count} الأبعاد مرتبة في الترتيب.",
-      "morePackages": "+{count} أكثر من ذلك."
+      "dimensionsRankedOne": "{count} بُعد مرتّب",
+      "dimensionsRankedOther": "{count} أبعاد مرتّبة",
+      "morePackages": "+{count} أخرى"
     },
     "empty": {
       "ariaLabel": "لا توجد حزم",
       "message": "لم يتم اختيار أي حزم للمقارنة. انقر بزر الماوس الأيمن على حزمتين أو أكثر في لوحة تحكم الحزم واختر {compare}.",
       "compareWord": "مقارنة",
-      "openDashboard": "افتح لوحة تحكم الحزمة.",
+      "openDashboard": "افتح لوحة تحكم الحزمة",
       "openDashboardTitle": "افتح لوحة تحكم الحزمة Saropa."
     },
     "a11y": {
-      "skipToTable": "قفز إلى جدول المقارنة.",
+      "skipToTable": "انتقل إلى جدول المقارنة",
       "recommendation": "توصية التوصية",
-      "addingToProject": "إضافة {name} إلى المشروع."
+      "addingToProject": "إضافة {name} إلى المشروع"
     },
     "shortcuts": {
-      "showOverlay": "عرض هذا الاختصار التراكب الرقمي.",
+      "showOverlay": "عرض تراكب الاختصارات هذا",
       "closeOverlay": "أغلق التراكب المختصر للكمبيوتر."
     },
     "kpi": {
@@ -2187,10 +2187,10 @@
       "leading": "الرائدة المميزة",
       "leadingTitle": "الحزمة الرائدة من قبل معظم الأبعاد يفوز.",
       "dimensionWinsOne": "{count} بعدة الفوز بالفوز",
-      "dimensionWinsOther": "{count} بعد الفوز يفوز.",
+      "dimensionWinsOther": "{count} أبعاد فائزة",
       "packages": "حزمة الطلبات الحمولة",
       "packagesTitle": "عدد الحزم مقارنة جنبا إلى جنب.",
-      "inComparison": "في المقارنة بالمقارنة.",
+      "inComparison": "في المقارنة",
       "dimensions": "الأبعاد",
       "dimensionsTitle": "عدد الأبعاد التي يمكن أن يتم فيها ترتيب الفائز.",
       "ranked": "مرتبة"
@@ -2356,9 +2356,9 @@
       "prs": "{count} PRs من قبل",
       "activity90d": "90d: تم إغلاق قضايا {closed} ، اندمجت علاقات عامة {merged}.",
       "lastCommit": "آخر إرسال: {time}",
-      "archived": "يتم أرشفة مستودع الأرشيف.",
+      "archived": "المستودع مؤرشف",
       "pubPoints": "{points}/160 نقاط الحانات",
-      "latestRelease": "آخر إصدار: {age} منذ فترة طويلة.",
+      "latestRelease": "آخر إصدار: منذ {age}",
       "dependents": "{count} المعالين"
     },
     "dormancy": {
@@ -2372,7 +2372,7 @@
       "transitiveCount": "{count} حزم انتقالية",
       "unique": "{count} فريدة",
       "shared": "{count} المشتركة ({pct}٪)",
-      "moreOverflow": "+{count} أكثر من ذلك.",
+      "moreOverflow": "+{count} أخرى",
       "sharedList": "المشتركة: {names}"
     },
     "platforms": {
@@ -2410,7 +2410,7 @@
   },
   "suite": {
     "fix": {
-      "explainRule": "شرح هذه القاعدة."
+      "explainRule": "اشرح هذه القاعدة"
     },
     "enableRule": {
       "done": "قاعدة تمكين {ruleId}. تحليل إعادة التشغيل لتطبيق.",
@@ -2430,23 +2430,23 @@
     },
     "nudge": {
       "message": "يستخدم هذا المشروع Drift Advisor. قم بتثبيت Saropa ملحق التقاط السجلات لترتيب SQL أثناء تشغيل مع هذه النتائج الثابتة.",
-      "install": "قم بتثبيت التقاط السجلات.",
+      "install": "ثبّت Log Capture",
       "dismiss": "فصله من العمل"
     },
     "driftRecommend": {
       "message": "يتم توصيل خادم Drift Advisor. قم بتثبيت إضافة Saropa Drift Advisor المستقلة للحصول على تجربة كاملة في لوحة المشاكل.",
-      "install": "قم بتثبيت مستشار الانجراف Drift Advisor.",
+      "install": "ثبّت Drift Advisor",
       "dismiss": "فصله من العمل"
     }
   },
   "notify": {
     "activation": {
-      "cacheCleared": "تم مسح ذاكرة التخزين المؤقت لـ Vibrancy.",
-      "copiedInfo": "نسخت معلومات {package} إلى لوحة المفاتيح.",
+      "cacheCleared": "تم مسح ذاكرة التخزين المؤقت لـ Vibrancy",
+      "copiedInfo": "تم نسخ معلومات {package} إلى الحافظة",
       "noPubspecOrLock": "لا يوجد pubspec.yaml/pubspec.lock في مساحة العمل.",
       "backfillComplete": "حزمة الحزم: النشاط البطيء تم استكمال ملء التاريخ مرة واحدة (تستورد لقطات {count}).",
       "runScanFirst": "شغّل فحصًا أولاً",
-      "noUpgradable": "لم يتم العثور على حزم قابلة للتحديث.",
+      "noUpgradable": "لم يتم العثور على حزم قابلة للترقية",
       "proceedUpgrades": "المضي قدما مع {count} ترقية (((s)) ؟ الخطوات الفاشلة تتراجع وتستمر الخطة.",
       "actionExecute": "تنفيذ",
       "actionCancel": "إلغاء الإلغاء",
@@ -2454,16 +2454,16 @@
       "upgradeAllComplete": "تمت بنجاح جميع الترقيات {count}.",
       "notPubspec": "الملف الذي تم اختياره ليس pubspec.yaml.",
       "suppressedPackage": "التحذير \"{package}\" تم إلغاء تفعيله — سيتم إخفاء التشخيصات",
-      "noPackagesToSuppress": "لا توجد حزم لإخمادها.",
+      "noPackagesToSuppress": "لا توجد حزم لإخمادها",
       "suppressedCount": "حزمة {count} المكبوتة (((s)",
       "noUnhealthyToSuppress": "لا توجد عبوات غير صحية للقمع.",
       "suppressAllConfirm": "إخفاء جميع {count} الحزم غير الصحية؟ هذا سيحذف جميع التشخيصات.",
-      "noSuppressedPackages": "لا توجد حزم مضغوطة.",
+      "noSuppressedPackages": "لا توجد حزم مُخمَدة",
       "unsuppressedCount": "حزمة غير مضغوطة من {count} (s)",
       "noPubspecWorkspace": "لم يتم العثور على pubspec.yaml في مساحة العمل.",
-      "depsAlreadySorted": "التبعيات التي تم فرزها بالفعل.",
+      "depsAlreadySorted": "التبعيات مرتبة بالفعل",
       "depsSorted": "{detail} في {sections}",
-      "noPubspec": "لم يتم العثور على pubspec.yaml.",
+      "noPubspec": "لم يتم العثور على pubspec.yaml",
       "updatePrereleaseConfirm": "هل تريد تحديث {package} إلى النسخة التجريبية {version}؟ قد تحتوي النسخ التجريبية على تغييرات تؤدي إلى تشقق التطبيق.",
       "packageNotFound": "الحزمة {package} غير موجودة في pubspec.yaml",
       "updatedTo": "تم تحديث {package} إلى {version}",
@@ -2472,8 +2472,8 @@
       "ciOverwriteConfirm": "{path} موجود بالفعل. إعادة الكتابة؟",
       "actionOverwrite": "إزالة الكتابة فوقها",
       "ciGenerated": "تم إنشاء مسار CI: {path}",
-      "compareSelectCount": "حدد 2-3 حزم للمقارنة.",
-      "compareMax": "أقصى 3 حزم للمقارنة.",
+      "compareSelectCount": "حدد 2-3 حزم للمقارنة",
+      "compareMax": "3 حزم كحد أقصى للمقارنة",
       "compareFetchFailed": "لم يتمكن من استلام بيانات حزمة كافية."
     },
     "main": {
@@ -2531,15 +2531,15 @@
       "analysisScanning": "جارٍ فحص مساحة العمل… {percent}% ({count} مشكلة حتى الآن)",
       "configUpdated": "تم تحديث تكوين Saropa Lints (المستوى: {tier}).",
       "configWriteFailed": "فشل كتابة التكوين. {details}",
-      "scaffoldGateTitle": "المكونات المحلل إضافة هيكل الهيكل الإسكاني.",
+      "scaffoldGateTitle": "هيكل إضافة محلل مركّب",
       "scaffoldGateDetail": "هذا يكتب حزمة جديدة Dart تحت مساحة العمل الخاصة بك (pubspec.yaml، lib/main.dart، README): برنامج إضافي custom_lint واحد يسجل Saropa ويترك خطافات لقواعدك الخاصة.\n\nاستخدم هذا فقط عندما تقوم بشحن قواعد المحلل المخصصة مع Saropa. يمكن للمشاريع العادية Saropa فقط تخطي ذلك ، يسمح المحلل بإدخال مكون إضافي واحد لكل سياق.\n\nالتالي: القادم اختر مجلدًا نسبيًا لمجال العمل. إذا كان هذا المجلد موجودًا بالفعل ، فسيتم طلبك قبل الكتابة فوق أي شيء.",
       "actionContinue": "استمروا استمرو",
-      "actionOpenGuide": "افتح دليل الإرشادات.",
+      "actionOpenGuide": "افتح الدليل",
       "scaffoldPathOutsideWorkspace": "يجب أن يكون مسار السقالة داخل مجلد مساحة العمل.",
       "scaffoldFolderExists": "المجلد موجود بالفعل: {folder}. قد تتم إضافة ملفات أو الكتابة فوقها. هل تريد المتابعة؟",
       "scaffoldCreated": "تم إنشاء السقالة المكونة من الإضافات المركبة. فتح المولد الرئيسي.دارت؟",
       "actionOpenMainDart": "افتح main.dart الرئيسي",
-      "actionOpenReadme": "افتح README.",
+      "actionOpenReadme": "افتح README",
       "scaffoldFailed": "فشل الشاشة. {details}",
       "scaffoldFailedHint": "تأكد من وجود saropa_lints في dev_dependencies وقم بتشغيل pub get.",
       "alreadyOnTier": "بالفعل على مستوى {tier}.",
@@ -2578,7 +2578,7 @@
       "crossFileHtmlReportFailed": "تقرير HTML عبر الملفات فاشل: {message}",
       "crossFileReportNoIndex": "تم إكمال تقرير الملفات المتقاطعة ولكن لم يتم العثور على index.html.",
       "crossFileHtmlReportGenerated": "تم إنشاء تقرير HTML عبر الملفات.",
-      "actionOpenInBrowser": "افتح في المتصفح.",
+      "actionOpenInBrowser": "افتح في المتصفح",
       "actionOpenFile": "فتح الملف",
       "crossFileSnapshotFailed": "فشل اقتطاع الملفات عبرية: {message}",
       "crossFileSnapshotNoJson": "تم الانتهاء من لقطة ملفات متقاطعة ولكن لم يتم العثور على ملف JSON.",
@@ -2634,7 +2634,7 @@
       "couldNotOpenFileRef": "لم يتم فتح مرجع الملف: {filePath}",
       "savedReportJson": "التقرير المحفوظ JSON: {path}",
       "couldNotSaveReportJson": "لم يتم حفظ JSON التقرير.",
-      "noPubspecFound": "لم يتم العثور على pubspec.yaml.",
+      "noPubspecFound": "لم يتم العثور على pubspec.yaml",
       "noDependenciesSection": "لم يتم العثور على قسم الاعتمادات",
       "addedToPubspec": "أضاف {name}: من {constraint} إلى pubspec.yaml",
       "failedToAddToPubspec": "فشل في إضافة {name} إلى pubspec.yaml.",
@@ -2645,21 +2645,21 @@
       "couldNotFindPubspec": "لم يتمكن من العثور على pubspec.yaml",
       "updatedPackage": "تم تحديث {name} إلى {constraint}",
       "failedToUpdate": "فشل في تحديث {name}",
-      "selectPackagesToCompare": "حدد 2-3 حزم للمقارنة.",
-      "maxPackagesToCompare": "أقصى 3 حزم للمقارنة.",
+      "selectPackagesToCompare": "حدد 2-3 حزم للمقارنة",
+      "maxPackagesToCompare": "3 حزم كحد أقصى للمقارنة",
       "couldNotFindLocalSource": "لم يتم العثور على المصدر المحلي لـ {name}",
       "registryAuthAdded": "✓ إضافة مصادقة لـ {name}",
       "registryAddFailed": "فشل في إضافة السجل: {message}",
-      "noConfiguredRegistries": "لا يوجد سجلات مُكوَّنة.",
+      "noConfiguredRegistries": "لا توجد سجلات مُكوَّنة",
       "registryAuthRemoved": "✓ إزالة المصادقة لـ {name}",
       "registryRemoveFailed": "فشل في إزالة السجل: {message}",
-      "registryTokenUpdated": "✓ تم تحديث الرمز المميز.",
+      "registryTokenUpdated": "✓ تم تحديث الرمز المميز",
       "registryTokenUpdateFailed": "فشل تحديث التوكن: {message}",
       "actionRemove": "إزالة",
       "removeAuthPrompt": "إزالة المصادقة لـ {name}؟",
       "annotateInProgress": "التعليقات على الملاحظات قيد التنفيذ بالفعل",
       "noPubspecInWorkspace": "لم يتم العثور على pubspec.yaml في مساحة العمل.",
-      "noDependenciesToAnnotate": "لا توجد إعتمادات للتعليق على التعليق.",
+      "noDependenciesToAnnotate": "لا توجد تبعيات للتعليق عليها",
       "failedToApplyAnnotations": "فشل في تطبيق التعليقات على pubspec.yaml",
       "annotatedSummary": "الملاحظة {parts} في {basename}",
       "upgradeInProgress": "ويتم حالياً إجراء ترقية.",
@@ -2708,11 +2708,11 @@
       "reportViewSuppressed": "تم قمع \"{flag}\" في {file}.",
       "reportViewCouldNotSuppress": "تعذّر كتم '{flag}' في {file}: {error}",
       "actionRescan": "إعادة الفحص",
-      "bulkUpdateNoUpdates": "لا توجد تحديثات متاحة.",
-      "bulkUpdateNoUpdatesFiltered": "لا توجد تحديثات {filter} متاحة.",
+      "bulkUpdateNoUpdates": "لا توجد تحديثات متاحة",
+      "bulkUpdateNoUpdatesFiltered": "لا توجد تحديثات {filter} متاحة",
       "bulkUpdateFailed": "تحديث كتلة فاشل: {error}",
-      "bulkUpdateUpdatedOne": "تم تحديث حزمة {count}.",
-      "bulkUpdateUpdatedOther": "تم تحديث حزم {count}.",
+      "bulkUpdateUpdatedOne": "تم تحديث {count} حزمة",
+      "bulkUpdateUpdatedOther": "تم تحديث {count} حزم",
       "detailViewConstraintNotFound": "لم يتمكن من تحديد موقع قيود الإصدار لـ {package}.",
       "detailViewUpdated": "تم تحديث {package} إلى {version}"
     }

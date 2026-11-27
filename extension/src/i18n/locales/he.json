@@ -142,7 +142,7 @@
       "baselineNew": "חדש",
       "baselineUnchanged": "לא השתנה",
       "saveBaseline": "שמירה כקו בסיס",
-      "copyJson": "העתק את JSON.",
+      "copyJson": "העתק JSON",
       "toggleGroup": "החלפת קבוצת קבצים",
       "colFile": "קובץ",
       "colLine": "שורה",
@@ -301,13 +301,13 @@
     }
   },
   "packs": {
-    "forYourProject": "עבור הפרויקט שלך.",
+    "forYourProject": "עבור הפרויקט שלך",
     "forYourProjectHint": "חבילות שההתלות שלהן או SDK תואמים את ספציפית הפאב שלך. הכללים האלה חלים על קוד שאתה בעצם שולח.",
     "noneDetected": "עדיין אין חבילות שמתאימות לתלות שלך. הוסף חבילה נתמכת, או לפתוח כל החבילות למטה.",
     "allPackages": "כל החבילות",
     "allPackagesHint": "כל חבילה זמינה, כולל אלה שלא זוהו בפרויקט זה. אפשר לחבורה לבחור את כלליה.",
     "versionGroup": {
-      "tag": "בחרו גרסה אחת.",
+      "tag": "בחר גרסה אחת",
       "tooltip": "הacks מכוונים לเวอร์סיות עיקריות שונות של אותה תלות. רק אחד מהם פעיל בכל זמן — הפעלת אחד כופה את האחרים להישתק."
     },
     "domainDesc": {
@@ -462,7 +462,7 @@
     "shortcuts": {
       "jumpToTab": "מעבר ללשונית 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
       "prevNextTab": "הלשונית הקודמת / הבאה",
-      "showOverlay": "להראות את התוספת של קיצור דרך זה."
+      "showOverlay": "הצג את שכבת קיצורי הדרך הזו"
     }
   },
   "dashboards": {
@@ -500,7 +500,7 @@
     "card": {
       "versionUpgrade": "עדכון זמין ל- {latest}",
       "versionCurrent": "על העדכונים האחרונים",
-      "featuresTitle": "תכונות שטרם שימשו.",
+      "featuresTitle": "תכונות שטרם נעשה בהן שימוש",
       "locationsTitle": "היכן הפרויקט שלך משתמש בחבילה זו?",
       "noLocations": "לא יported בקוד המקור של הפרויקט — ככל הנראה תלות פיתוח או תלויה טרנסיטיבית.",
       "moreFiles": "ו-{count} קבצים נוספים",
@@ -538,11 +538,11 @@
       "published": "פורסם {date}"
     },
     "partialBanner": {
-      "partReadme": "README ולוגו.",
+      "partReadme": "README ולוגו",
       "partGap": "PRs ו- Issue של version gap והנשאלות",
       "partReverseDeps": "ספירת תלותי הפוך",
       "listTwo": "{first} ו- {second}",
-      "listMany": "{head}, ו- {last}.",
+      "listMany": "{head} ו-{last}",
       "message": "חלק מהחלקים לא הצליחו להעלות: {list}.",
       "retry": "נסה שוב",
       "retrying": "מנסה שוב...",
@@ -563,7 +563,7 @@
       "constrained": "מוגבל",
       "constrainedBy": "המגבלה שלך {constraint} מגבה את זה ({resolvable} ניתן לפתרון, {latest} האחרון)",
       "pinHeld": "החזיקו מחזיק",
-      "pinDoNotUse": "אל תשתמשו בו.",
+      "pinDoNotUse": "אין להשתמש",
       "drift": "סטייה בין פרויקטים",
       "driftBehind": "מאחור: {siblings} (יש לך {own})",
       "driftDiffers": "שונה: {siblings} (יש לך {own})",
@@ -585,11 +585,11 @@
       "stars": "כוכבים",
       "likes": "לייקים",
       "report": "דוח",
-      "openIssues": "סוגיות פתוחות בנושא.",
+      "openIssues": "סוגיות פתוחות",
       "openPrs": "בקשות משיכה פתוחות",
       "activity": "פעילות (90d)",
       "activityValue": "נושאי {closed} נסגרו, אנשי יחסי ציבור של {merged} התמזגו",
-      "noActivity": "אין פעילות לאחרונה.",
+      "noActivity": "אין פעילות לאחרונה",
       "lastCommit": "התחייבות אחרונה",
       "pubPoints": "פאב נקודות Pub נקודות",
       "verified": "(אמת) אווירה",
@@ -628,9 +628,9 @@
       "overrideTitle": "התעלמות מ-Gap Override Gap",
       "noDates": "לא ניתן לקבוע תאריכי גרסה עבור החבילה הזו.",
       "noItems": "לא נמצאו PRs או בעיות בין הגרסאות האלה.",
-      "prsMerged": "PRs התמזגו.",
+      "prsMerged": "בקשות משיכה שמוזגו",
       "issuesClosed": "סוגיות שנסגרו",
-      "searchLabel": "חיפוש PRs ונושאים.",
+      "searchLabel": "חיפוש בקשות משיכה וסוגיות",
       "searchPlaceholder": "חיפוש PRs ונושאים ...",
       "filterAria": "מסנן לפי קטגוריה",
       "filterAll": "הכל",
@@ -662,20 +662,20 @@
       "changelog": "שינויים ב- Changelog",
       "versions": "גרסאות גרסויות",
       "repository": "מאגר מידע Repository",
-      "openIssues": "סוגיות פתוחות בנושא.",
+      "openIssues": "סוגיות פתוחות",
       "reportIssue": "דו\"ח דיווח נושא הנושא"
     },
     "a11y": {
-      "skipToDetails": "קפוץ לפרטי החבילה."
+      "skipToDetails": "דלג לפרטי החבילה"
     },
     "shortcuts": {
-      "showOverlay": "להראות את התוספת של קיצור דרך זה.",
+      "showOverlay": "הצג את שכבת קיצורי הדרך הזו",
       "closeOverlay": "סגור את השכבה העליונה של קיצור הדרך במקלדת."
     }
   },
   "toolbar": {
     "runAnalysis": "רץ ניתוח ריצה",
-    "copyJson": "העתק את JSON.",
+    "copyJson": "העתק JSON",
     "saveReport": "שמור דוח",
     "moreActions": "פעולות נוספות",
     "clearAll": "נקה הכל"
@@ -1006,7 +1006,7 @@
   "findingsDash": {
     "pageTitle": "Saropa דשבורד ממצאים",
     "documentTitle": "Saropa דשבורד ממצאים",
-    "skipToFindings": "קפוץ לממצאים.",
+    "skipToFindings": "דלג לממצאים",
     "secondaryAsideLabel": "אבחון משני אבחנה שנייה",
     "hero": {
       "gaugeTitle": "ציון בריאות {score} (דרגה {grade}). הטעויות שוקלות הכי הרבה.",
@@ -1062,8 +1062,8 @@
     },
     "kpi": {
       "visibleLabel": "ממצאים מוצגים",
-      "allMatched": "כולם התאמו, כל התואמים.",
-      "ofTotal": "של {total} סך הכל.",
+      "allMatched": "הכל תואם",
+      "ofTotal": "מתוך {total} בסך הכל",
       "clearFiltersTitle": "לחץ על כדי לנקות את כל המסננים.",
       "errorsLabel": "שגיאות טעויות",
       "errorsSubFix": "חייב לתקן צריך לתקן",
@@ -1079,7 +1079,7 @@
       "infoTitle": "סינון ממצאים למידע (לידיעתך - סגנון והצעות)",
       "filesLabel": "קבצים מושפעים",
       "filesSubAcross": "בכל הייצוא",
-      "filesSubNone": "לא היו קבצים שנפגעו.",
+      "filesSubNone": "אין קבצים מושפעים",
       "filesTitle": "קבצים נפרדים התורמים לפחות לממצא אחד.",
       "topRuleLabel": "הכלל המוביל",
       "topRuleTitle": "סנן ממצאים לפי הכלל {name}",
@@ -1087,7 +1087,7 @@
       "sectionAria": "סטטיסטיקות כללית"
     },
     "toolbar": {
-      "ariaFiltersActions": "מסננים ופעולות.",
+      "ariaFiltersActions": "מסננים ופעולות",
       "groupByFieldTitle": "ממצאי קבוצה לפי מימד נבחר",
       "groupByLabel": "קבוצה לפי קבוצה",
       "textFilterTitle": "מסננים את הממצאים לפי דרך קובץ, כלל או טקסט הודעה.",
@@ -1140,7 +1140,7 @@
     "chip": {
       "contains": "מכיל \"{q}\"",
       "severityOff": "חומרת ≠ {v}",
-      "resetAllTitle": "החזר את כל המסננים."
+      "resetAllTitle": "אפס את כל המסננים"
     },
     "menuPalette": {
       "help": "עזרה עזר סיוע",
@@ -1155,20 +1155,20 @@
       "matchActiveEditor": "התאם לעורך הפעיל",
       "copyTreeJson": "עץ העתק JSON של ג'ון",
       "refreshExtension": "רענן את ההרחבה",
-      "openPackageDashboard": "פתח לוח המחוונים של החבילה.",
+      "openPackageDashboard": "פתח את לוח המחוונים של החבילות",
       "openCodeHealth": "פתיחת תקינות קוד",
       "openLintsConfig": "ניהול חבילות כללים של Rule Packs",
-      "reloadFromDisk": "להטעין מחדש מהדיסק.",
+      "reloadFromDisk": "טען מחדש מהדיסק",
       "reloadFromDiskTitle": "להציג מחדש את לוח המחוונים מה violations.json האחרון מבלי להפעיל שוב את הניתוח.",
       "reEnableDisabledRules": "הפעל מחדש את הכללים המופרעים...",
       "reEnableDisabledRulesTitle": "פתח בחירה מהירה של כללים שאינם מופעלים כרגע ב analysis_options_custom.yaml והפוך את אלה שנבחרו מחדש.",
       "reEnableNoneMessage": "אין כללים מוגבלים כרגע באמצעות analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "אפשרות להפעיל מחדש כללים מופרעים.",
+      "reEnableQuickPickTitle": "הפעל מחדש כללים מושבתים",
       "reEnableQuickPickPlaceholder": "בחרו אחד או יותר כללים כדי לאפשר מחדש את הפעילות.",
       "menuGroupExport": "ייצוא",
       "menuGroupBulk": "פעולות מונחות",
       "menuGroupFilter": "מסנן & התמקדות",
-      "menuGroupOpen": "פתח את לוח המחוונים.",
+      "menuGroupOpen": "פתח את לוח המחוונים",
       "menuGroupSystem": "מערכת מערכות מערכת"
     },
     "progress": {
@@ -1205,15 +1205,15 @@
       "expandAll": "הרחיב את כל הכל",
       "collapseAll": "כווץ הכל",
       "bulkSelected": "{count} נבחרו",
-      "bulkCopy": "העתק את הבחירה כ-JSON.",
-      "selectAllTitle": "בחר את כל הממצאים הנראים.",
-      "selectAllAria": "בחר את כל הממצאים הנראים.",
+      "bulkCopy": "העתק את הפריטים שנבחרו כ-JSON",
+      "selectAllTitle": "בחר את כל הממצאים הנראים",
+      "selectAllAria": "בחר את כל הממצאים הנראים",
       "colSeverity": "חומרת החמורות",
       "colRule": "חוקי בית סעיף",
       "colMessage": "הודעה מסר הודעת",
       "colLine": "שורה",
       "colActionsAria": "פעולות שורה (Row actions)",
-      "selectRowAria": "בחר את שורת המציאה הזו.",
+      "selectRowAria": "בחר את שורת הממצא הזו",
       "copyRowTitle": "העתיק את הממצא הזה כ-JSON.",
       "suppressedBadge": "הסמכה",
       "suppressedByTitle": "מוסתרה מהמבט הרגיל שלך על ידי {kind} — מוצגת רק כאן בגלל ש\"הצגת מונעים\" מופעל",
@@ -1314,7 +1314,7 @@
       "perFileRulesSample": "כללים לכל תיק (דוגמא)"
     },
     "script": {
-      "announceCleared": "כל המסננים נקיים.",
+      "announceCleared": "כל המסננים נוקו",
       "announceFiltersPrefix": "מסננים:",
       "announceStarted": "החלה ניתוח התחילה",
       "announceComplete": "הניתוח הושלם",
@@ -1331,15 +1331,15 @@
       "refreshDisk": "רענן מהדיסק"
     },
     "shortcuts": {
-      "focusTextFilter": "התמקד במעיל הטקסט.",
+      "focusTextFilter": "מקד את מסנן הטקסט",
       "clearTextFilter": "לנקות את מסנן הטקסט הממוקד.",
       "activateKpi": "הפעל כרטיס KPI ממוקד או בר תרשים.",
       "activateKpiSpace": "הפעל כרטיס KPI ממוקד או בר תרשים.",
-      "showOverlay": "להראות את התוספת של קיצור דרך זה."
+      "showOverlay": "הצג את שכבת קיצורי הדרך הזו"
     },
     "unknownAnalyzerKind": "לא ידוע",
     "supplementary": {
-      "scannerPromo": "הפעל את סורק TODO/HACK.",
+      "scannerPromo": "הפעל את סורק TODO/HACK",
       "tooltipScanner": "סורק מערכת הקבצים של Saropa - סופר סמני TODO/HACK פתוחים במקור.",
       "tooltipPromoClickToOn": "לחץ על Enable כדי לאפשר"
     }
@@ -1361,7 +1361,7 @@
     }
   },
   "triageDash": {
-    "showInIssues": "להראות בעניינים.",
+    "showInIssues": "הצג בסוגיות",
     "disableRules": "השבת כללים",
     "enableRules": "הפעל כללים",
     "issues": "נושאים סוגיות",
@@ -1473,14 +1473,14 @@
       "projectGrade": "חבילת פרויקטים רמה של ציון",
       "totalSize": "גודל כולל*",
       "gradeTooltip": "ציון פרויקט {avgGrade}\nציון ממוצע: {avgScore}/100\nחבילות: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "חי ופעיל.",
+      "vibrantTitle": "תוססות",
       "stableTitle": "יציב",
       "outdatedTitle": "מיושן לא מעודכן",
       "abandonedTitle": "ננטש",
       "eolTitle": "סוף חיים",
       "updates": "עדכונים עדכונות",
       "unused": "לא בשימוש",
-      "singleUse": "שימוש חד פעמי.",
+      "singleUse": "בשימוש יחיד",
       "vulnerable": "פגיעים פגיעות",
       "overrides": "דריסות",
       "caveatLine1": "*גדלי קוד מוצגים (lib + נכסים מוצהרים), נופלים חזרה לגודל הארכיון pub.dev כאשר גודל הקוד אינו זמין. לא כולל dev_dependencies (build_runner, lints, saropa_lints וכו') - הם לעולם לא נשלחים ל-APK / IPA / web bundle. גודל האפליקציה בפועל יהיה קטן יותר לאחר ניעור עץ.",
@@ -1493,8 +1493,8 @@
       "distributionHeading": "חלוקת הפצה:",
       "signalsHeading": "סימני סיכון גוררים את הציון למטה.",
       "signalFlagged": "{count} מסומן (נטוש / סוף-חיים)",
-      "signalVulnerable": "{count} עם נקודות תורפה ידועות.",
-      "signalUpdates": "{count} יש עדכונים זמינים.",
+      "signalVulnerable": "{count} עם פגיעויות ידועות",
+      "signalUpdates": "{count} עם עדכונים זמינים",
       "bottomHeading": "החבילות עם הציון הנמוך ביותר",
       "thresholdsHeading": "איך ציונים מתאימים לציונים",
       "thresholdA": "70+ - תוסס: מתוחזק באופן פעיל, פורסם לאחרונה",
@@ -1520,7 +1520,7 @@
       "copyAllTitle": "העתק דוח JSON (כל השורות + הפרטים)",
       "copyAllLabel": "העתק",
       "copyOpportunitiesTitle": "העתק את ההזמנות לשיפור AI עבור החבילות המונחות ביותר לתוך דבק אחד.",
-      "copyOpportunitiesLabel": "העתק הזדמנויות עבור AI.",
+      "copyOpportunitiesLabel": "העתק הזדמנויות עבור AI",
       "saveAllTitle": "שמור את דוח JSON לדוחות / YYYYMMDD /...",
       "saveAllLabel": "שמור",
       "saveUpgradeTitle": "שמור דוח של חבילות בלבד עם עדכון זמין לדוחות/YYY YMMDD/...",
@@ -1537,7 +1537,7 @@
       "footprintOwnTitle": "גודל קוד משלו בלבד (lib + declared assets); חוזר לגודל הארכיון pub.dev כאשר הוא אינו זמין.",
       "footprintOwn": "שֶׁלוֹ",
       "footprintUniqueTitle": "גודל עצמי + טרנזיטיבים המשמשים רק את המחלקה הזו (חיסכון אם תוריד אותה)",
-      "footprintUnique": "+ ייחודי.",
+      "footprintUnique": "+ ייחודיות",
       "footprintTotalTitle": "גודל משלו + כל ה-transitives, כולל אלה המשותפים עם מחלקות אחרות.",
       "footprintTotal": "+ כל + הכל",
       "searchLabel": "חבילות חיפוש של חבילת החיפוש",
@@ -1547,13 +1547,13 @@
       "ageFilterTitle": "סינון לפי גיל פרסום, גיל הפריסה",
       "publishedAgeLabel": "גיל הפרסום",
       "ageMaxAll": "הכל",
-      "presetFilterTitle": "החולק את הגדרות המוקדמות של המסנן המהיר.",
+      "presetFilterTitle": "החל הגדרות מוכנות לסינון מהיר",
       "presetLabel": "הגדרה מוכנה",
       "presetNone": "ללא",
       "presetModernization": "מודרניזציה - המודרניזציות",
       "presetRiskHotspots": "נקודות חום סיכון:",
       "presetCleanup": "מועמדים לניקוי",
-      "presetDirectOnly": "ישיר בלבד, רק ישירות.",
+      "presetDirectOnly": "ישירות בלבד",
       "devToggleTitle": "כלול תלותיות dev בטבלה ובסכומים.",
       "includeDev": "כלול dev",
       "activeFiltersLabel": "מסננים פעילים:",
@@ -1594,7 +1594,7 @@
       },
       "prs": {
         "label": "PRs (החברה הציבורית)",
-        "tooltip": "פתח GitHub בקשות משיכה."
+        "tooltip": "פתח בקשות משיכה ב-GitHub"
       },
       "size": {
         "label": "גודל",
@@ -1633,12 +1633,12 @@
         "tooltip": "מצב שימוש: האם החבילה מופיעה ללא שימוש בקוד שלך."
       },
       "description": {
-        "label": "תיאור תואר Description",
+        "label": "תיאור",
         "tooltip": "תיאור החבילה מ pub.dev"
       }
     },
     "cells": {
-      "noGithub": "לא נמצא מאגר GitHub.",
+      "noGithub": "לא נמצא מאגר GitHub",
       "devBadge": "dev",
       "transitiveBadge": "טרנזיטיבית",
       "opportunitiesTooltip": "תכונות לא בשימוש: {features}",
@@ -1650,23 +1650,23 @@
       "downloadsUnavailable": "pub.dev הורדות של 30 יום אינן זמינות.",
       "downloadsCount": "{count} הורדות ב-30 הימים האחרונים.",
       "sizeUnavailable": "גודל לא זמין מ pub.dev",
-      "noVulnerabilities": "אין פגיעות ידועות.",
+      "noVulnerabilities": "אין פגיעויות ידועות",
       "licenseUnspecified": "רישיון לא מפורט ב pub.dev",
       "unusedBadge": "לא בשימוש",
-      "packageInUse": "החבילה נמצאת בשימוש."
+      "packageInUse": "החבילה נמצאת בשימוש"
     },
     "row": {
-      "expandDetails": "הרחיב פרטים על הפרטים.",
-      "copyRowJson": "העתק שורה כ-JSON."
+      "expandDetails": "הרחב פרטים",
+      "copyRowJson": "העתק שורה כ-JSON"
     },
     "shortcuts": {
-      "focusSearch": "התמקד בשדה החיפוש.",
+      "focusSearch": "מקד את שדה החיפוש",
       "nextRow": "הדגיש את שורת החבילה הבאה.",
       "prevRow": "הדגיש את שורת החבילה הקודמת.",
       "toggleDetail": "הפעל את המרחב של פרטי החבילה המדוברים.",
       "escapeSearch": "חיפוש ממוקד ברור; Esc שני קורס כל השורות המורחבות.",
       "historyBack": "חזור דרך ההיסטוריה של ניווט החבילה.",
-      "showOverlay": "להראות את התוספת של קיצור דרך זה.",
+      "showOverlay": "הצג את שכבת קיצורי הדרך הזו",
       "jumpToTab": "מעבר ללשונית 1-6 (סקירה, שדרוגים, דוח מלא, בעיות ידועות, השוואה, הגדרות)"
     },
     "versionTooltip": {
@@ -1691,23 +1691,23 @@
       "onDisk": "בדיסק: {size}",
       "withUniqueTransitives": "עם טרנזיטיבים ייחודיים: {size}",
       "withSharedTransitives": "עם טרנזיטיבים משותפים: {size}",
-      "openFolder": "פתח את תיקיית החבילה המקומית."
+      "openFolder": "פתח את תיקיית החבילה המקומית"
     },
     "references": {
       "noImports": "לא נמצאו תיק מקורות של יבוא.",
       "reExportLine": "{location} (הייצוא מחדש)",
       "publicApiSurface": "משטח ה-API הציבורי — לפחות שימוש אחד הוא ייצוא מחדש.",
-      "reExportedBadge": "יצוא מחדש - נשלח בחזרה.",
-      "openFileReferences": "פתח הפניות לקובץ פתוח."
+      "reExportedBadge": "מיוצא מחדש",
+      "openFileReferences": "פתח הפניות בקבצים"
     },
     "deps": {
       "noTransitives": "אין תלויות טרנזיטיביות",
-      "showTransitives": "להראות תלותיות טרנזיטיביות.",
+      "showTransitives": "הצג תלויות טרנזיטיביות",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (משותף)",
       "tooltipHeader": "{total} תלויות טרנזיטיביות",
       "tooltipHeaderShared": "{total} טרנזיטיביים ({shared} משותפים)",
-      "sharedBadgeTitle": "{count} משותף עם חבילות אחרות."
+      "sharedBadgeTitle": "{count} משותפות עם חבילות אחרות"
     },
     "dormancy": {
       "noActivity6mo": "אין התחייבות ואין שחרורים ב-6 חודשים ומעלה.",
@@ -1723,7 +1723,7 @@
       "codeCommitActivity": "פעילות commit בקוד",
       "releaseActivity": "פעילות שחרור (Release Activity)",
       "dormancySignal": "אות תנומה סיגנלי",
-      "ago": "{age} לפני זמן מה.",
+      "ago": "לפני {age}",
       "qualityExample": "+דוגמא דוגמה",
       "qualityExampleTitle": "כולל הדגמה להרצה",
       "qualityTests": "+בדיקות",
@@ -1753,9 +1753,9 @@
       "placeholder": "שם החיפוש, תיאור או מזהה פקודה...",
       "ariaLabel": "פקודות חיפוש לפקודות החיפוש",
       "clearAria": "נקה חיפוש",
-      "hintLine1": "תואם לכל פקודה של כל הפקוד.",
+      "hintLine1": "מחפש בכל פקודה לפי",
       "hintStrongTitle": "כותרת",
-      "hintStrongDesc": "תיאור תואר התיאוריה",
+      "hintStrongDesc": "תיאור",
       "hintStrongId": "מזהה",
       "hintLine2": "(גם אסימוני מזהה מרווחים - הקלד",
       "hintLine2kbd": "הרץ ניתוח",
@@ -1791,16 +1791,16 @@
       "internalBadgeTitle": "מופעל רק ממנהי הקשר.",
       "internalBadge": "תפריט",
       "copyTitle": "העתק את זהות הפקודה ({id})",
-      "copyAria": "העתק את id פיקוד ID."
+      "copyAria": "העתק מזהה פקודה"
     },
     "categoryJumpTitle": "קפוץ אל {category}",
     "shortcuts": {
-      "focusSearch": "התמקד בשדה החיפוש.",
-      "navRows": "לנווט בשורות פקודה גלויות נגישות.",
+      "focusSearch": "מקד את שדה החיפוש",
+      "navRows": "ניווט בין שורות הפקודות הנראות",
       "homeEnd": "קפוץ לשורה הראשונה או האחרונה הנראית לעין.",
-      "enterRun": "רץ את הפקודה הממוקדת.",
+      "enterRun": "הרץ את הפקודה הממוקדת",
       "escClear": "לנקות את מסנני החיפוש וההתחזוקה.",
-      "showOverlay": "להראות את התוספת של קיצור דרך זה."
+      "showOverlay": "הצג את שכבת קיצורי הדרך הזו"
     },
     "script": {
       "moreSuffix": "+{count} יותר",
@@ -1829,14 +1829,14 @@
       "collect": "גילוי קבצים...",
       "firstRunHint": "הנגנון בוצע לראשונה והסקנר מתערך; לפרויקטים גדולים לוקח זמן רב לפני שהתיקים מופיעים.",
       "paused": "הפסקתי עצרתי",
-      "stopped": "הסריקה נעצרה.",
+      "stopped": "הסריקה נעצרה",
       "elapsed": "זמן שחלף",
       "phase": {
         "parse": "מנתח את תחביר הקבצים",
         "history": "קריאת היסטוריה של גיט",
         "blame": "גיל קוד מחשב עידן הקוד",
         "usage": "ספור הפניות לספירה",
-        "score": "פונקציות ציון של תפקודי ניקוד."
+        "score": "מחשב ציוני פונקציות"
       },
       "counter": {
         "files": "קבצים",
@@ -1876,7 +1876,7 @@
       "functionOther": "{count} פונקציות",
       "avgFormat": "אווג {score} ({grade})",
       "gatesFailing": "שערים נכשלים",
-      "gatesPassing": "שערים עוברים דרך השערים."
+      "gatesPassing": "ספים עוברים"
     },
     "gate": {
       "fallback": "שערי איכות נכשלו - סקירת ספים בהגדרות Code Health.",
@@ -1891,22 +1891,22 @@
       "clickToFilter": "לחץ כדי לסנן את הטבלה לתפקודים עם הדגל {flag}.",
       "noFlagged": "אין פונקציות מסומנות {flag}.",
       "unused": "לא בשימוש",
-      "unusedSub": "פונקציות שלא הוזכרו בשום מקום.",
+      "unusedSub": "פונקציות שאין אליהן הפניה בשום מקום",
       "uncovered": "חשוף לא מכוסה",
-      "uncoveredSub": "אין כיסוי LCOV.",
-      "stubTested": "בדיקות חבילה.",
+      "uncoveredSub": "אין כיסוי LCOV",
+      "stubTested": "נבדק באמצעות stub",
       "stubTestedSub": "בדיקות קיימות אך טוענות מעט.",
-      "suspiciousCoverage": "כיסוי חשוד של נושאים.",
-      "suspiciousCoverageSub": "כיסוי נראה מפוברק מתוחכם.",
+      "suspiciousCoverage": "כיסוי חשוד",
+      "suspiciousCoverageSub": "הכיסוי נראה מפוברק",
       "testDrift": "הנגשה במבחן של דריפט",
-      "testDriftSub": "בדיקות מאחרים את פונקציית הפונקציה."
+      "testDriftSub": "הבדיקות מפגרות אחרי הפונקציה"
     },
     "toolbar": {
       "ariaLabel": "קוד פעולות בריאותיות",
       "rescanTitle": "הפעל מחדש את סריקה בריאות הקוד ועדכן את לוח המחוונים הזה.",
       "rescan": "סרוק מחדש",
       "copyJsonTitle": "העתק את קוד הבריאות JSON הגולמי למרכז ההעתקות.",
-      "copyJson": "העתק את JSON.",
+      "copyJson": "העתק JSON",
       "settingsTitle": "פתח את הגדרות בריאות הקוד.",
       "settingsButton": "קוד הגדרות בריאותיות",
       "filterTitle": "מסננים שורות לפי שם, קובץ או דגל.",
@@ -1941,7 +1941,7 @@
         "rule": "מסומן כאשר אין שום קובץ אחר מתייחס לשם הפונקציה."
       },
       "uncovered": {
-        "label": "חשוף, לא מכוסה.",
+        "label": "ללא כיסוי",
         "evidence": "{pct}% מבחני בדיקות",
         "rule": "מסומן כאשר LCOV מדווח 0% כיסוי קו."
       },
@@ -1957,17 +1957,17 @@
       },
       "test_drift": {
         "label": "מבחן דריפט בדיקת דריף",
-        "evidence": "בדיקות מאחרים את פונקציית הפונקציה.",
+        "evidence": "הבדיקות מפגרות אחרי הפונקציה",
         "rule": "מסומן כאשר קובץ הבדיקה המקושר החדש ביותר הוא מבוגר משמעותית יותר מקובץ מקור הפונקציה."
       },
       "stub_tested": {
-        "label": "מבחן בדיקות סטאב-טסט.",
+        "label": "נבדק באמצעות stub",
         "evidence": "assert דלים",
         "rule": "מסומנת כאשר מבחן מקושר קיים אך בקושי טוען משהו."
       },
       "suspicious_coverage": {
-        "label": "כיסוי חשוד של שידורים.",
-        "evidence": "{pct}% ללא בדיקת ניסוי.",
+        "label": "כיסוי חשוד",
+        "evidence": "{pct}% ללא בדיקה",
         "rule": "מסומן כאשר LCOV מדווח כיסוי גבוה אבל אין בדיקה מתייחסת הפונקציה."
       },
       "fresh_code": {
@@ -1977,11 +1977,11 @@
       }
     },
     "shortcuts": {
-      "focusFilter": "התמקד בסנן השורה של המסר.",
+      "focusFilter": "מקד את מסנן השורות",
       "clearFilter": "לנקות את מסנן השורה הממוקדת.",
-      "activateKpi": "הפעל את כרטיס KPI ממוקד.",
-      "activateKpiSpace": "הפעל את כרטיס KPI ממוקד.",
-      "showOverlay": "להראות את התוספת של קיצור דרך זה."
+      "activateKpi": "הפעל את כרטיס ה-KPI הממוקד",
+      "activateKpiSpace": "הפעל את כרטיס ה-KPI הממוקד",
+      "showOverlay": "הצג את שכבת קיצורי הדרך הזו"
     },
     "script": {
       "activeFiltersLabel": "מסננים פעילים:",
@@ -2066,7 +2066,7 @@
     },
     "shortcuts": {
       "jumpToTab": "מעבר ללשונית 1-2 (מפה, דוחות)",
-      "showOverlay": "להראות את התוספת של קיצור דרך זה."
+      "showOverlay": "הצג את שכבת קיצורי הדרך הזו"
     },
     "hero": {
       "files": "קבצים",
@@ -2080,7 +2080,7 @@
     "noKindBreakdown": "אין פירוט לפי סוג של היצוא הזה.",
     "title": "סילוק (ייצוא)",
     "readOnlyNote": "(רק לקריאה; פתח את הממצאים כדי לעיין ולפעול.)",
-    "openFindings": "פתח את דשבורד הממצאים הפתוחים."
+    "openFindings": "פתח את לוח המחוונים של הממצאים"
   },
   "configMirrors": {
     "noFileRisk": "אין פירוק סיכונים לפי תיק (אין הפרות בתחום).",
@@ -2092,18 +2092,18 @@
     "summaryFileRisk": "סיכון קבצים (קובצי עליון)"
   },
   "telemetry": {
-    "heroTitle": "כלל קשור טלמטריה.",
-    "skipToCounters": "קפצו למספרות הטלמטריה.",
+    "heroTitle": "טלמטריית כללים קשורים",
+    "skipToCounters": "דלג למוני הטלמטריה",
     "lastEvent": "האירוע האחרון {relative}",
-    "noEvents": "לא נרשמו אירועים.",
+    "noEvents": "לא נרשמו אירועים",
     "totalEventOne": "{count} אירוע סך הכל",
     "totalEventOther": "סך הכל {count} אירועים",
     "noCountersTitle": "אין מדדים כדי לאפס.",
     "resetTitle": "אפס את כל המונים",
     "refreshTitle": "טען מחדש את מוני הטלמטריה מהדיסק",
     "refresh": "מרענן ומקפיא",
-    "copyTitle": "העתק את התמונה כ-JSON.",
-    "copyJson": "העתק את JSON.",
+    "copyTitle": "העתק תמונת מצב כ-JSON",
+    "copyJson": "העתק JSON",
     "resetCounters": "אפס מונים",
     "countersAria": "מונים",
     "countersHeading": "מוני אירועים",
@@ -2111,7 +2111,7 @@
     "thCount": "ספור ספרה סופר",
     "emptyMessage": "עדיין לא תועדו אירועי טלמטריה - פתחו כלל מלוח המחוונים של הממצאים כדי להתחיל ללכוד מונים.",
     "openFindingsTitle": "פתח את לוח המחוונים של Saropa Findings.",
-    "openFindings": "פתח את דשבורד הממצאים הפתוחים.",
+    "openFindings": "פתח את לוח המחוונים של הממצאים",
     "lastPropsHeading": "תכונות האירוע האחרון של אירוע אחרון",
     "copiedJson": "Saropa Lints: ה-JSON של טלמטריית הכללים הקשורים הועתק.",
     "countersReset": "Saropa Lints: מוני הטלמטריה של הכללים הקשורים אופסו."
@@ -2123,7 +2123,7 @@
   "securityPosture": {
     "issueOne": "{count} בעיה",
     "issueOther": "{count} בעיות",
-    "noIssues": "אין בעיות, לא נושאים.",
+    "noIssues": "אין סוגיות",
     "showIssues": "הצג בעיות בעיתון Show issues",
     "violationTooltip": "{count} הפרות על פני {ruleCount} כללים. לחץ כדי להציג בבעיות.",
     "noViolationsTooltip": "אין הפרות ממפות לקטגוריה זו."
@@ -2142,7 +2142,7 @@
         "publisher": "מפרסם המו\"ל",
         "pubPoints": "פאב נקודות Pub נקודות",
         "githubStars": "GitHub כוכבים כוכבי",
-        "openIssues": "סוגיות פתוחות בנושא.",
+        "openIssues": "סוגיות פתוחות",
         "codeSize": "גודל קוד",
         "bloatRating": "דירוג Bloat בציון",
         "license": "רישיון רישוי",
@@ -2156,13 +2156,13 @@
         "no": "לא"
       },
       "badge": {
-        "inProject": "בפרויקט, בתוך הפרוייקט."
+        "inProject": "בפרויקט"
       }
     },
     "status": {
       "packagesSelected": "{count} חבילות נבחרים שנבחרו",
-      "packagesCompared": "{count} חבילות בהשוואה.",
-      "dimensionsRankedOne": "מימד {count} מדורג לפי דירוג.",
+      "packagesCompared": "{count} חבילות הושוו",
+      "dimensionsRankedOne": "{count} ממד מדורג",
       "dimensionsRankedOther": "{count} מידות מדורגות",
       "morePackages": "+{count} יותר"
     },
@@ -2179,7 +2179,7 @@
       "addingToProject": "הוספת {name} לפרויקט"
     },
     "shortcuts": {
-      "showOverlay": "להראות את התוספת של קיצור דרך זה.",
+      "showOverlay": "הצג את שכבת קיצורי הדרך הזו",
       "closeOverlay": "סגור את השכבה העליונה של קיצור הדרך במקלדת."
     },
     "kpi": {
@@ -2187,16 +2187,16 @@
       "leading": "מוביל המוביל",
       "leadingTitle": "החבילה המובילה לפי רוב המימדים מנצחת.",
       "dimensionWinsOne": "ממד {count} זיהוי",
-      "dimensionWinsOther": "מימד {count} מנצח.",
+      "dimensionWinsOther": "{count} ניצחונות בממדים",
       "packages": "חבילות שלחומרי הנסיעה",
       "packagesTitle": "מספר החבילות בהשוואה זו לזו.",
-      "inComparison": "בהשוואה, בהשווה.",
+      "inComparison": "בהשוואה",
       "dimensions": "מימדים ממדים",
       "dimensionsTitle": "מספר הממדים שבהם יכול להיות זוכה מדורג.",
-      "ranked": "מדורגת במעמד."
+      "ranked": "מדורגים"
     },
     "toolbar": {
-      "ariaLabel": "פעולות השוואה - פעולה בהשוואה.",
+      "ariaLabel": "פעולות השוואה",
       "packageDashboard": "לוח המחוונים של החבילות",
       "packageDashboardTitle": "פתח את לוח המחוונים של החבילה כדי להשוות בין חבילות נוספות."
     }
@@ -2356,10 +2356,10 @@
       "prs": "{count} בקשות משיכה",
       "activity90d": "90ד: {closed} נושאים סגורים, {merged} PRs מיזוג.",
       "lastCommit": "התחייבות אחרונה: {time}",
-      "archived": "מאגר הוא ארכיון.",
-      "pubPoints": "{points}/160 נקודות פאב.",
+      "archived": "המאגר הועבר לארכיון",
+      "pubPoints": "{points}/160 נקודות pub",
       "latestRelease": "שחרור אחרון: לפני {age}",
-      "dependents": "{count} תלויים בתלות."
+      "dependents": "{count} חבילות תלויות"
     },
     "dormancy": {
       "noActivity6mo": "אין התחייבות ואין שחרורים ב-6 חודשים ומעלה.",
@@ -2410,7 +2410,7 @@
   },
   "suite": {
     "fix": {
-      "explainRule": "הסביר את הכלל הזה."
+      "explainRule": "הסבר את הכלל הזה"
     },
     "enableRule": {
       "done": "כלל מופעל {ruleId}. ניתוח חוזר-הריצה ייעשה.",
@@ -2445,8 +2445,8 @@
       "copiedInfo": "המידע על {package} הועתק ללוח",
       "noPubspecOrLock": "לא נמצא pubspec.yaml/pubspec.lock במרחב העבודה.",
       "backfillComplete": "חבילת חיוניות: רטביה של החבילה מילוי אחורי חד פעמי של ההיסטוריה הושלם (הורכבו תמונות{count}).",
-      "runScanFirst": "ראשית, רץ סריקה.",
-      "noUpgradable": "לא נמצאו חבילות שניתן לשדרג.",
+      "runScanFirst": "הרץ תחילה סריקה",
+      "noUpgradable": "לא נמצאו חבילות שניתן לשדרג",
       "proceedUpgrades": "להמשיך עם שדרוג {count} ? צעדים כושלים חוזרים לאחור והתוכנית ממשיכה.",
       "actionExecute": "בצע",
       "actionCancel": "ביטול לבטל",
@@ -2454,14 +2454,14 @@
       "upgradeAllComplete": "כל השדרוגים של {count} הושלמו בהצלחה",
       "notPubspec": "הקובץ הנבחר אינו pubspec.yaml.",
       "suppressedPackage": "הערה \"{package}\" — תחזיות יוסתרו",
-      "noPackagesToSuppress": "אין חבילות כדי לדכא.",
+      "noPackagesToSuppress": "אין חבילות להשתקה",
       "suppressedCount": "חבילה {count} מדוכאת (s)",
       "noUnhealthyToSuppress": "אין חבילות לא בריאות כדי לדכא.",
       "suppressAllConfirm": "לדכא את כל החבילות הלא בריאות של {count}? זה יסתיר את כל האבחון.",
-      "noSuppressedPackages": "אין חבילות מודחקות.",
+      "noSuppressedPackages": "אין חבילות מושתקות",
       "unsuppressedCount": "חבילה בלתי-דחויה של {count} (s)",
       "noPubspecWorkspace": "לא נמצא pubspec.yaml במרחב העבודה.",
-      "depsAlreadySorted": "תלותיות שכבר מסודרות.",
+      "depsAlreadySorted": "התלויות כבר ממוינות",
       "depsSorted": "{detail} ב-{sections}",
       "noPubspec": "לא נמצא pubspec.yaml",
       "updatePrereleaseConfirm": "עדכון {package} לשחרור מראש של {version}? פריריס עשויים להכיל שינויים שבורים.",
@@ -2472,8 +2472,8 @@
       "ciOverwriteConfirm": "{path} כבר קיים. להחליף?",
       "actionOverwrite": "דרוס",
       "ciGenerated": "pipeline CI שנוצר: {path}",
-      "compareSelectCount": "בחר 2-3 חבילות להשוות.",
-      "compareMax": "מקסימום 3 חבילות לשם השוואה.",
+      "compareSelectCount": "בחר 2-3 חבילות להשוואה",
+      "compareMax": "3 חבילות לכל היותר להשוואה",
       "compareFetchFailed": "לא ניתן היה להוציא מספיק נתוני חבילה."
     },
     "main": {
@@ -2641,25 +2641,25 @@
       "needsPackageRow": "{actionLabel} זקוק לשורת חבילה ממדף החבילות (תרומת העורך).",
       "couldNotLocateConstraint": "לא ניתן היה למצוא את מגבלות הגרסה עבור {name}.",
       "deletedFromPubspec": "נמחק {name} מ-pubspec.yaml (גיבוי: {backupName})",
-      "runScanFirst": "ראשית, רץ סריקה.",
+      "runScanFirst": "הרץ תחילה סריקה",
       "couldNotFindPubspec": "לא ניתן למצוא pubspec.yaml.",
       "updatedPackage": "עדכון {name} ל- {constraint}",
       "failedToUpdate": "לא הצליח לעדכן {name}",
-      "selectPackagesToCompare": "בחר 2-3 חבילות להשוות.",
-      "maxPackagesToCompare": "מקסימום 3 חבילות לשם השוואה.",
+      "selectPackagesToCompare": "בחר 2-3 חבילות להשוואה",
+      "maxPackagesToCompare": "3 חבילות לכל היותר להשוואה",
       "couldNotFindLocalSource": "לא ניתן למצוא מקור מקומי ל {name}.",
-      "registryAuthAdded": "✓ הוספה אימות עבור {name}.",
+      "registryAuthAdded": "✓ נוסף אימות עבור {name}",
       "registryAddFailed": "התקנת ר egistry נכשלה: {message}",
-      "noConfiguredRegistries": "אין רישומים מוגדרים.",
-      "registryAuthRemoved": "✓ הסרה אימות עבור {name}.",
+      "noConfiguredRegistries": "אין מאגרים מוגדרים",
+      "registryAuthRemoved": "✓ הוסר האימות עבור {name}",
       "registryRemoveFailed": "התקנת רשם נכשלה: {message}",
-      "registryTokenUpdated": "✓ טוקן מעודכן.",
+      "registryTokenUpdated": "✓ האסימון עודכן",
       "registryTokenUpdateFailed": "התקנה של טוקן נכשלה: {message}",
       "actionRemove": "הסר",
       "removeAuthPrompt": "הסרת אימות עבור {name}?",
-      "annotateInProgress": "הערה: הוספת סימנים כבר מתבצעת.",
+      "annotateInProgress": "הוספת ההערות כבר מתבצעת",
       "noPubspecInWorkspace": "לא נמצא pubspec.yaml במרחב העבודה.",
-      "noDependenciesToAnnotate": "אין תלותיות לתשובה.",
+      "noDependenciesToAnnotate": "אין תלויות להוספת הערות",
       "failedToApplyAnnotations": "לא הצליח להחיל הערות ל pubspec.yaml.",
       "annotatedSummary": "ביאור {parts} ב-{basename}",
       "upgradeInProgress": "השדרוג כבר בתהליך.",
@@ -2708,11 +2708,11 @@
       "reportViewSuppressed": "דחק '{flag}' ב {file}. .",
       "reportViewCouldNotSuppress": "לא ניתן לשתתק '{flag}' ב-{file}: {error}",
       "actionRescan": "סרוק מחדש",
-      "bulkUpdateNoUpdates": "אין עדכונים זמינים.",
-      "bulkUpdateNoUpdatesFiltered": "אין עדכונים {filter} זמינים.",
+      "bulkUpdateNoUpdates": "אין עדכונים זמינים",
+      "bulkUpdateNoUpdatesFiltered": "אין עדכוני {filter} זמינים",
       "bulkUpdateFailed": "עדכון בULK נכשל: {error}",
       "bulkUpdateUpdatedOne": "עדכון חבילה {count}",
-      "bulkUpdateUpdatedOther": "עדכון {count} חבילות.",
+      "bulkUpdateUpdatedOther": "{count} חבילות עודכנו",
       "detailViewConstraintNotFound": "לא ניתן היה למצוא את מגבלות הגרסה עבור {package}.",
       "detailViewUpdated": "עדכון {package} ל- {version}"
     }

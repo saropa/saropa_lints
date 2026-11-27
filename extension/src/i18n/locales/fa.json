@@ -280,7 +280,7 @@
     "title": "سبک و نظرات",
     "intro": "قوانین سبک اظهار نظر، به طور پیش فرض خاموش است. فقط مواردی را روشن کنید که تیم شما با آن موافقت کرده باشد. انتخاب های متضاد با هم گروه بندی می شوند تا شما یکی را انتخاب کنید.",
     "searchPlaceholder": "قوانین سبک جستجو...",
-    "pickOne": "یکی را انتخاب کنید.",
+    "pickOne": "یکی را انتخاب کنید",
     "none": "هیچ کدام",
     "enableAll": "فعال‌سازی همه",
     "disableAll": "همه را غیرفعال کنید",
@@ -307,7 +307,7 @@
     "allPackages": "همه بسته‌ها",
     "allPackagesHint": "هر بسته ای که در دسترس است، از جمله آنهایی که در این پروژه شناسایی نشده اند. این امکان را به یک دسته می دهد تا قوانین خود را انتخاب کند.",
     "versionGroup": {
-      "tag": "یک نسخه را انتخاب کنید.",
+      "tag": "یک نسخه را انتخاب کنید",
       "tooltip": "این پکیج‌ها به نسخه‌های مختلف اصلی یک وابسته یکسان می‌پردازند. فقط یکی در هر زمان فعال است — فعال کردن یکی دیگری‌ها را غیرفعال می‌کند."
     },
     "domainDesc": {
@@ -462,7 +462,7 @@
     "shortcuts": {
       "jumpToTab": "به تب ۱-۷ (لایه، پکیج قوانین، جایگزینی، عرضه SDK، فایل پیکربندی، اتوماسیون، افزونه) بروید",
       "prevNextTab": "قبلی / بعدی تب",
-      "showOverlay": "این shortcut overlay را نشان دهید."
+      "showOverlay": "نمایش این راهنمای میان‌برها"
     }
   },
   "dashboards": {
@@ -628,18 +628,18 @@
       "overrideTitle": "Override Gap را نادیده بگیرید",
       "noDates": "نتوانست تاریخ نسخه برای این بسته را تعیین کند.",
       "noItems": "هیچ PR یا مشکلی بین این نسخه ها پیدا نشد.",
-      "prsMerged": "PRs ادغام شده اند.",
+      "prsMerged": "PRهای ادغام‌شده",
       "issuesClosed": "مسائل بسته‌شده",
-      "searchLabel": "جستجو PRs و مسائل را پیدا کنید.",
+      "searchLabel": "جستجوی PRها و مسائل",
       "searchPlaceholder": "جستجو در مورد روابط عمومی و مسائل...",
       "filterAria": "فیلتر بر اساس دسته بندی",
       "filterAll": "همه",
-      "filterUnreviewed": "بررسی نشده است.",
+      "filterUnreviewed": "بررسی‌نشده",
       "filterPrs": "درخواست‌های ادغام",
       "filterIssues": "مسائل",
       "typePr": "PR",
       "typeIssue": "مسئله",
-      "reviewReviewed": "بررسی شده است.",
+      "reviewReviewed": "بررسی‌شده",
       "reviewApplicable": "قابل اعمال",
       "reviewNotApplicable": "قابل اجرا نیست",
       "notesPlaceholder": "یادداشت ها...",
@@ -666,19 +666,19 @@
       "reportIssue": "گزارش موضوعی، مسئله ای"
     },
     "a11y": {
-      "skipToDetails": "به جزئیات بسته بندی بروید."
+      "skipToDetails": "رفتن به جزئیات بسته"
     },
     "shortcuts": {
-      "showOverlay": "این shortcut overlay را نشان دهید.",
+      "showOverlay": "نمایش این راهنمای میان‌برها",
       "closeOverlay": "پوشش کلیدواژه های میانبر صفحه کلید را ببندید."
     }
   },
   "toolbar": {
-    "runAnalysis": "تحلیل را اجرا کنید.",
+    "runAnalysis": "اجرای تحلیل",
     "copyJson": "کپی JSON را کپی کنید",
     "saveReport": "ذخیره گزارش",
-    "moreActions": "اقدامات بیشتری انجام شود.",
-    "clearAll": "همه چیز را پاک کنید."
+    "moreActions": "اقدامات بیشتر",
+    "clearAll": "پاک کردن همه"
   },
   "loading": {
     "runningAnalysis": "انجام تجزیه و تحلیل...",
@@ -705,7 +705,7 @@
       "coverage": "{pct}% ترجمه شده - بقیه نمایش ها به زبان انگلیسی است"
     },
     "reloadPrompt": "زبان را به {locale}. پنجره را بارگذاری کنید تا برچسب های نوار کناری و فرمان ها به روز شود.",
-    "reloadNow": "حالا بارگیری مجدد کنید.",
+    "reloadNow": "بارگذاری مجدد اکنون",
     "reloadLater": "بعداً"
   },
   "statusBar": {
@@ -1006,7 +1006,7 @@
   "findingsDash": {
     "pageTitle": "Saropa داشبورد یافته ها",
     "documentTitle": "Saropa داشبورد یافته ها",
-    "skipToFindings": "به یافته ها بروید.",
+    "skipToFindings": "رفتن به یافته‌ها",
     "secondaryAsideLabel": "تشخیص ثانویه: تشخیص ثانوی",
     "hero": {
       "gaugeTitle": "نمره سلامت {score} (درجه {grade}). اشتباهات سنگین ترین وزن را دارند.",
@@ -1058,7 +1058,7 @@
       "pack": "بسته بندی (pack)"
     },
     "seg": {
-      "toggleSeverityTitle": "{v} شدت را تغییر دهید."
+      "toggleSeverityTitle": "تغییر وضعیت شدت {v}"
     },
     "kpi": {
       "visibleLabel": "یافته های قابل مشاهده",
@@ -1099,7 +1099,7 @@
       "clearRecentTitle": "پاک کردن تمام فیلترهای اخیر",
       "clearRecentButton": "صاف شفاف روشن",
       "recentFiltersListAria": "فیلترهای اخیر:",
-      "runAnalysisTitle": "Saropa Lints تحلیل را اجرا کنید.",
+      "runAnalysisTitle": "اجرای تحلیل Saropa Lints",
       "severityGroupAria": "فیلتر شدت",
       "severityLabel": "شدت",
       "moreSummary": "بیشتر",
@@ -1138,9 +1138,9 @@
       "notRunYet": "یک محدوده بالا را انتخاب کنید، سپس اجرا کنید"
     },
     "chip": {
-      "contains": "حاوی \"{q}\" است.",
+      "contains": "شامل \"{q}\"",
       "severityOff": "شدت ≠ {v}",
-      "resetAllTitle": "همه فیلترها را از نو تنظیم کنید."
+      "resetAllTitle": "بازنشانی همه فیلترها"
     },
     "menuPalette": {
       "help": "راهنما",
@@ -1168,7 +1168,7 @@
       "menuGroupExport": "صادرات و فروش:",
       "menuGroupBulk": "عملیات جمعی",
       "menuGroupFilter": "فیلتر و فوکوس کنید",
-      "menuGroupOpen": "داشبورد را باز کنید.",
+      "menuGroupOpen": "باز کردن داشبورد",
       "menuGroupSystem": "سیستم"
     },
     "progress": {
@@ -1206,14 +1206,14 @@
       "collapseAll": "جمع کردن همه",
       "bulkSelected": "{count} انتخاب شده",
       "bulkCopy": "کپی کردن انتخاب شده به عنوان JSON",
-      "selectAllTitle": "تمام یافته های قابل مشاهده را انتخاب کنید.",
-      "selectAllAria": "تمام یافته های قابل مشاهده را انتخاب کنید.",
+      "selectAllTitle": "انتخاب همه یافته‌های قابل مشاهده",
+      "selectAllAria": "انتخاب همه یافته‌های قابل مشاهده",
       "colSeverity": "شدت",
       "colRule": "قانون",
       "colMessage": "پیام",
       "colLine": "خط",
       "colActionsAria": "اقدامات ردیف",
-      "selectRowAria": "این ردیف یافتن را انتخاب کنید.",
+      "selectRowAria": "انتخاب این ردیف یافته",
       "copyRowTitle": "این یافته را به عنوان JSON کپی کنید.",
       "suppressedBadge": "ممنوع شده",
       "suppressedByTitle": "مخفی از نظر نمایش معمولی شما توسط {kind} — فقط در اینجا قابل مشاهده است زیرا \"Include suppressed\" فعال است",
@@ -1222,7 +1222,7 @@
       "metaSourceCap": "منبع برای عملکرد در {max} محدود شده است",
       "metaGroupedBy": "گروه‌بندی‌شده بر اساس {mode}",
       "overflowNote": "لیست منابع در {max} برای عملکرد رندر کوتاه شده است.",
-      "runAgain": "دوباره آنالیز را اجرا کنید.",
+      "runAgain": "اجرای دوباره تحلیل",
       "emptyNoViolations": "هیچ نقض در آخرین تحلیل اجرا نشده است.",
       "emptyNoMatch": "هیچ نقض ای با فیلترهای فعلی مطابقت ندارد.",
       "emptyHintNoData": "تحلیل را اجرا کنید تا `reports/.saropa_lints/violations.json` پر شود، سپس به‌روزرسانی کنید.",
@@ -1235,7 +1235,7 @@
       "sectionAria": "نمودارهای ترکیب",
       "heading": "ترکیب",
       "metaClickSlice": "برای فیلتر کردن یک تراشه روی آن کلیک کنید.",
-      "severityMix": "ترکیبی از شدت و شدت.",
+      "severityMix": "ترکیب شدت‌ها",
       "filterBarTitle": "فیلتر فقط به {key}",
       "donutTotal": "مجموع"
     },
@@ -1267,7 +1267,7 @@
       "metaConnected": "متصل",
       "noIssues": "به {label} متصل شد - مشکل فعلی وجود ندارد.",
       "refresh": "تازه‌سازی",
-      "openBrowser": "در مرورگر باز شود.",
+      "openBrowser": "باز کردن در مرورگر",
       "headingIssues": "Drift Advisor",
       "disable": "غیرفعال کردن Drift Advisor"
     },
@@ -1314,7 +1314,7 @@
       "perFileRulesSample": "قوانین پرونده ای (نمونه)"
     },
     "script": {
-      "announceCleared": "تمام فیلترها پاک شده اند.",
+      "announceCleared": "همه فیلترها پاک شدند",
       "announceFiltersPrefix": "فیلترها: فیلترهای",
       "announceStarted": "تحلیل آغاز شد",
       "announceComplete": "تحلیل کامل شد",
@@ -1331,17 +1331,17 @@
       "refreshDisk": "Refresh از دیسک"
     },
     "shortcuts": {
-      "focusTextFilter": "تمرکز فیلتر متن را بر روی فیلتر متنی متمرکز کنید.",
+      "focusTextFilter": "تمرکز روی فیلتر متن",
       "clearTextFilter": "فیلتر متن متمرکز شده را پاک کنید.",
       "activateKpi": "کارت KPI متمرکز یا نوار نمودار را فعال کنید.",
       "activateKpiSpace": "کارت KPI متمرکز یا نوار نمودار را فعال کنید.",
-      "showOverlay": "این shortcut overlay را نشان دهید."
+      "showOverlay": "نمایش این راهنمای میان‌برها"
     },
     "unknownAnalyzerKind": "ناشناخته",
     "supplementary": {
-      "scannerPromo": "اسکنر TODO/HACK را فعال کنید.",
+      "scannerPromo": "فعال کردن اسکنر TODO/HACK",
       "tooltipScanner": "اسکنر سیستم فایل Saropa - نشانگرهای باز TODO/HACK را در منبع می شمارد.",
-      "tooltipPromoClickToOn": "برای فعال کردن آن کلیک کنید."
+      "tooltipPromoClickToOn": "برای فعال کردن کلیک کنید"
     }
   },
   "ruleExplain": {
@@ -1361,7 +1361,7 @@
     }
   },
   "triageDash": {
-    "showInIssues": "در مسائل نشان دهید.",
+    "showInIssues": "نمایش در مسائل",
     "disableRules": "غیرفعال کردن قوانین",
     "enableRules": "فعال کردن قوانین",
     "issues": "مسائل",
@@ -1479,7 +1479,7 @@
       "abandonedTitle": "رها شده",
       "eolTitle": "پایان زندگی:",
       "updates": "به‌روزرسانی‌ها",
-      "unused": "استفاده نشده است.",
+      "unused": "استفاده‌نشده",
       "singleUse": "تک‌مصرف",
       "vulnerable": "آسیب‌پذیر",
       "overrides": "بازنویسی‌ها",
@@ -1515,12 +1515,12 @@
       "packages": "بسته‌ها"
     },
     "toolbar": {
-      "openPubspecTitle": "pubspec.yaml را باز کنید.",
+      "openPubspecTitle": "باز کردن pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "کپی گزارش JSON (همه ردیف ها + جزئیات)",
       "copyAllLabel": "کپی",
       "copyOpportunitiesTitle": "درخواست های ارتقاء هوش مصنوعی را برای بسته های زیر پذیرفته شده بالا به یک پیست کپی کنید.",
-      "copyOpportunitiesLabel": "فرصت های کپی برای هوش مصنوعی را کپی کنید.",
+      "copyOpportunitiesLabel": "کپی فرصت‌ها برای هوش مصنوعی",
       "saveAllTitle": "ذخیره گزارش JSON به گزارش ها/سالسالMMDD/...",
       "saveAllLabel": "ذخیره",
       "saveUpgradeTitle": "ذخیره گزارشی که فقط شامل بسته‌های دارای به‌روزرسانی است در reports/YYYYMMDD/...",
@@ -1557,7 +1557,7 @@
       "devToggleTitle": "وابستگی های dev را در جدول و مجموع ها شامل شوید.",
       "includeDev": "شامل dev",
       "activeFiltersLabel": "فیلترهای فعال: فیلتر های فعال",
-      "clearAllFilters": "همه چیز را پاک کنید."
+      "clearAllFilters": "پاک کردن همه"
     },
     "columns": {
       "name": {
@@ -1638,7 +1638,7 @@
       }
     },
     "cells": {
-      "noGithub": "هیچ مخزن GitHub پیدا نشد.",
+      "noGithub": "هیچ مخزن GitHub پیدا نشد",
       "devBadge": "توسعه",
       "transitiveBadge": "غیرمستقیم",
       "opportunitiesTooltip": "ویژگی های استفاده نشده: {features}",
@@ -1652,12 +1652,12 @@
       "sizeUnavailable": "اندازه در دسترس نیست از pub.dev",
       "noVulnerabilities": "آسیب‌پذیری شناخته‌شده‌ای نیست",
       "licenseUnspecified": "مجوز مشخص نشده در pub.dev",
-      "unusedBadge": "استفاده نشده است.",
+      "unusedBadge": "استفاده‌نشده",
       "packageInUse": "بسته در حال استفاده است"
     },
     "row": {
-      "expandDetails": "جزئیات را گسترش دهید.",
-      "copyRowJson": "ردیف را به عنوان JSON کپی کنید."
+      "expandDetails": "گسترش جزئیات",
+      "copyRowJson": "کپی ردیف به‌صورت JSON"
     },
     "shortcuts": {
       "focusSearch": "تمرکز بر روی میدان جستجو",
@@ -1666,7 +1666,7 @@
       "toggleDetail": "در این حالت، اکسپاندر جزئیات بسته برجسته شده را تغییر دهید.",
       "escapeSearch": "جستجوی متمرکز را پاک کنید؛ در دوم Esc تمام ردیف های گسترش یافته را فرو می ریزد.",
       "historyBack": "به مرور تاریخچه ی ناوبری بسته ها برگردید.",
-      "showOverlay": "این shortcut overlay را نشان دهید.",
+      "showOverlay": "نمایش این راهنمای میان‌برها",
       "jumpToTab": "به تب ۱-۶ (نظربه کلی، به‌روزرسانی‌ها، گزارش کامل، مشکلات شناخته شده، مقایسه، تنظیمات) بروید"
     },
     "versionTooltip": {
@@ -1691,7 +1691,7 @@
       "onDisk": "در دیسک: {size}",
       "withUniqueTransitives": "با ترانزیتیو های منحصر به فرد: {size}",
       "withSharedTransitives": "با ترانزیتیو های مشترک: {size}",
-      "openFolder": "پوشه ی بسته های محلی را باز کنید."
+      "openFolder": "باز کردن پوشه بسته محلی"
     },
     "references": {
       "noImports": "هیچ فایل منبع وارداتی شناسایی نشده است.",
@@ -1701,13 +1701,13 @@
       "openFileReferences": "باز کردن مرجع فایل های باز"
     },
     "deps": {
-      "noTransitives": "بدون وابستگی های انتقالی.",
-      "showTransitives": "وابستگی های انتقالی را نشان دهید.",
+      "noTransitives": "بدون وابستگی انتقالی",
+      "showTransitives": "نمایش وابستگی‌های انتقالی",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (مشترک)",
       "tooltipHeader": "{total} deps انتقالی",
       "tooltipHeaderShared": "عمق انتقالی {total} ({shared} مشترک)",
-      "sharedBadgeTitle": "{count} با سایر بسته ها به اشتراک گذاشته شده است."
+      "sharedBadgeTitle": "{count} مشترک با بسته‌های دیگر"
     },
     "dormancy": {
       "noActivity6mo": "هیچ تعهد و انتشار در 6 ماه گذشته وجود نداشته است.",
@@ -1725,9 +1725,9 @@
       "dormancySignal": "نشانه رکود",
       "ago": "{age} پیش از این",
       "qualityExample": "+مثال",
-      "qualityExampleTitle": "یک نسخه ی نمایشی قابل اجرا را با ما همراه می کند.",
+      "qualityExampleTitle": "دارای نسخه نمایشی قابل اجرا",
       "qualityTests": "+تست های آزمایشی",
-      "qualityTestsTitle": "یک مجموعه تست را به همراه دارد.",
+      "qualityTestsTitle": "دارای مجموعه تست",
       "qualityTools": "+ابزار",
       "qualityToolsTitle": "ابزار نگهداری کشتی ها",
       "qualityDocs": "+docs",
@@ -1753,7 +1753,7 @@
       "placeholder": "عنوان جستجو، توصیف یا ID فرمان...",
       "ariaLabel": "دستورات جستجو فرمان های جستجو",
       "clearAria": "پاک کردن جستجو",
-      "hintLine1": "با هر فرماندهی مطابقت دارد.",
+      "hintLine1": "مطابقت با بخش‌های هر فرمان",
       "hintStrongTitle": "عنوان",
       "hintStrongDesc": "توضیحات: توصیف مشخصات",
       "hintStrongId": "شناسه",
@@ -1774,7 +1774,7 @@
     "filterChips": {
       "ariaRegion": "فیلترهای فعال: فیلتر های فعال",
       "activeLabel": "فیلترهای فعال: فیلتر های فعال",
-      "clearAll": "همه چیز را پاک کنید."
+      "clearAll": "پاک کردن همه"
     },
     "bands": {
       "frequentTitle": "اغلب مکرر متداول",
@@ -1791,16 +1791,16 @@
       "internalBadgeTitle": "فقط از منوهای زمینه ای فعال می شود.",
       "internalBadge": "منوی منو Menu",
       "copyTitle": "کپی از id فرمان ({id})",
-      "copyAria": "کپی ID فرمان را کپی کنید."
+      "copyAria": "کپی شناسه فرمان"
     },
-    "categoryJumpTitle": "به {category} بروید.",
+    "categoryJumpTitle": "رفتن به {category}",
     "shortcuts": {
       "focusSearch": "تمرکز بر روی میدان جستجو",
-      "navRows": "حرکت در ردیف های فرمان قابل مشاهده را هدایت کنید.",
+      "navRows": "پیمایش ردیف‌های فرمان قابل مشاهده",
       "homeEnd": "به اولین یا آخرین ردیف قابل مشاهده بروید.",
       "enterRun": "اجرای دستور دارای فوکوس",
       "escClear": "فیلترهای جستجو و تنظیم مجدد را پاک کنید.",
-      "showOverlay": "این shortcut overlay را نشان دهید."
+      "showOverlay": "نمایش این راهنمای میان‌برها"
     },
     "script": {
       "moreSuffix": "+{count} بیشتر",
@@ -1819,7 +1819,7 @@
   },
   "codeHealth": {
     "documentTitle": "Saropa کد Health Dashboard صفحه کنترل سلامت",
-    "skipToTable": "به توابع جدول بروید.",
+    "skipToTable": "رفتن به جدول توابع",
     "openWorkspaceFirst": "ابتدا یک فضای کاری Dart/Flutter را باز کنید.",
     "scan": {
       "title": "در حال اسکن سلامت پروژه",
@@ -1874,7 +1874,7 @@
       "generated": "تولید شده",
       "functionOne": "{count} تابع",
       "functionOther": "{count} تابع",
-      "avgFormat": "avg {score} ({grade}) است.",
+      "avgFormat": "میانگین {score} ({grade})",
       "gatesFailing": "دروازه ها شکست خورده اند",
       "gatesPassing": "دروازه های عبور از گذرگاه"
     },
@@ -1890,16 +1890,16 @@
       "allClear": "هیچ توابع پرچم‌گذاری شده در هیچ دسته‌ای وجود ندارد - همه واضح است.",
       "clickToFilter": "برای فیلتر کردن جدول به سمت توابع با پرچم {flag} کلیک کنید.",
       "noFlagged": "هیچ عملکردی با پرچم {flag}.",
-      "unused": "استفاده نشده است.",
+      "unused": "استفاده‌نشده",
       "unusedSub": "توابعی که هیچ‌جا ارجاع نشده‌اند",
       "uncovered": "پوشش‌داده‌نشده",
-      "uncoveredSub": "هیچ پوشش LCOV وجود ندارد.",
+      "uncoveredSub": "بدون پوشش LCOV",
       "stubTested": "آزمون صوری",
       "stubTestedSub": "آزمایشات وجود دارد اما ادعا کمی را تایید می کند.",
       "suspiciousCoverage": "پوشش مشکوک: پوشش مشکوکی",
-      "suspiciousCoverageSub": "پوشش ظاهراً ساختگی است.",
+      "suspiciousCoverageSub": "پوشش ساختگی به نظر می‌رسد",
       "testDrift": "عقب‌ماندگی آزمون‌ها",
-      "testDriftSub": "تست ها عملکرد تابع را عقب می اندازند."
+      "testDriftSub": "تست‌ها از تابع عقب‌ترند"
     },
     "toolbar": {
       "ariaLabel": "کد اقدامات بهداشتی:",
@@ -1952,12 +1952,12 @@
       },
       "undocumented": {
         "label": "بدون مستندات",
-        "evidence": "CC {cc}، بدون هیچ مدرکی.",
+        "evidence": "CC {cc}، بدون مستندات",
         "rule": "پرچم گذاری زمانی که یک تابع پیچیده (CC > 10) هیچ کامنت doc ندارد."
       },
       "test_drift": {
         "label": "تست drift در آزمون Drift",
-        "evidence": "تست ها عملکرد تابع را عقب می اندازند.",
+        "evidence": "تست‌ها از تابع عقب‌ترند",
         "rule": "پرچم گذاری زمانی که جدیدترین فایل تست مرتبط به طور معنی داری قدیمی تر از پرونده منبع تابع است."
       },
       "stub_tested": {
@@ -1977,15 +1977,15 @@
       }
     },
     "shortcuts": {
-      "focusFilter": "روی فیلتر ردیف تمرکز کنید.",
+      "focusFilter": "تمرکز روی فیلتر ردیف",
       "clearFilter": "فیلتر ردیف متمرکز را پاک کنید.",
       "activateKpi": "کارت KPI متمرکز را فعال کنید",
       "activateKpiSpace": "کارت KPI متمرکز را فعال کنید",
-      "showOverlay": "این shortcut overlay را نشان دهید."
+      "showOverlay": "نمایش این راهنمای میان‌برها"
     },
     "script": {
       "activeFiltersLabel": "فیلترهای فعال: فیلتر های فعال",
-      "clearAll": "همه چیز را پاک کنید.",
+      "clearAll": "پاک کردن همه",
       "neverRun": "هرگز اجرا نشده"
     },
     "freshness": {
@@ -2066,7 +2066,7 @@
     },
     "shortcuts": {
       "jumpToTab": "به تب ۱-۲ (نقشه، گزارش) بروید",
-      "showOverlay": "این shortcut overlay را نشان دهید."
+      "showOverlay": "نمایش این راهنمای میان‌برها"
     },
     "hero": {
       "files": "فایل‌ها",
@@ -2093,16 +2093,16 @@
   },
   "telemetry": {
     "heroTitle": "قانون مرتبط: تله متری",
-    "skipToCounters": "به شمارنده های تله متری بروید.",
+    "skipToCounters": "رفتن به شمارنده‌های تله‌متری",
     "lastEvent": "آخرین رویداد {relative}",
-    "noEvents": "هیچ رویدادی ثبت نشده است.",
+    "noEvents": "هیچ رویدادی ثبت نشده است",
     "totalEventOne": "{count} رویداد کل",
     "totalEventOther": "{count} رویداد کل",
     "noCountersTitle": "هیچ شمارنده ای برای تنظیم مجدد وجود ندارد.",
     "resetTitle": "بازنشانی همه شمارنده‌ها",
     "refreshTitle": "شمارنده های تله متری را از دیسک بارگیری مجدد کنید.",
     "refresh": "تازه‌سازی",
-    "copyTitle": "اسنپ شات را به عنوان JSON کپی کنید.",
+    "copyTitle": "کپی اسنپ‌شات به‌صورت JSON",
     "copyJson": "کپی JSON را کپی کنید",
     "resetCounters": "بازنشانی شمارنده‌ها",
     "countersAria": "- شمارنده ها:",
@@ -2174,12 +2174,12 @@
       "openDashboardTitle": "صفحه کنترل بسته Saropa را باز کنید."
     },
     "a11y": {
-      "skipToTable": "به جدول مقایسه ای بروید.",
+      "skipToTable": "رفتن به جدول مقایسه",
       "recommendation": "توصیه سفارش توصیه",
       "addingToProject": "اضافه کردن {name} به پروژه"
     },
     "shortcuts": {
-      "showOverlay": "این shortcut overlay را نشان دهید.",
+      "showOverlay": "نمایش این راهنمای میان‌برها",
       "closeOverlay": "پوشش کلیدواژه های میانبر صفحه کلید را ببندید."
     },
     "kpi": {
@@ -2190,7 +2190,7 @@
       "dimensionWinsOther": "بعد {count} برنده است",
       "packages": "بسته‌ها",
       "packagesTitle": "تعداد بسته ها در مقایسه با هم.",
-      "inComparison": "در مقایسه با آن.",
+      "inComparison": "در مقایسه",
       "dimensions": "ابعاد",
       "dimensionsTitle": "تعداد ابعاد که در آن یک برنده می تواند رتبه بندی شود.",
       "ranked": "رتبه‌بندی‌شده"
@@ -2356,7 +2356,7 @@
       "prs": "{count} روابط عمومی",
       "activity90d": "90d: مسائل {closed} بسته شده، روابط عمومی {merged} ادغام شده است.",
       "lastCommit": "آخرین کامیت: {time}",
-      "archived": "مخزن بایگانی شده است.",
+      "archived": "مخزن بایگانی شده است",
       "pubPoints": "{points}/160 پب نقاط",
       "latestRelease": "آخرین نسخه: {age} پیش از این",
       "dependents": "{count} وابستگان وابسته"
@@ -2410,11 +2410,11 @@
   },
   "suite": {
     "fix": {
-      "explainRule": "این قانون را توضیح دهید."
+      "explainRule": "توضیح این قانون"
     },
     "enableRule": {
       "done": "قاعده {ruleId}. فعال شده استفاده از تجزیه و تحلیل Re-run برای اعمال.",
-      "runAnalysis": "تحلیل را اجرا کنید.",
+      "runAnalysis": "اجرای تحلیل",
       "noWorkspace": "یک پوشه فضای کاری را برای فعال کردن یک قاعده باز کنید."
     },
     "openFinding": {
@@ -2442,11 +2442,11 @@
   "notify": {
     "activation": {
       "cacheCleared": "Vibrancy cache پاک شد",
-      "copiedInfo": "اطلاعات {package} را به کلیپ بورد کپی کرده ام.",
+      "copiedInfo": "اطلاعات {package} در کلیپ‌بورد کپی شد",
       "noPubspecOrLock": "هیچ pubspec.yaml/pubspec.lock در فضای کاری پیدا نشده است.",
       "backfillComplete": "بسته بندی: پر جنب و جوش بودن یک بار تاریخچه backfill کامل ({count} عکس های فوری وارد شده است).",
-      "runScanFirst": "ابتدا اسکن را اجرا کنید.",
-      "noUpgradable": "هیچ بسته ای قابل ارتقاء پیدا نشد.",
+      "runScanFirst": "ابتدا اسکن را اجرا کنید",
+      "noUpgradable": "هیچ بسته قابل ارتقایی پیدا نشد",
       "proceedUpgrades": "با {count} ارتقاء ادامه دهید؟ گام های شکست خورده به عقب برمی گردند و برنامه ادامه می یابد.",
       "actionExecute": "اجرا",
       "actionCancel": "لغو",
@@ -2454,25 +2454,25 @@
       "upgradeAllComplete": "تمام ارتقاء های {count} با موفقیت به پایان رسید.",
       "notPubspec": "فایل انتخاب شده یک pubspec.yaml نیست.",
       "suppressedPackage": "ممنوع شده \"{package}\" — تشخیصات مخفی خواهند شد",
-      "noPackagesToSuppress": "هیچ بسته ای برای سرکوب کردن وجود ندارد.",
+      "noPackagesToSuppress": "هیچ بسته‌ای برای سرکوب وجود ندارد",
       "suppressedCount": "بسته های {count} سرکوب شده (s)",
       "noUnhealthyToSuppress": "هیچ بسته بندی ناسالم برای سرکوب کردن وجود ندارد.",
       "suppressAllConfirm": "تمام بسته های ناسالم {count} را سرکوب کنید؟ این همه تشخیص ها را پنهان می کند.",
-      "noSuppressedPackages": "هیچ بسته ای که سرکوب شده باشد.",
+      "noSuppressedPackages": "هیچ بسته سرکوب‌شده‌ای وجود ندارد",
       "unsuppressedCount": "بسته های غیر سرکوب شده {count} (s)",
       "noPubspecWorkspace": "هیچ pubspec.yaml در فضای کاری پیدا نشده است.",
-      "depsAlreadySorted": "وابستگی هایی که قبلاً مرتب شده اند.",
+      "depsAlreadySorted": "وابستگی‌ها از قبل مرتب شده‌اند",
       "depsSorted": "{detail} در {sections}",
-      "noPubspec": "هیچ pubspec.yaml پیدا نشد.",
+      "noPubspec": "هیچ pubspec.yaml پیدا نشد",
       "updatePrereleaseConfirm": "به روزرسانی {package} برای انتشار پیش از نسخه {version}؟ نسخه های پیش از انتشار ممکن است شامل تغییرات شکستن باشند.",
       "packageNotFound": "بسته {package} در pubspec.yaml یافت نشد",
-      "updatedTo": "{package} به {version} بروزرسانی شد.",
+      "updatedTo": "{package} به {version} بروزرسانی شد",
       "ciRunScanFirst": "ابتدا یک اسکن را اجرا کنید تا CI config با آستانه های مناسب ایجاد شود.",
       "noWorkspace": "بدون پوشه فضای کاری باز است",
       "ciOverwriteConfirm": "{path} قبلا وجود دارد. بر روی نوشته ها؟",
       "actionOverwrite": "بازنویسی",
       "ciGenerated": "خط لوله CI تولید شده: {path}",
-      "compareSelectCount": "برای مقایسه دو یا سه بسته انتخاب کنید.",
+      "compareSelectCount": "برای مقایسه دو یا سه بسته انتخاب کنید",
       "compareMax": "حداکثر 3 بسته برای مقایسه",
       "compareFetchFailed": "نتوانست داده های بسته ای کافی را دریافت کند."
     },
@@ -2634,24 +2634,24 @@
       "couldNotOpenFileRef": "مرجع فایل باز نشد: {filePath}",
       "savedReportJson": "گزارش ذخیره شده JSON: {path}",
       "couldNotSaveReportJson": "نتوانست JSON گزارش را ذخیره کند.",
-      "noPubspecFound": "هیچ pubspec.yaml پیدا نشد.",
+      "noPubspecFound": "هیچ pubspec.yaml پیدا نشد",
       "noDependenciesSection": "نتوانست وابستگی های بخش را پیدا کند.",
       "addedToPubspec": "اضافه شده {name}: {constraint} به pubspec.yaml",
       "failedToAddToPubspec": "نتوانست {name} را به pubspec.yaml اضافه کند.",
       "needsPackageRow": "{actionLabel} به یک ردیف بسته از داشبورد بسته (برگه ویرایشگر) نیاز دارد.",
       "couldNotLocateConstraint": "نتوانست محدودیت نسخه را برای {name} پیدا کند.",
       "deletedFromPubspec": "{name} از pubspec.yaml حذف شد (پس گیری: پشتیبان) {backupName}) را در اختیار دارد.",
-      "runScanFirst": "ابتدا اسکن را اجرا کنید.",
+      "runScanFirst": "ابتدا اسکن را اجرا کنید",
       "couldNotFindPubspec": "نتوانست pubspec.yaml را پیدا کند.",
-      "updatedPackage": "{name} به {constraint} بروزرسانی شد.",
-      "failedToUpdate": "نتوانسته است {name} را به روزرسانی کند.",
-      "selectPackagesToCompare": "برای مقایسه دو یا سه بسته انتخاب کنید.",
+      "updatedPackage": "{name} به {constraint} بروزرسانی شد",
+      "failedToUpdate": "به‌روزرسانی {name} ناموفق بود",
+      "selectPackagesToCompare": "برای مقایسه دو یا سه بسته انتخاب کنید",
       "maxPackagesToCompare": "حداکثر 3 بسته برای مقایسه",
       "couldNotFindLocalSource": "نتوانست منبع محلی برای {name} را پیدا کند.",
       "registryAuthAdded": "✓ اضافه شدن احراز هویت برای {name}",
       "registryAddFailed": "رجیستری اضافه نشد: {message}",
-      "noConfiguredRegistries": "هیچ رجیستری پیکربندی نشده است.",
-      "registryAuthRemoved": "✓ احراز هویت برای {name} حذف شد.",
+      "noConfiguredRegistries": "هیچ رجیستری پیکربندی نشده است",
+      "registryAuthRemoved": "✓ احراز هویت برای {name} حذف شد",
       "registryRemoveFailed": "رجیستری حذف نشد: {message}",
       "registryTokenUpdated": "✓ توکن به روز شده است",
       "registryTokenUpdateFailed": "رمز به‌روزرسانی نشد: {message}",
@@ -2659,7 +2659,7 @@
       "removeAuthPrompt": "حذف احراز هویت برای {name}؟",
       "annotateInProgress": "حاشیه‌نویسی از قبل در حال انجام است",
       "noPubspecInWorkspace": "هیچ pubspec.yaml در فضای کاری پیدا نشده است.",
-      "noDependenciesToAnnotate": "هیچ وابستگی ای برای یادداشت برداری وجود ندارد.",
+      "noDependenciesToAnnotate": "هیچ وابستگی‌ای برای حاشیه‌نویسی وجود ندارد",
       "failedToApplyAnnotations": "نتوانسته است که تدوینات را به pubspec.yaml اعمال کند.",
       "annotatedSummary": "{parts} با اشاره در {basename}",
       "upgradeInProgress": "یک ارتقاء در حال حاضر در جریان است.",
@@ -2709,12 +2709,12 @@
       "reportViewCouldNotSuppress": "نمیتوانم '{flag}' را در {file} سکانس کنم: {error}",
       "actionRescan": "اسکن مجدد Rescan",
       "bulkUpdateNoUpdates": "هیچ به روزرسانی در دسترس نیست",
-      "bulkUpdateNoUpdatesFiltered": "هیچ {filter} به روزرسانی در دسترس نیست.",
+      "bulkUpdateNoUpdatesFiltered": "هیچ به‌روزرسانی {filter} در دسترس نیست",
       "bulkUpdateFailed": "به روز رسانی انبوه ناموفق بود: {error}",
       "bulkUpdateUpdatedOne": "بسته {count} به روز شده",
       "bulkUpdateUpdatedOther": "{count} بسته به‌روز شد",
       "detailViewConstraintNotFound": "نتوانست محدودیت نسخه را برای {package} پیدا کند.",
-      "detailViewUpdated": "{package} به {version} بروزرسانی شد."
+      "detailViewUpdated": "{package} به {version} بروزرسانی شد"
     }
   },
   "analysisOptimizer": {
@@ -2924,7 +2924,7 @@
   },
   "sidebar": {
     "actions": {
-      "runAnalysisLabel": "تحلیل را اجرا کنید.",
+      "runAnalysisLabel": "اجرای تحلیل",
       "runAnalysisDescription": "تحلیل کننده را مجدد اجرا کنید",
       "latestEngineLabel": "اسکن با آخرین موتور",
       "latestEngineDescription": "این پروژه Dart SDK خودش به اندازه کافی قدیمی است تحلیل زنده انجام نمی‌شود",

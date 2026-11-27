@@ -263,8 +263,8 @@
       "usagesOne": "Penggunaan {count}",
       "usagesUnknown": "penggunaan tidak dapat diukur",
       "apiHeading": "{symbol} ({count})",
-      "viewCode": "Lihat kode tampilan.",
-      "viewDocs": "Lihat dokumen.",
+      "viewCode": "Lihat kode",
+      "viewDocs": "Lihat dokumen",
       "noUsages": "Tidak ditemukan penggunaan dalam sumber proyek.",
       "moreUsages": "{count} lebih banyak penggunaan",
       "moreUsagesOne": "{count} lebih banyak penggunaan"
@@ -280,7 +280,7 @@
     "title": "Gaya & opini",
     "intro": "Opiniated style rules, off secara default. Hanya mengaktifkan apa yang disetujui tim Anda. Pilihan yang bertentangan dikelompokkan sehingga Anda memilih satu.",
     "searchPlaceholder": "Cari aturan gaya…",
-    "pickOne": "Pilih salah satu dari mereka.",
+    "pickOne": "Pilih satu",
     "none": "Tidak ada",
     "enableAll": "Aktifkan semua",
     "disableAll": "Menonaktifkan semua",
@@ -301,13 +301,13 @@
     }
   },
   "packs": {
-    "forYourProject": "Untuk proyek Anda.",
+    "forYourProject": "Untuk proyek Anda",
     "forYourProjectHint": "Paket yang ketergantungan atau SDK-nya cocok dengan spesifikasi pub Anda. Aturan ini berlaku untuk kode yang Anda kirimkan.",
     "noneDetected": "Belum ada paket yang cocok dengan ketergantungan Anda. Tambahkan paket yang didukung, atau buka Semua paket di bawah ini.",
-    "allPackages": "Semua paket yang dikirimkan.",
+    "allPackages": "Semua paket",
     "allPackagesHint": "Setiap paket yang tersedia, termasuk yang tidak terdeteksi dalam proyek ini. Membuat sebuah kelompok untuk memilih aturan-aturannya.",
     "versionGroup": {
-      "tag": "Pilih satu versi.",
+      "tag": "Pilih satu versi",
       "tooltip": "Paket-paket ini menargetkan versi utama yang berbeda dari dependensi yang sama. Hanya satu yang berlaku sekaligus — mengaktifkan satu akan menonaktifkan yang lain."
     },
     "domainDesc": {
@@ -338,7 +338,7 @@
     "tab": {
       "tier": "Tingkat",
       "packs": "Paket aturan",
-      "overrides": "Overrides mengabaikan.",
+      "overrides": "Override",
       "sdk": "Peluncuran SDK",
       "configFile": "File konfigurasi",
       "automation": "Otomatisasi",
@@ -462,7 +462,7 @@
     "shortcuts": {
       "jumpToTab": "Lompat ke tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
       "prevNextTab": "Tab sebelumnya / tab berikutnya",
-      "showOverlay": "Tampilkan overlay shortcut ini."
+      "showOverlay": "Tampilkan overlay pintasan ini"
     }
   },
   "dashboards": {
@@ -492,19 +492,19 @@
     "reviewFailed": "Tidak dapat membuka tinjauan paket aturan Saropa Lints. {error}"
   },
   "opportunities": {
-    "documentTitle": "Upgrade Peluang untuk meningkatkan kemampuan.",
-    "heroTitle": "Upgrade Peluang untuk meningkatkan kemampuan.",
+    "documentTitle": "Peluang Upgrade",
+    "heroTitle": "Peluang Upgrade",
     "subtitle": "Paket {count} memiliki fitur yang belum digunakan oleh proyek Anda.",
     "noScan": "Jalankan pemindaian paket terlebih dahulu untuk menemukan peluang upgrade.",
     "openFileFailed": "Tidak dapat membuka {file} — mungkin telah berpindah sejak pemindaian terakhir.",
     "card": {
-      "versionUpgrade": "update yang tersedia untuk {latest}.",
-      "versionCurrent": "tentang hal terbaru.",
+      "versionUpgrade": "pembaruan tersedia ke {latest}",
+      "versionCurrent": "di versi terbaru",
       "featuresTitle": "Fitur yang belum digunakan",
       "locationsTitle": "Dimana proyek Anda menggunakan paket ini.",
       "noLocations": "Tidak diimpor dalam sumber proyek — kemungkinan besar merupakan dependensi dev atau transitive.",
-      "moreFiles": "dan {count} lebih banyak file.",
-      "openInDashboard": "Buka di Dashboard Paket.",
+      "moreFiles": "dan {count} file lainnya",
+      "openInDashboard": "Buka di Dasbor Paket",
       "writeReport": "Tulis Laporan"
     },
     "actions": {
@@ -516,7 +516,7 @@
       "failed": "Gagal menulis laporan peluang: {error}"
     },
     "empty": {
-      "title": "Tidak ada yang harus diadopsi.",
+      "title": "Tidak ada yang perlu diadopsi",
       "body": "Setiap fitur paket yang dipindai sudah digunakan dalam proyek Anda, atau tidak ada kesempatan changelog ditemukan."
     }
   },
@@ -525,7 +525,7 @@
       "version": "VERSI",
       "changelog": "LOG PERUBAHAN",
       "community": "KOMUNITAS",
-      "dependencies": "Dependensi adalah ketergantungan.",
+      "dependencies": "DEPENDENSI",
       "alerts": "PERINGATAN",
       "platforms": "PLATFORM",
       "suggestions": "SARAN",
@@ -538,11 +538,11 @@
       "published": "Diterbitkan {date}"
     },
     "partialBanner": {
-      "partReadme": "README dan logo.",
+      "partReadme": "README dan logo",
       "partGap": "PR dan masalah versi-gap.",
       "partReverseDeps": "jumlah dependensi terbalik",
       "listTwo": "{first} dan {second}",
-      "listMany": "{head}, dan {last}.",
+      "listMany": "{head}, dan {last}",
       "message": "Beberapa bagian tidak bisa dimuat: {list}.",
       "retry": "Coba lagi",
       "retrying": "Mencoba lagi…",
@@ -554,17 +554,17 @@
     "version": {
       "constraint": "Batasan",
       "latest": "Terbaru",
-      "prerelease": "Prerelease pra-penerbitan.",
+      "prerelease": "Prarilis",
       "published": "Diterbitkan",
       "update": "Memperbarui",
       "blockedBy": "Diblokir oleh:",
       "blockedVia": "{blocker} caps {dep} {constraint} ({resolvable} dapat diselesaikan, {latest} terbaru)",
       "blockedViaSdk": "disematkan oleh {blocker} (Flutter SDK) untuk {dep} ({resolvable} dapat diselesaikan, {latest} terbaru)",
-      "constrained": "Terbatas, terikat.",
+      "constrained": "Dibatasi",
       "constrainedBy": "Kendala Anda {constraint} membatasi ini ({resolvable} dapat diselesaikan, {latest} terbaru)",
       "pinHeld": "Ditahan",
       "pinDoNotUse": "Jangan gunakan",
-      "drift": "Drift lintas proyek.",
+      "drift": "Drift lintas proyek",
       "driftBehind": "Di belakang: di depan. {siblings} (Anda memiliki {own})",
       "driftDiffers": "Berbeda: berbeda. {siblings} (Anda memiliki {own})",
       "codeSize": "Ukuran Kode",
@@ -573,7 +573,7 @@
       "onDisk": "Di Disk",
       "upgrade": "Perbarui",
       "upgrading": "Meningkatkan…",
-      "viewChangelog": "Lihat Changelog."
+      "viewChangelog": "Lihat Changelog"
     },
     "changelog": {
       "intro": "Apa yang berubah dari {from} ke {to} — tinjau sebelum memperbarui.",
@@ -589,7 +589,7 @@
       "openPrs": "PR Terbuka",
       "activity": "Aktivitas (90d)",
       "activityValue": "Masalah {closed} ditutup, PR {merged} digabungkan",
-      "noActivity": "Tidak ada aktivitas baru-baru ini.",
+      "noActivity": "Tidak ada aktivitas terbaru",
       "lastCommit": "Komitmen Terakhir Commitment",
       "pubPoints": "Poin Pub",
       "verified": "(diverifikasi)",
@@ -606,7 +606,7 @@
       "commentedOut": "Referensi yang dikomentari:",
       "fileCount": "{count} file",
       "exportNoteTitle": "Setidaknya satu penggunaan adalah arahan ekspor.",
-      "publicApiSurface": "API permukaan publik di atas API.",
+      "publicApiSurface": "permukaan API publik",
       "header": "PENGGUNAAN FILE ({label})",
       "commentedReexportTitle": "Commented-out reekspor ekspor kembali",
       "reexportTitle": "Re-ekspor — bagian dari API publik library ini",
@@ -614,8 +614,8 @@
     },
     "opportunities": {
       "header": "Peluang ({count})",
-      "viewCode": "Lihat kode tampilan.",
-      "viewDocs": "Lihat dokumen."
+      "viewCode": "Lihat kode",
+      "viewDocs": "Lihat dokumen"
     },
     "alerts": {
       "archived": "ARCHIVED — repositori adalah read-only",
@@ -628,9 +628,9 @@
       "overrideTitle": "Selisih Override",
       "noDates": "Tidak dapat menentukan tanggal versi untuk paket ini.",
       "noItems": "Tidak ada PR atau masalah yang ditemukan antara versi ini.",
-      "prsMerged": "PRs bergabung dengan merger.",
+      "prsMerged": "PR digabungkan",
       "issuesClosed": "Isu ditutup",
-      "searchLabel": "Cari PR dan isu-isu pencarian.",
+      "searchLabel": "Cari PR dan isu",
       "searchPlaceholder": "Cari PR dan isu...",
       "filterAria": "Filter menurut kategori",
       "filterAll": "Semua",
@@ -639,8 +639,8 @@
       "filterIssues": "Isu",
       "typePr": "Pull Request",
       "typeIssue": "Isu",
-      "reviewReviewed": "Diulas ulang.",
-      "reviewApplicable": "Termasuk yang berlaku.",
+      "reviewReviewed": "Sudah ditinjau",
+      "reviewApplicable": "Berlaku",
       "reviewNotApplicable": "N/A",
       "notesPlaceholder": "Catatan...",
       "colType": "Tipe",
@@ -666,10 +666,10 @@
       "reportIssue": "Laporkan Isu"
     },
     "a11y": {
-      "skipToDetails": "Langkau ke rincian paket."
+      "skipToDetails": "Langsung ke detail paket"
     },
     "shortcuts": {
-      "showOverlay": "Tampilkan overlay shortcut ini.",
+      "showOverlay": "Tampilkan overlay pintasan ini",
       "closeOverlay": "Tutup overlay keyboard-shortcut."
     }
   },
@@ -693,8 +693,8 @@
     "chipRemove": "Hapus"
   },
   "a11y": {
-    "toggleFullWidth": "Toggle layout lebar penuh.",
-    "expandRow": "Memperluas baris Expand row.",
+    "toggleFullWidth": "Alihkan tata letak lebar penuh",
+    "expandRow": "Perluas baris",
     "comparisonDimension": "Metrik"
   },
   "uiLanguage": {
@@ -705,7 +705,7 @@
       "coverage": "{pct}% diterjemahkan — sisanya ditampilkan dalam bahasa Inggris"
     },
     "reloadPrompt": "Bahasa yang disetel ke {locale}. Muat ulang jendela untuk memperbarui sidebar dan label perintah.",
-    "reloadNow": "Reload sekarang.",
+    "reloadNow": "Muat ulang sekarang",
     "reloadLater": "Nanti"
   },
   "statusBar": {
@@ -715,7 +715,7 @@
     },
     "menu": {
       "openViolations": "Buka Laporan Pelanggaran",
-      "openPackageDashboard": "Buka Dashboard Paket yang terbuka.",
+      "openPackageDashboard": "Buka Dasbor Paket",
       "openProcessHealth": "Buka Proses Kesehatan",
       "commandCatalog": "Katalog Perintah",
       "about": "Tentang"
@@ -984,7 +984,7 @@
     },
     "notification": {
       "shedDisabled": "Tekanan memori analyzer terdeteksi (RSS {rssMb} MB, batas lunak {softLimitMb} MB). Aktifkan aturan pengurangan untuk secara otomatis menonaktifkan aturan yang mahal saat terjadi tekanan.",
-      "enableButton": "Enable mengaktifkan.",
+      "enableButton": "Aktifkan",
       "learnMoreButton": "Pelajari Selengkapnya",
       "runInit": "Jalankan 'dart run saropa_lints:init' untuk menghasilkan analysis_options_custom.yaml, lalu atur shed_rules: true.",
       "enabledConfirmation": "Aturan penghapusan diaktifkan dalam analysis_options_custom.yaml. Analizer akan mendeteksi perubahan pada kali reload berikutnya."
@@ -1006,7 +1006,7 @@
   "findingsDash": {
     "pageTitle": "Saropa Dashboard Temuan Hasil Penelitian",
     "documentTitle": "Saropa Dashboard Temuan Hasil Penelitian",
-    "skipToFindings": "Lompati ke temuan.",
+    "skipToFindings": "Lompati ke temuan",
     "secondaryAsideLabel": "Diagnostik sekunder",
     "hero": {
       "gaugeTitle": "Skor kesehatan {score} (grade {grade}). Kesalahan adalah yang paling berat.",
@@ -1019,7 +1019,7 @@
       "daysAgo": "{day}h yang lalu"
     },
     "status": {
-      "updatedPrefix": "Update yang diperbarui.",
+      "updatedPrefix": "Diperbarui",
       "refreshHint": "Klik untuk refresh dari analyzer.",
       "lastRunUnknown": "Waktu jalan terakhir tidak diketahui",
       "noTimestampTitle": "Tidak ada tanda waktu pada violations.json.",
@@ -1058,7 +1058,7 @@
       "pack": "Paket (s)"
     },
     "seg": {
-      "toggleSeverityTitle": "Toggle {v} tingkat keparahan."
+      "toggleSeverityTitle": "Alihkan tingkat keparahan {v}"
     },
     "kpi": {
       "visibleLabel": "Temuan yang terlihat",
@@ -1079,27 +1079,27 @@
       "infoTitle": "Filter temuan menjadi info (FYI — gaya dan saran)",
       "filesLabel": "File yang terpengaruh",
       "filesSubAcross": "di seluruh ekspor",
-      "filesSubNone": "Tidak ada file yang terpengaruh.",
+      "filesSubNone": "tidak ada file yang terpengaruh",
       "filesTitle": "Berbagai file yang berbeda berkontribusi setidaknya satu temuan.",
       "topRuleLabel": "Aturan teratas",
-      "topRuleTitle": "Filter temuan untuk aturan {name}.",
+      "topRuleTitle": "Filter temuan ke aturan {name}",
       "sectionHeading": "Ringkasan",
       "sectionAria": "Statistik ringkasan"
     },
     "toolbar": {
-      "ariaFiltersActions": "Filter dan tindakan.",
+      "ariaFiltersActions": "Filter dan tindakan",
       "groupByFieldTitle": "Temuan kelompok berdasarkan dimensi yang dipilih.",
       "groupByLabel": "Kelompokkan menurut",
       "textFilterTitle": "Filter temuan dengan jalur file, aturan, atau teks pesan.",
       "textFilterPlaceholder": "Filter berdasarkan file, aturan, atau pesan...",
       "textFilterAria": "Filter teks",
-      "clearTextFilterTitle": "Clear filter teks yang jelas.",
-      "clearTextFilterAria": "Clear filter teks yang jelas.",
+      "clearTextFilterTitle": "Hapus filter teks",
+      "clearTextFilterAria": "Hapus filter teks",
       "recentFiltersTitle": "Filter terbaru",
       "clearRecentTitle": "Hapus semua filter terbaru",
       "clearRecentButton": "Hapus",
       "recentFiltersListAria": "Filter terbaru",
-      "runAnalysisTitle": "Jalankan analisis Saropa Lints.",
+      "runAnalysisTitle": "Jalankan analisis Saropa Lints",
       "severityGroupAria": "Filter tingkat keparahan",
       "severityLabel": "Tingkat keparahan",
       "moreSummary": "Lagi",
@@ -1140,7 +1140,7 @@
     "chip": {
       "contains": "berisi \"{q}\"",
       "severityOff": "tingkat keparahan ≠ {v}",
-      "resetAllTitle": "Reset semua filter."
+      "resetAllTitle": "Atur ulang semua filter"
     },
     "menuPalette": {
       "help": "Membantu",
@@ -1148,17 +1148,17 @@
       "textFilter": "Filter teks…",
       "severityImpact": "Filter tingkat keparahan…",
       "hideRules": "Menyembunyikan aturan...",
-      "ruleMetadata": "Metadata adalah aturan.",
+      "ruleMetadata": "Metadata aturan",
       "clearFilters": "Hapus filter",
       "clearSuppressions": "Hapus penyembunyian",
       "clearFileFocus": "Hapus fokus file",
       "matchActiveEditor": "Ikuti editor aktif",
       "copyTreeJson": "Salin JSON pohon",
       "refreshExtension": "Muat ulang ekstensi",
-      "openPackageDashboard": "Buka Dashboard paket yang terbuka.",
+      "openPackageDashboard": "Buka Dasbor Paket",
       "openCodeHealth": "Buka Kesehatan Kode",
-      "openLintsConfig": "Mengelola Rule Packs.",
-      "reloadFromDisk": "Mengisi ulang dari disk.",
+      "openLintsConfig": "Kelola Paket Aturan",
+      "reloadFromDisk": "Muat ulang dari disk",
       "reloadFromDiskTitle": "Re-render dashboard dari violations.json terakhir tanpa menjalankan kembali analiser.",
       "reEnableDisabledRules": "Aktifkan kembali aturan yang dinonaktifkan…",
       "reEnableDisabledRulesTitle": "Buka pilihan cepat aturan yang saat ini dinonaktifkan di analysis_options_custom.yaml dan kembali mengaktifkan yang dipilih.",
@@ -1176,12 +1176,12 @@
       "runningMeta": "Ini bisa memakan waktu sebentar pada proyek-proyek besar."
     },
     "topRules": {
-      "sectionAria": "Aturan teratas berdasarkan hitungan.",
+      "sectionAria": "Aturan teratas menurut jumlah",
       "hideTitle": "Sembunyikan hanya untuk saya — tingkat ruang kerja, dapat dibalik melalui Clear Suppressions",
       "hideButton": "Bersembunyi",
       "disableTitle": "Nonaktifkan untuk keseluruhan proyek — tulis analysis_options_custom.yaml dan jalankan kembali analisis",
       "disableButton": "Nonaktifkan",
-      "workspaceOnlyShort": "Hanya ruang kerja saja.",
+      "workspaceOnlyShort": "hanya ruang kerja",
       "projectConfigShort": "config proyek (menulis analysis_options_custom.yaml)",
       "topRulesOne": "{count} aturan teratas",
       "topRulesOther": "Aturan {count} teratas",
@@ -1189,7 +1189,7 @@
       "colRule": "Aturan",
       "colCount": "Jumlah",
       "colSeverity": "Tingkat keparahan",
-      "colActionsAria": "Tindakan baris Row actions.",
+      "colActionsAria": "Tindakan baris",
       "filesAffected": "File yang terkena dampak ({count})",
       "howToFixHeading": "Bagaimana cara memperbaiki",
       "owaspMobileLabel": "Mobile",
@@ -1205,24 +1205,24 @@
       "expandAll": "Bentangkan semua",
       "collapseAll": "Ciutkan semua",
       "bulkSelected": "{count} dipilih",
-      "bulkCopy": "Salin yang dipilih sebagai JSON.",
-      "selectAllTitle": "Pilih semua temuan yang terlihat.",
-      "selectAllAria": "Pilih semua temuan yang terlihat.",
+      "bulkCopy": "Salin yang dipilih sebagai JSON",
+      "selectAllTitle": "Pilih semua temuan yang terlihat",
+      "selectAllAria": "Pilih semua temuan yang terlihat",
       "colSeverity": "Tingkat keparahan",
       "colRule": "Aturan",
       "colMessage": "Pesan",
       "colLine": "Baris",
-      "colActionsAria": "Tindakan baris Row actions.",
-      "selectRowAria": "Pilih baris pencarian ini.",
+      "colActionsAria": "Tindakan baris",
+      "selectRowAria": "Pilih baris temuan ini",
       "copyRowTitle": "Salin temuan ini sebagai JSON.",
       "suppressedBadge": "Ditindaklanjuti",
       "suppressedByTitle": "Tersembunyi dari tampilan normal Anda oleh {kind} — hanya terlihat di sini karena \"Include suppressed\" diaktifkan",
       "metaShown": "{filtered} ditampilkan",
       "metaAfterDisable": "{total} setelah filter aturan dinonaktifkan",
       "metaSourceCap": "sumber yang dibatasi pada {max} untuk kinerja",
-      "metaGroupedBy": "dikelompokkan oleh {mode}.",
+      "metaGroupedBy": "dikelompokkan menurut {mode}",
       "overflowNote": "Daftar sumber dipotong di {max} untuk kinerja rendering.",
-      "runAgain": "Jalankan analisis lagi.",
+      "runAgain": "Jalankan analisis lagi",
       "emptyNoViolations": "Tidak ada pelanggaran dalam analisis terakhir berjalan.",
       "emptyNoMatch": "Tidak ada pelanggaran yang cocok dengan filter saat ini.",
       "emptyHintNoData": "Jalankan analisis untuk mengisi `reports/.saropa_lints/violations.json`, lalu segarkan.",
@@ -1235,16 +1235,16 @@
       "sectionAria": "Grafik komposisi",
       "heading": "Mencampur",
       "metaClickSlice": "Klik slice untuk menyaring.",
-      "severityMix": "Perpaduan tingkat keparahan.",
-      "filterBarTitle": "Filter ke {key} saja.",
+      "severityMix": "Komposisi tingkat keparahan",
+      "filterBarTitle": "Filter hanya {key}",
       "donutTotal": "total"
     },
     "todoHack": {
-      "sectionAria": "TODO dan HACKS.",
+      "sectionAria": "TODO dan HACK",
       "headingDisabled": "TODO & HACK",
       "metaDisabled": "pemindaian dinonaktifkan",
       "scanOff": "Pemindaian ruang kerja tidak aktif — aktifkan untuk menampilkan penanda dari file proyek.",
-      "enableScan": "Aktifkan pemindaian scan.",
+      "enableScan": "Aktifkan pemindaian",
       "heading": "TODO & HACK",
       "subsectionNone": "{title}: tidak ada dalam jangkauan pemindaian.",
       "capNote": "Pemindaian mencapai batas file, sehingga beberapa file di-skip.",
@@ -1258,7 +1258,7 @@
       "headingOff": "Drift Advisor",
       "metaOff": "integrasi nonaktif",
       "enableBlurb": "Aktifkan integrasi Drift Advisor dengan saran database permukaan di sini.",
-      "enable": "Enable mengaktifkan.",
+      "enable": "Aktifkan",
       "headingNoServer": "Drift Advisor",
       "metaNoServer": "tidak ada server",
       "noServerBlurb": "Tidak ada server Drift Advisor yang ditemukan pada port yang dikonfigurasi.",
@@ -1267,7 +1267,7 @@
       "metaConnected": "terhubung",
       "noIssues": "Terhubung ke {label} — tidak ada masalah saat ini.",
       "refresh": "Muat ulang",
-      "openBrowser": "Buka di browser yang terbuka.",
+      "openBrowser": "Buka di browser",
       "headingIssues": "Drift Advisor",
       "disable": "Menonaktifkan Drift Advisor"
     },
@@ -1290,8 +1290,8 @@
     "suppressions": {
       "sectionAria": "Penyembunyian",
       "headingExport": "Penghapusan (ekspor)",
-      "viewHidesHeading": "Isu tampilan menyembunyikan isu.",
-      "viewHidesMetaActive": "Aktivitas yang aktif.",
+      "viewHidesHeading": "Disembunyikan tampilan Isu",
+      "viewHidesMetaActive": "aktif",
       "viewHidesMetaNone": "tidak ada",
       "noneInExport": "Tidak ada penindasan penganalisis dalam ekspor `violations.json` saat ini. Jalankan analisis setelah mengedit pengabaian atau garis dasar untuk diisi.",
       "totalRow": "Total — hapus filter dan buka Temuan",
@@ -1314,7 +1314,7 @@
       "perFileRulesSample": "Peraturan per-file (contoh)"
     },
     "script": {
-      "announceCleared": "Semua filter dibersihkan.",
+      "announceCleared": "Semua filter dihapus",
       "announceFiltersPrefix": "Filter:",
       "announceStarted": "Analisis dimulai",
       "announceComplete": "Analisis selesai",
@@ -1328,20 +1328,20 @@
     },
     "emptyState": {
       "hintAfterMessage": "Jalankan analisis Saropa Lints untuk menghasilkan violations.json, lalu gunakan Refresh di sini atau buka kembali dasbor ini.",
-      "refreshDisk": "Refresh dari disk."
+      "refreshDisk": "Segarkan dari disk"
     },
     "shortcuts": {
       "focusTextFilter": "Fokus ke filter teks",
       "clearTextFilter": "Hapus filter teks yang difokuskan.",
       "activateKpi": "Aktifkan kartu KPI terfokus atau bar grafik.",
       "activateKpiSpace": "Aktifkan kartu KPI terfokus atau bar grafik.",
-      "showOverlay": "Tampilkan overlay shortcut ini."
+      "showOverlay": "Tampilkan overlay pintasan ini"
     },
     "unknownAnalyzerKind": "Tidak diketahui",
     "supplementary": {
-      "scannerPromo": "Aktifkan pemindai TODO/HACK scanner.",
+      "scannerPromo": "Aktifkan pemindai TODO/HACK",
       "tooltipScanner": "Pemindai sistem file Saropa — menghitung penanda TODO/HACK yang terbuka di sumber.",
-      "tooltipPromoClickToOn": "Klik untuk mengaktifkan."
+      "tooltipPromoClickToOn": "Klik untuk mengaktifkan"
     }
   },
   "ruleExplain": {
@@ -1382,9 +1382,9 @@
   },
   "kbdOverlay": {
     "toggleTitle": "Tampilkan pintasan keyboard (?)",
-    "toggleAria": "Tampilkan pintasan keyboard.",
-    "dialogTitle": "Pintasan keyboard shortcut.",
-    "closeAria": "Tutup pintasan keyboard.",
+    "toggleAria": "Tampilkan pintasan keyboard",
+    "dialogTitle": "Pintasan keyboard",
+    "closeAria": "Tutup pintasan keyboard",
     "footer": "Tekan Esc atau klik luar untuk menutup."
   },
   "wideReport": {
@@ -1435,8 +1435,8 @@
       }
     },
     "detailPane": {
-      "aria": "Detail paket yang lengkap.",
-      "title": "Detail paket yang lengkap.",
+      "aria": "Detail paket",
+      "title": "Detail paket",
       "close": "Tutup detail",
       "copyForAi": "Salin upgrade prompt untuk AI."
     },
@@ -1475,26 +1475,26 @@
       "gradeTooltip": "Kelas proyek {avgGrade}\nSkor rata-rata: {avgScore}/100\nPaket: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "Bersemangat",
       "stableTitle": "Stabil",
-      "outdatedTitle": "Usang, ketinggalan zaman.",
+      "outdatedTitle": "Usang",
       "abandonedTitle": "Terbengkalai",
-      "eolTitle": "Akhir dari Kehidupan.",
-      "updates": "Pembaruan Update.",
+      "eolTitle": "Akhir Masa Pakai",
+      "updates": "Pembaruan",
       "unused": "Tidak digunakan",
       "singleUse": "Sekali pakai",
       "vulnerable": "Rentan",
-      "overrides": "Overrides mengabaikan.",
+      "overrides": "Override",
       "caveatLine1": "*Ukuran kode ditampilkan (lib + aset yang dideklarasikan), dikembalikan ke ukuran arsip pub.dev ketika ukuran kode tidak tersedia. Tidak termasuk dev_dependencies (build_runner, lints, saropa_lints, dll.) — semuanya tidak pernah dikirim ke bundel APK / IPA / web. Ukuran aplikasi sebenarnya akan lebih kecil setelah pohon diguncang.",
       "caveatLine2": "Batas aktivitas: 90d = basi, 180d = tidak aktif (komitmen + rilis garis waktu).",
       "upgradeTitle": "Pembaruan Diperlukan"
     },
     "breakdown": {
       "title": "Mengapa kelas {grade}? — Rata-rata {avgScore}/100 di seluruh paket {pkgCount}",
-      "hint": "Klik untuk memperluas.",
+      "hint": "Klik untuk memperluas",
       "distributionHeading": "Distribusi",
       "signalsHeading": "Sinyal risiko yang menyeret skor ke bawah.",
       "signalFlagged": "{count} ditandai (ditinggalkan / akhir-hidup)",
-      "signalVulnerable": "{count} dengan kerentanan yang diketahui.",
-      "signalUpdates": "{count} memiliki update yang tersedia.",
+      "signalVulnerable": "{count} dengan kerentanan yang diketahui",
+      "signalUpdates": "{count} memiliki pembaruan tersedia",
       "bottomHeading": "Paket dengan skor terendah",
       "thresholdsHeading": "Bagaimana skor memetakan ke nilai.",
       "thresholdA": "70+ — Bersemangat: dipelihara secara aktif, baru-baru ini diterbitkan",
@@ -1515,16 +1515,16 @@
       "packages": "Paket"
     },
     "toolbar": {
-      "openPubspecTitle": "Bukalah pubspec.yaml.",
+      "openPubspecTitle": "Buka pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Salin laporan JSON (semua baris + detail)",
       "copyAllLabel": "Salin",
       "copyOpportunitiesTitle": "Salin ajakan upgrade AI untuk paket-paket yang paling banyak diadopsi menjadi satu paste.",
-      "copyOpportunitiesLabel": "Salin kesempatan untuk AI.",
+      "copyOpportunitiesLabel": "Salin peluang untuk AI",
       "saveAllTitle": "Simpan laporan JSON ke reports/YYY YMMDD/...",
       "saveAllLabel": "Menyimpan",
       "saveUpgradeTitle": "Simpan laporan hanya paket dengan update yang tersedia untuk laporan/YYY YMMDD/...",
-      "saveUpgradeLabel": "Simpan Laporan Upgrade.",
+      "saveUpgradeLabel": "Simpan Laporan Upgrade",
       "resetViewTitle": "Reset filter, menyortir dan menyimpan tampilan state view.",
       "resetViewLabel": "Atur ulang tampilan",
       "rescanTitle": "Pindai ulang paket — membersihkan cache pub.dev dan mengambil ulang versinya",
@@ -1544,18 +1544,18 @@
       "searchPlaceholder": "Cari paket…",
       "clearSearchTitle": "Hapus pencarian",
       "clearSearchAria": "Hapus pencarian",
-      "ageFilterTitle": "Filter menurut usia publikasi.",
-      "publishedAgeLabel": "Usia yang diterbitkan.",
+      "ageFilterTitle": "Filter menurut usia publikasi",
+      "publishedAgeLabel": "Usia publikasi",
       "ageMaxAll": "Semua",
-      "presetFilterTitle": "Menerapkan preset filter cepat.",
+      "presetFilterTitle": "Terapkan preset filter cepat",
       "presetLabel": "Prasetel",
       "presetNone": "Tidak ada",
       "presetModernization": "Modernisasi",
       "presetRiskHotspots": "Titik rawan risiko",
-      "presetCleanup": "Calon pembersih kandidat.",
-      "presetDirectOnly": "Hanya Direct saja.",
+      "presetCleanup": "Kandidat pembersihan",
+      "presetDirectOnly": "Hanya langsung",
       "devToggleTitle": "Sertakan ketergantungan dev dalam tabel dan total.",
-      "includeDev": "Termasuk dev dev.",
+      "includeDev": "Sertakan dev",
       "activeFiltersLabel": "Filter aktif:",
       "clearAllFilters": "Hapus semua"
     },
@@ -1577,7 +1577,7 @@
         "tooltip": "Tanggal versi yang diinstal diterbitkan ke pub.dev."
       },
       "activity": {
-        "label": "Aktivitas Aktifitas.",
+        "label": "Aktivitas",
         "tooltip": "Kode-dan-release kegiatan kelas dari berkomitmen + publikasi baru."
       },
       "likes": {
@@ -1594,7 +1594,7 @@
       },
       "prs": {
         "label": "Pull Request",
-        "tooltip": "Buka GitHub pull request yang ditarik."
+        "tooltip": "Buka pull request GitHub"
       },
       "size": {
         "label": "Ukuran",
@@ -1638,7 +1638,7 @@
       }
     },
     "cells": {
-      "noGithub": "Tidak ada repositori GitHub yang ditemukan.",
+      "noGithub": "Repositori GitHub tidak ditemukan",
       "devBadge": "dev",
       "transitiveBadge": "transitif",
       "opportunitiesTooltip": "Fitur yang tidak digunakan: {features}",
@@ -1650,14 +1650,14 @@
       "downloadsUnavailable": "pub.dev 30 hari download tidak tersedia.",
       "downloadsCount": "{count} download dalam 30 hari terakhir",
       "sizeUnavailable": "Ukuran tidak tersedia dari pub.dev",
-      "noVulnerabilities": "Tidak ada kerentanan yang diketahui.",
+      "noVulnerabilities": "Tidak ada kerentanan yang diketahui",
       "licenseUnspecified": "Lisensi tidak ditentukan pada pub.dev",
       "unusedBadge": "Tidak digunakan",
-      "packageInUse": "Paket sedang digunakan."
+      "packageInUse": "Paket sedang digunakan"
     },
     "row": {
-      "expandDetails": "Memperluas detail perincian.",
-      "copyRowJson": "Salin baris sebagai JSON."
+      "expandDetails": "Perluas detail",
+      "copyRowJson": "Salin baris sebagai JSON"
     },
     "shortcuts": {
       "focusSearch": "Fokus ke kolom pencarian",
@@ -1666,7 +1666,7 @@
       "toggleDetail": "Toggle yang disorot paket detail expander.",
       "escapeSearch": "Menghapus pencarian yang difokus; Esc kedua menciutkan semua baris yang dibentangkan",
       "historyBack": "Kembali ke sejarah navigasi paket.",
-      "showOverlay": "Tampilkan overlay shortcut ini.",
+      "showOverlay": "Tampilkan overlay pintasan ini",
       "jumpToTab": "Lompat ke tab 1-6 (Overview, Upgrades, Full report, Known issues, Compare, Settings)"
     },
     "versionTooltip": {
@@ -1689,25 +1689,25 @@
       "codeSize": "Ukuran kode: {size}",
       "archiveSize": "Ukuran arsip: {size}",
       "onDisk": "Pada disk: {size}",
-      "withUniqueTransitives": "Dengan transitif unik: {size}.",
+      "withUniqueTransitives": "Dengan transitif unik: {size}",
       "withSharedTransitives": "Dengan transitif bersama: {size}",
-      "openFolder": "Buka folder paket lokal."
+      "openFolder": "Buka folder paket lokal"
     },
     "references": {
       "noImports": "Tidak ada impor file sumber yang terdeteksi.",
       "reExportLine": "{location} (ekspor kembali)",
       "publicApiSurface": "Permukaan API publik — setidaknya satu penggunaan adalah re-export.",
-      "reExportedBadge": "Ekspor kembali diekspor ulang.",
-      "openFileReferences": "Buka referensi file yang terbuka."
+      "reExportedBadge": "Diekspor ulang",
+      "openFileReferences": "Buka referensi file"
     },
     "deps": {
-      "noTransitives": "Tidak ada transitif ketergantungan.",
-      "showTransitives": "Tunjukkan ketergantungan transitif.",
+      "noTransitives": "Tidak ada dependensi transitif",
+      "showTransitives": "Tampilkan dependensi transitif",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (dibagikan)",
       "tooltipHeader": "{total} dependensi transitif",
       "tooltipHeaderShared": "Deps transitif {total} ({shared} dibagikan)",
-      "sharedBadgeTitle": "{count} dibagi dengan paket lain."
+      "sharedBadgeTitle": "{count} dibagi dengan paket lain"
     },
     "dormancy": {
       "noActivity6mo": "Tidak ada komitmen dan tidak ada rilis dalam 6+ bulan.",
@@ -1720,21 +1720,21 @@
       "healthy": "Kode dan aktivitas pelepasan sehat (kelas kegiatan {grade})"
     },
     "detail": {
-      "codeCommitActivity": "Kode melakukan aktivitas Komitmen.",
+      "codeCommitActivity": "Aktivitas Commit Kode",
       "releaseActivity": "Aktivitas Rilis",
       "dormancySignal": "Sinyal Dormansi",
       "ago": "{age} tahun yang lalu",
       "qualityExample": "+contoh",
-      "qualityExampleTitle": "Mengirimkan demo yang dapat dijalankan.",
+      "qualityExampleTitle": "Menyertakan demo yang dapat dijalankan",
       "qualityTests": "+tes",
-      "qualityTestsTitle": "Mengirimkan test suite.",
+      "qualityTestsTitle": "Menyertakan rangkaian tes",
       "qualityTools": "+alat",
       "qualityToolsTitle": "Menyertakan perkakas pemelihara",
       "qualityDocs": "+docs",
-      "qualityDocsTitle": "Kapal memperluas dokumentasi.",
+      "qualityDocsTitle": "Menyertakan dokumentasi lengkap",
       "healthScore": "Skor Kesehatan",
       "resolutionVelocity": "Kecepatan Penyelesaian",
-      "engagementLevel": "Tingkat keterlibatan Level Engagement.",
+      "engagementLevel": "Tingkat Keterlibatan",
       "popularity": "Popularitas",
       "publisherTrust": "Kepercayaan Penerbit"
     }
@@ -1753,7 +1753,7 @@
       "placeholder": "Mencari judul, deskripsi, atau id perintah...",
       "ariaLabel": "Cari perintah",
       "clearAria": "Hapus pencarian",
-      "hintLine1": "Cocok dengan masing-masing perintah setiap komando.",
+      "hintLine1": "Mencocokkan setiap perintah berdasarkan",
       "hintStrongTitle": "judul",
       "hintStrongDesc": "deskripsi",
       "hintStrongId": "id",
@@ -1762,14 +1762,14 @@
       "hintLine2End": "tanpa titik)."
     },
     "toolbar": {
-      "showInternal": "Tampilkan perintah menu konteks.",
+      "showInternal": "Tampilkan perintah menu konteks",
       "collapseAll": "Ciutkan semua"
     },
     "recentPopover": {
-      "title": "Pencarian terbaru yang dilakukan.",
-      "clearTitle": "Hapus semua pencarian terbaru.",
+      "title": "Pencarian terbaru",
+      "clearTitle": "Hapus semua pencarian terbaru",
       "clearButton": "Hapus",
-      "listAria": "Pencarian terbaru yang dilakukan."
+      "listAria": "Pencarian terbaru"
     },
     "filterChips": {
       "ariaRegion": "Filter aktif",
@@ -1791,35 +1791,35 @@
       "internalBadgeTitle": "Dipicu dari menu konteks saja.",
       "internalBadge": "menu",
       "copyTitle": "Salin id perintah ({id})",
-      "copyAria": "Salin ID perintah."
+      "copyAria": "Salin ID perintah"
     },
-    "categoryJumpTitle": "Melompat ke {category}.",
+    "categoryJumpTitle": "Lompat ke {category}",
     "shortcuts": {
       "focusSearch": "Fokus ke kolom pencarian",
-      "navRows": "Navigasi baris perintah yang terlihat.",
+      "navRows": "Navigasi baris perintah yang terlihat",
       "homeEnd": "Melompat ke baris pertama atau terakhir yang terlihat.",
-      "enterRun": "Jalankan perintah fokus yang terfokus.",
+      "enterRun": "Jalankan perintah yang difokuskan",
       "escClear": "Hapus filter pencarian dan reset yang jelas.",
-      "showOverlay": "Tampilkan overlay shortcut ini."
+      "showOverlay": "Tampilkan overlay pintasan ini"
     },
     "script": {
-      "moreSuffix": "+{count} lebih banyak lagi.",
-      "showLess": "Tampilkan kurang.",
+      "moreSuffix": "+{count} lainnya",
+      "showLess": "Tampilkan lebih sedikit",
       "runSingular": "berlari",
       "runPlural": " kali dijalankan",
       "recentWord": "terbaru",
       "expandAll": "Bentangkan semua",
       "collapseAll": "Ciutkan semua",
       "searchChip": "Pencarian: \"{query}\"",
-      "internalChip": "Menampilkan perintah menu konteks.",
-      "removeFilterPrefix": "Hapus filter yang digunakan.",
+      "internalChip": "Menampilkan perintah menu konteks",
+      "removeFilterPrefix": "Hapus filter ",
       "matchOne": "{count} kecocokan",
       "matchOther": "{count} kecocokan"
     }
   },
   "codeHealth": {
     "documentTitle": "Saropa Kode Dashboard Kesehatan",
-    "skipToTable": "Lompati ke fungsi tabel.",
+    "skipToTable": "Lompati ke tabel fungsi",
     "openWorkspaceFirst": "Buka ruang kerja Dart/Flutter terlebih dahulu.",
     "scan": {
       "title": "Memindai kesehatan proyek",
@@ -1829,13 +1829,13 @@
       "collect": "Menemukan file…",
       "firstRunHint": "Saat pertama kali dijalankan, pemindai dikompilasi; pada proyek besar perlu waktu sebelum file muncul.",
       "paused": "Dijeda",
-      "stopped": "Scan berhenti saat dihentikan.",
-      "elapsed": "Terlalu lama berlalu.",
+      "stopped": "Pemindaian dihentikan",
+      "elapsed": "Waktu berlalu",
       "phase": {
         "parse": "Mengurai file",
         "history": "Membaca riwayat git",
         "blame": "Menghitung usia kode",
-        "usage": "Menghitung referensi hitung.",
+        "usage": "Menghitung referensi",
         "score": "Menilai fungsi"
       },
       "counter": {
@@ -1847,7 +1847,7 @@
         "aria": "Penghitung pemindaian langsung"
       },
       "controls": {
-        "aria": "Scan kontrol pemindaian."
+        "aria": "Kontrol pemindaian"
       },
       "btn": {
         "pause": "Jeda",
@@ -1871,11 +1871,11 @@
     "panelTitle": "Saropa Kode Dashboard Kesehatan",
     "hero": {
       "title": "Saropa Kode Dashboard Kesehatan",
-      "generated": "Generasi yang dihasilkan.",
+      "generated": "Dibuat",
       "functionOne": "{count} fungsi",
       "functionOther": "{count} fungsi",
       "avgFormat": "avg adalah {score} ({grade})",
-      "gatesFailing": "Gerbang yang gagal.",
+      "gatesFailing": "gerbang gagal",
       "gatesPassing": "gerbang lolos"
     },
     "gate": {
@@ -1891,15 +1891,15 @@
       "clickToFilter": "Klik untuk menyaring tabel ke fungsi yang ditandai dengan {flag}.",
       "noFlagged": "Tidak ada fungsi yang ditandai {flag}.",
       "unused": "Tidak digunakan",
-      "unusedSub": "fungsi yang tidak dirujuk di tempat lain.",
+      "unusedSub": "fungsi yang tidak dirujuk di mana pun",
       "uncovered": "Tidak tercakup",
-      "uncoveredSub": "tidak ada cakupan LCOV.",
+      "uncoveredSub": "tidak ada cakupan LCOV",
       "stubTested": "Diuji dengan stub",
       "stubTestedSub": "tes ada tetapi menyatakan sedikit.",
-      "suspiciousCoverage": "Liputan yang mencurigakan.",
+      "suspiciousCoverage": "Cakupan mencurigakan",
       "suspiciousCoverageSub": "cakupan terlihat direkayasa",
       "testDrift": "Penyimpangan tes",
-      "testDriftSub": "tes lag fungsi test yang terlambat."
+      "testDriftSub": "tes tertinggal dari fungsi"
     },
     "toolbar": {
       "ariaLabel": "Tindakan Kesehatan Kode",
@@ -1908,13 +1908,13 @@
       "copyJsonTitle": "Salin JSON Kode Kesehatan mentah ke clipboard.",
       "copyJson": "Salin JSON",
       "settingsTitle": "Buka pengaturan Kesehatan Kode.",
-      "settingsButton": "Kode Pengaturan kesehatan.",
+      "settingsButton": "Pengaturan Kesehatan Kode",
       "filterTitle": "Filter baris dengan nama, file, atau flag.",
       "filterLabel": "Filter baris",
       "filterPlaceholder": "Filter baris…"
     },
     "table": {
-      "ariaLabel": "Fungsi terburuk menurut skor.",
+      "ariaLabel": "Fungsi terburuk menurut skor",
       "heading": "Fungsi terburuk",
       "colScore": "Skor",
       "colFunction": "Fungsi",
@@ -1927,7 +1927,7 @@
       "noMatch": "Tidak ada fungsi yang cocok dengan filter saat ini.",
       "resetFiltersTitle": "Hapus pencarian dan filter bendera aktif.",
       "resetFilters": "Atur ulang filter",
-      "expanderAriaCollapsed": "Tampilkan rincian masalah.",
+      "expanderAriaCollapsed": "Tampilkan detail isu",
       "expanderAriaExpanded": "Sembunyikan detail isu",
       "detailHeading": "Mengapa fungsi ini mencetak skor {score}",
       "detailNoIssues": "Tidak ada tanda pada baris ini — skor ditentukan oleh nilai kolom di atas (penggunaan, cakupan, kompleksitas, usia, dokumentasi).",
@@ -1936,7 +1936,7 @@
     },
     "flag": {
       "unused": {
-        "label": "yang belum digunakan.",
+        "label": "tidak digunakan",
         "evidence": "0 orang yang menelepon",
         "rule": "Ditandai ketika tidak ada file lain yang merujuk nama fungsi ini."
       },
@@ -1952,21 +1952,21 @@
       },
       "undocumented": {
         "label": "tidak terdokumentasi",
-        "evidence": "CC {cc}, tidak ada doc.",
+        "evidence": "CC {cc}, tanpa doc",
         "rule": "Ditandai ketika fungsi kompleks (CC > 10) tidak memiliki komentar doc."
       },
       "test_drift": {
-        "label": "Tes drift uji coba.",
-        "evidence": "tes lag fungsi test yang terlambat.",
+        "label": "drift tes",
+        "evidence": "tes tertinggal dari fungsi",
         "rule": "Ditandai ketika file tes tertaut terbaru secara signifikan lebih tua dari file sumber fungsi."
       },
       "stub_tested": {
-        "label": "Diuji oleh stub-tested.",
-        "evidence": "Asserts tipis menegaskan.",
+        "label": "diuji stub",
+        "evidence": "assert minim",
         "rule": "Ditandai ketika tes terkait ada tetapi hampir tidak menegaskan apa pun."
       },
       "suspicious_coverage": {
-        "label": "sinyal yang mencurigakan.",
+        "label": "cakupan mencurigakan",
         "evidence": "{pct}% tanpa tes",
         "rule": "Ditandai ketika LCOV melaporkan cakupan tinggi tetapi tidak ada tes yang merujuk fungsi."
       },
@@ -1979,9 +1979,9 @@
     "shortcuts": {
       "focusFilter": "Fokus ke filter baris",
       "clearFilter": "Hapus filter baris fokus yang terfokus.",
-      "activateKpi": "Aktifkan kartu KPI yang terfokus.",
-      "activateKpiSpace": "Aktifkan kartu KPI yang terfokus.",
-      "showOverlay": "Tampilkan overlay shortcut ini."
+      "activateKpi": "Aktifkan kartu KPI yang difokuskan",
+      "activateKpiSpace": "Aktifkan kartu KPI yang difokuskan",
+      "showOverlay": "Tampilkan overlay pintasan ini"
     },
     "script": {
       "activeFiltersLabel": "Filter aktif:",
@@ -2005,11 +2005,11 @@
     },
     "scan": {
       "subtitle": "Mengamati ukuran proyek, kompleksitas, dan titik panas…",
-      "elapsed": "Terlalu lama berlalu.",
+      "elapsed": "Waktu berlalu",
       "cancel": "Batal",
       "restart": "Mulai ulang",
       "stopped": "Berhenti",
-      "logHeading": "Aktivitas Aktifitas.",
+      "logHeading": "Aktivitas",
       "logEmpty": "Belum ada output — log ini hanya terisi jika pemindaian mencetak pesan diagnostik.",
       "progress": "{percent}% — {done}/{total} file"
     },
@@ -2066,7 +2066,7 @@
     },
     "shortcuts": {
       "jumpToTab": "Lompat ke tab 1-2 (Peta, Laporan)",
-      "showOverlay": "Tampilkan overlay shortcut ini."
+      "showOverlay": "Tampilkan overlay pintasan ini"
     },
     "hero": {
       "files": "File",
@@ -2080,7 +2080,7 @@
     "noKindBreakdown": "Tidak ada perincian berdasarkan jenis dalam ekspor ini.",
     "title": "Penghapusan (ekspor)",
     "readOnlyNote": "(hanya dibaca; buka Temuan untuk menelusuri dan bertindak.)",
-    "openFindings": "Buka temuan Dashboard Dasbor."
+    "openFindings": "Buka Dasbor Temuan"
   },
   "configMirrors": {
     "noFileRisk": "Tidak ada rincian risiko per-file (tidak ada pelanggaran dalam lingkup).",
@@ -2092,39 +2092,39 @@
     "summaryFileRisk": "Risiko file (top files)"
   },
   "telemetry": {
-    "heroTitle": "Aturan terkait Telemetri.",
-    "skipToCounters": "Lompati ke penghitung telemetri.",
+    "heroTitle": "Telemetri Aturan Terkait",
+    "skipToCounters": "Lompati ke penghitung telemetri",
     "lastEvent": "Peristiwa terakhir {relative}",
-    "noEvents": "Tidak ada peristiwa yang tercatat.",
+    "noEvents": "Tidak ada peristiwa yang tercatat",
     "totalEventOne": "total {count} peristiwa",
     "totalEventOther": "total {count} peristiwa",
     "noCountersTitle": "Tidak ada counter untuk reset.",
-    "resetTitle": "Reset semua counter.",
+    "resetTitle": "Atur ulang semua penghitung",
     "refreshTitle": "Isi ulang penghitung telemetri dari disk.",
     "refresh": "Muat ulang",
-    "copyTitle": "Salin snapshot sebagai JSON.",
+    "copyTitle": "Salin snapshot sebagai JSON",
     "copyJson": "Salin JSON",
-    "resetCounters": "Reset counter penghitung.",
+    "resetCounters": "Atur ulang penghitung",
     "countersAria": "Penghitung",
-    "countersHeading": "Event counter adalah penghitung acara.",
+    "countersHeading": "Penghitung peristiwa",
     "thEvent": "Peristiwa",
     "thCount": "Jumlah",
     "emptyMessage": "Belum ada peristiwa telemetri yang tercatat — buka aturan dari Dasbor Temuan untuk mulai mencatat penghitung.",
     "openFindingsTitle": "Buka Dashboard Penemuan Saropa.",
-    "openFindings": "Buka temuan Dashboard Dasbor.",
+    "openFindings": "Buka Dasbor Temuan",
     "lastPropsHeading": "Properti peristiwa terakhir",
     "copiedJson": "Saropa Lints: JSON telemetri aturan terkait disalin.",
     "countersReset": "Saropa Lints: penghitung telemetri aturan terkait diatur ulang."
   },
   "sidebarLayout": {
-    "summary": "Layout bar aktivitas.",
+    "summary": "Tata letak bilah aktivitas",
     "hint": "Hidupkan atau matikan bagian Saropa activity-bar di sini (disimpan dengan ruang kerja, tanpa meninggalkan dasbor)."
   },
   "securityPosture": {
     "issueOne": "{count} masalah",
     "issueOther": "{count} masalah",
     "noIssues": "Tidak ada masalah No issues",
-    "showIssues": "Tampilkan masalah yang muncul.",
+    "showIssues": "Tampilkan isu",
     "violationTooltip": "{count} pelanggaran di {ruleCount} aturan. Klik untuk menampilkan di Masalah.",
     "noViolationsTooltip": "Tidak ada pelanggaran yang dipetakan ke kategori ini."
   },
@@ -2163,23 +2163,23 @@
       "packagesSelected": "{count} paket dipilih",
       "packagesCompared": "{count} paket dibandingkan",
       "dimensionsRankedOne": "{count} dimensi diperingkat",
-      "dimensionsRankedOther": "{count} dimensi yang diberi peringkat.",
-      "morePackages": "+{count} lebih banyak lagi."
+      "dimensionsRankedOther": "{count} dimensi diperingkat",
+      "morePackages": "+{count} lainnya"
     },
     "empty": {
-      "ariaLabel": "Tidak ada paket No packages.",
+      "ariaLabel": "Tidak ada paket",
       "message": "Tidak ada paket yang dipilih untuk perbandingan. Klik kanan dua atau lebih paket di dasbor Paket dan pilih {compare}.",
       "compareWord": "Bandingkan",
-      "openDashboard": "Buka Dashboard Paket yang terbuka.",
+      "openDashboard": "Buka Dasbor Paket",
       "openDashboardTitle": "Buka Dashboard Paket Saropa."
     },
     "a11y": {
-      "skipToTable": "Lompati ke tabel perbandingan.",
+      "skipToTable": "Lompati ke tabel perbandingan",
       "recommendation": "Rekomendasi",
-      "addingToProject": "Menambahkan {name} ke proyek."
+      "addingToProject": "Menambahkan {name} ke proyek"
     },
     "shortcuts": {
-      "showOverlay": "Tampilkan overlay shortcut ini.",
+      "showOverlay": "Tampilkan overlay pintasan ini",
       "closeOverlay": "Tutup overlay keyboard-shortcut."
     },
     "kpi": {
@@ -2187,10 +2187,10 @@
       "leading": "Terdepan",
       "leadingTitle": "Paket yang memimpin oleh sebagian besar dimensi menang.",
       "dimensionWinsOne": "unggul di {count} dimensi",
-      "dimensionWinsOther": "Dimensi {count} menang.",
+      "dimensionWinsOther": "{count} dimensi unggul",
       "packages": "Paket",
       "packagesTitle": "Jumlah paket dibandingkan side-by-side.",
-      "inComparison": "dibandingkan dalam perbandingan.",
+      "inComparison": "dalam perbandingan",
       "dimensions": "Dimensi",
       "dimensionsTitle": "Jumlah dimensi di mana pemenang bisa diberi peringkat.",
       "ranked": "berperingkat"
@@ -2217,7 +2217,7 @@
       "rss": "RSS:",
       "statusLabel": "Status:",
       "statusValue": {
-        "active": "Aktivitas yang aktif.",
+        "active": "aktif",
         "idle": "menganggur",
         "running": "berlari",
         "stopped": "berhenti",
@@ -2268,7 +2268,7 @@
       "lspToggleOff": "LSP Server: menonaktifkan…",
       "lspStarted": "LSP Server: dimulai.",
       "lspDisabledPrompt": "Server LSP dinonaktifkan dalam pengaturan (saropaLints.lspServer.enabled). Aktifkan dan mulai?",
-      "lspEnableButton": "Enable mengaktifkan.",
+      "lspEnableButton": "Aktifkan",
       "lspStopped": "LSP Server: berhenti.",
       "lspStartFailed": "Server LSP: gagal dimulai (lihat pesan error dan saluran output LSP Saropa Lints).",
       "analyzerToggleOn": "Plugin Analis: mengaktifkan…",
@@ -2326,7 +2326,7 @@
       "update": "UPDATE",
       "suggestion": "SARAN",
       "community": "KOMUNITAS",
-      "dependencies": "Dependensi adalah ketergantungan.",
+      "dependencies": "DEPENDENSI",
       "alerts": "PERINGATAN",
       "platforms": "PLATFORM",
       "directDeps": "DEPENDENSI LANGSUNG",
@@ -2356,7 +2356,7 @@
       "prs": "{count} PR",
       "activity90d": "90d: Masalah {closed} ditutup, PR {merged} digabungkan",
       "lastCommit": "Komitmen terakhir: {time}",
-      "archived": "Repository adalah arsip yang diarsipkan.",
+      "archived": "Repositori diarsipkan",
       "pubPoints": "{points}/160 poin pub",
       "latestRelease": "Rilis terbaru: {age} tahun yang lalu",
       "dependents": "{count} orang yang tergantung"
@@ -2369,10 +2369,10 @@
     },
     "dependencies": {
       "flagged": "({count} ditandai)",
-      "transitiveCount": "{count} paket transitif.",
+      "transitiveCount": "{count} paket transitif",
       "unique": "{count} unik",
       "shared": "{count} dibagi ({pct}%)",
-      "moreOverflow": "+{count} lebih banyak lagi.",
+      "moreOverflow": "+{count} lainnya",
       "sharedList": "Dibagikan: {names}"
     },
     "platforms": {
@@ -2410,7 +2410,7 @@
   },
   "suite": {
     "fix": {
-      "explainRule": "Jelaskan aturan ini."
+      "explainRule": "Jelaskan aturan ini"
     },
     "enableRule": {
       "done": "Aturan yang diaktifkan adalah {ruleId}. Analisis Re-Run untuk diterapkan.",
@@ -2423,7 +2423,7 @@
     },
     "crashNudge": {
       "message": "Log Capture melihat {count} kali crash yang seharusnya tertangkap oleh aturan {ruleId}. Aturan ini saat ini dinonaktifkan.",
-      "enable": "Mengaktifkan aturan rule."
+      "enable": "Aktifkan aturan"
     },
     "deepLink": {
       "showDriftIssues": "Tampilkan langsung masalah Drift (Drift Advisor)"
@@ -2435,45 +2435,45 @@
     },
     "driftRecommend": {
       "message": "Server Drift Advisor terhubung. Instal ekstensi Saropa Drift Advisor yang berdiri sendiri untuk pengalaman panel Masalah-panel penuh.",
-      "install": "Instal Drift Advisor untuk menginstal.",
+      "install": "Instal Drift Advisor",
       "dismiss": "Tutup"
     }
   },
   "notify": {
     "activation": {
-      "cacheCleared": "Vibrancy cache dibersihkan.",
-      "copiedInfo": "Menyalin informasi {package} ke clipboard.",
+      "cacheCleared": "Cache Vibrancy dibersihkan",
+      "copiedInfo": "Info {package} disalin ke clipboard",
       "noPubspecOrLock": "Tidak ada pubspec.yaml/pubspec.lock ditemukan di ruang kerja.",
       "backfillComplete": "Paket Vibrancy: Keanggunan one-time history backfill lengkap ({count} snapshot diimpor).",
-      "runScanFirst": "Jalankan pemindaian terlebih dahulu.",
-      "noUpgradable": "Tidak ditemukan paket yang dapat ditingkatkan.",
+      "runScanFirst": "Jalankan pemindaian terlebih dahulu",
+      "noUpgradable": "Tidak ditemukan paket yang dapat ditingkatkan",
       "proceedUpgrades": "Lanjutkan dengan upgrade {count} (s)? Langkah-langkah yang gagal berbalik dan rencana terus berlanjut.",
-      "actionExecute": "Eksekusi: Mengeksekusi.",
+      "actionExecute": "Jalankan",
       "actionCancel": "Batal",
       "upgradeStopped": "Pembaruan berhenti di {failedAt} — {completed}/{total} selesai",
       "upgradeAllComplete": "Semua upgrade {count} selesai dengan sukses.",
       "notPubspec": "File yang dipilih bukan pubspec.yaml.",
       "suppressedPackage": "\"{package}\" ditutup — diagnosa akan disembunyikan",
-      "noPackagesToSuppress": "Tidak ada paket untuk menekan.",
+      "noPackagesToSuppress": "Tidak ada paket untuk disembunyikan peringatannya",
       "suppressedCount": "Paket {count} yang ditekan (s)",
       "noUnhealthyToSuppress": "Tidak ada kemasan yang tidak sehat untuk menekan.",
       "suppressAllConfirm": "Menekan semua paket {count} tidak sehat? Ini akan menyembunyikan semua diagnostik.",
-      "noSuppressedPackages": "Tidak ada paket yang ditekan.",
+      "noSuppressedPackages": "Tidak ada paket yang ditekan",
       "unsuppressedCount": "Paket {count} yang tidak tertekan (s)",
       "noPubspecWorkspace": "Tidak ada pubspec.yaml ditemukan di ruang kerja.",
-      "depsAlreadySorted": "Ketergantungan yang sudah disortir.",
+      "depsAlreadySorted": "Dependensi sudah diurutkan",
       "depsSorted": "{detail} dalam {sections}",
-      "noPubspec": "Tidak ada pubspec.yaml ditemukan.",
+      "noPubspec": "pubspec.yaml tidak ditemukan",
       "updatePrereleaseConfirm": "Update {package} untuk pra-release {version}? Prerelease mungkin berisi perubahan yang mematahkan.",
       "packageNotFound": "Paket {package} tidak ditemukan di pubspec.yaml",
-      "updatedTo": "Diupdate dari {package} menjadi {version}.",
+      "updatedTo": "{package} diperbarui ke {version}",
       "ciRunScanFirst": "Jalankan scan terlebih dahulu untuk menghasilkan CI config dengan ambang batas yang sesuai.",
-      "noWorkspace": "Tidak ada folder ruang kerja terbuka buka.",
+      "noWorkspace": "Tidak ada folder ruang kerja yang terbuka",
       "ciOverwriteConfirm": "{path} sudah ada. Menulis ulang?",
       "actionOverwrite": "Timpa",
       "ciGenerated": "Pipeline CI dibuat: {path}",
-      "compareSelectCount": "Pilih 2-3 paket untuk membandingkan.",
-      "compareMax": "Maksimum 3 paket untuk perbandingan.",
+      "compareSelectCount": "Pilih 2-3 paket untuk dibandingkan",
+      "compareMax": "Maksimum 3 paket untuk perbandingan",
       "compareFetchFailed": "Tidak dapat mengambil cukup data paket."
     },
     "main": {
@@ -2501,7 +2501,7 @@
       "openReportFailed": "Saropa Lints: gagal membuka laporan — {message}",
       "noAnalysisData": "Tidak ada data analisis. Jalankan analisis terlebih dahulu.",
       "actionDisable": "Nonaktifkan",
-      "actionEnable": "Enable mengaktifkan.",
+      "actionEnable": "Aktifkan",
       "bulkRuleToggleConfirm": "{verb} {count} aturan? Ini memperbarui analysis_options_custom.yaml.",
       "setupPrompt": "Saropa Lints mendeteksi proyek Dart tanpa konfigurasi saropa_lints. Siapkan sekarang untuk 2350+ aturan lint.",
       "actionSetUpProject": "Membuat Set Up Project Proyek",
@@ -2531,15 +2531,15 @@
       "analysisScanning": "Memindai workspace… {percent}% ({count} masalah sejauh ini)",
       "configUpdated": "Konfigurasi Saropa Lints diperbarui (tier: {tier}).",
       "configWriteFailed": "Gagal menulis konfigurasi. {details}",
-      "scaffoldGateTitle": "Komposisi analiser plugin scaffolding perancah.",
+      "scaffoldGateTitle": "Kerangka plugin analyzer komposit",
       "scaffoldGateDetail": "Ini menulis paket Dart baru di bawah ruang kerja Anda (pubspec.yaml, lib/main.dart, README): satu custom_lint plugin yang mendaftarkan Saropa dan meninggalkan hook untuk aturan Anda sendiri.\n\nHanya gunakan ini ketika Anda mengirimkan aturan analiser khusus bersama dengan Saropa. Proyek Saropa-only normal dapat melewatkannya, analiser memungkinkan satu entri plugin per konteks.\n\nSelanjutnya: memilih folder yang relatif terhadap ruang kerja. Jika folder itu sudah ada, Anda akan diminta sebelum apa pun ditulis ulang.",
       "actionContinue": "Lanjutkan",
-      "actionOpenGuide": "Buka panduan pembuka.",
+      "actionOpenGuide": "Buka panduan",
       "scaffoldPathOutsideWorkspace": "Scaffold path harus berada di dalam folder workspace.",
       "scaffoldFolderExists": "Folder sudah ada: {folder}. File mungkin ditambahkan atau ditimpa. Lanjutkan?",
       "scaffoldCreated": "Kerangka plugin komposit dibuat. Buka main.dart yang dihasilkan?",
       "actionOpenMainDart": "Buka main.dart",
-      "actionOpenReadme": "Buka README yang terbuka.",
+      "actionOpenReadme": "Buka README",
       "scaffoldFailed": "Perancah gagal. {details}",
       "scaffoldFailedHint": "Pastikan saropa_lints ada di dev_dependencies dan jalankan pub get.",
       "alreadyOnTier": "Sudah ada di tingkat {tier}.",
@@ -2578,7 +2578,7 @@
       "crossFileHtmlReportFailed": "Laporan HTML lintas file gagal: {message}",
       "crossFileReportNoIndex": "Cross-file report selesai tapi index.html tidak ditemukan.",
       "crossFileHtmlReportGenerated": "Cross-file HTML laporan yang dihasilkan.",
-      "actionOpenInBrowser": "Buka di browser.",
+      "actionOpenInBrowser": "Buka di browser",
       "actionOpenFile": "Buka File",
       "crossFileSnapshotFailed": "Snapshot lintas file gagal: {message}",
       "crossFileSnapshotNoJson": "Cross-file snapshot selesai tetapi file JSON tidak ditemukan.",
@@ -2634,34 +2634,34 @@
       "couldNotOpenFileRef": "Tidak dapat membuka referensi file: {filePath}",
       "savedReportJson": "JSON laporan disimpan: {path}",
       "couldNotSaveReportJson": "Tidak dapat menyimpan laporan JSON.",
-      "noPubspecFound": "Tidak ada pubspec.yaml ditemukan.",
+      "noPubspecFound": "pubspec.yaml tidak ditemukan",
       "noDependenciesSection": "Tidak dapat menemukan ketergantungan bagian.",
       "addedToPubspec": "Ditambahkan {name}: {constraint} sampai dengan pubspec.yaml",
       "failedToAddToPubspec": "Gagal menambahkan {name} ke pubspec.yaml.",
       "needsPackageRow": "{actionLabel} membutuhkan baris paket dari Dashboard Paket (tab editor).",
       "couldNotLocateConstraint": "Tidak dapat menemukan kendala versi untuk {name}.",
       "deletedFromPubspec": "Dihapus {name} dari pubspec.yaml (backup: {backupName}) yang dapat menyebabkan infeksi.",
-      "runScanFirst": "Jalankan pemindaian terlebih dahulu.",
+      "runScanFirst": "Jalankan pemindaian terlebih dahulu",
       "couldNotFindPubspec": "Tidak dapat menemukan pubspec.yaml.",
       "updatedPackage": "{name} diperbarui menjadi {constraint}",
       "failedToUpdate": "Gagal untuk memperbarui {name}",
-      "selectPackagesToCompare": "Pilih 2-3 paket untuk membandingkan.",
-      "maxPackagesToCompare": "Maksimum 3 paket untuk perbandingan.",
+      "selectPackagesToCompare": "Pilih 2-3 paket untuk dibandingkan",
+      "maxPackagesToCompare": "Maksimum 3 paket untuk perbandingan",
       "couldNotFindLocalSource": "Tidak dapat menemukan sumber lokal untuk {name}.",
-      "registryAuthAdded": "✓ Ditambahkan otentikasi untuk {name}.",
+      "registryAuthAdded": "✓ Autentikasi ditambahkan untuk {name}",
       "registryAddFailed": "Gagal menambahkan registry: {message}",
-      "noConfiguredRegistries": "Tidak ada konfigurasi registry yang dikonfigurasi.",
-      "registryAuthRemoved": "✓ Dihapus otentikasi untuk {name}.",
+      "noConfiguredRegistries": "Tidak ada registry yang dikonfigurasi",
+      "registryAuthRemoved": "✓ Autentikasi dihapus untuk {name}",
       "registryRemoveFailed": "Gagal menghapus registry: {message}",
-      "registryTokenUpdated": "✓ Token diperbarui.",
+      "registryTokenUpdated": "✓ Token diperbarui",
       "registryTokenUpdateFailed": "Gagal memperbarui token: {message}",
       "actionRemove": "Hapus",
       "removeAuthPrompt": "Hapus otentikasi untuk {name}?",
-      "annotateInProgress": "Annotasi sudah berjalan.",
+      "annotateInProgress": "Anotasi sudah berjalan",
       "noPubspecInWorkspace": "Tidak ada pubspec.yaml ditemukan di ruang kerja.",
-      "noDependenciesToAnnotate": "Tidak ada ketergantungan untuk menganotasi.",
+      "noDependenciesToAnnotate": "Tidak ada dependensi untuk dianotasi",
       "failedToApplyAnnotations": "Gagal menerapkan anotasi ke pubspec.yaml.",
-      "annotatedSummary": "Dianotasi {parts} dalam {basename}.",
+      "annotatedSummary": "{parts} dianotasi di {basename}",
       "upgradeInProgress": "Upgrade sudah berlangsung.",
       "couldNotReadConstraint": "Tidak dapat membaca kendala untuk {name}.",
       "upgradeSuccess": "{name} ditingkatkan ke {constraint} — semua tes lulus",
@@ -2677,7 +2677,7 @@
       "openFolderBeforeEnablePacks": "Saropa Lints: buka folder workspace sebelum mengaktifkan packs.",
       "allApplicablePacksEnabled": "Saropa Lints: setiap paket aturan yang berlaku sudah diaktifkan.",
       "noApplicablePacksDetected": "Saropa Lints: tidak ada paket aturan yang cocok terdeteksi untuk proyek ini. Aktifkan paket secara individu di Dashboard Konfigurasi.",
-      "actionEnable": "Enable mengaktifkan.",
+      "actionEnable": "Aktifkan",
       "enableRecommendedPacksPrompt": "Membuat {count} recommended pack (s) bisa?",
       "enablePacksDetail": "Ini memperbarui rule_packs.enabled di analysis_options.yaml. {preview}",
       "enabledRecommendedPacks": "Saropa Lints: mengaktifkan {count} paket yang direkomendasikan.",
@@ -2688,8 +2688,8 @@
       "actionLater": "Nanti",
       "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Ini adalah versi utama dan mungkin memerlukan perubahan konfigurasi — lihat changelog.",
       "upgradeCheckerMajorUpdate": "Pembaruan mayor",
-      "upgradeCheckerMinorUpdate": "Pembaruan minor update.",
-      "upgradeCheckerPatchUpdate": "Pembaruan patch update.",
+      "upgradeCheckerMinorUpdate": "Pembaruan minor",
+      "upgradeCheckerPatchUpdate": "Pembaruan patch",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: Tidak dapat memperbarui pubspec.yaml — entri saropa_lints tidak ditemukan.",
       "upgradeCheckerCancelled": "Peningkatan Saropa Lints dibatalkan. pubspec.yaml telah diperbarui menjadi ^{version}; jalankan `{cmd} pub get` untuk menyelesaikan, atau kembalikan perubahan.",
@@ -2697,7 +2697,7 @@
       "upgradeCheckerCheckOutput": "Periksa Output.",
       "upgradeCheckerUpgraded": "Saropa Lints diupgrade menjadi {version}.",
       "actionUpgrade": "Perbarui",
-      "actionViewChangelog": "Lihat Changelog.",
+      "actionViewChangelog": "Lihat Changelog",
       "healthCodeLensEnabled": "Saropa Peta Proyek heat CodeLens diaktifkan.",
       "healthCodeLensDisabled": "Saropa Peta Proyek heat CodeLens dinonaktifkan.",
       "reportViewCopiedPath": "Jalur laporan disalin: {path}",
@@ -2708,13 +2708,13 @@
       "reportViewSuppressed": "Ditekan '{flag}' di {file}. .",
       "reportViewCouldNotSuppress": "Tidak dapat menyembunyikan '{flag}' di {file}: {error}",
       "actionRescan": "Pindai ulang",
-      "bulkUpdateNoUpdates": "Tidak ada update yang tersedia.",
-      "bulkUpdateNoUpdatesFiltered": "Tidak ada update {filter} yang tersedia.",
+      "bulkUpdateNoUpdates": "Tidak ada pembaruan yang tersedia",
+      "bulkUpdateNoUpdatesFiltered": "Tidak ada pembaruan {filter} yang tersedia",
       "bulkUpdateFailed": "Pembaruan massal gagal: {error}",
-      "bulkUpdateUpdatedOne": "Paket {count} diperbarui.",
-      "bulkUpdateUpdatedOther": "Paket {count} diperbarui.",
+      "bulkUpdateUpdatedOne": "{count} paket diperbarui",
+      "bulkUpdateUpdatedOther": "{count} paket diperbarui",
       "detailViewConstraintNotFound": "Tidak dapat menemukan kendala versi untuk {package}.",
-      "detailViewUpdated": "Diupdate dari {package} menjadi {version}."
+      "detailViewUpdated": "{package} diperbarui ke {version}"
     }
   },
   "analysisOptimizer": {
