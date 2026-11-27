@@ -258,6 +258,31 @@ void f(String s) {
       expect(await lines(a, code), [4]);
     });
 
+    // The analysis server keeps running while the list is edited.
+    test(
+      'a raised max applies without a restart, to that package only',
+      () async {
+        final a = package('a', 1);
+        final b = package('b', 1);
+        AcceptedFindingsRuntime.enable();
+        expect(await lines(a, code), [3, 4]);
+        expect(await lines(b, code), [3, 4]);
+
+        final list = File('${a.path}/$kAcceptedFindingsFileName');
+        // Wait out the recheck interval first, so the rewrite also gets a
+        // later modification time than the first load saw.
+        await Future<void>.delayed(
+          AcceptedFindingsRuntime.recheckInterval +
+              const Duration(milliseconds: 100),
+        );
+        list.writeAsStringSync(
+          list.readAsStringSync().replaceAll('max: 1', 'max: 3'),
+        );
+        expect(await lines(a, code), isEmpty);
+        expect(await lines(b, code), [3, 4]);
+      },
+    );
+
     test('an ignored finding does not use up the count', () async {
       final a = package('a', 1);
       AcceptedFindingsRuntime.enable();

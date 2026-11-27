@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} 작업 공간 문제(들)"
     },
     "issue": {
-      "hazardFiles": "$(경고) {count} 큰 제외되지 않은 파일(s)",
+      "hazardFiles": "$(warning) 제외되지 않은 큰 파일 {count}개",
       "hazardFilesDetail": "대용량 파일은 파일 감시기에서 추적되며 메모리가 고갈되어 VS Code가 중단될 수 있습니다. 위험 스캔을 실행하여 제외하십시오.",
       "missingExcludes": "$(info) {count} 누락된 watcher 제외 항목(s)",
       "missingExcludesDetail": "권장 파일 감시 제외 패턴이 구성되지 않았습니다. 추가하면 불필요한 메모리 사용을 방지할 수 있습니다.",
@@ -1043,7 +1043,7 @@
       "hotspotsPill": "{open} 열림 · {percent}% 검토",
       "qualityGatePassingTitle": "Code Health 품질 게이트 통과 - Code Health를 열려면 클릭하세요.",
       "qualityGatePassingPill": "게이트 통과",
-      "qualityGateFailingTitle": "코드 상태 품질 게이트 실패({count} 위반) - 코드 상태를 열려면 클릭하세요.",
+      "qualityGateFailingTitle": "Code Health 품질 게이트 실패(위반 {count}건) — Code Health를 열려면 클릭하세요",
       "qualityGateFailingPill": "게이트 실패"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "트리 JSON 복사",
       "refreshExtension": "확장 프로그램 새로 고침",
       "openPackageDashboard": "패키지 대시보드를 열기",
-      "openCodeHealth": "오픈 코드 건강",
+      "openCodeHealth": "Code Health 열기",
       "openLintsConfig": "규칙 팩 관리",
       "reloadFromDisk": "디스크에서 다시 로드",
       "reloadFromDiskTitle": "분석기를 다시 실행하지 않고 마지막 violations.json에서 대시보드를 재 렌더링하십시오.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa 코드 건강 대시보드",
+    "documentTitle": "Saropa Code Health 대시보드",
     "skipToTable": "함수 표로 건너뛰기",
     "openWorkspaceFirst": "먼저 Dart/Flutter 작업 공간을 열어보세요.",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "보고서를 다시 실행하고 JSON을 복사합니다.",
-    "copiedJson": "코드 건강 JSON이 클립보드에 복사되었습니다.",
+    "copiedJson": "Code Health JSON이 클립보드에 복사되었습니다.",
     "couldNotOpenFile": "파일을 열 수 없음: {path}",
-    "panelTitle": "Saropa 코드 건강 대시보드",
+    "panelTitle": "Saropa Code Health 대시보드",
     "hero": {
-      "title": "Saropa 코드 건강 대시보드",
+      "title": "Saropa Code Health 대시보드",
       "generated": "생성됨",
       "functionOne": "{count}개 함수",
       "functionOther": "{count}개 함수",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "게이트 통과"
     },
     "gate": {
-      "fallback": "품질 게이트 실패 - 코드 상태 설정에서 임계값을 검토하세요.",
+      "fallback": "품질 게이트 실패 — Code Health 설정에서 임계값을 검토하세요.",
       "failingOne": "{count}개 게이트 실패 — 임계값을 검토하거나 JSON을 복사하여 gates.violations를 검사하세요.",
       "failingOther": "{count}개 게이트 실패 — 임계값을 검토하거나 JSON을 복사하여 gates.violations를 검사하세요.",
-      "openSettingsTitle": "임계값을 조정하기 위해 코드 건강 설정을 열으십시오.",
-      "openSettingsButton": "오픈 코드 건강 설정"
+      "openSettingsTitle": "임계값을 조정하려면 Code Health 설정을 여세요.",
+      "openSettingsButton": "Code Health 설정 열기"
     },
     "kpi": {
       "ariaLabel": "코드 건강 요약",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "테스트가 함수 변경을 따라가지 못함"
     },
     "toolbar": {
-      "ariaLabel": "코드 건강 행동 보건 활동",
-      "rescanTitle": "코드 건강 스캔을 다시 실행하고 이 대시보드를 새로 고쳐주세요.",
+      "ariaLabel": "Code Health 작업",
+      "rescanTitle": "Code Health 스캔을 다시 실행하고 이 대시보드를 새로 고칩니다.",
       "rescan": "다시 스캔",
-      "copyJsonTitle": "원시 코드 건강 JSON을 클립보드에 복사하십시오.",
+      "copyJsonTitle": "Code Health 원본 JSON을 클립보드에 복사합니다.",
       "copyJson": "JSON 복사",
-      "settingsTitle": "코드 건강 설정을 열으십시오.",
-      "settingsButton": "코드 건강 설정 보건 환경",
+      "settingsTitle": "Code Health 설정을 여세요.",
+      "settingsButton": "Code Health 설정",
       "filterTitle": "이름, 파일 또는 플래그에 따라 줄을 필터링하십시오.",
       "filterLabel": "행 필터링",
       "filterPlaceholder": "행 필터링…"
@@ -2078,6 +2078,7 @@
     "noData": "아직 violations.json가 없습니다 — 분석을 실행하여 억제 스냅샷을 채워주세요.",
     "zeroTotal": "0 분석기 억제 최신 수출.",
     "noKindBreakdown": "이 수출의 종류별 분산은 없습니다.",
+    "total": "합계 {total}",
     "title": "삭제 (수출)",
     "readOnlyNote": "(독서용; 검색 및 행동하기 위해 발견을 열다.)",
     "openFindings": "오픈 결과 대시보드"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy 캐시 삭제됨",
       "copiedInfo": "{package} 정보를 클립보드에 복사함",
       "noPubspecOrLock": "작업 공간에서 pubspec.yaml/pubspec.lock가 발견되지 않았습니다.",
-      "backfillComplete": "패키지 진동성: 박진감 일회성 역사 백필 완료 ({count} 스냅샷을 가져왔다).",
+      "backfillComplete": "Package Vibrancy: 일회성 기록 백필 완료(스냅샷 {count}개를 가져왔습니다).",
       "runScanFirst": "먼저 스캔 실행",
       "noUpgradable": "업그레이드 가능한 패키지 없음",
       "proceedUpgrades": "{count} 업그레이드를 진행해 볼까요? 실패한 단계들이 뒤집혀서 계획이 계속된다.",
@@ -2634,12 +2635,12 @@
       "scanOnSaveBaselineCanceled": "전체 프로젝트 스캔이 {scanned}/{total} 파일 후 취소되었습니다.",
       "scanOnSaveBaselineFailed": "전체 프로젝트 스캔 실패: {details}",
       "scanOnSaveBaselineDone": "전체 프로젝트 스캔 완료: {total} 파일, {issues} 문제(사항).",
-      "codeHealthStartFailedDetails": "코드 건강 스캔 시작 실패 ({command}): {details}는",
-      "codeHealthStartFailed": "코드 건강 스캔 시작 실패. Dart SDK가 설치되어 있는지 확인하십시오.",
-      "codeHealthScanFailed": "코드 건강 스캔 실패.",
-      "codeHealthScanFailedDetails": "코드 헬스케어 스캔 실패: {details}",
-      "codeHealthGatesFailed": "코드 건강: 설정된 품질 게이트를 통과하지 못했습니다. 코드 건강 설정을 열거나 JSON을 복사하여 gates.violations를 확인하세요.",
-      "codeHealthInvalidJson": "코드 건강은 유효하지 않은 JSON 출력을 반환했습니다.",
+      "codeHealthStartFailedDetails": "Code Health 스캔을 시작하지 못했습니다({command}): {details}",
+      "codeHealthStartFailed": "Code Health 스캔을 시작하지 못했습니다. Dart SDK가 설치되어 있는지 확인하세요.",
+      "codeHealthScanFailed": "Code Health 스캔에 실패했습니다.",
+      "codeHealthScanFailedDetails": "Code Health 스캔 실패: {details}",
+      "codeHealthGatesFailed": "Code Health: 설정된 품질 게이트를 통과하지 못했습니다. Code Health 설정을 열거나 JSON을 복사하여 gates.violations를 확인하세요.",
+      "codeHealthInvalidJson": "Code Health가 잘못된 JSON 출력을 반환했습니다.",
       "sidebarSectionUpdateFailed": "Saropa Lints: 활동 바 섹션을 업데이트할 수 없습니다 — {message}"
     },
     "vibrancy": {

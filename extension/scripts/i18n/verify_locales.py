@@ -31,6 +31,11 @@ BACKTICK = re.compile(r"`[^`]*`")
 MD_LINK = re.compile(r"\[[^\]]*\]\(([^)]*)\)")
 URL = re.compile(r"(?:https?|command|file)://\S+|command:[\w.\-?=%&/,]+")
 WORD = re.compile(r"[A-Za-z]{3,}")
+# VS Code icon tokens such as "$(warning)"; a translated one renders as text.
+CODICON = re.compile(r"\$\([^)]*\)")
+# Product names kept in English by ruling, so they never count as untranslated.
+# bad_translations.PRODUCT_NAMES is the same pair (it fails a translated name).
+PRODUCT_NAMES = ("Package Vibrancy", "Code Health")
 
 
 def flatten(obj, prefix=""):
@@ -52,6 +57,7 @@ def tokens(s: str) -> dict:
     """Things that must match English exactly (as multisets)."""
     return {
         "placeholders": Counter(PH.findall(s)),
+        "codicons": Counter(CODICON.findall(s)),
         "code": Counter(BACKTICK.findall(s)),
         "links": Counter(MD_LINK.findall(s)),
         "urls": Counter(URL.findall(s)),
@@ -74,6 +80,8 @@ def real_words(s: str, allowed_words: set) -> list[str]:
     s = URL.sub(" ", s)
     s = PH.sub(" ", s)
     s = MD_LINK.sub(" ", s)
+    for name in PRODUCT_NAMES:
+        s = s.replace(name, " ")
     return [w for w in WORD.findall(s) if w.lower() not in allowed_words]
 
 

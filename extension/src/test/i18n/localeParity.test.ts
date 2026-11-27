@@ -4,7 +4,8 @@
  * Values still identical to English fail too, unless allowlisted in scripts/i18n/english_allowed.json.
  * Leaked MT prompts, looped words (spaced or CJK), overlong values and known invented
  * phrases (scripts/i18n/invented_phrases.json) fail as "mt-echo" (see mtEchoProblems).
- * Sindhi-only letters in an ur value fail too (see SINDHI_ONLY).
+ * Sindhi-only and Arabic-only letters in an ur value fail too (SINDHI_ONLY, ARABIC_IN_UR),
+ * as does a translated product name (PRODUCT_NAMES) or codicon token.
  * Full audit lives in scripts/i18n/verify_locales.py.
  */
 import * as assert from 'node:assert';
@@ -45,8 +46,15 @@ function hasRealWords(ev: string, words: Set<string>): boolean {
     .replace(/(?:https?|command|file):\/\/\S+|command:[\w.\-?=%&/,]+/g, ' ')
     .replace(/\{[A-Za-z_][\w.]*\}/g, ' ')
     .replace(/\[[^\]]*\]\(([^)]*)\)/g, ' ');
-  return (stripped.match(/[A-Za-z]{3,}/g) ?? []).some((w) => !words.has(w.toLowerCase()));
+  // Product names stay English by ruling, so they never count as untranslated words.
+  const prose = PRODUCT_NAMES.reduce((s, name) => s.split(name).join(' '), stripped);
+  return (prose.match(/[A-Za-z]{3,}/g) ?? []).some((w) => !words.has(w.toLowerCase()));
 }
+
+// Product names that stay English in every locale (owner ruling). Case-sensitive:
+// lowercase "code health" is ordinary prose and is translated. Mirrors
+// PRODUCT_NAMES in bad_translations.py.
+const PRODUCT_NAMES = ['Package Vibrancy', 'Code Health'];
 
 const ALLOW = loadAllow();
 
@@ -74,6 +82,8 @@ function multiset(s: string, re: RegExp, group = 0): string {
 function placeholderProblems(en: string, loc: string): string[] {
   const checks: [string, RegExp, number][] = [
     ['placeholders', /\{[A-Za-z_][\w.]*\}/g, 0],
+    // VS Code icon tokens: a translated "$(warning)" renders as literal text.
+    ['codicons', /\$\([^)]*\)/g, 0],
     ['code', /`[^`]*`/g, 0],
     ['links', /\[[^\]]*\]\(([^)]*)\)/g, 1],
     ['urls', /(?:https?|command|file):\/\/\S+|command:[\w.\-?=%&/,]+/g, 0],
@@ -135,6 +145,15 @@ const INVENTED = loadInvented();
 // bad_translations.py.
 const SINDHI_ONLY = /[ٺٻٽٿڀڃڄڇڊڌڍڏڙڦڪڱڳڻ۽۾]/;
 
+// Arabic yeh, kaf, teh marbuta and alef maksura, which Urdu does not write. Same
+// set as _ARABIC_IN_UR_RE in bad_translations.py.
+const ARABIC_IN_UR = /[\u064a\u0643\u0629\u0649]/;
+
+/** True when loc has a character matching rx that English does not itself contain. */
+function hasUnexcused(rx: RegExp, en: string, loc: string): boolean {
+  return [...loc].some((ch) => rx.test(ch) && !en.includes(ch));
+}
+
 function mtEchoProblems(en: string, loc: string, locale: string): string[] {
   const out: string[] = [];
   if (PROMPT_LIST.test(loc) && !PROMPT_LIST.test(en)) { out.push('prompt-leak'); }
@@ -146,8 +165,13 @@ function mtEchoProblems(en: string, loc: string, locale: string): string[] {
   const low = loc.toLowerCase();
   const hit = (INVENTED[locale] ?? []).find((p) => low.includes(p.phrase) && !(p.excuse && p.excuse.test(en)));
   if (hit) { out.push(`invented:${hit.phrase.slice(0, 30)}`); }
-  // Only ur: the check says "this is Sindhi, not Urdu", which means nothing elsewhere.
-  if (locale === 'ur' && SINDHI_ONLY.test(loc)) { out.push('sindhi'); }
+  // Only ur: the checks say "this is not Urdu", which means nothing elsewhere.
+  if (locale === 'ur' && hasUnexcused(SINDHI_ONLY, en, loc)) { out.push('sindhi'); }
+  if (locale === 'ur' && hasUnexcused(ARABIC_IN_UR, en, loc)) { out.push('arabic-letter'); }
+  // Counted, so a value naming a product twice cannot translate one of the two.
+  for (const name of PRODUCT_NAMES) {
+    if (loc.split(name).length < en.split(name).length) { out.push(`product-name:${name}`); }
+  }
   return out;
 }
 
@@ -174,6 +198,21 @@ describe('locale parity', () => {
     assert.ok(mtEchoProblems('Remove', sindhi, 'ur').includes('sindhi'));
     assert.ok(!mtEchoProblems('Remove', urdu, 'ur').includes('sindhi'));
     assert.ok(!mtEchoProblems('Remove', sindhi, 'ar').includes('sindhi'));
+  });
+
+  it('excuses ur letters English carries, and flags the ones it does not', () => {
+    assert.ok(mtEchoProblems('Remove', 'تحذير', 'ur').includes('arabic-letter'));
+    assert.ok(!mtEchoProblems('Type ي', 'ي لکھیں', 'ur').includes('arabic-letter'));
+    assert.ok(!mtEchoProblems('Type ٻ', 'ٻ لکھیں', 'ur').includes('sindhi'));
+    // An excused letter must not hide a second one that English lacks.
+    assert.ok(mtEchoProblems('Type ٻ', 'ٻ ٽ', 'ur').includes('sindhi'));
+  });
+
+  it('requires product names in English and codicons intact', () => {
+    assert.ok(mtEchoProblems('Open Code Health', 'کھولیں', 'ur').includes('product-name:Code Health'));
+    assert.ok(mtEchoProblems('Code Health: open Code Health', 'Code Health', 'de').includes('product-name:Code Health'));
+    assert.deepStrictEqual(mtEchoProblems('Code health summary', 'Zusammenfassung', 'de'), []);
+    assert.deepStrictEqual(placeholderProblems('$(warning) {count}', '$(aviso) {count}'), ['codicons']);
   });
 
   for (const fam of families) {

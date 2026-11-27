@@ -345,7 +345,12 @@
     "src/owaspExport.ts",
     "src/test/owaspExport.test.ts",
     "src/views/lintsConfigDashboardMirrors.ts",
-    "src/test/views/lintsConfigDashboardMirrors.test.ts"
+    "src/test/views/lintsConfigDashboardMirrors.test.ts",
+    "src/views/configDashboardSuppressionsStrip.ts",
+    "src/test/views/configDashboardSuppressionsStrip.test.ts",
+    "src/test/views/baselineExplainSurface.test.ts",
+    "src/ruleMigration/migrateController.ts",
+    "src/test/views/acceptedChecklist.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

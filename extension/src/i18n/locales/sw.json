@@ -1041,9 +1041,9 @@
       "trendTitle": "Skore ya health / matokeo ya kifungu kwa ajili ya runi ya kwanza",
       "hotspotsTitle": "{open} imefunguliwa, {safe} imewekwa alama kuwa salama, {fixed} imerekebishwa - bofya ili kukagua",
       "hotspotsPill": "{open} imefunguliwa · {percent}% imekaguliwa",
-      "qualityGatePassingTitle": "Kanuni ya lango la Ubora wa Afya — bofya ili kufungua Kanuni ya Afya",
+      "qualityGatePassingTitle": "Lango la ubora la Code Health limefaulu — bofya ili kufungua Code Health",
       "qualityGatePassingPill": "Lango kupita",
-      "qualityGateFailingTitle": "Kanuni lango la ubora wa Afya halikufaulu (ukiukaji wa {count}) — bofya ili kufungua Kanuni ya Afya",
+      "qualityGateFailingTitle": "Lango la ubora la Code Health halikufaulu (ukiukaji {count}) — bofya ili kufungua Code Health",
       "qualityGateFailingPill": "Gate haijapita"
     },
     "groupBy": {
@@ -1879,10 +1879,10 @@
       "gatesPassing": "milango inayopita"
     },
     "gate": {
-      "fallback": "Milango ya ubora imeshindwa - kagua vizingiti katika mipangilio ya Kanuni ya Afya.",
+      "fallback": "Milango ya ubora imeshindwa - kagua vizingiti katika mipangilio ya Code Health.",
       "failingOne": "lango {count} linaloshindwa — kagua viwango, au nakili JSON ili kukagua gates.violations.",
       "failingOther": "malango {count} yanayoshindwa — kagua viwango, au nakili JSON ili kukagua gates.violations.",
-      "openSettingsTitle": "Fungua mipangilio ya Afya ya Nambari ili kurekebisha vizingiti.",
+      "openSettingsTitle": "Fungua mipangilio ya Code Health ili kurekebisha vizingiti.",
       "openSettingsButton": "Fungua mipangilio ya Code Health"
     },
     "kpi": {
@@ -1903,11 +1903,11 @@
     },
     "toolbar": {
       "ariaLabel": "Vitendo vya Code Health",
-      "rescanTitle": "Endesha tena Scan ya Afya ya Nambari na usasishe dashibodi hii.",
+      "rescanTitle": "Endesha tena uchanganuzi wa Code Health na usasishe dashibodi hii.",
       "rescan": "Changanua tena",
-      "copyJsonTitle": "Nakili JSON ya Afya ya Kanuni mbichi kwenye ubao wa kuingizwa.",
+      "copyJsonTitle": "Nakili JSON ghafi ya Code Health kwenye ubao wa kunakili.",
       "copyJson": "Nakili JSON",
-      "settingsTitle": "Fungua mipangilio ya Afya ya Nambari.",
+      "settingsTitle": "Fungua mipangilio ya Code Health.",
       "settingsButton": "Mipangilio ya Code Health",
       "filterTitle": "Chuja safu kwa jina, faili au bendera.",
       "filterLabel": "Chuja safu",
@@ -2078,6 +2078,7 @@
     "noData": "Hakuna violations.json yet — tuma analizi kujaribu kujadili kipengele cha suppression.",
     "zeroTotal": "0 kuondokana na analyzer katika mauzo ya nje ya hivi karibuni.",
     "noKindBreakdown": "Hakuna mgawanyiko wa aina katika usafirishaji huu.",
+    "total": "Jumla {total}",
     "title": "Kuondolewa (kuuza nje)",
     "readOnlyNote": "(kusoma tu; fungua Matokeo ya kuvinjari na kutenda.)",
     "openFindings": "Fungua Dashibodi ya Matokeo"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy cache imefutwa",
       "copiedInfo": "Imenakili taarifa za {package} kwenye ubao wa kunakili",
       "noPubspecOrLock": "Hakuna pubspec.yaml/pubspec.lock iliyopatikana katika eneo la kazi.",
-      "backfillComplete": "Upakiaji wa Kifurushi: Vibrancy: historia ya mara moja backfill kukamilika ({count} snapshots zilizoagizwa).",
+      "backfillComplete": "Package Vibrancy: ujazaji wa historia wa mara moja umekamilika (muhtasari {count} umeingizwa).",
       "runScanFirst": "Endesha uchanganuzi kwanza",
       "noUpgradable": "Hakuna vifurushi vinavyoweza kuboreshwa vilivyopatikana",
       "proceedUpgrades": "Endelea na upgrades za {count}? Hatua zilizofeli hurudishwa nyuma na mpango unaendelea.",
@@ -2634,12 +2635,12 @@
       "scanOnSaveBaselineCanceled": "Kuzingia kwa kutoa kwa {scanned}/{total} faili.",
       "scanOnSaveBaselineFailed": "Unganisha matokeo ya kujifunza kwa kujitokeza kwa kujifunza kwa kujitokeza: {details}",
       "scanOnSaveBaselineDone": "Skan ya kipengele kote kati: {total} faili, {issues} maswali.",
-      "codeHealthStartFailedDetails": "Kodi Health scan failed to start ({command}): {details}",
-      "codeHealthStartFailed": "Nambari ya Afya Scan imeshindwa kuanza. Hakikisha Dart SDK imewekwa.",
-      "codeHealthScanFailed": "Nambari ya Afya Scan imeshindwa.",
-      "codeHealthScanFailedDetails": "Kodi Health scan failed: {details}",
+      "codeHealthStartFailedDetails": "Uchanganuzi wa Code Health umeshindwa kuanza ({command}): {details}",
+      "codeHealthStartFailed": "Uchanganuzi wa Code Health umeshindwa kuanza. Hakikisha Dart SDK imesakinishwa.",
+      "codeHealthScanFailed": "Uchanganuzi wa Code Health umeshindwa.",
+      "codeHealthScanFailedDetails": "Uchanganuzi wa Code Health umeshindwa: {details}",
       "codeHealthGatesFailed": "Code Health: quality gates zilizosanidiwa zimeshindwa. Fungua mipangilio ya Code Health au nakili JSON ili kukagua gates.violations.",
-      "codeHealthInvalidJson": "Afya ya Nambari ilirudisha pato batili la JSON.",
+      "codeHealthInvalidJson": "Code Health ilirudisha matokeo batili ya JSON.",
       "sidebarSectionUpdateFailed": "Saropa Lints: haikuweza kusasisha sehemu ya activity bar — {message}"
     },
     "vibrancy": {
@@ -2965,7 +2966,7 @@
       "packagesNeedlesCount": "vifurushi {count} vya kukubali",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Lango limeshindwa",
-      "codeHealthNeverScanned": "Endesha Kanuni ya Afya ili kuona alama zako",
+      "codeHealthNeverScanned": "Endesha Code Health ili kuona alama zako",
       "projectMapDescription": "Imechanganuliwa {ago}",
       "projectMapNeverScanned": "Endesha Ramani ya Mradi ili kuona ukubwa na maeneo maarufu"
     },

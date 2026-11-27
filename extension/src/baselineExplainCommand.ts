@@ -34,13 +34,24 @@ export function resolveExplainTarget(
 
 /**
  * The directory to launch `dart run` from, which must depend on saropa_lints:
- * the file's nearest package, else a workspace folder's package (a plugin-only
- * nested package cannot run the CLI itself).
+ * the nearest package enclosing the file that has it, else a workspace folder's
+ * package (a plugin-only nested package cannot run the CLI itself).
  */
 export function resolveExplainHost(file: string, folders: readonly string[]): string | undefined {
-  const own = findPackageRoot(file, fs.existsSync);
-  const candidates = [own, ...folders.map(findProjectRootIn)];
-  return candidates.find((root): root is string => !!root && hasSaropaLintsDep(root));
+  // Every enclosing package, not only the nearest: in a monorepo opened at a root
+  // without a pubspec, `packages/a/example/` is hosted by `packages/a`, which sits
+  // too deep for the one-level workspace folder search below.
+  let own = findPackageRoot(file, fs.existsSync);
+  while (own) {
+    if (hasSaropaLintsDep(own)) return own;
+    // findPackageRoot starts at its argument's parent, so this moves one package up.
+    const above = findPackageRoot(own, fs.existsSync);
+    // A pubspec at the filesystem root is its own parent; stop instead of looping.
+    own = above === own ? undefined : above;
+  }
+  return folders
+    .map(findProjectRootIn)
+    .find((root): root is string => !!root && hasSaropaLintsDep(root));
 }
 
 /**

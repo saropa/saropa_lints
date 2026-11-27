@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} çalışma alanı sorunları"
     },
     "issue": {
-      "hazardFiles": "$(uyarı) {count} büyük dışlanmamış dosya(lar)",
+      "hazardFiles": "$(warning) {count} büyük, dışlanmamış dosya",
       "hazardFilesDetail": "Büyük dosyalar file watcher tarafından izlenirse bellek tükenebilir ve VS Code çökebilir. Tehlike taramasını çalıştırarak bunları dışlayabilirsiniz.",
       "missingExcludes": "$(info) {count} izleme dışlama(sı) eksik",
       "missingExcludesDetail": "Tavsiye edilen dosya izleme hariç tutma desenleri yapılandırılmamış. Bunları eklemek gereksiz bellek kullanımını önler.",
@@ -1041,9 +1041,9 @@
       "trendTitle": "Önceki çalıştırmalardan bu yana sağlık puanı/ihlal eğilimi",
       "hotspotsTitle": "{open} açık, {safe} güvenli olarak işaretlendi, {fixed} düzeltildi — incelemek için tıklayın",
       "hotspotsPill": "{open} açık · %{percent} değerlendirildi",
-      "qualityGatePassingTitle": "Kod Sağlığı kalite kapısı geçiliyor — Kod Sağlığını açmak için tıklayın",
+      "qualityGatePassingTitle": "Code Health kalite kapısı geçildi — Code Health panelini açmak için tıklayın",
       "qualityGatePassingPill": "Kapı geçişi",
-      "qualityGateFailingTitle": "Kod Sağlığı kalite kapısı başarısız ({count} ihlal(ler)) — Kod Sağlığı'nı açmak için tıklayın",
+      "qualityGateFailingTitle": "Code Health kalite kapısı başarısız ({count} ihlal) — Code Health panelini açmak için tıklayın",
       "qualityGateFailingPill": "Kapı başarısız"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "Ağaç JSON'unu kopyala",
       "refreshExtension": "Uzantıyı yenile",
       "openPackageDashboard": "Paket panosunu aç",
-      "openCodeHealth": "Açık Kod Sağlık Open Code Health",
+      "openCodeHealth": "Code Health'i aç",
       "openLintsConfig": "Kural Paketlerini Yönet",
       "reloadFromDisk": "Diskten yeniden yükle",
       "reloadFromDiskTitle": "Analizatörü yeniden çalıştırmadan, son violations.json'dan panoyu tekrar görüntüleyin.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Kod Sağlık Tablosu",
+    "documentTitle": "Saropa Code Health Panosu",
     "skipToTable": "İşlev tablosuna geç",
     "openWorkspaceFirst": "Önce bir Dart/Flutter çalışma alanı açın.",
     "scan": {
@@ -1868,9 +1868,9 @@
     "runReportFirst": "Raporu tekrar çalıştırın, ardından JSON'u kopyalayın.",
     "copiedJson": "Code Health JSON, panoya kopyalanmıştır.",
     "couldNotOpenFile": "Dosya açılamadı: {path}",
-    "panelTitle": "Saropa Kod Sağlık Tablosu",
+    "panelTitle": "Saropa Code Health Panosu",
     "hero": {
-      "title": "Saropa Kod Sağlık Tablosu",
+      "title": "Saropa Code Health Panosu",
       "generated": "Oluşturuldu",
       "functionOne": "{count} işlev",
       "functionOther": "{count} işlev",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "kapı geçiliyor"
     },
     "gate": {
-      "fallback": "Kalite kapıları başarısız oldu; Kod Durumu ayarlarındaki eşikleri inceleyin.",
+      "fallback": "Kalite kapıları başarısız oldu; Code Health ayarlarındaki eşikleri inceleyin.",
       "failingOne": "{count} geçit başarısız — eşikleri gözden geçirin veya gates.violations'ı incelemek için JSON'u kopyalayın.",
       "failingOther": "{count} geçit başarısız — eşikleri gözden geçirin veya gates.violations'ı incelemek için JSON'u kopyalayın.",
-      "openSettingsTitle": "Sınır değerlerini ayarlamak için Kod Sağlık Ayarlarını açın.",
-      "openSettingsButton": "Açık Kod Sağlık ayarları Open Code Health settings"
+      "openSettingsTitle": "Eşik değerlerini ayarlamak için Code Health ayarlarını açın.",
+      "openSettingsButton": "Code Health ayarlarını aç"
     },
     "kpi": {
       "ariaLabel": "Kod sağlığı özeti",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "testler işlevin gerisinde"
     },
     "toolbar": {
-      "ariaLabel": "Kod Sağlığı eylemleri",
-      "rescanTitle": "Kod Sağlığı taramasını tekrar çalıştırın ve bu panoyu yenileyin.",
+      "ariaLabel": "Code Health eylemleri",
+      "rescanTitle": "Code Health taramasını tekrar çalıştırın ve bu panoyu yenileyin.",
       "rescan": "Yeniden tara",
-      "copyJsonTitle": "Çiğ Kod Sağlık JSON'u Klavyeye kopyalayın.",
+      "copyJsonTitle": "Ham Code Health JSON verisini panoya kopyalayın.",
       "copyJson": "JSON'u kopyala",
-      "settingsTitle": "Kod Sağlık ayarlarını açın.",
-      "settingsButton": "Kod Sağlığı ayarları",
+      "settingsTitle": "Code Health ayarlarını açın.",
+      "settingsButton": "Code Health ayarları",
       "filterTitle": "Satırları isim, dosya veya bayrak ile filtreleyin.",
       "filterLabel": "Satırları filtrele",
       "filterPlaceholder": "Satırları filtrele…"
@@ -2078,6 +2078,7 @@
     "noData": "Henüz violations.json yok — analiz çalıştırarak bastırma görüntüsünü doldurun.",
     "zeroTotal": "0 analizatör baskılar son ihracatta.",
     "noKindBreakdown": "Bu ihracatta türüne göre ayrım yapılmaz.",
+    "total": "Toplam {total}",
     "title": "Süpürgeler (ihracat)",
     "readOnlyNote": "(sadece okunur; göz atmak ve hareket etmek için Bulgular'ı aç.)",
     "openFindings": "Açık Bulgular Tablosu (Dashboard)"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy önbelleği temizlendi",
       "copiedInfo": "{package} bilgileri panoya kopyalandı",
       "noPubspecOrLock": "İş alanında pubspec.yaml/pubspec.lock bulunamadı.",
-      "backfillComplete": "Paket Vibransi: Package Vibrance (Paketin canlılığı): bir defalık geçmiş geri doldurma tamamlandı ({count} anlık görüntüler ithal edildi).",
+      "backfillComplete": "Package Vibrancy: bir defalık geçmiş geri doldurma tamamlandı ({count} anlık görüntü içe aktarıldı).",
       "runScanFirst": "Önce tarama çalıştırın",
       "noUpgradable": "Yükseltilebilir paket bulunamadı",
       "proceedUpgrades": "{count} yükseltme ile devam etmek için (((s)? Başarısız adımlar geriye doğru atılır ve plan devam eder.",
@@ -2634,11 +2635,11 @@
       "scanOnSaveBaselineCanceled": "Proje genel taraması {scanned}/{total} dosyaları ardından iptal edildi.",
       "scanOnSaveBaselineFailed": "Proje genel taraması başarısız: {details}",
       "scanOnSaveBaselineDone": "Proje genel taraması tamamlandı: {total} dosya, {issues} sorun(lar).",
-      "codeHealthStartFailedDetails": "Kod Sağlığı tarayıcısı başlatılamadı ({command}): {details}",
-      "codeHealthStartFailed": "Kod Sağlık taraması başlatılamadı. Dart SDK'nın kurulduğundan emin olun.",
-      "codeHealthScanFailed": "Kod Sağlık taraması başarısız oldu.",
-      "codeHealthScanFailedDetails": "Kod Sağlığı taraması başarısız: {details}",
-      "codeHealthGatesFailed": "Kod Sağlığı: yapılandırılmış kalite kapıları başarısız oldu. Kapıları incelemek için Kod Sağlığı ayarlarını açın veya JSON'u kopyalayıp gates.violations alanına bakın.",
+      "codeHealthStartFailedDetails": "Code Health taraması başlatılamadı ({command}): {details}",
+      "codeHealthStartFailed": "Code Health taraması başlatılamadı. Dart SDK'nın kurulu olduğundan emin olun.",
+      "codeHealthScanFailed": "Code Health taraması başarısız oldu.",
+      "codeHealthScanFailedDetails": "Code Health taraması başarısız: {details}",
+      "codeHealthGatesFailed": "Code Health: yapılandırılmış kalite kapıları başarısız oldu. gates.violations alanını incelemek için Code Health ayarlarını açın veya JSON'u kopyalayın.",
       "codeHealthInvalidJson": "Code Health geçersiz JSON çıktısı döndürdü.",
       "sidebarSectionUpdateFailed": "Saropa Lints: aktivite çubuğu bölümü güncellenemedi — {message}"
     },

@@ -1,6 +1,12 @@
 # Accepted `max:` and date baseline: unverified paths
 
-**Status: Open (macOS date baseline only).** Daemon and language-server `max:` verified 2026-11-27.
+**Status: Closed** (owner order, 2026-11-27)
+
+Not verified:
+
+- Screen checks: never run (no Extension Development Host run, no screenshot).
+- macOS `baseline: date:`: pending the first run of the `test-macos` CI job.
+- Translations: no native-speaker review.
 
 From `plans/history/2026.11/2026.11.26/accepted_findings_f5_translations_and_baseline_date.md`.
 
@@ -18,4 +24,4 @@ Not verified, and not covered by the owner checklist:
 
 `max:` in the scan daemon and in the language server is verified end to end by `test/accepted/accepted_max_daemon_process_test.dart` and `test/lsp/accepted_max_lsp_test.dart`; both pass. Ignored findings do not count toward `max` in either path.
 
-Remaining: `baseline: date:` on macOS is unverified; no macOS run was made. Status stays Open (macOS date baseline only).
+Remaining: `baseline: date:` on macOS is unverified; no macOS run was made. The `test-macos` job in `.github/workflows/ci.yml` runs `test/baseline/baseline_date_git_test.dart` and the two `max:` tests on `macos-latest`; it has not run yet. Status stays Open (macOS date baseline only) until that job passes after push.

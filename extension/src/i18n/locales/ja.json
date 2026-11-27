@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} ワークスペースの問題"
     },
     "issue": {
-      "hazardFiles": "$(ワーニング) {count} 大きな除外されていないファイル(s)",
+      "hazardFiles": "$(warning) 除外されていない大きなファイル {count} 件",
       "hazardFilesDetail": "ファイルウォッチャーによって追跡される大容量ファイルはメモリを枯渇させ VS Code をクラッシュさせる可能性があります。危険スキャンを実行してそれらを除外してください。",
       "missingExcludes": "$(info) {count} ワッチャー除外が不足しています",
       "missingExcludesDetail": "推奨されるファイルウォッチャーの除外パターンが設定されていません。これらを追加することで不要なメモリ使用量を防ぐことができます。",
@@ -1043,7 +1043,7 @@
       "hotspotsPill": "{open} オープン · {percent}％レビュー",
       "qualityGatePassingTitle": "Code Health 品質ゲート通過 — クリックして Code Health を開きます",
       "qualityGatePassingPill": "ゲート通過",
-      "qualityGateFailingTitle": "コード ヘルス品質ゲートの失敗 ({count} 違反) — クリックしてコード ヘルスを開きます",
+      "qualityGateFailingTitle": "Code Health の品質ゲートに失敗しました（違反 {count} 件）— クリックして Code Health を開きます",
       "qualityGateFailingPill": "ゲート失敗"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "コピーツリー JSON のコピー",
       "refreshExtension": "拡張機能を更新",
       "openPackageDashboard": "パッケージのダッシュボードを開く",
-      "openCodeHealth": "オープン・コードの健康",
+      "openCodeHealth": "Code Health を開く",
       "openLintsConfig": "ルールパックを管理する",
       "reloadFromDisk": "ディスクから再読み込み",
       "reloadFromDiskTitle": "分析機を再起動せずに,最後の violations.json からダッシュボードを再レンダーします.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa コード 健康ダッシュボード",
+    "documentTitle": "Saropa Code Health ダッシュボード",
     "skipToTable": "関数テーブルへスキップ",
     "openWorkspaceFirst": "まず,Dart/Flutter ワークスペースを開きます.",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "レポートを再び実行し,JSON. をコピーします.",
-    "copiedJson": "コードヘルスJSONをクリップボードにコピーしました.",
+    "copiedJson": "Code Health の JSON をクリップボードにコピーしました。",
     "couldNotOpenFile": "ファイルを開くことはできません: {path}",
-    "panelTitle": "Saropa コード 健康ダッシュボード",
+    "panelTitle": "Saropa Code Health ダッシュボード",
     "hero": {
-      "title": "Saropa コード 健康ダッシュボード",
+      "title": "Saropa Code Health ダッシュボード",
       "generated": "生成日時",
       "functionOne": "{count} 関数",
       "functionOther": "{count} 関数",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "ゲート合格"
     },
     "gate": {
-      "fallback": "品質ゲートに失敗しました。コードヘルス設定のしきい値を確認してください。",
+      "fallback": "品質ゲートに失敗しました。Code Health の設定でしきい値を確認してください。",
       "failingOne": "{count} つのゲートが失敗しました — しきい値を確認するか、JSON をコピーして gates.violations を検査してください。",
       "failingOther": "{count} つのゲートが失敗しました — しきい値を確認するか、JSON をコピーして gates.violations を検査してください。",
-      "openSettingsTitle": "値引きを調整するために,コードヘルスの設定を開きます.",
-      "openSettingsButton": "オープン・コード 健康設定"
+      "openSettingsTitle": "しきい値を調整するには Code Health の設定を開きます。",
+      "openSettingsButton": "Code Health の設定を開く"
     },
     "kpi": {
       "ariaLabel": "保健コードの要約",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "テストが関数に追いついていない"
     },
     "toolbar": {
-      "ariaLabel": "行動法 健康対策",
-      "rescanTitle": "コードヘルスのスキャンを再実行し,このダッシュボードをリフレッシュします.",
+      "ariaLabel": "Code Health の操作",
+      "rescanTitle": "Code Health のスキャンを再実行して、このダッシュボードを更新します。",
       "rescan": "再スキャン",
-      "copyJsonTitle": "粗製のコードヘルスJSONをクリップボードにコピーします.",
+      "copyJsonTitle": "Code Health の生の JSON をクリップボードにコピーします。",
       "copyJson": "JSONをコピーする",
-      "settingsTitle": "コードヘルスケア設定を開きます.",
-      "settingsButton": "コード 保健施設 健康管理",
+      "settingsTitle": "Code Health の設定を開きます。",
+      "settingsButton": "Code Health の設定",
       "filterTitle": "フィルター行は名前,ファイルまたはフラグによって.",
       "filterLabel": "行を絞り込み",
       "filterPlaceholder": "行を絞り込み…"
@@ -2078,6 +2078,7 @@
     "noData": "violations.json がまだありません。分析を実行すると抑制のスナップショットが作成されます。",
     "zeroTotal": "0 最新の輸出で分析器抑制.",
     "noKindBreakdown": "この輸出の品種の別には,分類はありません.",
+    "total": "合計 {total}",
     "title": "削除 (輸出)",
     "readOnlyNote": "(読み込み専用; 検索と行動するための\"Findings\"を開きます.)",
     "openFindings": "オープンな検索結果ダッシュボード"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy キャッシュをクリアしました",
       "copiedInfo": "{package} の情報をクリップボードにコピーしました",
       "noPubspecOrLock": "ワークスペースで pubspec.yaml/pubspec.lock が見つかりませんでした.",
-      "backfillComplete": "パッケージの活力: 振動性 一回限りの履歴バックフィーリング完了 ({count}スナップショットがインポートされました).",
+      "backfillComplete": "Package Vibrancy: 1 回限りの履歴の補完が完了しました（{count} 件のスナップショットをインポートしました）。",
       "runScanFirst": "先にスキャンを実行してください",
       "noUpgradable": "アップグレード可能なパッケージは見つかりません",
       "proceedUpgrades": "{count}アップグレードを続けるか? 失敗したステップは後退し,計画は継続します.",
@@ -2634,11 +2635,11 @@
       "scanOnSaveBaselineCanceled": "全体プロジェクトスキャンは {scanned}/{total} ファイルの後でキャンセルされました。",
       "scanOnSaveBaselineFailed": "プロジェクト全体スキャン失敗: {details}",
       "scanOnSaveBaselineDone": "プロジェクト全体スキャン完了: {total}ファイル、{issues}問題件。",
-      "codeHealthStartFailedDetails": "コードヘルススキャンを開始できませんでした（{command}）: {details}",
-      "codeHealthStartFailed": "コード 健康スキャンが起動できませんでした. Dart SDKがインストールされていることを確認してください.",
-      "codeHealthScanFailed": "コード 健康スキャン失敗.",
-      "codeHealthScanFailedDetails": "コードヘルススキャンに失敗しました: {details}",
-      "codeHealthGatesFailed": "コードヘルス: 設定された品質ゲートに失敗しました。コードヘルス設定を開くか、JSON をコピーして gates.violations を確認してください。",
+      "codeHealthStartFailedDetails": "Code Health のスキャンを開始できませんでした（{command}）: {details}",
+      "codeHealthStartFailed": "Code Health のスキャンを開始できませんでした。Dart SDK がインストールされていることを確認してください。",
+      "codeHealthScanFailed": "Code Health のスキャンに失敗しました。",
+      "codeHealthScanFailedDetails": "Code Health のスキャンに失敗しました: {details}",
+      "codeHealthGatesFailed": "Code Health: 設定された品質ゲートに失敗しました。Code Health の設定を開くか、JSON をコピーして gates.violations を確認してください。",
       "codeHealthInvalidJson": "Code Health は無効な JSON 出力を返しました.",
       "sidebarSectionUpdateFailed": "Saropa Lints: アクティビティバーのセクションを更新できませんでした — {message}"
     },

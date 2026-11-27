@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} werkruimte probleem(en)"
     },
     "issue": {
-      "hazardFiles": "$(waarschuwing) {count} grote niet-uitgesloten bestand(en)",
+      "hazardFiles": "$(warning) {count} grote niet-uitgesloten bestand(en)",
       "hazardFilesDetail": "Grote bestanden die door de bestandswatcher worden gevolgd, kunnen de geheugenverbruimening oplopen en VS Code crashen. Voer de gevaarlijke scan uit om ze uit te sluiten.",
       "missingExcludes": "$(info) {count} ontbrekende watcher uitsluitingen",
       "missingExcludesDetail": "Aanbevolen bestand-watcher uitsluitingspatronen zijn niet geconfigureerd. Het toevoegen ervan voorkomt onnodig geheugenverbruik.",
@@ -1043,7 +1043,7 @@
       "hotspotsPill": "{open} open · {percent}% beoordeeld",
       "qualityGatePassingTitle": "Code Health-kwaliteitspoort passeren - klik om Code Health te openen",
       "qualityGatePassingPill": "Poort passeren",
-      "qualityGateFailingTitle": "Kwaliteitspoort codestatus mislukt ({count}-overtreding(en)) — klik om Codestatus te openen",
+      "qualityGateFailingTitle": "Kwaliteitspoort van Code Health mislukt ({count} overtreding(en)) — klik om Code Health te openen",
       "qualityGateFailingPill": "Poort mislukt"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "Boom-JSON kopiëren",
       "refreshExtension": "Extensie vernieuwen",
       "openPackageDashboard": "Pakketdashboard openen",
-      "openCodeHealth": "Open Code Gezondheidszorg",
+      "openCodeHealth": "Code Health openen",
       "openLintsConfig": "Regelpakketten beheren",
       "reloadFromDisk": "Opnieuw laden vanaf schijf",
       "reloadFromDiskTitle": "Herhaal het dashboard van de laatste violations.json zonder opnieuw te starten met de analysator.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Code Gezondheid Dashboard",
+    "documentTitle": "Saropa Code Health-dashboard",
     "skipToTable": "Naar de functietabel springen",
     "openWorkspaceFirst": "Open eerst een Dart/Flutter werkruimte.",
     "scan": {
@@ -1868,9 +1868,9 @@
     "runReportFirst": "Voer het rapport opnieuw uit en kopieer vervolgens JSON.",
     "copiedJson": "Code Health JSON gekopieerd naar het clipboard.",
     "couldNotOpenFile": "Kon bestand niet openen: {path}",
-    "panelTitle": "Saropa Code Gezondheid Dashboard",
+    "panelTitle": "Saropa Code Health-dashboard",
     "hero": {
-      "title": "Saropa Code Gezondheid Dashboard",
+      "title": "Saropa Code Health-dashboard",
       "generated": "Gegenereerd",
       "functionOne": "{count} functie",
       "functionOther": "{count} functies",
@@ -1883,7 +1883,7 @@
       "failingOne": "{count} gate faalt — controleer drempelwaarden of kopieer de JSON om gates.violations te inspecteren.",
       "failingOther": "{count} gates falen — controleer drempelwaarden of kopieer de JSON om gates.violations te inspecteren.",
       "openSettingsTitle": "Open de Code Health-instellingen om drempels aan te passen.",
-      "openSettingsButton": "Open Code Gezondheidsinstellingen"
+      "openSettingsButton": "Instellingen van Code Health openen"
     },
     "kpi": {
       "ariaLabel": "Samenvatting codegezondheid",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "tests lopen achter op de functie"
     },
     "toolbar": {
-      "ariaLabel": "Code Gezondheidsacties",
-      "rescanTitle": "Voer de code gezondheidsscan opnieuw uit en verfris dit dashboard.",
+      "ariaLabel": "Acties voor Code Health",
+      "rescanTitle": "Voer de scan van Code Health opnieuw uit en vernieuw dit dashboard.",
       "rescan": "Opnieuw scannen",
       "copyJsonTitle": "Kopieer de ruwe Code Health JSON naar het klembord.",
       "copyJson": "JSON kopieren",
       "settingsTitle": "Open de Code Health-instellingen.",
-      "settingsButton": "Code Gezondheidsinstellingen",
+      "settingsButton": "Instellingen van Code Health",
       "filterTitle": "Filter rijen op naam, bestand of vlag.",
       "filterLabel": "Rijen filteren",
       "filterPlaceholder": "Rijen filteren…"
@@ -2078,6 +2078,7 @@
     "noData": "Geen violations.json nog — voer analyse uit om de suppressie-snapshot te vullen.",
     "zeroTotal": "0 analysator onderdrukkingen in de laatste export.",
     "noKindBreakdown": "Geen uitsplitsing naar soort in deze export.",
+    "total": "Totaal {total}",
     "title": "Uitwissing (export)",
     "readOnlyNote": "(alleen lezen; open Findings om te bladeren en op te treden.)",
     "openFindings": "Bevindingendashboard openen"
@@ -2635,8 +2636,8 @@
       "scanOnSaveBaselineFailed": "Gehele project scan mislukt: {details}",
       "scanOnSaveBaselineDone": "Volledige projectscan voltooid: {total} bestanden, {issues} probleem(en).",
       "codeHealthStartFailedDetails": "Code Health-scan kon niet worden gestart ({command}): {details}",
-      "codeHealthStartFailed": "Code Gezondheidsonderzoek kon niet starten. Zorg ervoor dat Dart SDK is geïnstalleerd.",
-      "codeHealthScanFailed": "Code Gezondheidsonderzoek mislukt.",
+      "codeHealthStartFailed": "De scan van Code Health kon niet starten. Zorg ervoor dat de Dart SDK is geïnstalleerd.",
+      "codeHealthScanFailed": "Scan van Code Health mislukt.",
       "codeHealthScanFailedDetails": "Code Health scan mislukt: {details}",
       "codeHealthGatesFailed": "Code Health: geconfigureerde kwaliteitspoorten zijn niet gehaald. Open de Code Health-instellingen of kopieer de JSON om gates.violations te inspecteren.",
       "codeHealthInvalidJson": "Code Health heeft ongeldige JSON-uitvoer geretourneerd.",

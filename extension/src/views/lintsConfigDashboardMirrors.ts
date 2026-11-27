@@ -42,8 +42,9 @@ function buildFileRiskLines(risks: readonly FileRisk[]): string {
 }
 
 /**
- * Suppression total with its per-kind breakdown. This strip is the only visible
- * surface for the `accepted` count, so every kind the analyzer exports is listed.
+ * Suppression total with its per-kind breakdown. No production code renders these
+ * panels; the Rule Packs "Suppressions (export)" strip users see is built by
+ * `configDashboardSuppressionsStrip.ts`.
  */
 function buildSuppressionBlock(sup: SuppressionsSummary | undefined): string {
   // Older analyzers write no aggregate; say so instead of showing zeros.
@@ -58,7 +59,7 @@ function buildSuppressionBlock(sup: SuppressionsSummary | undefined): string {
     : '';
   // {total} is left unfilled by l10n so the translated sentence can be escaped first
   // and the bold number placed wherever the language puts it.
-  const sentence = escapeHtml(l10n('configMirrors.suppressionTotal')).replace(
+  const sentence = escapeHtml(l10n('configMirrors.suppressionTotal')).replace( // l10n:passthrough
     '{total}',
     `<strong>${escapeHtml(String(sup.total))}</strong>`,
   );

@@ -1883,7 +1883,7 @@
       "failingOne": "{count} gate ang bumabagsak — suriin ang thresholds, o kopyahin ang JSON para inspeksyunin ang gates.violations.",
       "failingOther": "{count} gates ang bumabagsak — suriin ang thresholds, o kopyahin ang JSON para inspeksyunin ang gates.violations.",
       "openSettingsTitle": "Buksan ang Code Health settings upang ayusin ang mga threshold.",
-      "openSettingsButton": "Open Code Mga setting ng kalusugan"
+      "openSettingsButton": "Buksan ang mga setting ng Code Health"
     },
     "kpi": {
       "ariaLabel": "Buod ng kalusugan ng code",
@@ -2078,6 +2078,7 @@
     "noData": "Wala pang violations.json — magpatakbo ng pagsusuri upang i-populate ang snapshot ng pagsugpo.",
     "zeroTotal": "0 analyzer suppressions sa pinakabagong pag-export.",
     "noKindBreakdown": "Walang pag-breakdown sa pamamagitan ng uri sa eksport na ito.",
+    "total": "Kabuuan {total}",
     "title": "Mga suppression (export)",
     "readOnlyNote": "(mababasa lamang; buksan ang mga Natuklasan upang mag-browse at kumilos.)",
     "openFindings": "Buksan ang Dashboard ng mga Natuklasan"

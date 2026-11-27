@@ -1866,7 +1866,7 @@
       }
     },
     "runReportFirst": "Запустите отчет снова, затем скопируйте JSON.",
-    "copiedJson": "Код здоровья JSON скопирован в клипборд.",
+    "copiedJson": "JSON из Code Health скопирован в буфер обмена.",
     "couldNotOpenFile": "Не удалось открыть файл: {path}",
     "panelTitle": "Панель Saropa Code Health",
     "hero": {
@@ -1879,10 +1879,10 @@
       "gatesPassing": "порогов пройдено"
     },
     "gate": {
-      "fallback": "Не удалось выполнить контроль качества. Проверьте пороговые значения в настройках состояния кода.",
+      "fallback": "Не удалось пройти контроль качества. Проверьте пороговые значения в настройках Code Health.",
       "failingOne": "{count} шлюз завершился с ошибкой — проверьте пороги или скопируйте JSON для проверки gates.violations.",
       "failingOther": "{count} шлюзов завершились с ошибкой — проверьте пороги или скопируйте JSON для проверки gates.violations.",
-      "openSettingsTitle": "Откройте настройки Кода здоровья, чтобы скорректировать пороговые значения.",
+      "openSettingsTitle": "Откройте настройки Code Health, чтобы скорректировать пороговые значения.",
       "openSettingsButton": "Открыть настройки Code Health"
     },
     "kpi": {
@@ -1903,11 +1903,11 @@
     },
     "toolbar": {
       "ariaLabel": "Действия Code Health",
-      "rescanTitle": "Повторите сканирование состояния кода и обновите эту панель.",
+      "rescanTitle": "Повторите сканирование Code Health и обновите эту панель.",
       "rescan": "Повторное сканирование",
-      "copyJsonTitle": "Копируйте JSON с необработанным кодом здоровья в клипборд.",
+      "copyJsonTitle": "Скопировать необработанный JSON из Code Health в буфер обмена.",
       "copyJson": "Копировать JSON",
-      "settingsTitle": "Откройте настройки Кода здоровья.",
+      "settingsTitle": "Откройте настройки Code Health.",
       "settingsButton": "Настройки Code Health",
       "filterTitle": "Фильтруйте строки по имени, файлу или флагу.",
       "filterLabel": "Фильтровать строки",
@@ -2078,6 +2078,7 @@
     "noData": "Еще нет violations.json — выполните анализ для заполнения снимка подавления.",
     "zeroTotal": "0 анализирующие подавления в последнем экспорте.",
     "noKindBreakdown": "В этом экспорте нет разбивки по видам.",
+    "total": "Всего {total}",
     "title": "Удаления (экспорт)",
     "readOnlyNote": "(только для чтения; открыть результаты, чтобы просмотреть и действовать.)",
     "openFindings": "Открыть панель находок"
@@ -2635,8 +2636,8 @@
       "scanOnSaveBaselineFailed": "Полный сканирование проекта завершилось с ошибкой: {details}",
       "scanOnSaveBaselineDone": "Полный сканирование проекта завершено: {total} файлов, {issues} проблема(ы).",
       "codeHealthStartFailedDetails": "Не удалось запустить сканирование Code Health ({command}): {details}",
-      "codeHealthStartFailed": "Код \"Здоровье\" сканирование не удалось запустить. Убедитесь, что Dart SDK установлен.",
-      "codeHealthScanFailed": "Код \"Здоровье\" сканирования не удалось.",
+      "codeHealthStartFailed": "Не удалось запустить сканирование Code Health. Убедитесь, что Dart SDK установлен.",
+      "codeHealthScanFailed": "Сканирование Code Health не удалось.",
       "codeHealthScanFailedDetails": "Ошибка сканирования Code Health: {details}",
       "codeHealthGatesFailed": "Code Health: заданные пороги качества не пройдены. Откройте настройки Code Health или скопируйте JSON, чтобы изучить gates.violations.",
       "codeHealthInvalidJson": "Code Health вернул недействительный JSON-вывод.",

@@ -67,7 +67,7 @@
   "Close detail": "Chiudi dettagli",
   "Close keyboard shortcuts": "Chiudi le scorciatoie da tastiera",
   "Code Commit Activity": "Attività dei commit di codice",
-  "Code Health": "Salute del codice",
+  "Code Health": "Code Health",
   "Code Health scan failed to start ({command}): {details}": "Avvio della scansione Code Health non riuscito ({command}): {details}",
   "Code Health scan failed: {details}": "Scansione Code Health non riuscita: {details}",
   "Code Health: configured quality gates failed. Open Code Health settings or copy JSON to inspect gates.violations.": "Code Health: i quality gate configurati non sono stati superati. Apri le impostazioni di Code Health o copia il JSON per ispezionare gates.violations.",

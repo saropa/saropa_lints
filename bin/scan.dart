@@ -27,6 +27,7 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 import 'package:saropa_lints/src/tiers.dart';
 import 'package:saropa_lints/src/accepted/accepted_findings_check.dart';
 import 'package:saropa_lints/src/accepted/accepted_findings_roots.dart';
+import 'package:saropa_lints/src/accepted/accepted_findings_skipped_files.dart';
 
 /// Standalone lint scanner that runs saropa_lints rules against any Dart
 /// project without requiring it as a dependency.
@@ -254,8 +255,11 @@ Future<void> main(List<String> args) async {
     } else {
       // An empty tracker after a profiled run means no rule callbacks
       // executed — surface it, never let profiling fail silently again.
-      if (!quiet)
+      // Braced: the call wraps to a second line, which the
+      // curly_braces_in_flow_control_structures lint rejects without a block.
+      if (!quiet) {
         stderr.writeln('Timing profile: no data collected (no rules ran).');
+      }
     }
   }
 
@@ -300,9 +304,41 @@ Future<void> main(List<String> args) async {
           excludeGlobs: excludeGlobs,
           includeGlobs: parsed.includeGlobs,
         );
+  // --check-accepted also scans the files list entries name that discovery
+  // skipped (example/, bin/, generated), so those entries get a verdict. Not
+  // with --files: that run is scoped on purpose.
+  var extra = SkippedFilesScan();
+  if (parsed.checkAccepted && dartFiles.isEmpty) {
+    final target = p.absolute(path);
+    extra = await scanAcceptedSkippedFiles(
+      target: target,
+      filesByRoot: acceptedSkippedFiles(
+        target: target,
+        lists: AcceptedListSet(),
+        alreadyScanned: scannedFiles,
+        // Only the user's own globs: analyzer excludes such as example/** are
+        // what hid these files, and their lists are still read by the editor.
+        excludeGlobs: parsed.excludeGlobs,
+      ),
+      runnerFor: (configRoot, files) => ScanRunner(
+        targetPath: configRoot,
+        dartFiles: files,
+        tier: tier,
+        debugRule: parsed.debugRule,
+        excludeLightLane: parsed.excludeLightLane,
+        lane: parseRuleLane(parsed.lane ?? 'full'),
+        messageSink: quiet ? (_) {} : null,
+        maxIssues: maxIssues,
+        // The files were chosen above; also lets an analyzer-excluded file
+        // get its own context instead of being skipped.
+        applyExclusionsToFileList: false,
+      ),
+    );
+  }
+
   final ignoreFiltered = filterIgnoredDiagnostics(
-    diagnostics: diagnostics,
-    files: scannedFiles,
+    diagnostics: [...diagnostics, ...extra.diagnostics],
+    files: [...scannedFiles, ...extra.files],
   );
 
   // Accepted-findings lists (saropa_accepted.yaml beside each package's
@@ -327,12 +363,23 @@ Future<void> main(List<String> args) async {
   // stale, invalid) and exit. Runs here, after both filters, so it judges the
   // same finding set the normal output would have shown.
   if (parsed.checkAccepted) {
+    // An in-process run records which files it really walked; a file it could
+    // not resolve or never reached (memory stop) must not count as checked.
+    // Worker runs report their skips through lastParallelReport instead.
+    final walked = runner.lastParallelReport == null
+        ? {for (final f in runner.walkedFiles) rootKey(canonicalRoot(f))}
+        : null;
     _runCheckAccepted(
       target: p.absolute(path),
       lists: acceptedLists,
       split: acceptedSplit,
-      scannedFiles: scannedFiles,
+      scannedFiles: [
+        for (final f in scannedFiles)
+          if (walked == null || walked.contains(rootKey(canonicalRoot(f)))) f,
+        ...extra.files,
+      ],
       ranRules: runner.ranRuleNames,
+      rulesRunByFile: extra.rulesByFile,
       // Trimmed or aborted output may be missing findings, so "no finding"
       // cannot be trusted as stale in that case.
       complete:
@@ -365,10 +412,12 @@ Future<void> main(List<String> args) async {
         .where((s) => !_knownSeverities.contains(s))
         .toSet();
     for (final s in unknown) {
-      if (!quiet)
+      // Braced for the same multi-line-statement lint as above.
+      if (!quiet) {
         stderr.writeln(
           'Warning: unrecognized severity "$s" — excluded by filter.',
         );
+      }
     }
   }
 
@@ -812,6 +861,7 @@ void _runCheckAccepted({
   required AcceptedSplit split,
   required List<String> scannedFiles,
   required Set<String> ranRules,
+  required Map<String, Set<String>> rulesRunByFile,
   required bool complete,
   required List<String> skippedFiles,
   required bool formatJson,
@@ -830,6 +880,7 @@ void _runCheckAccepted({
         if (!skipped.contains(rootKey(canonicalRoot(f)))) f,
     ],
     rulesRun: ranRules,
+    rulesRunByFile: rulesRunByFile,
     complete: complete,
   );
   if (formatJson) {
@@ -1120,6 +1171,8 @@ void _printUsage() {
   print('                      Checks every list under the target (dependency');
   print('                      and build folders skipped); each file uses the');
   print('                      list of its nearest pubspec.yaml.');
+  print('                      Also scans files an entry names that a normal');
+  print('                      scan skips (example/, bin/, generated).');
   print('                      Never edits a list. Supports --format json.');
   print('                      Always runs resolved, as with --resolve.');
   print('');

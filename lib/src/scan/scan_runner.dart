@@ -1421,6 +1421,12 @@ class ScanRunner {
     includeGlobs.map(_globToRegex).toList(),
   );
 
+  /// Whether [path] matches one of [globs], with the same matching as
+  /// `--exclude-globs` (as given, absolute, or relative to [root]). For callers
+  /// that pick files outside discovery but must still honor the user's globs.
+  static bool matchesAnyGlob(String path, List<String> globs, String root) =>
+      _matchesExcludeGlob(path, globs.map(_globToRegex).toList(), root);
+
   static List<String> _findDartFiles(
     String directory, [
     List<RegExp> excludePatterns = const [],

@@ -19,10 +19,10 @@
     },
     "statusItem": {
       "text": "Vibrancy: pub דולג",
-      "tooltip": "Vibrancy של החבילות דילג על שאילתת pub כדי ש-pubspec.lock לא ייכתב מחדש. לחץ לפרטים."
+      "tooltip": "Package Vibrancy דילג על שאילתת pub כדי ש-pubspec.lock לא ייכתב מחדש. לחץ לפרטים."
     },
     "explain": {
-      "title": "Vibrancy של החבילות דילג על שאילתת pub",
+      "title": "Package Vibrancy דילג על שאילתת pub",
       "none": "לא דולגה אף שאילתת pub של Vibrancy בהפעלה הנוכחית.",
       "unknown": "לא ידוע",
       "reason": "סיבה: {reason}",
@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} בעיה(ות) במרחב העבודה"
     },
     "issue": {
-      "hazardFiles": "$(אזהרה) {count} קבצים גדולים לא מ-excluded",
+      "hazardFiles": "$(warning) קבצים גדולים שלא הוחרגו: {count}",
       "hazardFilesDetail": "קבצים גדולים שמעקב הקבצים עוקב אחריהם עלולים לדלדל את הזיכרון ולהקריס את VS Code. הרץ את סריקת הסיכונים כדי להחריג אותם.",
       "missingExcludes": "$(info) {count} חסר/ים מוניטור שיקול היעדרים",
       "missingExcludesDetail": "תבניות ההחרגה המומלצות של מעקב הקבצים אינן מוגדרות. הוספתן מונעת שימוש מיותר בזיכרון.",
@@ -1041,9 +1041,9 @@
       "trendTitle": "ציון בריאות / עלייה/ירידה בבעלות סכנת תקופות קודמות",
       "hotspotsTitle": "{open} פתוח, {safe} סימן כבטוח, {fixed} מותאם — לחץ כדי לסקור",
       "hotspotsPill": "{open} פתוח · {percent}% נקרא",
-      "qualityGatePassingTitle": "תהליך בדיקה של גובה קוד — לחץ כדי לפתוח מצביע על גובה קוד",
+      "qualityGatePassingTitle": "שער האיכות של Code Health עובר — לחץ כדי לפתוח את Code Health",
       "qualityGatePassingPill": "מעבר דלתות",
-      "qualityGateFailingTitle": "מבחן סטנדרט של תקינות קוד נכשל ({count} סכימה(ים)) — לחץ כדי לפתוח תקינות קוד",
+      "qualityGateFailingTitle": "שער האיכות של Code Health נכשל ({count} הפרות) — לחץ כדי לפתוח את Code Health",
       "qualityGateFailingPill": "שער כישלון"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "עץ העתק JSON של ג'ון",
       "refreshExtension": "רענן את ההרחבה",
       "openPackageDashboard": "פתח את לוח המחוונים של החבילות",
-      "openCodeHealth": "פתיחת תקינות קוד",
+      "openCodeHealth": "פתיחת Code Health",
       "openLintsConfig": "ניהול חבילות כללים של Rule Packs",
       "reloadFromDisk": "טען מחדש מהדיסק",
       "reloadFromDiskTitle": "להציג מחדש את לוח המחוונים מה violations.json האחרון מבלי להפעיל שוב את הניתוח.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa קוד לוח המחוונים הבריאותי של מערכת הנתונים",
+    "documentTitle": "לוח המחוונים Saropa Code Health",
     "skipToTable": "דלג לטבלת הפונקציות",
     "openWorkspaceFirst": "פתח תחילה את חלל העבודה Dart/Flutter.",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "הוצא את הדו\"ח שוב, ולאחר מכן העתק JSON.",
-    "copiedJson": "קוד בריאות JSON שכפל לקטע.",
+    "copiedJson": "ה-JSON של Code Health הועתק ללוח.",
     "couldNotOpenFile": "לא ניתן לפתוח את הקובץ: {path}",
-    "panelTitle": "Saropa קוד לוח המחוונים הבריאותי של מערכת הנתונים",
+    "panelTitle": "לוח המחוונים Saropa Code Health",
     "hero": {
-      "title": "Saropa קוד לוח המחוונים הבריאותי של מערכת הנתונים",
+      "title": "לוח המחוונים Saropa Code Health",
       "generated": "נוצרו שנוצרים",
       "functionOne": "{count} פונקציה",
       "functionOther": "{count} פונקציות",
@@ -1882,8 +1882,8 @@
       "fallback": "שערי איכות נכשלו - סקירת ספים בהגדרות Code Health.",
       "failingOne": "{count} שער נכשל — סקור את הספים, או העתק את ה-JSON כדי לבדוק את gates.violations.",
       "failingOther": "{count} שערים נכשלים — סקור את הספים, או העתק את ה-JSON כדי לבדוק את gates.violations.",
-      "openSettingsTitle": "פתח את הגדרות בריאות הקוד כדי להתאים סף.",
-      "openSettingsButton": "קוד פתוח הגדרות בריאותיות"
+      "openSettingsTitle": "פתח את הגדרות Code Health כדי להתאים ספים.",
+      "openSettingsButton": "פתיחת הגדרות Code Health"
     },
     "kpi": {
       "ariaLabel": "סיכום בריאותי של הקוד",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "הבדיקות מפגרות אחרי הפונקציה"
     },
     "toolbar": {
-      "ariaLabel": "קוד פעולות בריאותיות",
-      "rescanTitle": "הפעל מחדש את סריקה בריאות הקוד ועדכן את לוח המחוונים הזה.",
+      "ariaLabel": "פעולות Code Health",
+      "rescanTitle": "הפעל מחדש את סריקת Code Health ורענן את לוח המחוונים הזה.",
       "rescan": "סרוק מחדש",
-      "copyJsonTitle": "העתק את קוד הבריאות JSON הגולמי למרכז ההעתקות.",
+      "copyJsonTitle": "העתק את ה-JSON הגולמי של Code Health ללוח.",
       "copyJson": "העתק JSON",
-      "settingsTitle": "פתח את הגדרות בריאות הקוד.",
-      "settingsButton": "קוד הגדרות בריאותיות",
+      "settingsTitle": "פתח את הגדרות Code Health.",
+      "settingsButton": "הגדרות Code Health",
       "filterTitle": "מסננים שורות לפי שם, קובץ או דגל.",
       "filterLabel": "שורות מסנן: שורות המסננים",
       "filterPlaceholder": "שורות מסנן..."
@@ -2078,6 +2078,7 @@
     "noData": "אין עדיין violations.json - הפעל ניתוח כדי לאכלס את תמונת המצב של הדיכוי.",
     "zeroTotal": "0 דחיפות אנליזארים בייצוא האחרון.",
     "noKindBreakdown": "אין פירוט לפי סוג של היצוא הזה.",
+    "total": "סך הכול {total}",
     "title": "סילוק (ייצוא)",
     "readOnlyNote": "(רק לקריאה; פתח את הממצאים כדי לעיין ולפעול.)",
     "openFindings": "פתח את לוח המחוונים של הממצאים"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy cache cleared הוסרה מחסנית של ויברנסי",
       "copiedInfo": "המידע על {package} הועתק ללוח",
       "noPubspecOrLock": "לא נמצא pubspec.yaml/pubspec.lock במרחב העבודה.",
-      "backfillComplete": "חבילת חיוניות: רטביה של החבילה מילוי אחורי חד פעמי של ההיסטוריה הושלם (הורכבו תמונות{count}).",
+      "backfillComplete": "Package Vibrancy: מילוי ההיסטוריה החד-פעמי הושלם (יובאו {count} תמונות מצב).",
       "runScanFirst": "הרץ תחילה סריקה",
       "noUpgradable": "לא נמצאו חבילות שניתן לשדרג",
       "proceedUpgrades": "להמשיך עם שדרוג {count} ? צעדים כושלים חוזרים לאחור והתוכנית ממשיכה.",
@@ -2634,12 +2635,12 @@
       "scanOnSaveBaselineCanceled": "סריקה של כל הפרויקט בוטלה לאחר {scanned}/{total} קבצים.",
       "scanOnSaveBaselineFailed": "סריקה של כל הפרויקט נכשלה: {details}",
       "scanOnSaveBaselineDone": "סריקה של כל הפרויקט הושלמה: {total} קבצים, {issues} בעיה(ות).",
-      "codeHealthStartFailedDetails": "סריקה של מצב הקוד נכשלה להתחיל ({command}): {details}",
-      "codeHealthStartFailed": "קוד בריאות הסריקה לא הצליחה להתחיל. ודא ש- Dart SDK מותקן.",
-      "codeHealthScanFailed": "קוד סריקה בריאותית נכשלה.",
-      "codeHealthScanFailedDetails": "סריקה של מצב הקוד נכשלה: {details}",
-      "codeHealthGatesFailed": "קוד בריאות: Code Health: שערות איכות מותאמות נכשלו. פתח את הגדרות בריאות הקוד או העתק JSON כדי לבדוק gates.violations.",
-      "codeHealthInvalidJson": "בריאות קוד החזיר פלט JSON לא תקף.",
+      "codeHealthStartFailedDetails": "הפעלת סריקת Code Health נכשלה ({command}): {details}",
+      "codeHealthStartFailed": "הפעלת סריקת Code Health נכשלה. ודא ש-Dart SDK מותקן.",
+      "codeHealthScanFailed": "סריקת Code Health נכשלה.",
+      "codeHealthScanFailedDetails": "סריקת Code Health נכשלה: {details}",
+      "codeHealthGatesFailed": "Code Health: שערי האיכות שהוגדרו נכשלו. פתח את הגדרות Code Health או העתק JSON כדי לבדוק את gates.violations.",
+      "codeHealthInvalidJson": "Code Health החזיר פלט JSON לא תקין.",
       "sidebarSectionUpdateFailed": "Saropa Lints: לא ניתן לעדכן את המקטע בסרגל הפעילות — {message}"
     },
     "vibrancy": {

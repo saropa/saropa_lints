@@ -65,6 +65,11 @@ _DO_NOT_TRANSLATE = (
     "dart format",
     "Drift Advisor",
     "Saropa Lints",
+    # Product names: owner ruling, kept in English in every locale. Matching is
+    # case-sensitive, so the generic phrases "code health" / "package vibrancy"
+    # are still translated. bad_translations.PRODUCT_NAMES enforces the result.
+    "Package Vibrancy",
+    "Code Health",
     "VS Code",
     "pub.dev",
     "GitHub",

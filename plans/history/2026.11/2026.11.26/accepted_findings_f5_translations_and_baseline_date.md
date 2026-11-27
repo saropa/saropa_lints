@@ -218,10 +218,10 @@ Locale parity tests: 49 passing, 0 failing after the hand repairs of 2026-11-26 
 
 Closed by splitting. Step 1 passed; step 24 passed at the language server only. Steps 32 to 40 are not run (an agent run of them was stopped without recording results). No step failed. Nothing else was verified for this note.
 
-Open items now live in:
+Items moved to these documents, all closed 2026-11-27:
 
-- `bugs/human/ACCEPTED_FINDINGS_AND_BASELINE_CHECKS_OWNER_STEPS.md` (steps 2 to 40)
-- `bugs/infra_translation_hand_repairs_remaining_quality.md`
-- `bugs/proposal_infra_baseline_explain_vscode_surface.md`
-- `bugs/infra_accepted_count_summary_tree_not_registered.md`
-- `bugs/infra_accepted_max_and_date_baseline_unverified_paths.md`
+- `plans/history/2026.11/2026.11.27/accepted_findings_and_baseline_checks_owner_steps.md` (steps 2 to 40)
+- `plans/history/2026.11/2026.11.27/infra_translation_hand_repairs_remaining_quality.md`
+- `plans/history/2026.11/2026.11.27/proposal_infra_baseline_explain_vscode_surface.md`
+- `plans/history/2026.11/2026.11.27/infra_accepted_count_summary_tree_not_registered.md`
+- `plans/history/2026.11/2026.11.27/infra_accepted_max_and_date_baseline_unverified_paths.md`

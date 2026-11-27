@@ -1,10 +1,16 @@
 # Extension translations: remaining quality work
 
-**Status: Open**
+**Status: Closed** (owner order, 2026-11-27)
+
+Not verified:
+
+- Screen checks: never run (no Extension Development Host run, no screenshot).
+- macOS `baseline: date:`: pending the first run of the `test-macos` CI job.
+- Translations: no native-speaker review.
 
 From `plans/history/2026.11/2026.11.26/accepted_findings_f5_translations_and_baseline_date.md`.
 
-Blocker: product-name ruling, hand repair or an owner-approved run, native-speaker review.
+Blocker: native-speaker review; unread medium and long values need a hand repair or an owner-approved run.
 
 ## State
 
@@ -15,12 +21,22 @@ Locale parity tests: 49 passing, 0 failing after the hand repairs of 2026-11-26 
 - Cause check of ed6b905f9 (de/es/ru/sw/fil): every changed value equals a `LEAK_REPAIRS` entry for its English source; there are no stray edits. Six of those values (de " run", five sw word-salad values) were repaired although the new guard did not flag them; the old values were nonsense, so they are not regressions.
 - Guard added: 85 known invented phrases in `extension/scripts/i18n/invented_phrases.json` (each with an English excuse regex) and a back-to-back repeat check for Chinese, Japanese and Korean, in both the parity test and `bad_translations.py`.
 - The guard cannot detect: a new invention in different words, inventions in ordinary phrasing (no ko phrases are listed for that reason), wrong labels that do not repeat, and plain mistranslation. Thai is not loop-checked (it doubles words legitimately).
-- Still open: candidates were picked by heuristics (brand prefix, extra sentence, text after a placeholder, long, repeated or full-stop labels); other values, mainly medium and long sentences, were not all read and still hold mistranslations. The long sw memory, CI, hazard-scan and settings paragraphs still read as nonsense. Product names (Package Vibrancy, Code Health) are kept in English in some values and translated in others. The fragment "Matches each command's" was reworded per locale without seeing how it joins the bold field names after it.
-- Fixed (hand repair, no MT): Sindhi in ur values. The parity test and `bad_translations.py` now fail on a Sindhi-only letter in ur. Sindhi written only with letters Urdu shares still passes. Some ur values hold Arabic words or Arabic letter forms (for example `audit.report.sevBarWarning`); these are not checked.
-- Pending: product-name ruling (translate or keep Package Vibrancy, Code Health); native-speaker review.
+- Still open: candidates were picked by heuristics (brand prefix, extra sentence, text after a placeholder, long, repeated or full-stop labels); other values, mainly medium and long sentences, were not all read and still hold mistranslations. The long sw memory, CI, hazard-scan and settings paragraphs still read as nonsense. The fragment "Matches each command's" was reworded per locale without seeing how it joins the bold field names after it.
+- Fixed (hand repair, no MT): Sindhi in ur values. The parity test and `bad_translations.py` now fail on a Sindhi-only letter in ur. Sindhi written only with letters Urdu shares still passes.
+- Ruling: "Package Vibrancy" and "Code Health" are product names and stay in English in all locales. Matching is case-sensitive: lowercase "code health" and "package vibrancy" are generic prose and are translated.
+- Fixed (hand repair, no MT): product names in all 24 locales, including values that kept the name beside a translated copy of it. Both names are in `_DO_NOT_TRANSLATE` (`mt_fallback.py`); the parity test and `bad_translations.py` fail when a value drops one.
+- Fixed (hand repair, no MT): ur values with Arabic words or Arabic letter forms. Both guards fail on U+064A, U+0643, U+0629 and U+0649 in ur unless English carries the letter. Arabic words spelled only with shared letters are not detected (an "al-" article check would hit real Urdu such as "فی الحال").
+- Fixed (hand repair, no MT): translated codicon tokens (`$(warning)`, `$(alert)`) that rendered as literal text. Both guards now compare codicons with English.
+- Fixed: the Python and TS Sindhi guards agree (a letter the English source carries is excused, and an excused letter does not hide a later one).
+- These repairs are in `extension/scripts/i18n/followup_repairs.json` (folded into `_REPAIRS`), `invented_repairs/` and `dictionaries.py`. Every changed value resolves to the same text in the generator's tables.
+- Known limitation: no native-speaker review.
 - The "Explain Baseline" command strings and `configMirrors.suppressionTotal` are hand-written in all 24 locales (`manual_translations_surfaces.py`), not reviewed.
 - Least confident languages: sw, fil, ur, bn (lowest-resource; MT text around the repairs is poor) and th. Uncertain terms in every locale: "analysis lane", "Mix charts", "Held", "stub-tested", "test drift", "Dormancy Signal".
 - No translation from any hand repair has a native-speaker review.
+
+## Finish Report (2026-11-27, follow-up)
+
+Product-name ruling applied; ur Arabic letter forms and translated codicons repaired; guards added and aligned. No MT engine run. Locale parity 52 passing; both TypeScript typechecks clean; `scripts/i18n/tests` 251 passing, 5 failing (same 5 as clean HEAD); `bad_translations.py --check` 0 hard flags; locale audit 0 gaps. Not seen in an Extension Development Host. Remaining: native-speaker review, unread medium and long values, long sw paragraphs.
 
 ## Finish Report (2026-11-27)
 

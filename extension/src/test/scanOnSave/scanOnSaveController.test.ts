@@ -545,3 +545,33 @@ describe('tabInputUriPaths', () => {
     assert.deepStrictEqual(tabInputUriPaths({ uri: { fsPath: '' } }), []);
   });
 });
+
+describe('ScanOnSaveController publish', () => {
+  // A save that adds code must show its findings, and a later save that
+  // removes the code must take them out of the Problems panel again: a file
+  // that scans clean has to be set to an empty list, not skipped.
+  it('adds the findings of a rescan and removes them when the code is deleted', () => {
+    const published = new Map<string, vscode.Diagnostic[]>();
+    const collection = {
+      set: (uri: vscode.Uri, list: vscode.Diagnostic[]) => published.set(uri.fsPath, list),
+      clear: () => { /* no-op */ },
+      dispose: () => { /* no-op */ },
+    } as unknown as vscode.DiagnosticCollection;
+    const controller = new ScanOnSaveController(collection, () => '/proj');
+    const inner = controller as unknown as {
+      _applyDiagnostics(files: readonly string[], found: readonly ScanOnSaveDiagnostic[]): number;
+    };
+    const file = '/proj/lib/a.dart';
+    const lines = (): number[] => (published.get(file) ?? []).map((d) => d.range.start.line + 1);
+
+    inner._applyDiagnostics([file], [diag({ line: 5 })]);
+    assert.deepStrictEqual(lines(), [5]);
+    inner._applyDiagnostics([file], [diag({ line: 5 }), diag({ line: 21 }), diag({ line: 22 })]);
+    assert.deepStrictEqual(lines(), [5, 21, 22]);
+    inner._applyDiagnostics([file], [diag({ line: 5 })]);
+    assert.deepStrictEqual(lines(), [5]);
+    inner._applyDiagnostics([file], []);
+    assert.deepStrictEqual(lines(), []);
+    controller.dispose();
+  });
+});

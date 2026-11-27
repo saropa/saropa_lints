@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} problema(s) de espacio de trabajo"
     },
     "issue": {
-      "hazardFiles": "$(advertencia) {count} archivo(s) grande(s) no excluido(s)",
+      "hazardFiles": "$(warning) {count} archivo(s) grande(s) no excluido(s)",
       "hazardFilesDetail": "Archivos grandes seguidos por el observador de archivos pueden agotar la memoria y hacer que VS Code se bloquee. Ejecute el escaneo de riesgos para excluirlos.",
       "missingExcludes": "$(info) {count} falta(s) de exclusión(s) del observador",
       "missingExcludesDetail": "Los patrones de exclusión del observador de archivos recomendados no están configurados. Agregarlos previene el uso innecesario de memoria.",
@@ -1041,7 +1041,7 @@
       "trendTitle": "Puntuación de salud / tendencia de violaciones desde ejecuciones anteriores",
       "hotspotsTitle": "{open} abierto, {safe} marcado como seguro, {fixed} corregido — haga clic para revisar",
       "hotspotsPill": "{open} abierto · {percent}% revisado",
-      "qualityGatePassingTitle": "Regla estricta: Código de salud calidad gate pasando — haga clic para abrir Código de salud",
+      "qualityGatePassingTitle": "El control de calidad de Code Health se supera — haga clic para abrir Code Health",
       "qualityGatePassingPill": "Pasarela de puerta",
       "qualityGateFailingTitle": "Control de calidad Code Health fallando ({count} violación(es)) — haga clic para abrir Code Health",
       "qualityGateFailingPill": "Regla fallando"
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Código de la Tabla de Control de Salud",
+    "documentTitle": "Panel de Saropa Code Health",
     "skipToTable": "Saltar a la tabla de funciones",
     "openWorkspaceFirst": "Abra primero un espacio de trabajo Dart/Flutter.",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "Ejecute el informe de nuevo, luego copie JSON.",
-    "copiedJson": "Código de Salud JSON copiado al portapapeles.",
+    "copiedJson": "JSON de Code Health copiado al portapapeles.",
     "couldNotOpenFile": "No se pudo abrir el archivo: {path}",
-    "panelTitle": "Saropa Código de la Tabla de Control de Salud",
+    "panelTitle": "Panel de Saropa Code Health",
     "hero": {
-      "title": "Saropa Código de la Tabla de Control de Salud",
+      "title": "Panel de Saropa Code Health",
       "generated": "Generado",
       "functionOne": "{count} función",
       "functionOther": "{count} funciones",
@@ -1882,7 +1882,7 @@
       "fallback": "Los controles de calidad fallaron: revise los umbrales en la configuración de Code Health.",
       "failingOne": "{count} puerta fallando — revisa los umbrales o copia el JSON para inspeccionar gates.violations.",
       "failingOther": "{count} puertas fallando — revisa los umbrales o copia el JSON para inspeccionar gates.violations.",
-      "openSettingsTitle": "Abra la configuración de salud del código para ajustar los umbrales.",
+      "openSettingsTitle": "Abra la configuración de Code Health para ajustar los umbrales.",
       "openSettingsButton": "Abrir los ajustes de Code Health"
     },
     "kpi": {
@@ -1903,11 +1903,11 @@
     },
     "toolbar": {
       "ariaLabel": "Acciones de Code Health",
-      "rescanTitle": "Vuelva a ejecutar el escaneo de la salud del código y actualice este tablero.",
+      "rescanTitle": "Vuelva a ejecutar el análisis de Code Health y actualice este panel.",
       "rescan": "Volver a escanear",
-      "copyJsonTitle": "Copie el código JSON de salud sin procesar al portapapeles.",
+      "copyJsonTitle": "Copiar el JSON sin procesar de Code Health al portapapeles.",
       "copyJson": "Copiar JSON",
-      "settingsTitle": "Abra la configuración de salud del código.",
+      "settingsTitle": "Abra la configuración de Code Health.",
       "settingsButton": "Ajustes de Code Health",
       "filterTitle": "Filtrar filas por nombre, archivo o bandera.",
       "filterLabel": "Filtrar filas",
@@ -2078,6 +2078,7 @@
     "noData": "Aún no hay violations.json: ejecute el análisis para completar la instantánea de supresión.",
     "zeroTotal": "0 supresiones de analizadores en la última exportación.",
     "noKindBreakdown": "No hay desglose por especie en esta exportación.",
+    "total": "En total {total}",
     "title": "Supresiones (exportación)",
     "readOnlyNote": "(sólo lectura; abre los hallazgos para navegar y actuar.)",
     "openFindings": "Abrir el panel de resultados"
@@ -2635,11 +2636,11 @@
       "scanOnSaveBaselineFailed": "Escaneo de todo el proyecto falló: {details}",
       "scanOnSaveBaselineDone": "Escaneo de toda la aplicación completado: {total} archivos, {issues} problema(s).",
       "codeHealthStartFailedDetails": "No se pudo iniciar el escaneo de Code Health ({command}): {details}",
-      "codeHealthStartFailed": "Código de salud no pudo iniciar el escaneo. Asegúrese de que el SDK Dart esté instalado.",
-      "codeHealthScanFailed": "Código de salud no ha podido escanear.",
+      "codeHealthStartFailed": "No se pudo iniciar el análisis de Code Health. Asegúrese de que el SDK de Dart esté instalado.",
+      "codeHealthScanFailed": "Falló el análisis de Code Health.",
       "codeHealthScanFailedDetails": "Error en el escaneo de Code Health: {details}",
       "codeHealthGatesFailed": "Code Health: los controles de calidad configurados fallaron. Abra los ajustes de Code Health o copie el JSON para inspeccionar gates.violations.",
-      "codeHealthInvalidJson": "El código de salud devolvió una salida JSON inválida.",
+      "codeHealthInvalidJson": "Code Health devolvió una salida JSON no válida.",
       "sidebarSectionUpdateFailed": "Saropa Lints: no se pudo actualizar la sección de la barra de actividades — {message}"
     },
     "vibrancy": {

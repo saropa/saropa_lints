@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} masalah workspace"
     },
     "issue": {
-      "hazardFiles": "$(peringatan) {count} file(s) besar yang tidak termasuk dalam pengecualian",
+      "hazardFiles": "$(warning) {count} file besar yang tidak dikecualikan",
       "hazardFilesDetail": "File besar yang diawasi oleh file watcher dapat menghabiskan memori dan menyebabkan crash VS Code. Jalankan pemindaian bahaya untuk mengecualikan mereka.",
       "missingExcludes": "$(info) {count} kurang pengeluaran pengawas",
       "missingExcludesDetail": "Pola-pola pengecualian pengawas file yang direkomendasikan tidak dikonfigurasikan. Menambahkannya mencegah penggunaan memori yang tidak perlu.",
@@ -1041,9 +1041,9 @@
       "trendTitle": "Skor kesehatan / tren pelanggaran sejak jalan sebelumnya",
       "hotspotsTitle": "{open} terbuka, {safe} ditandai aman, {fixed} diperbaiki — klik untuk meninjau",
       "hotspotsPill": "{open} terbuka · {percent}% direview",
-      "qualityGatePassingTitle": "Gerbang kualitas Kode Kesehatan — klik untuk membuka Kode Kesehatan",
+      "qualityGatePassingTitle": "Gerbang kualitas Code Health lolos — klik untuk membuka Code Health",
       "qualityGatePassingPill": "Melewati gerbang",
-      "qualityGateFailingTitle": "Gerbang kualitas Kode Kesehatan gagal (pelanggaran {count}) — klik untuk membuka Kode Kesehatan",
+      "qualityGateFailingTitle": "Gerbang kualitas Code Health gagal ({count} pelanggaran) — klik untuk membuka Code Health",
       "qualityGateFailingPill": "Gerbang gagal"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "Salin JSON pohon",
       "refreshExtension": "Muat ulang ekstensi",
       "openPackageDashboard": "Buka Dasbor Paket",
-      "openCodeHealth": "Buka Kesehatan Kode",
+      "openCodeHealth": "Buka Code Health",
       "openLintsConfig": "Kelola Paket Aturan",
       "reloadFromDisk": "Muat ulang dari disk",
       "reloadFromDiskTitle": "Re-render dashboard dari violations.json terakhir tanpa menjalankan kembali analiser.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Kode Dashboard Kesehatan",
+    "documentTitle": "Dasbor Saropa Code Health",
     "skipToTable": "Lompati ke tabel fungsi",
     "openWorkspaceFirst": "Buka ruang kerja Dart/Flutter terlebih dahulu.",
     "scan": {
@@ -1868,9 +1868,9 @@
     "runReportFirst": "Jalankan laporan lagi, lalu salin JSON.",
     "copiedJson": "Code Health JSON disalin ke clipboard.",
     "couldNotOpenFile": "Tidak dapat membuka file: {path}",
-    "panelTitle": "Saropa Kode Dashboard Kesehatan",
+    "panelTitle": "Dasbor Saropa Code Health",
     "hero": {
-      "title": "Saropa Kode Dashboard Kesehatan",
+      "title": "Dasbor Saropa Code Health",
       "generated": "Dibuat",
       "functionOne": "{count} fungsi",
       "functionOther": "{count} fungsi",
@@ -1882,8 +1882,8 @@
       "fallback": "Gerbang kualitas gagal — meninjau ambang batas dalam pengaturan Code Health.",
       "failingOne": "{count} gerbang gagal — tinjau ambang batas, atau salin JSON untuk memeriksa gates.violations.",
       "failingOther": "{count} gerbang gagal — tinjau ambang batas, atau salin JSON untuk memeriksa gates.violations.",
-      "openSettingsTitle": "Buka pengaturan Kesehatan Kode untuk menyesuaikan ambang batas.",
-      "openSettingsButton": "Buka pengaturan Kesehatan Kode"
+      "openSettingsTitle": "Buka pengaturan Code Health untuk menyesuaikan ambang batas.",
+      "openSettingsButton": "Buka pengaturan Code Health"
     },
     "kpi": {
       "ariaLabel": "Ringkasan kesehatan kode",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "tes tertinggal dari fungsi"
     },
     "toolbar": {
-      "ariaLabel": "Tindakan Kesehatan Kode",
-      "rescanTitle": "Jalankan kembali pemindaian Kesehatan Kode dan perbarui dasbor ini.",
+      "ariaLabel": "Tindakan Code Health",
+      "rescanTitle": "Jalankan kembali pemindaian Code Health dan segarkan dasbor ini.",
       "rescan": "Pindai ulang",
-      "copyJsonTitle": "Salin JSON Kode Kesehatan mentah ke clipboard.",
+      "copyJsonTitle": "Salin JSON mentah Code Health ke papan klip.",
       "copyJson": "Salin JSON",
-      "settingsTitle": "Buka pengaturan Kesehatan Kode.",
-      "settingsButton": "Pengaturan Kesehatan Kode",
+      "settingsTitle": "Buka pengaturan Code Health.",
+      "settingsButton": "Pengaturan Code Health",
       "filterTitle": "Filter baris dengan nama, file, atau flag.",
       "filterLabel": "Filter baris",
       "filterPlaceholder": "Filter baris…"
@@ -2078,6 +2078,7 @@
     "noData": "Belum ada violations.json — jalankan analisis untuk mengisi snapshot pengabaian.",
     "zeroTotal": "0 penindasan analis dalam ekspor terbaru.",
     "noKindBreakdown": "Tidak ada perincian berdasarkan jenis dalam ekspor ini.",
+    "total": "Jumlah {total}",
     "title": "Penghapusan (ekspor)",
     "readOnlyNote": "(hanya dibaca; buka Temuan untuk menelusuri dan bertindak.)",
     "openFindings": "Buka Dasbor Temuan"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Cache Vibrancy dibersihkan",
       "copiedInfo": "Info {package} disalin ke clipboard",
       "noPubspecOrLock": "Tidak ada pubspec.yaml/pubspec.lock ditemukan di ruang kerja.",
-      "backfillComplete": "Paket Vibrancy: Keanggunan one-time history backfill lengkap ({count} snapshot diimpor).",
+      "backfillComplete": "Package Vibrancy: pengisian riwayat satu kali selesai ({count} snapshot diimpor).",
       "runScanFirst": "Jalankan pemindaian terlebih dahulu",
       "noUpgradable": "Tidak ditemukan paket yang dapat ditingkatkan",
       "proceedUpgrades": "Lanjutkan dengan upgrade {count} (s)? Langkah-langkah yang gagal berbalik dan rencana terus berlanjut.",
@@ -2634,11 +2635,11 @@
       "scanOnSaveBaselineCanceled": "Pindaian seluruh proyek dibatalkan setelah {scanned}/{total} file.",
       "scanOnSaveBaselineFailed": "Pindaian seluruh proyek gagal: {details}",
       "scanOnSaveBaselineDone": "Pindaian seluruh proyek selesai: {total} file, {issues} masalah.",
-      "codeHealthStartFailedDetails": "Pemindaian Kesehatan Kode gagal dimulai ({command}): {details}",
-      "codeHealthStartFailed": "Kode Kesehatan scan gagal dimulai. Pastikan Dart SDK diinstal.",
-      "codeHealthScanFailed": "Kode Kesehatan scan gagal.",
-      "codeHealthScanFailedDetails": "Pemindaian Kesehatan Kode gagal: {details}",
-      "codeHealthGatesFailed": "Kode Kesehatan: Code Health konfigurasi quality gates gagal. Buka pengaturan Kesehatan Kode atau salin JSON untuk memeriksa gates.violations.",
+      "codeHealthStartFailedDetails": "Pemindaian Code Health gagal dimulai ({command}): {details}",
+      "codeHealthStartFailed": "Pemindaian Code Health gagal dimulai. Pastikan Dart SDK terpasang.",
+      "codeHealthScanFailed": "Pemindaian Code Health gagal.",
+      "codeHealthScanFailedDetails": "Pemindaian Code Health gagal: {details}",
+      "codeHealthGatesFailed": "Code Health: gerbang kualitas yang dikonfigurasi gagal. Buka pengaturan Code Health atau salin JSON untuk memeriksa gates.violations.",
       "codeHealthInvalidJson": "Code Health mengembalikan output JSON yang tidak valid.",
       "sidebarSectionUpdateFailed": "Saropa Lints: tidak dapat memperbarui bagian activity bar — {message}"
     },

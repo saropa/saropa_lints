@@ -1,6 +1,22 @@
 # `dart analyze <parent folder>` reports plugin findings for only one of two packages
 
-Status: Fixed 2026-11-27 (in-repo part). The parent-folder `dart analyze` gap is upstream in the Dart analysis server and cannot be fixed here; it is documented as a known limit. The related in-repo flaw (scan CLI, scan daemon and LSP server using one package's baseline for every package) is fixed. Upstream issue drafted below; not posted.
+Status: Fixed 2026-11-27 for the reproducer. saropa_lints' plugin startup no longer spawns PowerShell on Windows, and `dart analyze` on the two-package reproducer now reports both packages (10 of 10 runs, both directory orders). The SDK race itself is upstream and remains; it is still documented as a known limit. The related in-repo flaw (scan CLI, scan daemon and LSP server using one package's baseline for every package) is fixed. Upstream issue drafted below; not posted.
+
+## Startup fix (2026-11-27, second pass)
+
+**Measured.** Trace points in an instrumented copy (`D:\tmp\parent_fix_check\saropa_instr`) on copies of the reproducer (`D:\tmp\parent_fix_check\live`, and `rev` with the packages renamed `a_two` / `z_one` so the order flips). The plugin is AOT-compiled, so isolate load is not the cost once compiled. Per isolate: `register()` 18-25 ms; `start()` 360-420 ms. The server sends work to both isolates only once the last one is up, and `dart analyze` exited ~0.6 s after the second isolate's `start()` returned, before that isolate ran any rule.
+
+**Cause of the 360 ms.** `initializeCacheManagement()` (called from `start()`) reads total RAM for the adaptive RSS cap, and on Windows did that with `Process.runSync('powershell', ... Get-CimInstance ...)`.
+
+**A/B on the same warm compiled copy.** Real probe: 3 issues (only `one`); `start()` ~390 ms. Probe skipped: 5 issues (both packages); `start()` 3 ms; second isolate ran its rules 0.7 s after start.
+
+**Fix.** `lib/src/windows_physical_memory.dart` reads `ullTotalPhys` via kernel32 `GlobalMemoryStatusEx` in-process (same HeapAlloc pattern as `init/display.dart`, no new dependency). `_probeTotalPhysicalMemoryMb` calls it first; PowerShell and wmic remain as fallbacks only when the FFI call fails. Same RAM figure as before (startup log shows the same adaptive cap and panic threshold).
+
+**Verified.** Against the real repo package: `live` 5/5 runs and `rev` 5/5 runs reported 5 issues (both packages, baseline in `two` and accepted `max: 1` in `one` still applied), including two cold runs per order that recompiled the plugin. Before the fix, the same copies reported 3 issues (cold and warm).
+
+**Tests.** `test/report/windows_physical_memory_test.dart`: FFI result matches PowerShell CIM within 1 MB; the memoized probe used by `start()` returns in under 150 ms through the FFI path with one probe attempt; non-Windows returns null.
+
+**Not fixed / unverified.** The SDK race is not removed: a slower or busier machine, more packages, or other plugins can still lose results. macOS still spawns `sysctl` for the same probe (not measured, no macOS host). When the `dart analyze` cwd has a `pubspec.yaml`, `start()` also loads config synchronously; that path was not measured. Live editor behaviour not checked.
 
 ## Finish report (2026-11-27)
 

@@ -74,6 +74,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - `require_error_widget` no longer reports a `FutureBuilder` whose future comes from a same-file async method that catches every error and only logs and returns a fallback, since its error state is unreachable; futures from other files, overridable methods and handlers that can still throw are still reported. No action required.
 - The scan CLI, scan daemon and language server now apply each package's own baseline when one run covers a folder with several packages; before, only the first analyzed package's baseline was used for every file. No action required.
+- On Windows the plugin no longer starts a PowerShell process to read total RAM at startup, so each plugin isolate is ready about 0.4 s sooner and `dart analyze` on a folder holding several packages no longer drops the second package's findings in the tested two-package case. No action required.
+- `scan --check-accepted` now also scans files that accepted entries name in places a normal scan skips (such as `example/` and `bin/`), so their stale entries are reported, and "Check Accepted Findings" no longer counts unchecked entries as checked. A check that passed before can now report stale entries.
 
 ### Added (Extension)
 
@@ -81,16 +83,19 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Changed (Extension)
 
-- The Rule Packs "Suppressions (export)" strip and the exported OWASP report now list findings hidden by `saropa_accepted.yaml` next to the ignore and baseline counts, so the kinds add up to the total. No action required.
+- The exported OWASP report now lists findings hidden by `saropa_accepted.yaml` next to the ignore and baseline counts, so the kinds add up to the total. No action required.
 
 ### Fixed (Extension)
 
-- Urdu text that had been written with Sindhi-only letters is corrected. No action required.
+- Urdu text that had been written with Arabic words or letters, or with Sindhi-only letters, is corrected. No action required.
+- "Package Vibrancy" and "Code Health" now appear in English in every language, and warning icons that showed as translated text appear as icons again. No action required.
+- The word "Total" in the Rule Packs "Suppressions (export)" strip is now translated. No action required.
 
 ### Internal
 
 - A translation guard and the locale parity test now fail when an Urdu value contains a Sindhi-only letter.
 - New process-level tests run the scan daemon and the language server on a temporary package to check that `max:` in `saropa_accepted.yaml` hides only the first findings and that ignored findings do not count toward it.
+- A new CI job runs the date-baseline and accepted `max:` process tests on macOS.
 - Diagnosed why `dart analyze` on a folder holding two packages reports plugin findings for only one: the analysis server tracks one shared "plugin analyzing" flag for all plugin isolates, so it reports idle once the first isolate finishes, before a slower second isolate starts. Upstream; the limit is documented in the configuration guide.
 
 ---

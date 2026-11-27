@@ -67,6 +67,42 @@ void main() {
     expect(await _daemonRuleLines(project), [3, 4]);
   });
 
+  // One warm process across saves: it must see the new file text and the new
+  // list on the next request, without a restart.
+  test('a later save adds, removes and re-limits findings', () async {
+    fixture(ignoreFirst: false);
+    final list = File(p.join(project, kAcceptedFindingsFileName));
+    final entry = list.readAsStringSync();
+    list.deleteSync();
+    final scan = await _startDaemon(project);
+    expect(await scan(), [2, 3, 4]);
+
+    // The fixture's three calls, then a fourth added in a new function.
+    const base = '''
+void f() {
+  print('a');
+  print('b');
+  print('c');
+}
+''';
+    const added = '''
+void g() {
+  print('d');
+}
+''';
+    write('lib/main.dart', '$base$added');
+    expect(await scan(), [2, 3, 4, 7]);
+
+    write('lib/main.dart', base);
+    expect(await scan(), [2, 3, 4]);
+
+    list.writeAsStringSync(entry);
+    expect(await scan(), [3, 4]);
+
+    list.writeAsStringSync(entry.replaceFirst('max: 1', 'max: 2'));
+    expect(await scan(), [4]);
+  });
+
   test('an ignored finding is not reported and does not use up max', () async {
     fixture(ignoreFirst: true);
     // Line 2 is ignored (dropped before the accepted filter, so it does not
@@ -77,7 +113,12 @@ void main() {
 
 /// Starts the daemon on [project], sends one scan request for
 /// `lib/main.dart`, and returns the sorted lines of its [_rule] findings.
-Future<List<int>> _daemonRuleLines(String project) async {
+Future<List<int>> _daemonRuleLines(String project) async =>
+    (await _startDaemon(project))();
+
+/// Starts one daemon on [project] and returns a function that scans
+/// `lib/main.dart` again on that same process, as each save does.
+Future<Future<List<int>> Function()> _startDaemon(String project) async {
   final root = Directory.current.path;
   final daemon = await Process.start(Platform.resolvedExecutable, [
     '--packages=${p.join(root, '.dart_tool', 'package_config.json')}',
@@ -93,28 +134,37 @@ Future<List<int>> _daemonRuleLines(String project) async {
   });
   unawaited(daemon.stderr.drain<void>());
 
-  final lines = daemon.stdout
-      .transform(utf8.decoder)
-      .transform(const LineSplitter());
-  await for (final line in lines) {
-    final message = jsonDecode(line) as Map;
-    // The daemon answers nothing until prewarm ends, so the request is sent
-    // only after `ready`.
-    if (message['event'] == 'ready') {
-      daemon.stdin.writeln(
-        jsonEncode({
-          'id': '1',
-          'files': [p.join(project, 'lib', 'main.dart')],
-        }),
-      );
-      continue;
+  // One iterator for the process's whole life: stdout can be listened to once.
+  final lines = StreamIterator(
+    daemon.stdout.transform(utf8.decoder).transform(const LineSplitter()),
+  );
+
+  /// The next message matching [wanted].
+  Future<Map<dynamic, dynamic>> read(bool Function(Map) wanted) async {
+    while (await lines.moveNext()) {
+      final message = jsonDecode(lines.current) as Map;
+      if (wanted(message)) return message;
     }
-    if (message['id'] != '1') continue;
+    fail('the scan daemon exited without answering');
+  }
+
+  // The daemon answers nothing until prewarm ends, so no request is sent
+  // before `ready`.
+  await read((m) => m['event'] == 'ready');
+  var requests = 0;
+  return () async {
+    final id = '${++requests}';
+    daemon.stdin.writeln(
+      jsonEncode({
+        'id': id,
+        'files': [p.join(project, 'lib', 'main.dart')],
+      }),
+    );
+    final message = await read((m) => m['id'] == id);
     expect(message['ok'], isTrue, reason: '$message');
     return [
       for (final d in message['diagnostics'] as List)
         if ((d as Map)['ruleName'] == _rule) d['line'] as int,
     ]..sort();
-  }
-  fail('the scan daemon exited without answering the request');
+  };
 }

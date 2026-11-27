@@ -19,10 +19,10 @@
     },
     "statusItem": {
       "text": "Vibrancy: pub چھوڑ دی گئی",
-      "tooltip": "پیکیج Vibrancy نے ایک pub کوئری چھوڑ دی تاکہ pubspec.lock دوبارہ نہ لکھی جائے۔ تفصیل کے لیے کلک کریں۔"
+      "tooltip": "Package Vibrancy نے ایک pub کوئری چھوڑ دی تاکہ pubspec.lock دوبارہ نہ لکھی جائے۔ تفصیل کے لیے کلک کریں۔"
     },
     "explain": {
-      "title": "پیکیج Vibrancy نے ایک pub کوئری چھوڑ دی",
+      "title": "Package Vibrancy نے ایک pub کوئری چھوڑ دی",
       "none": "اس سیشن میں Vibrancy کی کوئی pub کوئری چھوڑی نہیں گئی۔",
       "unknown": "نامعلوم",
       "reason": "وجہ: {reason}",
@@ -162,7 +162,7 @@
       "clearRuleFilter": "صاف کریں",
       "paginationNote": "فائل کی محدودیت فیلٹر کی گئی نتائج پر لاگو ہوتی ہے",
       "sevBarError": "{count} خطاں ({pct}%)",
-      "sevBarWarning": "{count} تحذيرات ({pct}%)",
+      "sevBarWarning": "{count} انتباہات ({pct}%)",
       "sevBarInfo": "{count} معلومات ({pct}%)",
       "baselineSaved": "اس کی بنیاد درج کر لی گئی ہے۔ مستقبل میں آڈٹس اس چھوٹے نمونے سے موازنہ کر سکتے ہیں۔",
       "baselineSaveFailed": "نیچے کی بنیاد کو بچانے میں ناکام رہ گیا: {message}",
@@ -888,7 +888,7 @@
       "prompt": "{folders} میں {count} تعداد میں Dart پیکیج ریڈ کی گئی ہے جو گٹ نظر انداز کر دیا گیا ہے۔ ہر ایک الگ الگ کنٹکس کے طور پر تحلیل کیا جاتا ہے اور تحلیل سرور کی یاد کو بھاری کر سکتا ہے۔",
       "fix": "تحلیل سے باہر کریں",
       "dismiss": "مسترد کریں",
-      "fixed": "تحفظ {folders} تحليل اور فائل نگرانی سے باہر کر دیا گیا۔"
+      "fixed": "{folders} کو تجزیے اور فائل نگرانی سے خارج کر دیا گیا۔"
     },
     "hazardScan": {
       "warning": "\"{folder}\" کے اندر {count} بڑے فائل(یں) ملا گیا(یں) (پہلوؤں کی ریلیٹیو ہیں): {files}۔ VS Code فولڈر کی ہر فائل کو تبدیلی کے لیے نگاہ رکھتا ہے، اور بڑی فائلیں اسے تیز نہیں کر سکتی یا اسے گھوم سکتی ہیں۔",
@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} میکسچر مسئلہ(ات)"
     },
     "issue": {
-      "hazardFiles": "$(تحذير) {count} بڑے نامناسب فائل(یں)",
+      "hazardFiles": "$(warning) {count} بڑی غیر مستثنیٰ فائلیں",
       "hazardFilesDetail": "بڑے فائل جو فائل وچر کے ذریعہ ٹریک کیے گئے ہیں، یادگیری اور VS Code کو ٹھیک کرنے میں مدد کر سکتے ہیں۔ خطرہ چیک کریں تاکہ انہیں چھوڑ دیا جا سکے۔",
       "missingExcludes": "$(info) {count} میں گریڈر تخلیق کی گئی ہے",
       "missingExcludesDetail": "اگرچہ اسٹرکچر کیا گیا ہے کہ فائل وچر کے اکثر استعمال ہونے والے نمونے نہیں تیار کیے گئے ہیں۔ ان کے شامل کرنا غیر ضروری یادگیری استعمال کو روکتا ہے۔",
@@ -941,7 +941,7 @@
       "systemLowMemory": "صرف {free} ہے {total} RAM میں فری ماشین وسیع ہے۔ غیر استعمال کی ہوئی ایپلیکیشنز یا VS Code ونڈوز بند کریں۔",
       "orphansFound": "{count} اکثریت کے بے گھر پروسس(س) پہلے سیشن سے {size} یادگیری کے ذریعے ہیں۔",
       "analysisServerLarge": "{count} Dart تجزیہ سرور عمل (es) {size} تک استعمال کر رہے ہیں۔ دوبارہ اسٹارٹ میموری کو جاری کرتا ہے۔",
-      "multipleAnalysisServers": "{count} Dart سرور تحليل کر رہے ہیں — اکثر ہر اپنے VS Code پنجرے پر ہوتے ہیں جو ایک دوسرے پر چھوٹے پروجیکٹس کے ساتھ ہیں۔",
+      "multipleAnalysisServers": "{count} Dart اینالیسس سرور چل رہے ہیں — عموماً ملتے جلتے پروجیکٹس پر کھلی ہر VS Code ونڈو کے لیے ایک۔",
       "noHeapCap": "Dart تحلیل سرور کے ذخیرہ اِنکار کی حد تعریف نہیں کی گئی ہے۔ ایک تعریف کرنا سب سے خراب صورت حال کی نمو کو محدود کرے گا۔",
       "modelLoaded": "مڈل \"{model}\" ترجمہ انجن میں لوڈ ہوچکا ہے، {size} کا استعمال کرتے ہوئے۔",
       "budgetOverspend": "ڈیو ٹولز نے سسٹم RAM کا {used}% استعمال کر لیا ہے ({size})، جو {budget}% بجٹ سے زیادہ ہے۔ ناکارہ VS Code ونڈوز بند کریں یا ترجمہ میڈل کو ڈیٹا ہٹا دیں۔"
@@ -969,7 +969,7 @@
   },
   "memoryPressure": {
     "statusBar": {
-      "hardTripped": "🔴 نظمات تعلق ({rssMb} ميگا بائٹ)",
+      "hardTripped": "🔴 قواعد موقوف ({rssMb} میگا بائٹ)",
       "shedCritical": "🔴 {count} قواعد چھوڑ دیں (مہمکن)",
       "shedWarning": "⚠ قواعد {count} چھوڑ دیں",
       "shedInfo": "⚡ {count} مہنگی نظمیں ریڈیو",
@@ -997,7 +997,7 @@
       "categoryTypeResolving": "نوع تحلیل (مہنگا)",
       "categoryHighCost": "ہائی کوسٹ",
       "categoryInfoSeverity": "معلومات سطح سختی",
-      "categoryWarningSeverity": "تحذير سطحیت",
+      "categoryWarningSeverity": "انتباہ کی شدت",
       "moreRules": "زیادہ نہیں فہرست میں شامل نہیں",
       "restartButton": "انالائزر کو دوبارہ شروع کریں",
       "restartTooltip": "Dart تحلیل سرور کو دوبارہ شروع کریں تاکہ یادگیری دباؤ کو دور کیا جائے اور شیڈ قواعد بحال کیے جائیں۔"
@@ -1041,9 +1041,9 @@
       "trendTitle": "صحت کے اسکور / خلاف ورزی کا رجحان پہلے سے چل رہا ہے۔",
       "hotspotsTitle": "{open} کھلا، {safe} محفوظ نشان زد، {fixed} فکسڈ — جائزہ لینے کے لیے کلک کریں",
       "hotspotsPill": "{open} کھلے · {percent}% جائزہ شدہ",
-      "qualityGatePassingTitle": "کوڈ ہیلتھ کوالٹی گیٹ پاسنگ - کوڈ ہیلتھ کھولنے کے لیے کلک کریں۔",
+      "qualityGatePassingTitle": "Code Health کوالٹی گیٹ پاس ہے — Code Health کھولنے کے لیے کلک کریں",
       "qualityGatePassingPill": "گیٹ پاسنگ",
-      "qualityGateFailingTitle": "کوڈ ہیلتھ کوالٹی گیٹ فیل ہو رہا ہے ({count} خلاف ورزی(s)) — کوڈ ہیلتھ کو کھولنے کے لیے کلک کریں",
+      "qualityGateFailingTitle": "Code Health کوالٹی گیٹ ناکام ہے ({count} خلاف ورزیاں) — Code Health کھولنے کے لیے کلک کریں",
       "qualityGateFailingPill": "گیٹ ناکام"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "ٹری JSON کاپی کریں",
       "refreshExtension": "ایکسٹینشن ریفریش کریں",
       "openPackageDashboard": "کھولیں پیکیج ڈیش بورڈ",
-      "openCodeHealth": "اوپن کوڈ ہیلتھ صحت",
+      "openCodeHealth": "Code Health کھولیں",
       "openLintsConfig": "قاعدہ پیکس کا انتظام کریں",
       "reloadFromDisk": "ڈسک سے دوبارہ لوڈ کریں",
       "reloadFromDiskTitle": "تجزیہ کار کو دوبارہ چلانے کے بغیر آخری violations.json سے ڈیش بورڈ کو دوبارہ پیش کریں۔",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa کوڈ ہیلتھ ڈیش بورڈ",
+    "documentTitle": "Saropa Code Health ڈیش بورڈ",
     "skipToTable": "فنکشنز ٹیبل پر جائیں",
     "openWorkspaceFirst": "پہلے ایک Dart/Flutter ورک اسپیس کھولیں۔",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "رپورٹ دوبارہ چلائیں، پھر JSON کاپی کریں۔",
-    "copiedJson": "کوڈ ہیلتھ JSON کلپ بورڈ میں کاپی کیا گیا۔",
+    "copiedJson": "Code Health JSON کلپ بورڈ میں کاپی کیا گیا۔",
     "couldNotOpenFile": "فائل نہیں کھل سکی: {path}",
-    "panelTitle": "Saropa کوڈ ہیلتھ ڈیش بورڈ",
+    "panelTitle": "Saropa Code Health ڈیش بورڈ",
     "hero": {
-      "title": "Saropa کوڈ ہیلتھ ڈیش بورڈ",
+      "title": "Saropa Code Health ڈیش بورڈ",
       "generated": "تیار کردہ",
       "functionOne": "{count} فنکشن",
       "functionOther": "{count} فنکشنز",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "دروازے گزرنے والے گزرتے ہوئے"
     },
     "gate": {
-      "fallback": "کوالٹی گیٹس ناکام ہو گئے — کوڈ ہیلتھ سیٹنگز میں تھریشولڈز کا جائزہ لیں۔",
+      "fallback": "کوالٹی گیٹس ناکام ہو گئے — Code Health کی ترتیبات میں حدوں کا جائزہ لیں۔",
       "failingOne": "{count} گیٹ ناکام — حدوں کا جائزہ لیں، یا gates.violations کا معائنہ کرنے کے لیے JSON کاپی کریں۔",
       "failingOther": "{count} گیٹس ناکام — حدوں کا جائزہ لیں، یا gates.violations کا معائنہ کرنے کے لیے JSON کاپی کریں۔",
-      "openSettingsTitle": "کوڈ کی صحت کی ترتیبات کھولیں حدوں کو ایڈجسٹ کرنے کے لئے.",
-      "openSettingsButton": "اوپن کوڈ صحت کی ترتیبات"
+      "openSettingsTitle": "حدیں ایڈجسٹ کرنے کے لیے Code Health کی ترتیبات کھولیں۔",
+      "openSettingsButton": "Code Health کی ترتیبات کھولیں"
     },
     "kpi": {
       "ariaLabel": "کوڈ صحت خلاصہ",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "ٹیسٹ فنکشن سے پیچھے ہیں"
     },
     "toolbar": {
-      "ariaLabel": "کوڈ صحت کی کارروائیوں کے لئے اقدامات",
-      "rescanTitle": "کوڈ ہیلتھ اسکین دوبارہ چلائیں اور ڈیش بورڈ کو تازہ کریں۔",
+      "ariaLabel": "Code Health کی کارروائیاں",
+      "rescanTitle": "Code Health اسکین دوبارہ چلائیں اور اس ڈیش بورڈ کو تازہ کریں۔",
       "rescan": "دوبارہ اسکین کریں",
-      "copyJsonTitle": "خام کوڈ ہیلتھ JSON کی کلپ بورڈ میں کاپی کریں۔",
+      "copyJsonTitle": "Code Health کا خام JSON کلپ بورڈ میں کاپی کریں۔",
       "copyJson": "JSON کاپی کریں",
-      "settingsTitle": "کوڈ ہیلتھ کی ترتیبات کھولیں۔",
-      "settingsButton": "کوڈ صحت کی ترتیبات",
+      "settingsTitle": "Code Health کی ترتیبات کھولیں۔",
+      "settingsButton": "Code Health کی ترتیبات",
       "filterTitle": "نام ، فائل یا پرچم کے مطابق صفوں کو فلٹر کریں۔",
       "filterLabel": "فلٹر کی قطاریں Filter rows",
       "filterPlaceholder": "فلٹر کی قطاریں..."
@@ -2078,6 +2078,7 @@
     "noData": "ابھی تک کوئی violations.json نہیں — دبانے کے اسنیپ شاٹ کو آباد کرنے کے لیے تجزیہ چلائیں۔",
     "zeroTotal": "0 تازہ ترین برآمدات میں تجزیہ کاروں کی دباؤ۔",
     "noKindBreakdown": "اس برآمد میں کوئی نوعیت کی خرابی نہیں ہے۔",
+    "total": "کل {total}",
     "title": "حذف (برآمد)",
     "readOnlyNote": "(صرف پڑھنے کے قابل؛ براؤز کرنے اور عمل کرنے کے لئے نتائج کھولیں۔)",
     "openFindings": "نتائج ڈیش بورڈ کھولیں"
@@ -2228,7 +2229,7 @@
       "pid": "PID:",
       "rules": "قواعد:",
       "rss": "RSS:",
-      "statusLabel": "حالة:",
+      "statusLabel": "حالت:",
       "statusValue": {
         "active": "فعال",
         "idle": "بیکار",
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy کیشے صاف کر دیا گیا",
       "copiedInfo": "{package} کی معلومات کلپ بورڈ پر کاپی کی گئیں",
       "noPubspecOrLock": "کوئی pubspec.yaml/pubspec.lock کام کی جگہ میں پایا گیا.",
-      "backfillComplete": "پیکیج کی متحرک: ایک بار کی تاریخ بیک فل مکمل ({count} سنیپ شاٹس درآمد شدہ) ۔",
+      "backfillComplete": "Package Vibrancy: تاریخ کی ایک بار کی بھرائی مکمل ({count} سنیپ شاٹس درآمد کیے گئے)۔",
       "runScanFirst": "پہلے اسکین چلائیں",
       "noUpgradable": "کوئی اپ گریڈ کے قابل پیکیج نہیں ملا",
       "proceedUpgrades": "{count} اپ گریڈ کے ساتھ آگے بڑھیں (((s)) ؟ ناکام اقدامات واپس رول اور منصوبہ جاری ہے.",
@@ -2634,12 +2635,12 @@
       "scanOnSaveBaselineCanceled": "کامل پروجیکٹ اسکن {scanned}/{total} فائلوں کے بعد منسوخ ہو گیا۔",
       "scanOnSaveBaselineFailed": "کامل پروجیکٹ اسکن فیل ہو گیا: {details}",
       "scanOnSaveBaselineDone": "کامل پروجیکٹ اسکن: {total} فائلیں، {issues} مسئلہ(ے)۔",
-      "codeHealthStartFailedDetails": "کوڈ ہیلتھ اسکن شروع ہونے میں ناکام رہا ({command}): {details}",
-      "codeHealthStartFailed": "کوڈ ہیلتھ اسکین شروع کرنے میں ناکام۔ اس بات کو یقینی بنائیں کہ Dart SDK انسٹال ہے۔",
-      "codeHealthScanFailed": "کوڈ ہیلتھ اسکین ناکام ہوگیا۔",
-      "codeHealthScanFailedDetails": "کوڈ ہیلتھ اسکین ناکام: {details}",
-      "codeHealthGatesFailed": "کوڈ ہیلتھ: ترتیب شدہ کوالٹی گیٹس ناکام ہو گئے۔ gates.violations دیکھنے کے لیے کوڈ ہیلتھ کی ترتیبات کھولیں یا JSON کاپی کریں۔",
-      "codeHealthInvalidJson": "کوڈ ہیلتھ نے غلط JSON آؤٹ پٹ واپس کیا۔",
+      "codeHealthStartFailedDetails": "Code Health اسکین شروع ہونے میں ناکام رہا ({command}): {details}",
+      "codeHealthStartFailed": "Code Health اسکین شروع کرنے میں ناکام۔ یقینی بنائیں کہ Dart SDK انسٹال ہے۔",
+      "codeHealthScanFailed": "Code Health اسکین ناکام ہوگیا۔",
+      "codeHealthScanFailedDetails": "Code Health اسکین ناکام: {details}",
+      "codeHealthGatesFailed": "Code Health: ترتیب شدہ کوالٹی گیٹس ناکام ہو گئے۔ gates.violations دیکھنے کے لیے Code Health کی ترتیبات کھولیں یا JSON کاپی کریں۔",
+      "codeHealthInvalidJson": "Code Health نے غلط JSON آؤٹ پٹ واپس کیا۔",
       "sidebarSectionUpdateFailed": "Saropa Lints: سرگرمی بار سیکشن کو اپ ڈیٹ نہیں کیا جا سکا — {message}"
     },
     "vibrancy": {
@@ -2784,7 +2785,7 @@
     "folderHeatMap": "فولڈر تحلیل کی لاگت",
     "hints": {
       "title": "کیسے کام کرتا ہے",
-      "body": "آپ کے ورک سپیس میں ہر Dart فائل کو اسکن کرے گا اور فائل کی تعقيد (لائن کنٹ یا کلاسز، فنکشنز، انسٹالس) کی بنیاد پر تحلیل کی لاگت کا تخمینہ لگائے گا۔ پھر اس کے بعد Dart تحلیل کرنے والے اینالائزر کے ذریعے یاد رکھنے والی فائلوں کی تعداد کو کم کرنے کے لیے خارج کرنے والے الگورتھم پیش کرے گا۔",
+      "body": "آپٹیمائزر آپ کے ورک اسپیس کی ہر Dart فائل اسکین کرتا ہے اور فائل کی پیچیدگی (سطروں کی تعداد، کلاسز، فنکشنز، امپورٹس) کی بنیاد پر تجزیے کی لاگت کا تخمینہ لگاتا ہے۔ پھر یہ اخراج کے پیٹرنز تجویز کرتا ہے تاکہ Dart اینالائزر کی میموری میں لوڈ ہونے والی فائلوں کی تعداد کم ہو۔",
       "generated": "تیکنیکی کوڈ (مثل *.g.dart, *.freezed.dart، وغیرہ) کو خارج کرنے کے لیے امان ہے — یہ منبع سے ہمیشہ دوبارہ تیار کیا جاتا ہے۔",
       "build": "ڈیٹا بنیادی (build/, .dart_tool/) میں زندگی تحلیل کے لیے ضروری نہیں ہونے والے میڈیئریٹ ارٹفیکٹس ہیں",
       "inactive": "کچھ فولڈر میں اپڈیٹ کی گئی گیٹ ایکٹیویٹی نہ ہو سکے تو یہ ممکن ہے کہ اس میں موت یا آرشیو کردہ کوڈ موجود ہو۔",
@@ -2804,7 +2805,7 @@
     },
     "confirmBulk": {
       "prompt": "{count} اکسچیوزن پٹرن کو analysis_options.yaml پر لاگو کریں؟",
-      "detail": "القواعد صارف: {preview}"
+      "detail": "پیٹرنز: {preview}"
     },
     "diffTitle": "تحلیل آپٹیمائزر: مجوزہ استثنیات"
   },
@@ -2891,7 +2892,7 @@
       "kindAccepted": "منظور: تلاش درست ہے اور کوڈ اس طرح رہے گا",
       "kindFalsePositive": "غلطی: قاعدہ یہاں غلط ہے",
       "reasonTitle": "تسلیم {rule} کی وجہ {file} میں",
-      "reasonPlaceholder": "ضروري. ریویئرز کے لیے saropa_accepted.yaml میں ذخیرہ کیا گیا۔",
+      "reasonPlaceholder": "ضروری۔ جائزہ لینے والوں کے لیے saropa_accepted.yaml میں محفوظ کیا جاتا ہے۔",
       "reasonRequired": "ایک سبب ضروری ہے۔"
     },
     "quickFix": {
@@ -2965,7 +2966,7 @@
       "packagesNeedlesCount": "{count} پیکیجس کو تسلیم کریں",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · گیٹ ناکام ہو رہا ہے۔",
-      "codeHealthNeverScanned": "اپنا سکور دیکھنے کے لیے کوڈ ہیلتھ چلائیں۔",
+      "codeHealthNeverScanned": "اپنا سکور دیکھنے کے لیے Code Health چلائیں۔",
       "projectMapDescription": "اسکین شدہ {ago}",
       "projectMapNeverScanned": "سائز اور گرم مقامات دیکھنے کے لیے پروجیکٹ میپ چلائیں۔"
     },
@@ -3015,7 +3016,7 @@
   },
   "lifecycle": {
     "note": {
-      "statusMayBeOutdated": "حالت ممکنہ طور پر قديم ہے: ریکارڈ کیا گیا ہے کہ انتہائی حالت ہے، لیکن pub.dev اس کو ختم نہ ہونے والی چیز قرار دیتا ہے اور اس کا ایڈیشن آخری 12 مہینوں میں ہے۔",
+      "statusMayBeOutdated": "حالت پرانی ہو سکتی ہے: اسے ختم شدہ (end of life) درج کیا گیا ہے، لیکن pub.dev کے مطابق یہ بند نہیں ہوا اور پچھلے 12 مہینوں میں شائع ہوا ہے۔",
       "maintenanceMode": "نگہبانی میڈیا: صرف اہم تصحیحات متوقع ہیں",
       "caution": "حذاری: اس پیکیج پر اعتماد کرنے سے پہلے جانے والی مسئلہ کو جائزہ لیں۔",
       "unlisted": "pub.dev پر غیر فہرست شدہ: تلاش کے نتائج سے پوشیدہ؛ موجودہ صارفین اب بھی اس پر انحصار کر سکتے ہیں۔"
@@ -3067,7 +3068,7 @@
       "both": "saropa_lints: pubspec + پلگ اِن {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (تفاو٦)",
       "neither": "saropa_lints: نہ ترتیب دیا گیا",
-      "localSource": "saropa_lints: لوكل سرچ",
+      "localSource": "saropa_lints: مقامی سورس",
       "dartTooOld": "saropa_lints: پلاگ ان نیا Dart کی ضرورت ہے",
       "tipPubspec": "اس پروجیکٹ نے پب سپیک روت استعمال کرتا ہے: saropa_lints ایک وابستہ ہے pubspec.yaml میں۔ آپ ایڈیٹر ڈیاگنوسٹکس اور کمینڈ لائن کمینڈز (dart run saropa_lints:init، سکن، بیس لائن) حاصل کرتے ہیں۔",
       "tipPlugin": "اس پروجیکٹ نے پلاگن روت اپنایا ہے: saropa_lints پلاگن کے طور پر analysis_options.yaml میں سیٹ کیا گیا ہے۔ آپ کیویڈیٹر ڈیاگنوسٹکس کی تنہا حاصل کرتے ہیں۔ کمینڈ لائن کمینڈز (dart run saropa_lints:init, scan, baseline) کے لیے saropa_lints کی ضرورت ہے pubspec.yaml میں۔",

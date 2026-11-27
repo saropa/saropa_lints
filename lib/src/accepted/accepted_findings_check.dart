@@ -43,7 +43,9 @@ class AcceptedListCheck {
 /// Checks every list under [target]. [scannedFiles] are absolute paths the
 /// run really scanned (worker-skipped files already removed); [split] and
 /// [lists] are the ones the run filtered with, so hidden counts and the
-/// judged lists are the same objects the normal output used.
+/// judged lists are the same objects the normal output used. [rulesRunByFile]
+/// (keyed by `rootKey(canonicalRoot(file))`) replaces [rulesRun] for files
+/// scanned with a different rule set.
 List<AcceptedListCheck> checkAcceptedLists({
   required String target,
   required AcceptedListSet lists,
@@ -51,6 +53,7 @@ List<AcceptedListCheck> checkAcceptedLists({
   required Iterable<String> scannedFiles,
   required Set<String> rulesRun,
   required bool complete,
+  Map<String, Set<String>> rulesRunByFile = const {},
 }) {
   final found = discoverAcceptedLists(target);
   final scanned = _scannedByRoot(scannedFiles);
@@ -67,6 +70,8 @@ List<AcceptedListCheck> checkAcceptedLists({
             aboveMaxByEntry: split.aboveMaxByEntryAt(root),
             scannedFiles: scanned[rootKey(root)] ?? const {},
             rulesRun: rulesRun,
+            rulesRunFor: (e) =>
+                rulesRunByFile[rootKey(canonicalRoot('$root/${e.file}'))],
             projectRoot: root,
             complete: complete,
           ),

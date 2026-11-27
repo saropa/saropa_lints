@@ -29,7 +29,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))  # sibling imports work whether run as script or module
 
 from verify_locales import (  # noqa: E402  (path tweak above must run first)
-    BACKTICK, PH, URL, WORD, discover, flatten, placeholder_problems, suspicious,
+    BACKTICK, PH, PRODUCT_NAMES, URL, WORD, discover, flatten, placeholder_problems, suspicious,
 )
 
 EXT = HERE.parent.parent
@@ -103,6 +103,22 @@ _SINDHI_ONLY_RE = re.compile(
 )
 
 
+# Arabic code points Urdu does not write: yeh U+064A, kaf U+0643, teh marbuta
+# U+0629, alef maksura U+0649 (Urdu uses U+06CC, U+06A9, U+06C1/U+06C3). Arabic
+# words spelled only with shared letters still pass; a check on the "al-" article
+# would also hit real Urdu such as "fi al-hal". Same set as ARABIC_IN_UR in the
+# TS parity test.
+_ARABIC_IN_UR_RE = re.compile("[\u064a\u0643\u0629\u0649]")
+
+def _unexcused(rx: re.Pattern, en: str, loc: str) -> str | None:
+    """First character of *loc* matching *rx* that English does not itself contain.
+
+    Every match is examined: an excused letter earlier in the value must not hide
+    a later one that English lacks.
+    """
+    return next((ch for ch in rx.findall(loc) if ch not in en), None)
+
+
 def _brand_terms() -> tuple[str, ...]:
     """Do-not-translate terms, imported lazily so the CLI works without mt_fallback."""
     try:
@@ -159,11 +175,18 @@ def detect(en: str, loc: str, locale: str, blocklist: list[dict]) -> list[tuple[
     if rx and loc != en and len(letters) >= 2 and not rx.search(loc):
         out.append(("hard", "wrong-script"))
 
-    # Sindhi in an Urdu value. Excused only if English itself carries the letter.
+    # Sindhi or Arabic letters in an Urdu value, unless English carries the letter.
     if locale == "ur":
-        sindhi = _SINDHI_ONLY_RE.search(loc)
-        if sindhi and sindhi.group(0) not in en:
-            out.append(("hard", f"sindhi:U+{ord(sindhi.group(0)):04X}"))
+        for label, ur_rx in (("sindhi", _SINDHI_ONLY_RE), ("arabic-letter", _ARABIC_IN_UR_RE)):
+            ch = _unexcused(ur_rx, en, loc)
+            if ch:
+                out.append(("hard", f"{label}:U+{ord(ch):04X}"))
+
+    # A product name (PRODUCT_NAMES, case-sensitive) translated or dropped. Counted, so a sentence naming it twice
+    # cannot keep one and translate the other.
+    for name in PRODUCT_NAMES:
+        if loc.count(name) < en.count(name):
+            out.append(("hard", f"product-name:{name}"))
 
     # Hallucinated continuation: output vastly longer than the source.
     # Compare PROSE to PROSE: placeholders/brands are stripped from both sides, or a

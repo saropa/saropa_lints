@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Code Gesundheitsdashboard",
+    "documentTitle": "Saropa Code Health-Dashboard",
     "skipToTable": "Zur Funktionstabelle springen",
     "openWorkspaceFirst": "Öffnen Sie zuerst einen Dart/Flutter Arbeitsbereich.",
     "scan": {
@@ -1868,9 +1868,9 @@
     "runReportFirst": "Führen Sie den Bericht erneut aus und kopieren Sie dann JSON.",
     "copiedJson": "Code Health JSON kopiert in die Zwischenablage.",
     "couldNotOpenFile": "Datei nicht öffnen können: {path}",
-    "panelTitle": "Saropa Code Gesundheitsdashboard",
+    "panelTitle": "Saropa Code Health-Dashboard",
     "hero": {
-      "title": "Saropa Code Gesundheitsdashboard",
+      "title": "Saropa Code Health-Dashboard",
       "generated": "Erstellt",
       "functionOne": "{count} Funktion",
       "functionOther": "{count} Funktionen",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "Gatter durchgegangen"
     },
     "gate": {
-      "fallback": "Qualitätstore fehlgeschlagen – überprüfen Sie die Schwellenwerte in den Code-Integritätseinstellungen.",
+      "fallback": "Qualitätsprüfungen fehlgeschlagen – überprüfen Sie die Schwellenwerte in den Einstellungen von Code Health.",
       "failingOne": "{count} Gate fehlgeschlagen — Schwellenwerte überprüfen oder das JSON kopieren, um gates.violations zu inspizieren.",
       "failingOther": "{count} Gates fehlgeschlagen — Schwellenwerte überprüfen oder das JSON kopieren, um gates.violations zu inspizieren.",
-      "openSettingsTitle": "Öffnen Sie die Code-Gesundheitseinstellungen, um Schwellenwerte anzupassen.",
-      "openSettingsButton": "Open Code Gesundheits-Einstellungen"
+      "openSettingsTitle": "Öffnen Sie die Einstellungen von Code Health, um Schwellenwerte anzupassen.",
+      "openSettingsButton": "Code Health Einstellungen öffnen"
     },
     "kpi": {
       "ariaLabel": "Code Gesundheitszusammenfassung",
@@ -1903,11 +1903,11 @@
     },
     "toolbar": {
       "ariaLabel": "Code Health-Aktionen",
-      "rescanTitle": "Führen Sie den Code-Gesundheitsscan erneut aus und aktualisieren Sie dieses Dashboard.",
+      "rescanTitle": "Führen Sie den Code Health Scan erneut aus und aktualisieren Sie dieses Dashboard.",
       "rescan": "Erneut scannen",
-      "copyJsonTitle": "Kopieren Sie den Rohcode Health JSON in die Zwischenablage.",
+      "copyJsonTitle": "Das rohe Code Health JSON in die Zwischenablage kopieren.",
       "copyJson": "JSON kopieren",
-      "settingsTitle": "Öffnen Sie die Code-Gesundheitseinstellungen.",
+      "settingsTitle": "Öffnen Sie die Einstellungen von Code Health.",
       "settingsButton": "Code Health-Einstellungen",
       "filterTitle": "Filterzeilen nach Namen, Datei oder Flagge.",
       "filterLabel": "Zeilen filtern",
@@ -2078,6 +2078,7 @@
     "noData": "Noch keine „violations.json“ – führen Sie die Analyse aus, um den Unterdrückungs-Snapshot zu füllen.",
     "zeroTotal": "0 Analysator-Unterdrückungen in den letzten Exporten.",
     "noKindBreakdown": "Keine Artenabteilung dieser Ausfuhr.",
+    "total": "Gesamt {total}",
     "title": "Löschungen (Export)",
     "readOnlyNote": "(nur-lesen; öffnen Sie Findings zum Durchsuchen und Handeln.)",
     "openFindings": "Befund-Dashboard öffnen"
@@ -2636,7 +2637,7 @@
       "scanOnSaveBaselineDone": "Ganzer Projekt-Scan abgeschlossen: {total} Dateien, {issues} Problem(e).",
       "codeHealthStartFailedDetails": "Code Health-Scan konnte nicht gestartet werden ({command}): {details}",
       "codeHealthStartFailed": "Code Health Scan konnte nicht gestartet werden. Stellen Sie sicher, dass das Dart SDK installiert ist.",
-      "codeHealthScanFailed": "Code Gesundheitsscan fehlgeschlagen.",
+      "codeHealthScanFailed": "Code Health Scan fehlgeschlagen.",
       "codeHealthScanFailedDetails": "Code Health-Scan fehlgeschlagen: {details}",
       "codeHealthGatesFailed": "Code Health: Konfigurierte Quality Gates sind fehlgeschlagen. Öffnen Sie die Code Health-Einstellungen oder kopieren Sie das JSON, um gates.violations zu prüfen.",
       "codeHealthInvalidJson": "Code Health hat ungültige JSON-Ausgabe zurückgegeben.",

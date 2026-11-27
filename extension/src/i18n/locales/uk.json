@@ -1041,9 +1041,9 @@
       "trendTitle": "Оцінка здоров’я/тенденція порушення з попередніх запусків",
       "hotspotsTitle": "{open} відкрито, {safe} позначено як безпечний, {fixed} виправлено — натисніть, щоб переглянути",
       "hotspotsPill": "{open} відкрито · {percent}% переглянуто",
-      "qualityGatePassingTitle": "Проходження воріт якості працездатності коду — натисніть, щоб відкрити працездатність коду",
+      "qualityGatePassingTitle": "Контроль якості Code Health пройдено — натисніть, щоб відкрити Code Health",
       "qualityGatePassingPill": "Проїзд воріт",
-      "qualityGateFailingTitle": "Помилка перевірки якості працездатності коду ({count} порушень) — натисніть, щоб відкрити працездатність коду",
+      "qualityGateFailingTitle": "Контроль якості Code Health не пройдено (порушень: {count}) — натисніть, щоб відкрити Code Health",
       "qualityGateFailingPill": "Несправність воріт"
     },
     "groupBy": {
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Панель здоров'я коду Saropa",
+    "documentTitle": "Панель Saropa Code Health",
     "skipToTable": "Перейти до таблиці функцій",
     "openWorkspaceFirst": "Спочатку відкрийте робочу зону Dart/Flutter.",
     "scan": {
@@ -1868,9 +1868,9 @@
     "runReportFirst": "Знову запустити звіт, а потім скопіювати JSON.",
     "copiedJson": "Code Health JSON скопійований в кліпборд.",
     "couldNotOpenFile": "Не вдалося відкрити файл: {path}",
-    "panelTitle": "Панель здоров'я коду Saropa",
+    "panelTitle": "Панель Saropa Code Health",
     "hero": {
-      "title": "Панель здоров'я коду Saropa",
+      "title": "Панель Saropa Code Health",
       "generated": "Вироблені генеруються",
       "functionOne": "{count} функція",
       "functionOther": "{count} функцій",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "порогів пройдено"
     },
     "gate": {
-      "fallback": "Помилка перевірки якості — перегляньте порогові значення в налаштуваннях працездатності коду.",
+      "fallback": "Контроль якості не пройдено — перегляньте порогові значення в налаштуваннях Code Health.",
       "failingOne": "{count} шлюз не пройдено — перегляньте пороги або скопіюйте JSON, щоб перевірити gates.violations.",
       "failingOther": "{count} шлюзів не пройдено — перегляньте пороги або скопіюйте JSON, щоб перевірити gates.violations.",
-      "openSettingsTitle": "Відкрийте Код настройки здоров'я, щоб налаштувати порогові значення.",
-      "openSettingsButton": "Відкритий код Настройки охорони здоров'я"
+      "openSettingsTitle": "Відкрийте налаштування Code Health, щоб змінити порогові значення.",
+      "openSettingsButton": "Відкрити налаштування Code Health"
     },
     "kpi": {
       "ariaLabel": "Код збірки кодів охорони здоров'я",
@@ -1903,11 +1903,11 @@
     },
     "toolbar": {
       "ariaLabel": "Дії Code Health",
-      "rescanTitle": "Перезапустити сканування стану коду і оновлення цієї панелі.",
+      "rescanTitle": "Повторно запустіть сканування Code Health і оновіть цю панель.",
       "rescan": "Повторне сканування",
-      "copyJsonTitle": "Копіюйте JSON з необработаного коду здоров'я в кліпборд.",
+      "copyJsonTitle": "Скопіювати необроблений JSON із Code Health у буфер обміну.",
       "copyJson": "Копіювати JSON",
-      "settingsTitle": "Відкрийте Код настройки здоров'я.",
+      "settingsTitle": "Відкрийте налаштування Code Health.",
       "settingsButton": "Налаштування Code Health",
       "filterTitle": "Фільтруйте рядки за назвою, файлом або прапором.",
       "filterLabel": "Фільтрувати рядки",
@@ -2078,6 +2078,7 @@
     "noData": "Ще немає violations.json — виконайте аналіз, щоб заповнити зняття придушення.",
     "zeroTotal": "0 придушення аналізатора в останньому експорту.",
     "noKindBreakdown": "Немає розбивки за видом у цьому експорті.",
+    "total": "Усього {total}",
     "title": "Видалення (експорт)",
     "readOnlyNote": "(тільки для читання; відкрити результати для перегляду та дії.)",
     "openFindings": "Відкрити панель знахідок"
@@ -2635,8 +2636,8 @@
       "scanOnSaveBaselineFailed": "Повноекранний сканування проекту не вдалося: {details}",
       "scanOnSaveBaselineDone": "Повний сканування проекту завершено: {total} файлів, {issues} проблема(и).",
       "codeHealthStartFailedDetails": "Не вдалося запустити сканування Code Health ({command}): {details}",
-      "codeHealthStartFailed": "Код здоров'я сканування не вдалося почати. Переконайтеся, що Dart SDK встановлений.",
-      "codeHealthScanFailed": "Код здоров'я сканування не вдалося.",
+      "codeHealthStartFailed": "Не вдалося запустити сканування Code Health. Переконайтеся, що Dart SDK встановлено.",
+      "codeHealthScanFailed": "Сканування Code Health не вдалося.",
       "codeHealthScanFailedDetails": "Помилка сканування Code Health: {details}",
       "codeHealthGatesFailed": "Code Health: задані пороги якості не пройдено. Відкрийте налаштування Code Health або скопіюйте JSON, щоб переглянути gates.violations.",
       "codeHealthInvalidJson": "Code Health повернув недійсний вихід JSON.",

@@ -19,10 +19,10 @@
     },
     "statusItem": {
       "text": "Vibrancy: تم تخطي pub",
-      "tooltip": "تخطّت Vibrancy للحزم استعلام pub حتى لا تتم إعادة كتابة pubspec.lock. انقر لعرض التفاصيل."
+      "tooltip": "تخطّى Package Vibrancy استعلام pub حتى لا تتم إعادة كتابة pubspec.lock. انقر لعرض التفاصيل."
     },
     "explain": {
-      "title": "تخطّت Vibrancy للحزم استعلام pub",
+      "title": "تخطّى Package Vibrancy استعلام pub",
       "none": "لم يتم تخطي أي استعلام pub في Vibrancy خلال هذه الجلسة.",
       "unknown": "غير معروف",
       "reason": "السبب: {reason}",
@@ -908,11 +908,11 @@
       "yellow": "⚠ {count} مشكلة(ات) في مساحة العمل"
     },
     "issue": {
-      "hazardFiles": "$(تحذير) {count} ملف(s) كبير(s) وغير مستثنى",
+      "hazardFiles": "$(warning) ملفات كبيرة غير مستثناة: {count}",
       "hazardFilesDetail": "الملفات الكبيرة المراقبة بواسطة مراقب الملفات يمكن أن تستهلك الذاكرة وتحسّن VS Code. قم بتشغيل مسح الخطر لاستبعادها.",
       "missingExcludes": "$(info) {count} تطبيق المراقبة مفقود(ة)",
       "missingExcludesDetail": "الأنماط الموصى بها لاستبعاد المراقبة الملفات غير مُكوَّنة. إضافة هذه الأنماط تمنع استخدام الذاكرة غير الضرورية.",
-      "hostMemory": "التنبيه) استضافExtension باستخدام {size}",
+      "hostMemory": "$(alert) مضيف الإضافات يستخدم {size}",
       "hostMemoryDetail": "العملية الرئيسية للتوسيع RSS تتجاوز حد التنبيه. افتح صحة العملية للحصول على التفاصيل."
     }
   },
@@ -1041,9 +1041,9 @@
       "trendTitle": "نسبة الصحة / اتجاه الانتهاكات منذ الإصدارات السابقة",
       "hotspotsTitle": "مغلق {open}، {safe} مارك كامن، {fixed} مصلح — انقر للتحقق",
       "hotspotsPill": "{open} مفتوح · {percent}% مراجعة",
-      "qualityGatePassingTitle": "ممر جودة الصحة البرمجية — اضغط للحصول على الصحة البرمجية",
+      "qualityGatePassingTitle": "بوابة جودة Code Health ناجحة — انقر لفتح Code Health",
       "qualityGatePassingPill": "المرور عبر البوابة",
-      "qualityGateFailingTitle": "معدل جودة الصحة الكودية فاشل ({count} انتهاك(ات)) — انقر لفتح الصحة الكودية",
+      "qualityGateFailingTitle": "بوابة جودة Code Health فاشلة ({count} انتهاك(ات)) — انقر لفتح Code Health",
       "qualityGateFailingPill": "الباب فاشل"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "شجرة النسخ JSON",
       "refreshExtension": "تمديد تحديث التجديد",
       "openPackageDashboard": "افتح لوحة تحكم الحزمة",
-      "openCodeHealth": "فتح صحة الشيفرة",
+      "openCodeHealth": "فتح Code Health",
       "openLintsConfig": "إدارة حزم القواعد",
       "reloadFromDisk": "إعادة التحميل من القرص",
       "reloadFromDiskTitle": "أعد عرض لوحة القيادة من آخر violations.json دون إعادة تشغيل المحلل.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa رمز لوحة المعلومات الصحية",
+    "documentTitle": "لوحة معلومات Saropa Code Health",
     "skipToTable": "انتقل إلى جدول الوظائف",
     "openWorkspaceFirst": "افتح مساحة عمل Dart/Flutter أولاً.",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "قم بتشغيل التقرير مرة أخرى ، ثم نسخ JSON.",
-    "copiedJson": "تم نسخ JSON Code Health إلى المجلدات.",
+    "copiedJson": "تم نسخ JSON الخاص بـ Code Health إلى الحافظة.",
     "couldNotOpenFile": "لم يتم فتح الملف: {path}",
-    "panelTitle": "Saropa رمز لوحة المعلومات الصحية",
+    "panelTitle": "لوحة معلومات Saropa Code Health",
     "hero": {
-      "title": "Saropa رمز لوحة المعلومات الصحية",
+      "title": "لوحة معلومات Saropa Code Health",
       "generated": "تاريخ الإنشاء",
       "functionOne": "{count} دالة",
       "functionOther": "{count} دوال",
@@ -1882,8 +1882,8 @@
       "fallback": "فشلت بوابات الجودة — قم بمراجعة الحدود في إعدادات Code Health.",
       "failingOne": "{count} بوابة فاشلة — راجع الحدود، أو انسخ JSON لفحص gates.violations.",
       "failingOther": "{count} بوابات فاشلة — راجع الحدود، أو انسخ JSON لفحص gates.violations.",
-      "openSettingsTitle": "افتح إعدادات الصحة لعدم ضبط العتبات.",
-      "openSettingsButton": "فتح إعدادات صحة الشيفرة"
+      "openSettingsTitle": "افتح إعدادات Code Health لضبط العتبات.",
+      "openSettingsButton": "فتح إعدادات Code Health"
     },
     "kpi": {
       "ariaLabel": "ملخص الصحة للكود",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "الاختبارات متأخرة عن الوظيفة"
     },
     "toolbar": {
-      "ariaLabel": "القانون الإجراءات الصحية",
-      "rescanTitle": "أعد تشغيل فحص صحة الرمز وتحديث لوحة القيادة هذه.",
+      "ariaLabel": "إجراءات Code Health",
+      "rescanTitle": "أعد تشغيل فحص Code Health وحدّث لوحة المعلومات هذه.",
       "rescan": "إعادة الفحص",
-      "copyJsonTitle": "نسخ JSON الصحة الرمزية الخام إلى الحافظة.",
+      "copyJsonTitle": "انسخ JSON الخام لـ Code Health إلى الحافظة.",
       "copyJson": "نسخ JSON",
-      "settingsTitle": "افتح إعدادات الصحة الخاصة بالرمز.",
-      "settingsButton": "إعدادات صحة الشيفرة",
+      "settingsTitle": "افتح إعدادات Code Health.",
+      "settingsButton": "إعدادات Code Health",
       "filterTitle": "تصفية الصفوف حسب الاسم أو الملف أو العلم.",
       "filterLabel": "تصفية الصفوف",
       "filterPlaceholder": "صفوف الفلترات..."
@@ -2078,6 +2078,7 @@
     "noData": "لا يوجد violations.json حتى الآن - قم بتشغيل التحليل لملء لقطة القمع.",
     "zeroTotal": "0 قمع المحلل في آخر صادرات.",
     "noKindBreakdown": "لا توجد تفاصيل حسب النوع في هذا التصدير.",
+    "total": "الإجمالي {total}",
     "title": "الحذف (التصدير)",
     "readOnlyNote": "(غير قابل للتحرير؛ افتح العيوب لتصفح واتخاذ الإجراءات.)",
     "openFindings": "فتح لوحة تحكم النتائج"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "تم مسح ذاكرة التخزين المؤقت لـ Vibrancy",
       "copiedInfo": "تم نسخ معلومات {package} إلى الحافظة",
       "noPubspecOrLock": "لا يوجد pubspec.yaml/pubspec.lock في مساحة العمل.",
-      "backfillComplete": "حزمة الحزم: النشاط البطيء تم استكمال ملء التاريخ مرة واحدة (تستورد لقطات {count}).",
+      "backfillComplete": "Package Vibrancy: اكتمل ملء السجل لمرة واحدة (تم استيراد {count} لقطة).",
       "runScanFirst": "شغّل فحصًا أولاً",
       "noUpgradable": "لم يتم العثور على حزم قابلة للترقية",
       "proceedUpgrades": "المضي قدما مع {count} ترقية (((s)) ؟ الخطوات الفاشلة تتراجع وتستمر الخطة.",
@@ -2634,11 +2635,11 @@
       "scanOnSaveBaselineCanceled": "تم إلغاء مسح المشروع بأكمله بعد {scanned}/{total} ملفات.",
       "scanOnSaveBaselineFailed": "فشل مسح المشروع بأكمله: {details}",
       "scanOnSaveBaselineDone": "مسح المشروع بأكمله اكتمل: {total} ملفات، {issues} مشكلة(ات).",
-      "codeHealthStartFailedDetails": "فشل بدء فحص صحة الشيفرة ({command}): {details}",
-      "codeHealthStartFailed": "فشل الاختبار الصحي للكود في البدء. تأكد من تثبيت Dart SDK.",
-      "codeHealthScanFailed": "فشل مسح الرمز الصحي.",
-      "codeHealthScanFailedDetails": "فحص صحة الكود فشل: {details}",
-      "codeHealthGatesFailed": "الرمز الصحة: القانون الصحية: فشلت بوابات الجودة المهيئة. افتح إعدادات صحة الكود أو قم بنسخ JSON لفحص gates.violations.",
+      "codeHealthStartFailedDetails": "فشل بدء فحص Code Health ({command}): {details}",
+      "codeHealthStartFailed": "فشل بدء فحص Code Health. تأكد من تثبيت Dart SDK.",
+      "codeHealthScanFailed": "فشل فحص Code Health.",
+      "codeHealthScanFailedDetails": "فشل فحص Code Health: {details}",
+      "codeHealthGatesFailed": "Code Health: فشلت بوابات الجودة المهيأة. افتح إعدادات Code Health أو انسخ JSON لفحص gates.violations.",
       "codeHealthInvalidJson": "أعاد Code Health خروجاً JSON غير صالح.",
       "sidebarSectionUpdateFailed": "Saropa Lints: لم يتم تحديث قسم شريط الأنشطة — {message}"
     },
@@ -2965,7 +2966,7 @@
       "packagesNeedlesCount": "{count} حزم لتبني",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate فاشل",
-      "codeHealthNeverScanned": "تشغيل صحة الكود لرؤية درجتك",
+      "codeHealthNeverScanned": "شغّل Code Health لرؤية درجتك",
       "projectMapDescription": "تم التحقق من {ago}",
       "projectMapNeverScanned": "تشغيل خريطة المشروع لرؤية الحجم ونقاط الحرارة"
     },

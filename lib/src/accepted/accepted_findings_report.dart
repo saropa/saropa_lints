@@ -224,6 +224,9 @@ List<AcceptedEntryStatus> evaluateAcceptedEntries({
   bool Function(String absPath)? fileExists,
   Iterable<AcceptedEntry>? entries,
   Map<String, int> aboveMaxByEntry = const {},
+  // Overrides [rulesRun] for an entry whose file was scanned with another rule
+  // set (a nested package's own config); null result keeps [rulesRun].
+  Set<String>? Function(AcceptedEntry entry)? rulesRunFor,
 }) {
   final exists = fileExists ?? FileSystemEntity.isFileSync;
   return [
@@ -237,7 +240,7 @@ List<AcceptedEntryStatus> evaluateAcceptedEntries({
           e,
           hiddenByEntry[e.key] ?? 0,
           scannedFiles,
-          rulesRun,
+          rulesRunFor?.call(e) ?? rulesRun,
           complete,
           exists('$projectRoot/${e.file}'),
         ),

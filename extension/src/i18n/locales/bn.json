@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} ওয়ার্কস্পেস সমস্যা(গুলি)"
     },
     "issue": {
-      "hazardFiles": "$(ত্রুটি) {count} বড় অন্তর্ভুক্ত করা হয়নি ফাইল (গুলি)",
+      "hazardFiles": "$(warning) বাদ না দেওয়া {count}টি বড় ফাইল",
       "hazardFilesDetail": "বড় ফাইলগুলো ফাইল ওবজার্ভার দ্বারা ট্র্যাক করা হলে মেমরি খালাস হতে পারে এবং VS Code বন্ধ হতে পারে। হাজার স্ক্যান চালানো হোক এবং তাদের বাদ দিন।",
       "missingExcludes": "$(info) {count} ওয়াচার এক্সক্লুসন অনুপস্থিত",
       "missingExcludesDetail": "পরামর্শ দেওয়া ফাইল ওবজারভার বাদ দেওয়া প্যাটার্ন অ্যাক্টিভ করা হয়নি। এগুলো যোগ করা অপ্রয়োজন মেমরি ব্যবহার বন্ধ করে।",
@@ -1041,9 +1041,9 @@
       "trendTitle": "স্বাস্থ্য স্কোর / আগের রান থেকে ভগ্নাভিসার প্রবণতা",
       "hotspotsTitle": "{open} খোলা, {safe} নিরাপদ চিহ্নিত, {fixed} সঠিক করা হয়েছে — পরীক্ষা করতে ক্লিক করুন",
       "hotspotsPill": "{open} খোলা · {percent}% পরীক্ষিত",
-      "qualityGatePassingTitle": "কোড হেলথ গুণ গেট পাস করুন — ক্লিক করুন কোড হেলথ খুলতে",
+      "qualityGatePassingTitle": "Code Health কোয়ালিটি গেট উত্তীর্ণ — Code Health খুলতে ক্লিক করুন",
       "qualityGatePassingPill": "প্যাসিং গেট",
-      "qualityGateFailingTitle": "কোড হেলথ গুণ পরীক্ষার ফেল ({count} ভংগিকরণ) — ক্লিক করুন কোড হেলথ খুলতে",
+      "qualityGateFailingTitle": "Code Health কোয়ালিটি গেট ব্যর্থ ({count}টি লঙ্ঘন) — Code Health খুলতে ক্লিক করুন",
       "qualityGateFailingPill": "প্রবেশদ্বার ব্যর্থ হয়েছে"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "ট্রি JSON কপি করুন",
       "refreshExtension": "এক্সটেনশন রিফ্রেশ করুন",
       "openPackageDashboard": "প্যাকেজ ড্যাশবোর্ড খুলুন",
-      "openCodeHealth": "ওপেন কোড হেলথ হ্যালুডে",
+      "openCodeHealth": "Code Health খুলুন",
       "openLintsConfig": "নিয়ম প্যাকগুলি পরিচালনা করুন",
       "reloadFromDisk": "ডিস্ক থেকে পুনরায় লোড করুন",
       "reloadFromDiskTitle": "বিশ্লেষকটি পুনরায় চালানো ছাড়াই শেষ violations.json থেকে ড্যাশবোর্ডটিকে আবার রেন্ডার করুন।",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
+    "documentTitle": "Saropa Code Health ড্যাশবোর্ড",
     "skipToTable": "ফাংশন টেবিলে যান",
     "openWorkspaceFirst": "প্রথমে একটি Dart/Flutter ওয়ার্কস্পেস খুলুন।",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "রিপোর্টটি আবার চালান, তারপর JSON কপি করুন।",
-    "copiedJson": "কোড হেলথ JSON ক্লিপবোর্ডে অনুলিপি করা হয়েছে।",
+    "copiedJson": "Code Health JSON ক্লিপবোর্ডে কপি করা হয়েছে।",
     "couldNotOpenFile": "ফাইলটি খুলতে পারেনিঃ {path}",
-    "panelTitle": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
+    "panelTitle": "Saropa Code Health ড্যাশবোর্ড",
     "hero": {
-      "title": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
+      "title": "Saropa Code Health ড্যাশবোর্ড",
       "generated": "তৈরি হয়েছে",
       "functionOne": "{count} ফাংশন",
       "functionOther": "{count} ফাংশন",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "পাস করা গেট"
     },
     "gate": {
-      "fallback": "গুণমান গেট ব্যর্থ হয়েছে — কোড স্বাস্থ্য সেটিংসে থ্রেশহোল্ড পর্যালোচনা করুন।",
+      "fallback": "কোয়ালিটি গেট ব্যর্থ হয়েছে — Code Health সেটিংসে থ্রেশহোল্ড পর্যালোচনা করুন।",
       "failingOne": "{count} গেট ব্যর্থ — থ্রেশহোল্ড পর্যালোচনা করুন, বা gates.violations পরিদর্শন করতে JSON কপি করুন।",
       "failingOther": "{count} গেট ব্যর্থ — থ্রেশহোল্ড পর্যালোচনা করুন, বা gates.violations পরিদর্শন করতে JSON কপি করুন।",
-      "openSettingsTitle": "প্রান্তিকগুলি সামঞ্জস্য করতে কোড স্বাস্থ্য সেটিংস খুলুন।",
-      "openSettingsButton": "ওপেন কোড স্বাস্থ্য সেটিংস"
+      "openSettingsTitle": "থ্রেশহোল্ড সামঞ্জস্য করতে Code Health সেটিংস খুলুন।",
+      "openSettingsButton": "Code Health সেটিংস খুলুন"
     },
     "kpi": {
       "ariaLabel": "কোড স্বাস্থ্য সারসংক্ষেপ",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "পরীক্ষাগুলো ফাংশনের পিছিয়ে"
     },
     "toolbar": {
-      "ariaLabel": "কোড স্বাস্থ্য কর্ম স্বাস্থ্য ব্যবস্থা",
-      "rescanTitle": "কোড হেলথ স্ক্যানটি আবার চালান এবং এই ড্যাশবোর্ডটি রিফ্রেশ করুন।",
+      "ariaLabel": "Code Health অ্যাকশন",
+      "rescanTitle": "Code Health স্ক্যান আবার চালান এবং এই ড্যাশবোর্ড রিফ্রেশ করুন।",
       "rescan": "পুনরায় স্ক্যান করুন",
-      "copyJsonTitle": "কাঁচা কোড স্বাস্থ্য JSON ক্লিপবোর্ডে অনুলিপি করুন।",
+      "copyJsonTitle": "Code Health-এর কাঁচা JSON ক্লিপবোর্ডে কপি করুন।",
       "copyJson": "JSON কপি করুন",
-      "settingsTitle": "কোড স্বাস্থ্য সেটিংস খুলুন।",
-      "settingsButton": "কোড স্বাস্থ্য সেটিংসে",
+      "settingsTitle": "Code Health সেটিংস খুলুন।",
+      "settingsButton": "Code Health সেটিংস",
       "filterTitle": "নাম, ফাইল বা পতাকা অনুসারে ফিল্টার সারিগুলি।",
       "filterLabel": "সারি ফিল্টার করুন",
       "filterPlaceholder": "ফিল্টার সারি..."
@@ -2078,6 +2078,7 @@
     "noData": "এখনও কোনো violations.json নেই — দমন স্ন্যাপশট তৈরি করতে বিশ্লেষণ চালান।",
     "zeroTotal": "0 সর্বশেষ রপ্তানিতে বিশ্লেষক দমন।",
     "noKindBreakdown": "এই রপ্তানির কোনও প্রকারের বিশ্লেষণ নেই।",
+    "total": "মোট {total}",
     "title": "নিষ্ক্রিয়করণ (রপ্তানি)",
     "readOnlyNote": "(শুধুমাত্র পাঠযোগ্য; ব্রাউজ এবং কাজ করার জন্য Findings খুলুন।",
     "openFindings": "ফলাফল ড্যাশবোর্ড খুলুন"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy ক্যাশ সাফ করা হয়েছে",
       "copiedInfo": "{package}-এর তথ্য ক্লিপবোর্ডে কপি করা হয়েছে",
       "noPubspecOrLock": "ওয়ার্কস্পেসে pubspec.yaml/pubspec.lock পাওয়া যায়নি।",
-      "backfillComplete": "প্যাকেজিংয়ের প্রাণবন্ততাঃ এককালীন ইতিহাস ব্যাকফিল সম্পূর্ণ ({count} স্ন্যাপশট আমদানি করা হয়েছে) ।",
+      "backfillComplete": "Package Vibrancy: এককালীন ইতিহাস ব্যাকফিল সম্পূর্ণ ({count}টি স্ন্যাপশট আমদানি করা হয়েছে)।",
       "runScanFirst": "প্রথমে একটি স্ক্যান চালান",
       "noUpgradable": "আপগ্রেডযোগ্য কোনো প্যাকেজ পাওয়া যায়নি",
       "proceedUpgrades": "{count} আপগ্রেডের সাথে এগিয়ে যান? ব্যর্থ পদক্ষেপগুলি পিছনে ফিরে যায় এবং পরিকল্পনাটি অব্যাহত থাকে।",
@@ -2634,12 +2635,12 @@
       "scanOnSaveBaselineCanceled": "{scanned}/{total} ফাইল পরিসংখ্যানের পর সম্পূর্ণ প্রকল্প স্ক্যান বাতিল হয়েছে।",
       "scanOnSaveBaselineFailed": "সম্পূর্ণ প্রকল্প স্ক্যান ব্যর্থ হয়েছে: {details}",
       "scanOnSaveBaselineDone": "পুরো প্রকল্প স্ক্যান সম্পন্ন: {total} ফাইল, {issues} সমস্যা(স)।",
-      "codeHealthStartFailedDetails": "কোড হেলথ স্ক্যান শুরু হতে ব্যর্থ ({command}): {details}",
-      "codeHealthStartFailed": "কোড স্বাস্থ্য স্ক্যান শুরু করতে ব্যর্থ হয়েছে। নিশ্চিত করুন যে Dart SDK ইনস্টল করা আছে।",
-      "codeHealthScanFailed": "কোড স্বাস্থ্য স্ক্যান ব্যর্থ হয়েছে।",
-      "codeHealthScanFailedDetails": "কোড হেলথ স্ক্যান ব্যর্থ হয়েছে: {details}",
-      "codeHealthGatesFailed": "কোড হেলথ: কনফিগার করা মানের গেট ব্যর্থ হয়েছে। gates.violations পরীক্ষা করতে কোড হেলথ সেটিংস খুলুন বা JSON কপি করুন।",
-      "codeHealthInvalidJson": "কোড হেলথ অবৈধ JSON আউটপুট ফেরত দিয়েছে।",
+      "codeHealthStartFailedDetails": "Code Health স্ক্যান শুরু করা যায়নি ({command}): {details}",
+      "codeHealthStartFailed": "Code Health স্ক্যান শুরু করা যায়নি। Dart SDK ইনস্টল করা আছে কিনা নিশ্চিত করুন।",
+      "codeHealthScanFailed": "Code Health স্ক্যান ব্যর্থ হয়েছে।",
+      "codeHealthScanFailedDetails": "Code Health স্ক্যান ব্যর্থ হয়েছে: {details}",
+      "codeHealthGatesFailed": "Code Health: কনফিগার করা কোয়ালিটি গেট ব্যর্থ হয়েছে। gates.violations পরীক্ষা করতে Code Health সেটিংস খুলুন বা JSON কপি করুন।",
+      "codeHealthInvalidJson": "Code Health অবৈধ JSON আউটপুট ফেরত দিয়েছে।",
       "sidebarSectionUpdateFailed": "Saropa Lints: অ্যাক্টিভিটি বার সেকশন আপডেট করা যায়নি — {message}"
     },
     "vibrancy": {
@@ -2965,7 +2966,7 @@
       "packagesNeedlesCount": "{count} প্যাকেজ গ্রহণ করুন",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · গেট ব্যর্থ হচ্ছে",
-      "codeHealthNeverScanned": "কোড হেলথ চালান আপনার স্কোর দেখুন",
+      "codeHealthNeverScanned": "আপনার স্কোর দেখতে Code Health চালান",
       "projectMapDescription": "স্ক্যান করা হয়েছে {ago}",
       "projectMapNeverScanned": "প্রজেক্ট ম্যাপ চালান সাইজ এবং হট স্পট দেখুন"
     },

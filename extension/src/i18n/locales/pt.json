@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} problema(s) no workspace"
     },
     "issue": {
-      "hazardFiles": "$(aviso) {count} arquivo(s) grande(s) não excluído(s)",
+      "hazardFiles": "$(warning) {count} arquivo(s) grande(s) não excluído(s)",
       "hazardFilesDetail": "Arquivos grandes monitorados pelo observador de arquivos podem esgotar a memória e causar o crash do VS Code. Execute a varredura de riscos para excluí-los.",
       "missingExcludes": "$(info) {count} ausência de exclusão(s) do watcher",
       "missingExcludesDetail": "Padrões de exclusão do observador de arquivos recomendados não estão configurados. Adicionar-os previne o uso desnecessário de memória.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Código Painel de Saúde",
+    "documentTitle": "Painel Saropa Code Health",
     "skipToTable": "Ir para a tabela de funções",
     "openWorkspaceFirst": "Abra primeiro uma área de trabalho Dart/Flutter.",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "Executar o relatório novamente, em seguida, copiar JSON.",
-    "copiedJson": "Código de Saúde JSON copiado para a área de transferência.",
+    "copiedJson": "JSON do Code Health copiado para a área de transferência.",
     "couldNotOpenFile": "Não foi possível abrir o arquivo: {path}",
-    "panelTitle": "Saropa Código Painel de Saúde",
+    "panelTitle": "Painel Saropa Code Health",
     "hero": {
-      "title": "Saropa Código Painel de Saúde",
+      "title": "Painel Saropa Code Health",
       "generated": "Gerado",
       "functionOne": "{count} função",
       "functionOther": "{count} funções",
@@ -1882,7 +1882,7 @@
       "fallback": "Falha nos portões de qualidade – revise os limites nas configurações do Code Health.",
       "failingOne": "{count} falha no portão — revise os limites ou copie o JSON para inspecionar gates.violations.",
       "failingOther": "{count} falhas nos portões — revise os limites ou copie o JSON para inspecionar gates.violations.",
-      "openSettingsTitle": "Abra as configurações de saúde do código para ajustar os limiares.",
+      "openSettingsTitle": "Abra as configurações do Code Health para ajustar os limiares.",
       "openSettingsButton": "Abrir configurações de Code Health"
     },
     "kpi": {
@@ -1902,12 +1902,12 @@
       "testDriftSub": "os testes estão defasados em relação à função"
     },
     "toolbar": {
-      "ariaLabel": "Código Ações de saúde",
-      "rescanTitle": "Refaça a verificação de saúde do código e atualize este painel.",
+      "ariaLabel": "Ações do Code Health",
+      "rescanTitle": "Execute novamente a verificação do Code Health e atualize este painel.",
       "rescan": "Analisar novamente",
-      "copyJsonTitle": "Copie o JSON de Saúde do Código bruto para a área de transferência.",
+      "copyJsonTitle": "Copie o JSON bruto do Code Health para a área de transferência.",
       "copyJson": "Copiar JSON",
-      "settingsTitle": "Abra as configurações de saúde do código.",
+      "settingsTitle": "Abra as configurações do Code Health.",
       "settingsButton": "Configurações de Code Health",
       "filterTitle": "Filtre as linhas por nome, arquivo ou bandeira.",
       "filterLabel": "Filtrar linhas",
@@ -2078,6 +2078,7 @@
     "noData": "Ainda não há violations.json – execute a análise para preencher o instantâneo de supressão.",
     "zeroTotal": "0 supressões de analisadores na última exportação.",
     "noKindBreakdown": "Nenhuma desagregação por espécie nesta exportação.",
+    "total": "No total {total}",
     "title": "Supressões (exportação)",
     "readOnlyNote": "(somente leitura; abrir Resultados para navegar e agir.)",
     "openFindings": "Abrir painel de resultados"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Cache do Vibrancy limpo",
       "copiedInfo": "Informações de {package} copiadas para a área de transferência",
       "noPubspecOrLock": "Não foi encontrado nenhum pubspec.yaml/pubspec.lock na área de trabalho.",
-      "backfillComplete": "Vibração do pacote: preenchimento único do histórico concluído (instantâneos {count} importados).",
+      "backfillComplete": "Package Vibrancy: preenchimento único do histórico concluído ({count} instantâneos importados).",
       "runScanFirst": "Execute uma varredura primeiro",
       "noUpgradable": "Nenhum pacote atualizável encontrado",
       "proceedUpgrades": "Prosseguir com a atualização {count} ((s)? Passos falhados são revertidos e o plano continua.",
@@ -2635,10 +2636,10 @@
       "scanOnSaveBaselineFailed": "Varredura do projeto inteiro falhou: {details}",
       "scanOnSaveBaselineDone": "Varredura do projeto completo: {total} arquivo(s), {issues} problema(s).",
       "codeHealthStartFailedDetails": "Falha ao iniciar a análise de Code Health ({command}): {details}",
-      "codeHealthStartFailed": "Código de Saúde a varredura não conseguiu iniciar. Certifique-se de que o Dart SDK esteja instalado.",
-      "codeHealthScanFailed": "Código de Saúde varredura falhou.",
+      "codeHealthStartFailed": "Não foi possível iniciar a verificação do Code Health. Certifique-se de que o Dart SDK esteja instalado.",
+      "codeHealthScanFailed": "A verificação do Code Health falhou.",
       "codeHealthScanFailedDetails": "Falha na análise de Code Health: {details}",
-      "codeHealthGatesFailed": "Código Saúde: Code Health: Configurações de Quality Gate falharam. Abra as configurações de saúde do código ou copie o JSON para inspecionar gates.violations.",
+      "codeHealthGatesFailed": "Code Health: os quality gates configurados falharam. Abra as configurações do Code Health ou copie o JSON para inspecionar gates.violations.",
       "codeHealthInvalidJson": "Code Health retornou saída JSON inválida.",
       "sidebarSectionUpdateFailed": "Saropa Lints: não foi possível atualizar a seção da barra de atividades — {message}"
     },

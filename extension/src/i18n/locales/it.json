@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} problema(i) dello spazio di lavoro"
     },
     "issue": {
-      "hazardFiles": "$(avviso) {count} file(s) grandi non esclusi",
+      "hazardFiles": "$(warning) {count} file di grandi dimensioni non esclusi",
       "hazardFilesDetail": "File grandi monitorati dal watcher possono esaurire la memoria e causare il crash di VS Code. Esegui la scansione dei pericoli per escluderli.",
       "missingExcludes": "$(info) {count} mancanti watcher exclusion(s)",
       "missingExcludesDetail": "Le pattern di esclusione del watcher dei file consigliati non sono configurati. L'aggiunta di questi previene l'utilizzo inutile di memoria.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Codice Dashboard sanitario",
+    "documentTitle": "Dashboard Saropa Code Health",
     "skipToTable": "Vai alla tabella delle funzioni",
     "openWorkspaceFirst": "Aprire un Dart/Flutter spazio di lavoro prima.",
     "scan": {
@@ -1868,9 +1868,9 @@
     "runReportFirst": "Eseguire nuovamente il rapporto, quindi copiare JSON.",
     "copiedJson": "Code Health JSON copiato nella clipboard.",
     "couldNotOpenFile": "Non è stato possibile aprire il file: {path}",
-    "panelTitle": "Saropa Codice Dashboard sanitario",
+    "panelTitle": "Dashboard Saropa Code Health",
     "hero": {
-      "title": "Saropa Codice Dashboard sanitario",
+      "title": "Dashboard Saropa Code Health",
       "generated": "Generato",
       "functionOne": "{count} funzione",
       "functionOther": "{count} funzioni",
@@ -1879,7 +1879,7 @@
       "gatesPassing": "controlli superati"
     },
     "gate": {
-      "fallback": "I controlli di qualità non sono riusciti: rivedi le soglie nelle impostazioni di integrità del codice.",
+      "fallback": "I controlli di qualità non sono riusciti: rivedi le soglie nelle impostazioni di Code Health.",
       "failingOne": "{count} gate non superato — controlla le soglie, oppure copia il JSON per ispezionare gates.violations.",
       "failingOther": "{count} gate non superati — controlla le soglie, oppure copia il JSON per ispezionare gates.violations.",
       "openSettingsTitle": "Apri le impostazioni di Code Health per regolare i valori soglia.",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "i test sono indietro rispetto alla funzione"
     },
     "toolbar": {
-      "ariaLabel": "Codice Azioni sanitarie",
-      "rescanTitle": "Riavviare la scansione del Codice di Salubrità e aggiornare questa dashboard.",
+      "ariaLabel": "Azioni di Code Health",
+      "rescanTitle": "Esegui di nuovo la scansione Code Health e aggiorna questa dashboard.",
       "rescan": "Nuova scansione",
       "copyJsonTitle": "Copia il JSON di Code Health grezzo nella clipboard.",
       "copyJson": "Copia JSON",
-      "settingsTitle": "Aprire le impostazioni di salute del codice.",
-      "settingsButton": "Codice Impostazioni sanitarie",
+      "settingsTitle": "Aprire le impostazioni di Code Health.",
+      "settingsButton": "Impostazioni di Code Health",
       "filterTitle": "Filtra le righe per nome, file o flag.",
       "filterLabel": "Filtra righe",
       "filterPlaceholder": "Filtra righe…"
@@ -2078,6 +2078,7 @@
     "noData": "Nessun violations.json ancora — esegui l'analisi per popolare la fotografia di soppressione.",
     "zeroTotal": "0 soppressioni dell'analizzatore nell'ultima esportazione.",
     "noKindBreakdown": "Nessuna disaggregazione per specie in questa esportazione.",
+    "total": "Totale {total}",
     "title": "Soppressioni (esportazione)",
     "readOnlyNote": "(solo lettura; aprire i risultati per sfogliare e agire.)",
     "openFindings": "Apri la dashboard dei risultati"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Cache di Vibrancy svuotata",
       "copiedInfo": "Informazioni di {package} copiate negli appunti",
       "noPubspecOrLock": "Nessun pubspec.yaml/pubspec.lock trovato nell'area di lavoro.",
-      "backfillComplete": "Pacchetto Vibranza: backfill una tantum della cronologia completo (importi di istantanee {count}).",
+      "backfillComplete": "Package Vibrancy: recupero una tantum della cronologia completato ({count} istantanee importate).",
       "runScanFirst": "Esegui prima una scansione",
       "noUpgradable": "Nessun pacchetto aggiornabile trovato",
       "proceedUpgrades": "Proseguire con l'aggiornamento {count}? I passi falliti si fanno indietro e il piano continua.",
@@ -2635,8 +2636,8 @@
       "scanOnSaveBaselineFailed": "Scansione dell'intero progetto fallita: {details}",
       "scanOnSaveBaselineDone": "Scansione dell'intero progetto completata: {total} file, {issues} problema(i).",
       "codeHealthStartFailedDetails": "Avvio della scansione Code Health non riuscito ({command}): {details}",
-      "codeHealthStartFailed": "Codice La scansione della salute non è riuscita ad avviarsi. Assicurarsi che Dart SDK sia installato.",
-      "codeHealthScanFailed": "Codice di salute Scansione fallita.",
+      "codeHealthStartFailed": "Impossibile avviare la scansione Code Health . Assicurarsi che Dart SDK sia installato.",
+      "codeHealthScanFailed": "Scansione Code Health non riuscita.",
       "codeHealthScanFailedDetails": "Scansione Code Health non riuscita: {details}",
       "codeHealthGatesFailed": "Code Health: i quality gate configurati non sono stati superati. Apri le impostazioni di Code Health o copia il JSON per ispezionare gates.violations.",
       "codeHealthInvalidJson": "Code Health ha restituito un'output JSON non valido.",

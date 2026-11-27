@@ -297,3 +297,40 @@ jobs:
       # key from rendering in the UI. Unused-key output is a warning only.
       - name: Verify l10n keys resolve against en.json
         run: python3 extension/scripts/check_l10n_keys.py --check-params
+
+  # `baseline: date:` runs git against the working tree and compares paths, and
+  # macOS has symlinked temp dirs (/var -> /private/var) that Linux lacks. The
+  # test job covers Linux only. The process-level accepted `max:` tests ride
+  # along because they are cheap. Only these files: macOS minutes cost more.
+  test-macos:
+    runs-on: macos-latest
+    # Skip the redundant main-push run on release commits; see the analyze job.
+    if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
+    # Bounds a hung child process on the costlier macOS runner.
+    timeout-minutes: 20
+    # Overrides the workflow-level write grant; this job only reads.
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Same ref as the other jobs so all see identical code.
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+          # Nothing here pushes, so keep the token out of the git config.
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.13.7'
+      - name: Install dependencies
+        # Same lockfile guard as the other jobs.
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
+      # git is preinstalled on the runner, and test/support/temp_git.dart passes
+      # identity and commit dates itself, so no git config or history is needed.
+      - name: Run date baseline and accepted max tests
+        run: >-
+          dart test
+          test/baseline/baseline_date_git_test.dart
+          test/accepted/accepted_max_daemon_process_test.dart
+          test/lsp/accepted_max_lsp_test.dart

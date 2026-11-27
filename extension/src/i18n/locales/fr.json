@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} problème(s) d'espace de travail"
     },
     "issue": {
-      "hazardFiles": "$(avertissement) {count} fichier(s) volumineux non exclu(s)",
+      "hazardFiles": "$(warning) {count} fichier(s) volumineux non exclu(s)",
       "hazardFilesDetail": "Les grands fichiers suivis par le surveillant de fichiers peuvent épuiser la mémoire et faire planter VS Code. Exécutez le scan des risques pour les exclure.",
       "missingExcludes": "$(info) {count} manque(nt) des exclusion(s) de watcher",
       "missingExcludesDetail": "Les motifs d'exclusion du surveillant de fichiers recommandés ne sont pas configurés. L'ajout de ces motifs évite une utilisation inutile de la mémoire.",
@@ -1041,9 +1041,9 @@
       "trendTitle": "Score de santé / tendance des violations depuis les exécutions précédentes",
       "hotspotsTitle": "{open} ouvert, {safe} marqué comme sûr, {fixed} corrigé — cliquez pour revérifier",
       "hotspotsPill": "{open} ouvert · {percent}% revu",
-      "qualityGatePassingTitle": "Portée de la qualité du code — cliquez pour ouvrir Code Health",
+      "qualityGatePassingTitle": "Critère de qualité Code Health réussi — cliquez pour ouvrir Code Health",
       "qualityGatePassingPill": "Passe de porte",
-      "qualityGateFailingTitle": "Porte d'entrée de la qualité du code en échec ({count} violation(s)) — cliquer pour ouvrir Code Health",
+      "qualityGateFailingTitle": "Critère de qualité Code Health en échec ({count} violation(s)) — cliquez pour ouvrir Code Health",
       "qualityGateFailingPill": "Porte en échec"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "Copier l'arborescence en JSON",
       "refreshExtension": "Actualiser l'extension",
       "openPackageDashboard": "Ouvrir le tableau de bord des paquets",
-      "openCodeHealth": "Ouvrir la santé du code",
+      "openCodeHealth": "Ouvrir Code Health",
       "openLintsConfig": "Gérer les packs de règles",
       "reloadFromDisk": "Recharger depuis le disque",
       "reloadFromDiskTitle": "Rendre le tableau de bord à partir du dernier violations.json sans refaire fonctionner l'analyseur.",
@@ -1866,7 +1866,7 @@
       }
     },
     "runReportFirst": "Exécutez à nouveau le rapport, puis copiez JSON.",
-    "copiedJson": "Code santé JSON copié dans le presse-papiers.",
+    "copiedJson": "JSON de Code Health copié dans le presse-papiers.",
     "couldNotOpenFile": "Impossible d'ouvrir le fichier suivant: {path}",
     "panelTitle": "Tableau de bord Saropa Code Health",
     "hero": {
@@ -1879,10 +1879,10 @@
       "gatesPassing": "contrôles réussis"
     },
     "gate": {
-      "fallback": "Échec des critères de qualité : vérifiez les seuils dans les paramètres du code d'intégrité.",
+      "fallback": "Échec des critères de qualité : vérifiez les seuils dans les paramètres de Code Health.",
       "failingOne": "{count} porte en échec — vérifiez les seuils, ou copiez le JSON pour inspecter gates.violations.",
       "failingOther": "{count} portes en échec — vérifiez les seuils, ou copiez le JSON pour inspecter gates.violations.",
-      "openSettingsTitle": "Ouvrez les paramètres de code santé pour ajuster les seuils.",
+      "openSettingsTitle": "Ouvrez les paramètres de Code Health pour ajuster les seuils.",
       "openSettingsButton": "Ouvrir les paramètres Code Health"
     },
     "kpi": {
@@ -1903,11 +1903,11 @@
     },
     "toolbar": {
       "ariaLabel": "Actions Code Health",
-      "rescanTitle": "Réécoutez l'analyse de code santé et rafraîchissez ce tableau de bord.",
+      "rescanTitle": "Relancez l'analyse Code Health et actualisez ce tableau de bord.",
       "rescan": "Relancer l'analyse",
-      "copyJsonTitle": "Copiez le JSON Code Santé brut dans le presse-papiers.",
+      "copyJsonTitle": "Copier le JSON brut de Code Health dans le presse-papiers.",
       "copyJson": "Copier JSON",
-      "settingsTitle": "Ouvrez les paramètres de santé du code.",
+      "settingsTitle": "Ouvrez les paramètres de Code Health.",
       "settingsButton": "Paramètres Code Health",
       "filterTitle": "Filtrer les lignes par nom, fichier ou drapeau.",
       "filterLabel": "Filtrer les lignes",
@@ -2078,6 +2078,7 @@
     "noData": "Pas encore de violations.json : exécutez une analyse pour remplir l'instantané de suppression.",
     "zeroTotal": "0 suppressions d'analyseur dans la dernière exportation.",
     "noKindBreakdown": "Aucune ventilation par nature de ces exportations.",
+    "total": "Total : {total}",
     "title": "Suppressions (exportation)",
     "readOnlyNote": "(seulement lecture; ouvrir les résultats pour parcourir et agir.)",
     "openFindings": "Ouvrir le tableau de bord des résultats"
@@ -2635,9 +2636,9 @@
       "scanOnSaveBaselineFailed": "Scan de l'ensemble du projet échoué : {details}",
       "scanOnSaveBaselineDone": "Analyse de l'ensemble du projet terminée : {total} fichier(s), {issues} problème(s).",
       "codeHealthStartFailedDetails": "Échec du démarrage de l'analyse Code Health ({command}) : {details}",
-      "codeHealthStartFailed": "Code La numérisation de l'état d'esprit n'a pas pu démarrer. Assurez-vous que le SDK Dart est installé.",
-      "codeHealthScanFailed": "Code de santé Le scan a échoué.",
-      "codeHealthScanFailedDetails": "Échec de l'analyse de l'état du code : {details}",
+      "codeHealthStartFailed": "L'analyse Code Health n'a pas pu démarrer. Assurez-vous que le SDK Dart est installé.",
+      "codeHealthScanFailed": "L'analyse Code Health a échoué.",
+      "codeHealthScanFailedDetails": "Échec de l'analyse Code Health : {details}",
       "codeHealthGatesFailed": "Code Health : les seuils de qualité configurés ont échoué. Ouvrez les paramètres Code Health ou copiez le JSON pour inspecter gates.violations.",
       "codeHealthInvalidJson": "Code Health a renvoyé une sortie JSON invalide.",
       "sidebarSectionUpdateFailed": "Saropa Lints : impossible de mettre à jour la section de la barre d'activité – {message}"

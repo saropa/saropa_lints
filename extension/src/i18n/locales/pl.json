@@ -1156,7 +1156,7 @@
       "copyTreeJson": "Copy tree JSON - drzewo kopiowania",
       "refreshExtension": "Odśwież rozszerzenie",
       "openPackageDashboard": "Otwórz panel pakietów",
-      "openCodeHealth": "Otwarte Kodeks Zdrowie Open Code Health",
+      "openCodeHealth": "Otwórz Code Health",
       "openLintsConfig": "Zarządzaj pakietami reguł",
       "reloadFromDisk": "Przeładuj z dysku",
       "reloadFromDiskTitle": "Ponownie wyświetlić deskę rozdzielczą z ostatniego violations.json bez ponownego uruchamiania analizatora.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Kod Tablica danych zdrowotnych",
+    "documentTitle": "Panel Saropa Code Health",
     "skipToTable": "Przejdź do tabeli funkcji",
     "openWorkspaceFirst": "Najpierw otwórz przestrzenię roboczą Dart/Flutter.",
     "scan": {
@@ -1868,9 +1868,9 @@
     "runReportFirst": "Uruchom ponownie raport, a następnie skopiować JSON.",
     "copiedJson": "Code Health JSON skopiowany do schowka.",
     "couldNotOpenFile": "Nie można otworzyć pliku: {path}",
-    "panelTitle": "Saropa Kod Tablica danych zdrowotnych",
+    "panelTitle": "Panel Saropa Code Health",
     "hero": {
-      "title": "Saropa Kod Tablica danych zdrowotnych",
+      "title": "Panel Saropa Code Health",
       "generated": "Generowane wygenerowane",
       "functionOne": "{count} funkcja",
       "functionOther": "{count} funkcji",
@@ -1882,7 +1882,7 @@
       "fallback": "Bramy jakości nie powiodły się — przejrzyj progi w ustawieniach Code Health.",
       "failingOne": "{count} brama kończy się niepowodzeniem — przejrzyj progi lub skopiuj kod JSON, aby sprawdzić gates.violations.",
       "failingOther": "{count} bramy kończą się niepowodzeniem — przejrzyj progi lub skopiuj kod JSON, aby sprawdzić gates.violations.",
-      "openSettingsTitle": "Otwórz ustawienia Kod zdrowia, aby dostosować progi.",
+      "openSettingsTitle": "Otwórz ustawienia Code Health, aby dostosować progi.",
       "openSettingsButton": "Otwórz ustawienia Code Health"
     },
     "kpi": {
@@ -1903,11 +1903,11 @@
     },
     "toolbar": {
       "ariaLabel": "Działania Code Health",
-      "rescanTitle": "Przeprowadź ponownie skanowanie stanu kodu i odśwież tę tablicę.",
+      "rescanTitle": "Uruchom ponownie skanowanie Code Health i odśwież ten panel.",
       "rescan": "Skanuj ponownie",
-      "copyJsonTitle": "Skopiuj surowy kod zdrowia JSON do schowka.",
+      "copyJsonTitle": "Skopiuj surowy JSON z Code Health do schowka.",
       "copyJson": "Kopiuj JSON",
-      "settingsTitle": "Otwórz ustawienia zdrowotne kodu.",
+      "settingsTitle": "Otwórz ustawienia Code Health.",
       "settingsButton": "Ustawienia Code Health",
       "filterTitle": "Filtruj wiersze według nazwy, pliku lub flagi.",
       "filterLabel": "Filtruj wiersze",
@@ -2078,6 +2078,7 @@
     "noData": "Brak violations.json — uruchom analizę, aby wypełnić przekrój wygaszeń.",
     "zeroTotal": "0 tłumienia analizatora w najnowszym wywozie.",
     "noKindBreakdown": "Brak podziału według rodzajów w tym wywozie.",
+    "total": "Łącznie {total}",
     "title": "Wyeliminowanie (eksport)",
     "readOnlyNote": "(tylko do odczytu; otwórz Wyniki, aby przeglądać i działać.)",
     "openFindings": "Otwórz panel wyników"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Wyczyszczono pamięć podręczną Vibrancy",
       "copiedInfo": "Skopiowano informacje o {package} do schowka",
       "noPubspecOrLock": "Nie znaleziono pubspec.yaml/pubspec.lock w przestrzeni roboczej.",
-      "backfillComplete": "Aktywność pakietu: ukończono jednorazowe uzupełnianie historii (zaimportowano migawki {count}).",
+      "backfillComplete": "Package Vibrancy: ukończono jednorazowe uzupełnianie historii (zaimportowane migawki: {count}).",
       "runScanFirst": "Najpierw wykonaj skanowanie",
       "noUpgradable": "Nie znaleziono pakietów do aktualizacji",
       "proceedUpgrades": "Kontynuuj z aktualizacją {count} ((s)? Nieudane kroki się cofają, a plan trwa dalej.",
@@ -2635,9 +2636,9 @@
       "scanOnSaveBaselineFailed": "Skan całego projektu niepowodzenie: {details}",
       "scanOnSaveBaselineDone": "Skan całego projektu zakończony: {total} plików, {issues} problem(y).",
       "codeHealthStartFailedDetails": "Nie udało się uruchomić skanowania Code Health ({command}): {details}",
-      "codeHealthStartFailed": "Kod Zdrowie skanowanie nie rozpoczęło się. Upewnij się, że Dart SDK jest zainstalowany.",
-      "codeHealthScanFailed": "Kod zdrowia Skan nie powiodł się.",
-      "codeHealthScanFailedDetails": "Skanowanie stanu kodu nie powiódł się: {details}",
+      "codeHealthStartFailed": "Nie udało się uruchomić skanowania Code Health. Upewnij się, że Dart SDK jest zainstalowany.",
+      "codeHealthScanFailed": "Skanowanie Code Health nie powiodło się.",
+      "codeHealthScanFailedDetails": "Skanowanie Code Health nie powiodło się: {details}",
       "codeHealthGatesFailed": "Code Health: skonfigurowane progi jakości nie zostały spełnione. Otwórz ustawienia Code Health lub skopiuj JSON, aby sprawdzić gates.violations.",
       "codeHealthInvalidJson": "Code Health zwrócił nieprawidłowy JSON output.",
       "sidebarSectionUpdateFailed": "Saropa Lints: nie można zaktualizować sekcji paska aktywności — {message}"

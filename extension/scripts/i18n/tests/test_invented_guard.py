@@ -96,6 +96,62 @@ class TestSindhiInUrdu(unittest.TestCase):
         self.assertEqual([i["key"] for i in shipped if i["reason"].startswith("sindhi:")], [])
 
 
+class TestArabicLettersInUrdu(unittest.TestCase):
+    """Arabic-only letters are a defect in ur; letters English carries are excused."""
+
+    def flags_for(self, en: str, loc: str, locale: str = "ur") -> list[str]:
+        return [r.split(":")[0] for _, r in bt.detect(en, loc, locale, []) if r.startswith(("arabic-letter:", "sindhi:"))]
+
+    def test_flagged_in_ur_only(self) -> None:
+        self.assertEqual(self.flags_for("Warning", "تحذير"), ["arabic-letter"])
+        self.assertEqual(self.flags_for("Warning", "تحذير", "ar"), [])
+
+    def test_excused_letter_does_not_hide_another(self) -> None:
+        self.assertEqual(self.flags_for("Type \u067b", "\u067b"), [])
+        self.assertEqual(self.flags_for("Type \u067b", "\u067b \u067d"), ["sindhi"])
+
+
+class TestProductNames(unittest.TestCase):
+    """"Code Health" and "Package Vibrancy" stay English; lowercase prose does not."""
+
+    def names(self, en: str, loc: str) -> list[str]:
+        return [r for _, r in bt.detect(en, loc, "de", []) if r.startswith("product-name:")]
+
+    def test_translated_name_is_flagged(self) -> None:
+        self.assertEqual(self.names("Open Code Health", "Codezustand öffnen"), ["product-name:Code Health"])
+        self.assertTrue(self.names("Code Health: open Code Health", "Code Health: öffnen"))
+
+    def test_lowercase_prose_is_free(self) -> None:
+        self.assertEqual(self.names("Code health summary", "Zusammenfassung"), [])
+
+    def test_codicon_must_survive(self) -> None:
+        reasons = [r for _, r in bt.detect("$(warning) {count}", "$(aviso) {count}", "es", [])]
+        self.assertTrue(any(r.startswith("placeholder:codicons") for r in reasons), reasons)
+
+    def test_curated_and_repairs_keep_names(self) -> None:
+        # Regeneration writes these values, so a translated name here would ship again.
+        # Only sources in the current English catalogs are checked.
+        from dictionaries import TRANSLATIONS
+        from verify_locales import discover, load
+
+        fams, _ = discover(Path(__file__).resolve().parents[3])
+        sources = {v for src, _p in fams.values() for v in load(src).values() if isinstance(v, str)}
+        bad = [
+            (loc, s[:40]) for loc, entries in TRANSLATIONS.items() for s, v in entries.items()
+            if s in sources and any(v.count(n) < s.count(n) for n in bt.PRODUCT_NAMES)
+        ]
+        self.assertEqual(bad, [])
+
+    def test_shipped_names_and_ur_letters_are_clean(self) -> None:
+        prefixes = ("product-name:", "arabic-letter:", "placeholder:codicons")
+        bad = [
+            f"{loc} {it['key']} {it['reason']}"
+            for loc, items in bt.scan_shipped(Path(__file__).resolve().parents[3]).items()
+            for it in items if it["reason"].startswith(prefixes)
+        ]
+        self.assertEqual(bad, [], f"{len(bad)} value(s), first: {bad[:5]}")
+
+
 class TestShippedAndRepairs(unittest.TestCase):
     """No shipped value may carry these flags; the repairs must win and be clean."""
 

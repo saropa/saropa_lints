@@ -14,6 +14,7 @@ from typing import Dict
 # source is spelled once.
 from manual_translations_mt_leaks import LEAK_REPAIRS, WIDGET_STYLE
 # Invented-sentence and nonsense-label repairs; JSON data, folded in below.
+from manual_translations_followups import load as _load_followups  # noqa: E402
 from manual_translations_invented import load as _load_invented
 
 # Long English sources are spelled once here and referenced by alias below, so each
@@ -404,6 +405,16 @@ for _loc, _entries in _load_invented().items():
     _overlap = sorted(set(_target) & set(_entries))
     if _overlap:
         raise ValueError(f"invented_repairs/{_loc}.json repeats _REPAIRS sources: {_overlap}")
+    _target.update(_entries)
+
+
+# Fold the follow-up repairs (product names, ur letter forms, codicons) with the
+# same overlap rule as above.
+for _loc, _entries in _load_followups().items():
+    _target = _REPAIRS.setdefault(_loc, {})
+    _overlap = sorted(set(_target) & set(_entries))
+    if _overlap:
+        raise ValueError(f"followup_repairs.json repeats _REPAIRS sources: {_overlap}")
     _target.update(_entries)
 
 

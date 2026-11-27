@@ -112,10 +112,12 @@ async function runCheck(): Promise<void> {
       void vscode.window.showInformationMessage(l10n('acceptedFindings.info.noList'));
       return;
     }
-    const { entryCount, stale, problemCount } = result.summary;
+    const { entryCount, notChecked, stale, problemCount } = result.summary;
     if (stale === 0 && problemCount === 0) {
+      // "N entries checked" must leave out entries the CLI could not judge
+      // (rule off, file unresolved); counting them overstated the check.
       void vscode.window.showInformationMessage(
-        l10n('acceptedFindings.info.clean', { count: String(entryCount) }),
+        l10n('acceptedFindings.info.clean', { count: String(entryCount - notChecked) }),
       );
       return;
     }
@@ -225,12 +227,14 @@ function showCheckError(message: string): null {
 function toDiagnostic(m: ListMarker): vscode.Diagnostic {
   // Literal keys (no template string) so the dead-key and missing-key
   // checkers can see every key this module uses.
-  const params = { rule: m.rule ?? '', file: m.file ?? '' };
+  // Passed inline at each call so check_l10n_keys.py can verify the param names.
+  const rule = m.rule ?? '';
+  const file = m.file ?? '';
   const message = m.kind === 'invalid'
     ? l10n('acceptedFindings.diagnostic.invalid', { message: m.message ?? '' })
     : m.kind === 'staleFileMissing'
-      ? l10n('acceptedFindings.diagnostic.staleFileMissing', params)
-      : l10n('acceptedFindings.diagnostic.staleNoFinding', params);
+      ? l10n('acceptedFindings.diagnostic.staleFileMissing', { rule, file })
+      : l10n('acceptedFindings.diagnostic.staleNoFinding', { rule, file });
   const d = new vscode.Diagnostic(
     new vscode.Range(m.line, 0, m.line, Number.MAX_SAFE_INTEGER),
     message,

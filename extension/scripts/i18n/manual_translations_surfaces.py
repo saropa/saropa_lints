@@ -1,5 +1,5 @@
 """Hand-written translations for the "Explain Baseline" command and the
-suppression-total line on the Rule Packs strip.
+suppression-total labels (Rule Packs strip and the config mirrors).
 
 Written by an agent without any MT engine; no native-speaker review. Merged into
 dictionaries.py with the same setdefault rule as the other manual modules, so a
@@ -14,6 +14,7 @@ from typing import Dict
 # cannot split one source across locales.
 _SOURCES = (
     "Total suppressed in export: {total}",
+    "Total {total}",
     "Explaining the baseline for {file}…",
     "A baseline report is already running.",
     "Open or select a Dart file to explain its baseline.",
@@ -27,6 +28,7 @@ _SOURCES = (
 _ROWS: Dict[str, tuple] = {
     "ar": (
         "إجمالي العناصر المكتومة في التصدير: {total}",
+        "الإجمالي {total}",
         "جارٍ شرح خط الأساس للملف {file}…",
         "تقرير خط الأساس قيد التشغيل بالفعل.",
         "افتح أو حدد ملف Dart لشرح خط الأساس الخاص به.",
@@ -37,6 +39,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "bn": (
         "এক্সপোর্টে মোট দমন করা: {total}",
+        "মোট {total}",
         "{file}-এর বেসলাইন ব্যাখ্যা করা হচ্ছে…",
         "একটি বেসলাইন রিপোর্ট ইতিমধ্যেই চলছে।",
         "বেসলাইন ব্যাখ্যা করতে একটি Dart ফাইল খুলুন বা নির্বাচন করুন।",
@@ -47,6 +50,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "de": (
         "Im Export insgesamt unterdrückt: {total}",
+        "Gesamt {total}",
         "Baseline für {file} wird erklärt…",
         "Ein Baseline-Bericht läuft bereits.",
         "Öffnen oder wählen Sie eine Dart-Datei, um ihre Baseline zu erklären.",
@@ -57,6 +61,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "es": (
         "Total suprimido en la exportación: {total}",
+        "En total {total}",
         "Explicando la línea base de {file}…",
         "Ya se está ejecutando un informe de línea base.",
         "Abra o seleccione un archivo Dart para explicar su línea base.",
@@ -67,6 +72,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "fa": (
         "مجموع موارد سرکوب‌شده در خروجی: {total}",
+        "مجموع {total}",
         "در حال توضیح خط مبنای {file}…",
         "یک گزارش خط مبنا از قبل در حال اجرا است.",
         "برای توضیح خط مبنا، یک فایل Dart را باز یا انتخاب کنید.",
@@ -77,6 +83,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "fil": (
         "Kabuuang na-suppress sa export: {total}",
+        "Kabuuan {total}",
         "Ipinapaliwanag ang baseline para sa {file}…",
         "May tumatakbo nang ulat ng baseline.",
         "Magbukas o pumili ng Dart file para ipaliwanag ang baseline nito.",
@@ -87,6 +94,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "fr": (
         "Total supprimé dans l'export : {total}",
+        "Total : {total}",
         "Explication de la ligne de base de {file}…",
         "Un rapport de ligne de base est déjà en cours.",
         "Ouvrez ou sélectionnez un fichier Dart pour expliquer sa ligne de base.",
@@ -97,6 +105,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "he": (
         "סך הכול מושתקים בייצוא: {total}",
+        "סך הכול {total}",
         "מסביר את קו הבסיס עבור {file}…",
         "דוח קו בסיס כבר רץ.",
         "פתחו או בחרו קובץ Dart כדי להסביר את קו הבסיס שלו.",
@@ -107,6 +116,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "hi": (
         "एक्सपोर्ट में कुल दबाए गए: {total}",
+        "कुल {total}",
         "{file} की बेसलाइन समझाई जा रही है…",
         "एक बेसलाइन रिपोर्ट पहले से चल रही है।",
         "बेसलाइन समझने के लिए कोई Dart फ़ाइल खोलें या चुनें।",
@@ -117,6 +127,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "id": (
         "Total yang disembunyikan dalam ekspor: {total}",
+        "Jumlah {total}",
         "Menjelaskan baseline untuk {file}…",
         "Laporan baseline sedang berjalan.",
         "Buka atau pilih file Dart untuk menjelaskan baseline-nya.",
@@ -127,6 +138,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "it": (
         "Totale soppressi nell'esportazione: {total}",
+        "Totale {total}",
         "Spiegazione della baseline di {file}…",
         "Un report della baseline è già in esecuzione.",
         "Apri o seleziona un file Dart per spiegarne la baseline.",
@@ -137,6 +149,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "ja": (
         "エクスポート内の抑制の合計: {total}",
+        "合計 {total}",
         "{file} のベースラインを説明しています…",
         "ベースラインのレポートはすでに実行中です。",
         "ベースラインを説明するには、Dart ファイルを開くか選択してください。",
@@ -147,6 +160,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "ko": (
         "내보내기에서 억제된 총 수: {total}",
+        "합계 {total}",
         "{file}의 기준선을 설명하는 중…",
         "기준선 보고서가 이미 실행 중입니다.",
         "기준선 설명을 보려면 Dart 파일을 열거나 선택하세요.",
@@ -157,6 +171,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "nl": (
         "Totaal onderdrukt in de export: {total}",
+        "Totaal {total}",
         "Baseline voor {file} wordt uitgelegd…",
         "Er wordt al een baselinerapport uitgevoerd.",
         "Open of selecteer een Dart-bestand om de baseline ervan uit te leggen.",
@@ -167,6 +182,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "pl": (
         "Łącznie wyciszonych w eksporcie: {total}",
+        "Łącznie {total}",
         "Objaśnianie linii bazowej dla {file}…",
         "Raport linii bazowej jest już uruchomiony.",
         "Otwórz lub zaznacz plik Dart, aby objaśnić jego linię bazową.",
@@ -177,6 +193,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "pt": (
         "Total suprimido na exportação: {total}",
+        "No total {total}",
         "Explicando a linha de base de {file}…",
         "Um relatório de linha de base já está em execução.",
         "Abra ou selecione um arquivo Dart para explicar sua linha de base.",
@@ -187,6 +204,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "ru": (
         "Всего подавлено в экспорте: {total}",
+        "Всего {total}",
         "Объяснение базовой линии для {file}…",
         "Отчёт по базовой линии уже выполняется.",
         "Откройте или выберите файл Dart, чтобы объяснить его базовую линию.",
@@ -197,6 +215,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "sw": (
         "Jumla ya vilivyonyamazishwa katika usafirishaji: {total}",
+        "Jumla {total}",
         "Inaeleza msingi wa {file}…",
         "Ripoti ya msingi tayari inaendeshwa.",
         "Fungua au chagua faili ya Dart ili kueleza msingi wake.",
@@ -207,6 +226,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "th": (
         "จำนวนที่ถูกระงับทั้งหมดในการส่งออก: {total}",
+        "ทั้งหมด {total}",
         "กำลังอธิบายเบสไลน์ของ {file}…",
         "รายงานเบสไลน์กำลังทำงานอยู่แล้ว",
         "เปิดหรือเลือกไฟล์ Dart เพื่ออธิบายเบสไลน์ของไฟล์",
@@ -217,6 +237,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "tr": (
         "Dışa aktarımda toplam bastırılan: {total}",
+        "Toplam {total}",
         "{file} için temel çizgi açıklanıyor…",
         "Bir temel çizgi raporu zaten çalışıyor.",
         "Temel çizgisini açıklamak için bir Dart dosyası açın veya seçin.",
@@ -227,6 +248,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "uk": (
         "Усього приглушено в експорті: {total}",
+        "Усього {total}",
         "Пояснення базової лінії для {file}…",
         "Звіт щодо базової лінії вже виконується.",
         "Відкрийте або виберіть файл Dart, щоб пояснити його базову лінію.",
@@ -237,6 +259,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "ur": (
         "برآمد میں کل دبائے گئے: {total}",
+        "کل {total}",
         "{file} کی بیس لائن کی وضاحت کی جا رہی ہے…",
         "بیس لائن رپورٹ پہلے ہی چل رہی ہے۔",
         "بیس لائن کی وضاحت کے لیے کوئی Dart فائل کھولیں یا منتخب کریں۔",
@@ -247,6 +270,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "vi": (
         "Tổng số bị ẩn trong bản xuất: {total}",
+        "Tổng cộng {total}",
         "Đang giải thích đường cơ sở của {file}…",
         "Một báo cáo đường cơ sở đang chạy.",
         "Mở hoặc chọn một tệp Dart để giải thích đường cơ sở của tệp.",
@@ -257,6 +281,7 @@ _ROWS: Dict[str, tuple] = {
     ),
     "zh": (
         "导出中被抑制的总数：{total}",
+        "总计 {total}",
         "正在解释 {file} 的基线…",
         "已有基线报告正在运行。",
         "请打开或选择一个 Dart 文件以解释其基线。",

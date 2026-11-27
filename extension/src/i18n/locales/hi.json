@@ -908,7 +908,7 @@
       "yellow": "⚠ {count} वर्कस्पेस समस्या(एं)"
     },
     "issue": {
-      "hazardFiles": "$(सावधानी) {count} बड़े अनलग फ़ाइल (एस)",
+      "hazardFiles": "$(warning) {count} बड़ी फ़ाइलें बाहर नहीं रखी गईं",
       "hazardFilesDetail": "महान फ़ाइलें जो फ़ाइल वॉचर द्वारा ट्रैक की जा रही हैं, मेमोरी को खाली कर सकती हैं और VS Code को बंद कर सकती हैं। खतरनाक स्कैन चलाएं ताकि उन्हें बाहर कर दें।",
       "missingExcludes": "$(info) {count} वॉचर एक्स्क्लुजन अपेक्षित",
       "missingExcludesDetail": "अनुशोधन आवश्यक फ़ाइल-वॉचर बाहरी पैटर्न निर्दिष्ट नहीं किए गए हैं। उनके जोड़ने से अतिरिक्त स्मृति उपयोग को रोका जा सकता है।",
@@ -1041,9 +1041,9 @@
       "trendTitle": "स्वास्थ्य स्कोर / पहले के चलाए गए चलाए गए उल्लंघन के प्रवृत्ति",
       "hotspotsTitle": "{open} खुला, {safe} सुरक्षित चिह्नित, {fixed} सुधार कर दिया — पर अपनी जांच करें",
       "hotspotsPill": "{open} खुला · {percent}% निरीक्षित",
-      "qualityGatePassingTitle": "कोड स्वास्थ्य गुणवत्ता गेट पासिंग - कोड स्वास्थ्य खोलने के लिए क्लिक करें",
+      "qualityGatePassingTitle": "Code Health क्वालिटी गेट पास — Code Health खोलने के लिए क्लिक करें",
       "qualityGatePassingPill": "गेट पासिंग",
-      "qualityGateFailingTitle": "कोड हेल्थ क्वालिटी गेट विफ़ॉल्ड ({count} उल्लंघन (ओ) स) — क्लिक करें कोड हेल्थ खोलने",
+      "qualityGateFailingTitle": "Code Health क्वालिटी गेट विफल ({count} उल्लंघन) — Code Health खोलने के लिए क्लिक करें",
       "qualityGateFailingPill": "गेट फेल हो रहा है"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "JSON का पेड़ कॉपी करें",
       "refreshExtension": "एक्सटेंशन रीफ्रेश करें",
       "openPackageDashboard": "पैकेज डैशबोर्ड खोलें",
-      "openCodeHealth": "ओपन कोड हेल्थ",
+      "openCodeHealth": "Code Health खोलें",
       "openLintsConfig": "नियम पैक का प्रबंधन करें",
       "reloadFromDisk": "डिस्क से पुनः लोड करें",
       "reloadFromDiskTitle": "विश्लेषक को फिर से चलाए बिना पिछले violations.json के डैशबोर्ड को पुनः प्रस्तुत करें।",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa कोड हेल्थ डैशबोर्ड",
+    "documentTitle": "Saropa Code Health डैशबोर्ड",
     "skipToTable": "फ़ंक्शंस टेबल पर जाएं",
     "openWorkspaceFirst": "पहले एक Dart/Flutter कार्यक्षेत्र खोलें।",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "रिपोर्ट फिर से चलाएं, फिर JSON कॉपी करें।",
-    "copiedJson": "कोड हेल्थ JSON को क्लिपबोर्ड पर कॉपी किया गया।",
+    "copiedJson": "Code Health JSON क्लिपबोर्ड पर कॉपी किया गया।",
     "couldNotOpenFile": "फ़ाइल नहीं खोल सकाः {path}",
-    "panelTitle": "Saropa कोड हेल्थ डैशबोर्ड",
+    "panelTitle": "Saropa Code Health डैशबोर्ड",
     "hero": {
-      "title": "Saropa कोड हेल्थ डैशबोर्ड",
+      "title": "Saropa Code Health डैशबोर्ड",
       "generated": "उत्पन्न",
       "functionOne": "{count} फ़ंक्शन",
       "functionOther": "{count} फ़ंक्शन",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "पास हो रहे गेट"
     },
     "gate": {
-      "fallback": "गुणवत्ता गेट विफल - कोड स्वास्थ्य सेटिंग्स में समीक्षा सीमाएँ।",
+      "fallback": "क्वालिटी गेट विफल — Code Health सेटिंग्स में सीमाओं की समीक्षा करें।",
       "failingOne": "{count} गेट विफल — थ्रेशोल्ड की समीक्षा करें, या gates.violations का निरीक्षण करने के लिए JSON कॉपी करें।",
       "failingOther": "{count} गेट विफल — थ्रेशोल्ड की समीक्षा करें, या gates.violations का निरीक्षण करने के लिए JSON कॉपी करें।",
-      "openSettingsTitle": "सीमाओं को समायोजित करने के लिए कोड हेल्थ सेटिंग्स खोलें।",
-      "openSettingsButton": "ओपन कोड स्वास्थ्य सेटिंग्स"
+      "openSettingsTitle": "सीमाएँ समायोजित करने के लिए Code Health सेटिंग्स खोलें।",
+      "openSettingsButton": "Code Health सेटिंग्स खोलें"
     },
     "kpi": {
       "ariaLabel": "कोड स्वास्थ्य सारांश संक्षिप्त विवरण",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "परीक्षण फ़ंक्शन से पीछे हैं"
     },
     "toolbar": {
-      "ariaLabel": "संहिता स्वास्थ्य कार्यकलाप",
-      "rescanTitle": "कोड हेल्थ स्कैन को फिर से चलाएं और इस डैशबोर्ड को ताज़ा करें।",
+      "ariaLabel": "Code Health क्रियाएँ",
+      "rescanTitle": "Code Health स्कैन फिर से चलाएँ और इस डैशबोर्ड को रीफ़्रेश करें।",
       "rescan": "फिर से स्कैन करें",
-      "copyJsonTitle": "कच्चे कोड स्वास्थ्य JSON को क्लिपबोर्ड में कॉपी करें।",
+      "copyJsonTitle": "Code Health का कच्चा JSON क्लिपबोर्ड पर कॉपी करें।",
       "copyJson": "JSON कॉपी करें",
-      "settingsTitle": "कोड स्वास्थ्य सेटिंग्स खोलें।",
-      "settingsButton": "कोड स्वास्थ्य सेटिंग्स",
+      "settingsTitle": "Code Health सेटिंग्स खोलें।",
+      "settingsButton": "Code Health सेटिंग्स",
       "filterTitle": "नाम, फ़ाइल या ध्वज के आधार पर पंक्तियों को फ़िल्टर करें।",
       "filterLabel": "फ़िल्टर पंक्तियाँ फिल्टर पंक्ति",
       "filterPlaceholder": "फ़िल्टर पंक्तियाँ ..."
@@ -2078,6 +2078,7 @@
     "noData": "कोई violations.json नहीं — विश्लेषण चलाएँ अवरोधन स्नैपशॉट को भरें।",
     "zeroTotal": "0 नवीनतम निर्यात में विश्लेषक दमन।",
     "noKindBreakdown": "इस निर्यात में कोई प्रकार का विखंडन नहीं है।",
+    "total": "कुल {total}",
     "title": "निर्यातीकरण (निर्यात)",
     "readOnlyNote": "(केवल पढ़ने के लिए; ब्राउज़ करने और कार्य करने के लिए खोलें निष्कर्ष।",
     "openFindings": "ओपन निष्कर्ष डैशबोर्ड खोलें"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy कैश साफ़ किया गया",
       "copiedInfo": "{package} की जानकारी क्लिपबोर्ड पर कॉपी की गई",
       "noPubspecOrLock": "कार्यक्षेत्र में कोई pubspec.yaml/pubspec.lock नहीं मिला।",
-      "backfillComplete": "पैकेज जीवंतताः एक बार का इतिहास बैकफिल पूरा हो गया है ({count} स्नैपशॉट आयात किए गए हैं) ।",
+      "backfillComplete": "Package Vibrancy: एक बार का इतिहास बैकफ़िल पूरा हुआ ({count} स्नैपशॉट आयात किए गए)।",
       "runScanFirst": "पहले एक स्कैन चलाएं",
       "noUpgradable": "कोई अपग्रेड योग्य पैकेज नहीं मिला",
       "proceedUpgrades": "{count} उन्नयन के साथ आगे बढ़ें? असफल कदम वापस रोल और योजना जारी है।",
@@ -2634,12 +2635,12 @@
       "scanOnSaveBaselineCanceled": "पूरे प्रोजेक्ट की स्कैन बाद में {scanned}/{total} फ़ाइलों के बाद रद्द कर दिया गया।",
       "scanOnSaveBaselineFailed": "पूरे प्रोजेक्ट स्कैन विफल रहा: {details}",
       "scanOnSaveBaselineDone": "पूरे प्रोजेक्ट की स्कैन पूरा: {total} फ़ाइल, {issues} समस्या(एं)।",
-      "codeHealthStartFailedDetails": "कोड हेल्थ स्कैन शुरू करने में विफल ({command}): {details}",
-      "codeHealthStartFailed": "कोड स्वास्थ्य स्कैन शुरू करने में विफल रहा। सुनिश्चित करें कि Dart SDK स्थापित है।",
-      "codeHealthScanFailed": "कोड स्वास्थ्य स्कैन विफल।",
-      "codeHealthScanFailedDetails": "कोड स्वास्थ्य स्कैन विफल: {details}",
-      "codeHealthGatesFailed": "कोड हेल्थ: कॉन्फ़िगर किए गए गुणवत्ता गेट विफल हुए। gates.violations देखने के लिए कोड हेल्थ सेटिंग्स खोलें या JSON कॉपी करें।",
-      "codeHealthInvalidJson": "कोड हेल्थ ने अमान्य JSON आउटपुट लौटाया।",
+      "codeHealthStartFailedDetails": "Code Health स्कैन शुरू नहीं हो सका ({command}): {details}",
+      "codeHealthStartFailed": "Code Health स्कैन शुरू नहीं हो सका। सुनिश्चित करें कि Dart SDK इंस्टॉल है।",
+      "codeHealthScanFailed": "Code Health स्कैन विफल रहा।",
+      "codeHealthScanFailedDetails": "Code Health स्कैन विफल: {details}",
+      "codeHealthGatesFailed": "Code Health: कॉन्फ़िगर किए गए क्वालिटी गेट विफल हुए। gates.violations देखने के लिए Code Health सेटिंग्स खोलें या JSON कॉपी करें।",
+      "codeHealthInvalidJson": "Code Health ने अमान्य JSON आउटपुट लौटाया।",
       "sidebarSectionUpdateFailed": "Saropa Lints: गतिविधि बार अनुभाग को अपडेट नहीं किया जा सका - {message}"
     },
     "vibrancy": {
@@ -2965,7 +2966,7 @@
       "packagesNeedlesCount": "{count} पैकेज अDOPT करें",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · गेट फेल होना",
-      "codeHealthNeverScanned": "अपना स्कोर देखने के लिए कोड हेल्थ चलाएँ",
+      "codeHealthNeverScanned": "अपना स्कोर देखने के लिए Code Health चलाएँ",
       "projectMapDescription": "स्कैन किया गया {ago}",
       "projectMapNeverScanned": "आकार और हॉट स्पॉट देखने के लिए प्रोजेक्ट मैप चलाएँ"
     },

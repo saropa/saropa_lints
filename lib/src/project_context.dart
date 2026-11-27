@@ -23,6 +23,9 @@ import 'package:saropa_lints/src/report/import_graph_tracker.dart'
     show ImportGraphTracker;
 import 'package:saropa_lints/src/string_slice_utils.dart';
 import 'package:saropa_lints/src/tiers.dart' show essentialRules;
+// Spawn-free total-RAM probe used by the memory subsystem at plugin start.
+import 'package:saropa_lints/src/windows_physical_memory.dart'
+    show windowsTotalPhysicalMemoryMb;
 
 part 'project_context_path_bloom_git.dart';
 part 'project_context_project_file.dart';

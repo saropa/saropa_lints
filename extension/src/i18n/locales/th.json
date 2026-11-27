@@ -1043,7 +1043,7 @@
       "hotspotsPill": "{open} เปิด · {percent}% ตรวจสอบแล้ว",
       "qualityGatePassingTitle": "การส่งผ่านประตูคุณภาพ Code Health — คลิกเพื่อเปิด Code Health",
       "qualityGatePassingPill": "ด่านผ่าน",
-      "qualityGateFailingTitle": "ประตูคุณภาพความสมบูรณ์ของโค้ดล้มเหลว (การละเมิด {count}) — คลิกเพื่อเปิดความสมบูรณ์ของโค้ด",
+      "qualityGateFailingTitle": "ประตูคุณภาพของ Code Health ล้มเหลว (การละเมิด {count}) — คลิกเพื่อเปิด Code Health",
       "qualityGateFailingPill": "ประตูล้มเหลว"
     },
     "groupBy": {
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa รหัส แดชบอร์ดสุขภาพ",
+    "documentTitle": "แดชบอร์ด Saropa Code Health",
     "skipToTable": "ลอยข้ามไปยัง Functions Table ไปก่อน",
     "openWorkspaceFirst": "เปิดพื้นที่ทํางาน Dart/Flutter ก่อน",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "รีบทํางานรายงานอีกครั้ง แล้วคัดลอก JSON.",
-    "copiedJson": "รหัสสุขภาพ JSON สําเนาไปยัง clipboard.",
+    "copiedJson": "คัดลอก JSON ของ Code Health ไปยังคลิปบอร์ดแล้ว",
     "couldNotOpenFile": "ไม่สามารถเปิดไฟล์: {path}",
-    "panelTitle": "Saropa รหัส แดชบอร์ดสุขภาพ",
+    "panelTitle": "แดชบอร์ด Saropa Code Health",
     "hero": {
-      "title": "Saropa รหัส แดชบอร์ดสุขภาพ",
+      "title": "แดชบอร์ด Saropa Code Health",
       "generated": "สร้างขึ้น Generated",
       "functionOne": "{count} ฟังก์ชัน",
       "functionOther": "{count} ฟังก์ชัน",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "ประตูผ่านไป ผ่านมา"
     },
     "gate": {
-      "fallback": "ประตูคุณภาพล้มเหลว — ตรวจสอบเกณฑ์ในการตั้งค่าความสมบูรณ์ของโค้ด",
+      "fallback": "ประตูคุณภาพล้มเหลว — ตรวจสอบเกณฑ์ในการตั้งค่า Code Health",
       "failingOne": "{count} เกตล้มเหลว — ตรวจสอบเกณฑ์ หรือคัดลอก JSON เพื่อตรวจสอบ gates.violations.",
       "failingOther": "{count} เกตล้มเหลว — ตรวจสอบเกณฑ์ หรือคัดลอก JSON เพื่อตรวจสอบ gates.violations.",
       "openSettingsTitle": "เปิด Code Health settings เพื่อปรับขีดขั้นต่ํา",
-      "openSettingsButton": "Open Code การตั้งค่าสุขภาพ"
+      "openSettingsButton": "เปิดการตั้งค่า Code Health"
     },
     "kpi": {
       "ariaLabel": "รหัส สรุปสุขภาพ",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "การทดสอบ lag ฟังก์ชันการทํางาน"
     },
     "toolbar": {
-      "ariaLabel": "กฎหมาย การกระทําสุขภาพ",
+      "ariaLabel": "การดำเนินการของ Code Health",
       "rescanTitle": "รีรันการสแกน Code Health และอัพเดทดัชบอร์ดนี้",
       "rescan": "Rescan รีสแกน",
       "copyJsonTitle": "สําเนา Code Health JSON แดงไปยังคลิปบอร์ด",
       "copyJson": "สําเนา JSON",
-      "settingsTitle": "เปิดการตั้งค่าสุขภาพ Code Health.",
-      "settingsButton": "รหัส การตั้งค่าสุขภาพ สถานที่รักษาพยาบาล",
+      "settingsTitle": "เปิดการตั้งค่า Code Health",
+      "settingsButton": "การตั้งค่า Code Health",
       "filterTitle": "การกรองแถวตามชื่อ, ไฟล์หรือธง.",
       "filterLabel": "กําหนดเส้น filter",
       "filterPlaceholder": "แถวกรอง ..."
@@ -2078,6 +2078,7 @@
     "noData": "ยังไม่มี violations.json อยู่ — ให้รันการวิเคราะห์เพื่อเติมเต็มการถ่ายภาพการปิดบัง",
     "zeroTotal": "0 การยับยั้งเครื่องวิเคราะห์ในการส่งออกล่าสุด.",
     "noKindBreakdown": "ไม่มีการแบ่งแยกตามประเภทในการส่งออกนี้",
+    "total": "ทั้งหมด {total}",
     "title": "การลบ (การส่งออก)",
     "readOnlyNote": "(อ่านเท่านั้น; เปิด Findings เพื่อดูและกระทํา)",
     "openFindings": "เปิดผลการค้นพบ Dashboard"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy คาชเชียร์แล้ว",
       "copiedInfo": "สําเนาข้อมูล {package} ไปยังแผ่นพับ",
       "noPubspecOrLock": "ไม่พบ pubspec.yaml/pubspec.lock ในพื้นที่ทํางาน",
-      "backfillComplete": "แพ็คเกจ ความกระตือรือร้น: การเติมย้อนหลังประวัติศาสตร์ครั้งเดียวเสร็จสิ้น ({count} snapshots นําเข้า).",
+      "backfillComplete": "Package Vibrancy: เติมประวัติย้อนหลังครั้งเดียวเสร็จสิ้น (นำเข้าสแนปช็อต {count} รายการ)",
       "runScanFirst": "วิ่งสแกนก่อน",
       "noUpgradable": "ไม่พบแพคเกจที่สามารถอัพเกรดได้",
       "proceedUpgrades": "ขั้นตอนต่อเนื่องกับ {count} การปรับปรุง (((s)? ขั้นตอนที่ล้มเหลวถอยกลับ และแผนการดําเนินต่อไป",
@@ -2635,10 +2636,10 @@
       "scanOnSaveBaselineFailed": "การสแกนทั้งโครงการล้มเหลว: {details}",
       "scanOnSaveBaselineDone": "การสแกนทั้งโครงการเสร็จสิ้น: {total} ไฟล์, {issues} ปัญหา(ส)",
       "codeHealthStartFailedDetails": "การสแกน Code Health ไม่สามารถเริ่มได้ ({command}): {details}",
-      "codeHealthStartFailed": "รหัส สุขภาพ scan ไม่สามารถเริ่มต้น. รับรองว่า Dart SDK ได้รับการติดตั้ง.",
-      "codeHealthScanFailed": "รหัส สภาพ scan ไม่สําเร็จ.",
+      "codeHealthStartFailed": "เริ่มการสแกน Code Health ไม่ได้ ตรวจสอบว่าติดตั้ง Dart SDK แล้ว",
+      "codeHealthScanFailed": "การสแกน Code Health ล้มเหลว",
       "codeHealthScanFailedDetails": "การสแกน Code Health ล้มเหลว: {details}",
-      "codeHealthGatesFailed": "รหัส สุขภาพ: สาธารณสุข การตั้งค่า quality gates ที่ได้รับการปรับแต่งล้มเหลว. เปิดการตั้งค่า Code Health หรือสําเนา JSON เพื่อตรวจสอบ gates.violations.",
+      "codeHealthGatesFailed": "Code Health: ประตูคุณภาพที่กำหนดค่าไว้ล้มเหลว เปิดการตั้งค่า Code Health หรือคัดลอก JSON เพื่อตรวจสอบ gates.violations",
       "codeHealthInvalidJson": "Code Health คืนผลการออก JSON ที่ไม่ถูกต้อง.",
       "sidebarSectionUpdateFailed": "Saropa Lints: ไม่สามารถอัปเดตส่วนของแถบกิจกรรมได้ — {message}"
     },

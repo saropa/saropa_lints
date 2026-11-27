@@ -19,10 +19,10 @@
     },
     "statusItem": {
       "text": "Vibrancy: pub نادیده گرفته شد",
-      "tooltip": "Vibrancy بسته‌ها یک پرس‌وجوی pub را نادیده گرفت تا pubspec.lock بازنویسی نشود. برای جزئیات کلیک کنید."
+      "tooltip": "Package Vibrancy یک پرس‌وجوی pub را نادیده گرفت تا pubspec.lock بازنویسی نشود. برای جزئیات کلیک کنید."
     },
     "explain": {
-      "title": "Vibrancy بسته‌ها یک پرس‌وجوی pub را نادیده گرفت",
+      "title": "Package Vibrancy یک پرس‌وجوی pub را نادیده گرفت",
       "none": "در این نشست هیچ پرس‌وجوی pub در Vibrancy نادیده گرفته نشده است.",
       "unknown": "نامشخص",
       "reason": "دلیل: {reason}",
@@ -908,11 +908,11 @@
       "yellow": "⚠ {count} مشکل(های) فضای کاری"
     },
     "issue": {
-      "hazardFiles": "(هشدار) {count} فایل(های) بزرگ غیرمحدود شده",
+      "hazardFiles": "$(warning) {count} فایل بزرگ مستثنانشده",
       "hazardFilesDetail": "فایل‌های بزرگی که توسط ناظر فایل ردیابی می‌شوند می‌توانند حافظه را به خوبی استفاده کنند و VS Code را خاموش کنند. اجرای اسکن خطر را انجام دهید تا آنها را از بین ببرید.",
       "missingExcludes": "$(info) {count} عدم وجود نظارت (exclusion) در نظارت",
       "missingExcludesDetail": "الگو های حذف فایل ناظر پیشنهادی تنظیم نشده اند. افزودن آنها جلوگیری از استفاده از حافظه غیر ضروری می کند.",
-      "hostMemory": "(هشدار) میزبان افزونه از طریق {size}",
+      "hostMemory": "$(alert) میزبان افزونه {size} مصرف می‌کند",
       "hostMemoryDetail": "فرایند میزبان افزونه RSS محدوده ا cảnhح به ویژه را از بین می‌برد. جزئیات را در مورد سلامت فرایند باز کنید."
     }
   },
@@ -1041,9 +1041,9 @@
       "trendTitle": "امتیاز سلامت / روند خطاها از جمله اجرای های قبلی",
       "hotspotsTitle": "{open} باز، {safe} امن نشان داده شده، {fixed} تعمیر شده — کلیک کنید تا بررسی کنید",
       "hotspotsPill": "{open} باز کردن · {percent}% بررسی شده",
-      "qualityGatePassingTitle": "کیفیت گیت کد سلامت — کلیک کنید تا کد سلامت را باز کنید",
+      "qualityGatePassingTitle": "دروازه کیفیت Code Health پذیرفته شد — برای باز کردن Code Health کلیک کنید",
       "qualityGatePassingPill": "گیت پاسینگ",
-      "qualityGateFailingTitle": "کیفیت گیت کد سالم نیست ({count} خطا(ها)) — کلیک کنید تا کد سالم را باز کنید",
+      "qualityGateFailingTitle": "دروازه کیفیت Code Health رد شد ({count} تخلف) — برای باز کردن Code Health کلیک کنید",
       "qualityGateFailingPill": "درگاه شکسته است"
     },
     "groupBy": {
@@ -1156,7 +1156,7 @@
       "copyTreeJson": "درخت کپی JSON را کپی کنید",
       "refreshExtension": "تازه‌سازی افزونه",
       "openPackageDashboard": "صفحه داشبورد بسته را باز کنید",
-      "openCodeHealth": "باز کردن سلامت کد",
+      "openCodeHealth": "باز کردن Code Health",
       "openLintsConfig": "مدیریت Rule Packs بسته های قاعده",
       "reloadFromDisk": "بارگذاری مجدد از دیسک",
       "reloadFromDiskTitle": "داشبورد را از آخرین violations.json بدون دوباره اجرا کردن آنالیزور مجدداً رندر کنید.",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa کد Health Dashboard صفحه کنترل سلامت",
+    "documentTitle": "داشبورد Saropa Code Health",
     "skipToTable": "رفتن به جدول توابع",
     "openWorkspaceFirst": "ابتدا یک فضای کاری Dart/Flutter را باز کنید.",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "گزارش را دوباره اجرا کنید، سپس JSON را کپی کنید.",
-    "copiedJson": "کد سلامت JSON کپی شده به کلیپ بورد.",
+    "copiedJson": "JSON مربوط به Code Health در کلیپ‌بورد کپی شد.",
     "couldNotOpenFile": "باز کردن فایل ممکن نشد: {path}",
-    "panelTitle": "Saropa کد Health Dashboard صفحه کنترل سلامت",
+    "panelTitle": "داشبورد Saropa Code Health",
     "hero": {
-      "title": "Saropa کد Health Dashboard صفحه کنترل سلامت",
+      "title": "داشبورد Saropa Code Health",
       "generated": "تولید شده",
       "functionOne": "{count} تابع",
       "functionOther": "{count} تابع",
@@ -1883,7 +1883,7 @@
       "failingOne": "{count} دروازه ناموفق — حد آستانه را بررسی کنید یا برای بررسی gates.violations کد JSON را کپی کنید.",
       "failingOther": "{count} دروازه ناموفق — حد آستانه را بررسی کنید یا برای بررسی gates.violations کد JSON را کپی کنید.",
       "openSettingsTitle": "تنظیمات Code Health را باز کنید تا آستانه ها را تنظیم کنید.",
-      "openSettingsButton": "کد باز تنظیمات سلامت"
+      "openSettingsButton": "باز کردن تنظیمات Code Health"
     },
     "kpi": {
       "ariaLabel": "خلاصه ای از کد سلامت",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "تست‌ها از تابع عقب‌ترند"
     },
     "toolbar": {
-      "ariaLabel": "کد اقدامات بهداشتی:",
-      "rescanTitle": "اسکن سلامت کد را دوباره اجرا کنید و این داشبورد را تازه کنید.",
+      "ariaLabel": "اقدامات Code Health",
+      "rescanTitle": "اسکن Code Health را دوباره اجرا کنید و این داشبورد را تازه‌سازی کنید.",
       "rescan": "اسکن مجدد Rescan",
-      "copyJsonTitle": "کد خام سلامت JSON را به کلیپ بورد کپی کنید.",
+      "copyJsonTitle": "JSON خام Code Health را در کلیپ‌بورد کپی کنید.",
       "copyJson": "کپی JSON را کپی کنید",
-      "settingsTitle": "تنظیمات سلامت کد را باز کنید.",
-      "settingsButton": "کد تنظیمات بهداشتی تنظیمات سلامتی",
+      "settingsTitle": "تنظیمات Code Health را باز کنید.",
+      "settingsButton": "تنظیمات Code Health",
       "filterTitle": "ردیف های فیلتر را بر اساس نام، فایل یا پرچم.",
       "filterLabel": "ردیف های فیلتر:صفحات فیلتری",
       "filterPlaceholder": "ردیف های فیلتر..."
@@ -2078,6 +2078,7 @@
     "noData": "هنوز violations.json وجود ندارد - تجزیه و تحلیل را برای پر کردن عکس فوری سرکوب اجرا کنید.",
     "zeroTotal": "0 سرکوب آنالیزور در آخرین صادرات.",
     "noKindBreakdown": "هیچ گونه تجزیه و تحلیل بر حسب نوع در این صادرات وجود ندارد.",
+    "total": "مجموع {total}",
     "title": "حذف (صادرات)",
     "readOnlyNote": "(فقط برای خواندن؛ یافته ها را باز کنید تا مرور و عمل شود.)",
     "openFindings": "باز کردن Dashboard یافته ها"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Vibrancy cache پاک شد",
       "copiedInfo": "اطلاعات {package} در کلیپ‌بورد کپی شد",
       "noPubspecOrLock": "هیچ pubspec.yaml/pubspec.lock در فضای کاری پیدا نشده است.",
-      "backfillComplete": "بسته بندی: پر جنب و جوش بودن یک بار تاریخچه backfill کامل ({count} عکس های فوری وارد شده است).",
+      "backfillComplete": "Package Vibrancy: تکمیل یک‌باره تاریخچه انجام شد ({count} تصویر لحظه‌ای وارد شد).",
       "runScanFirst": "ابتدا اسکن را اجرا کنید",
       "noUpgradable": "هیچ بسته قابل ارتقایی پیدا نشد",
       "proceedUpgrades": "با {count} ارتقاء ادامه دهید؟ گام های شکست خورده به عقب برمی گردند و برنامه ادامه می یابد.",
@@ -2634,12 +2635,12 @@
       "scanOnSaveBaselineCanceled": "اسکن پروژه کامل پس از {scanned}/{total} فایل لغو شد.",
       "scanOnSaveBaselineFailed": "اسکن پروژه کامل ناموفق بود: {details}",
       "scanOnSaveBaselineDone": "اسکن پروژه کامل شد: {total} فایل، {issues} مشکل(ها).",
-      "codeHealthStartFailedDetails": "شروع اسکن سلامت کد ناموفق بود ({command}): {details}",
-      "codeHealthStartFailed": "کد سلامت اسکن شروع نشد. اطمینان حاصل کنید که Dart SDK نصب شده است.",
-      "codeHealthScanFailed": "کد اسکن سلامت ناموفق شد.",
+      "codeHealthStartFailedDetails": "شروع اسکن Code Health ناموفق بود ({command}): {details}",
+      "codeHealthStartFailed": "اسکن Code Health شروع نشد. مطمئن شوید که Dart SDK نصب شده است.",
+      "codeHealthScanFailed": "اسکن Code Health ناموفق بود.",
       "codeHealthScanFailedDetails": "اسکن Code Health ناموفق بود: {details}",
-      "codeHealthGatesFailed": "سلامت کد: دروازه‌های کیفیت پیکربندی‌شده رد شدند. تنظیمات Code Health را باز کنید یا JSON را کپی کنید تا gates.violations را بررسی کنید.",
-      "codeHealthInvalidJson": "کد سلامت (Code Health) خروجی JSON نامعتبر را بازگردانده است.",
+      "codeHealthGatesFailed": "Code Health: دروازه‌های کیفیت پیکربندی‌شده رد شدند. تنظیمات Code Health را باز کنید یا JSON را کپی کنید تا gates.violations را بررسی کنید.",
+      "codeHealthInvalidJson": "Code Health خروجی JSON نامعتبری برگرداند.",
       "sidebarSectionUpdateFailed": "Saropa Lints: نمی توان بخش نوار فعالیت را به روز کرد - {message}"
     },
     "vibrancy": {
@@ -2965,7 +2966,7 @@
       "packagesNeedlesCount": "{count} پکیج به ادغام درآوردن",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · گیت شکست خورده",
-      "codeHealthNeverScanned": "نمره خود را با اجرا کردن کد سلامت ببینید",
+      "codeHealthNeverScanned": "برای دیدن امتیاز خود Code Health را اجرا کنید",
       "projectMapDescription": "سکن شده {ago}",
       "projectMapNeverScanned": "پروژه مپ را اجرا کنید تا اندازه و نقاط گرم را ببینید"
     },

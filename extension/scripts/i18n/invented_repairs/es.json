@@ -66,7 +66,7 @@
   "Close detail": "Cerrar detalle",
   "Close keyboard shortcuts": "Cerrar los atajos de teclado",
   "Code Commit Activity": "Actividad de commits de código",
-  "Code Health": "Salud del código",
+  "Code Health": "Code Health",
   "Code Health actions": "Acciones de Code Health",
   "Code Health scan failed to start ({command}): {details}": "No se pudo iniciar el escaneo de Code Health ({command}): {details}",
   "Code Health scan failed: {details}": "Error en el escaneo de Code Health: {details}",

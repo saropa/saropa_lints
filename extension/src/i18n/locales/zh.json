@@ -1156,7 +1156,7 @@
       "copyTreeJson": "复制树 JSON",
       "refreshExtension": "更新扩展程序的刷新",
       "openPackageDashboard": "打开\"包装仪表板\",可以使用",
-      "openCodeHealth": "开放代码健康的公共卫生",
+      "openCodeHealth": "打开 Code Health",
       "openLintsConfig": "管理规则包的管理",
       "reloadFromDisk": "从磁盘重新加载",
       "reloadFromDiskTitle": "重新从最后一个violations.json渲染仪表板，而无需重新运行分析器。",
@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa 代码健康仪表板",
+    "documentTitle": "Saropa Code Health 仪表板",
     "skipToTable": "跳到函数表",
     "openWorkspaceFirst": "首先打开一个Dart/Flutter工作空间.",
     "scan": {
@@ -1866,11 +1866,11 @@
       }
     },
     "runReportFirst": "再运行报告,然后复制JSON.",
-    "copiedJson": "代码健康 JSON 被复制到剪贴板.",
+    "copiedJson": "Code Health JSON 已复制到剪贴板。",
     "couldNotOpenFile": "无法打开文件：{path}",
-    "panelTitle": "Saropa 代码健康仪表板",
+    "panelTitle": "Saropa Code Health 仪表板",
     "hero": {
-      "title": "Saropa 代码健康仪表板",
+      "title": "Saropa Code Health 仪表板",
       "generated": "已生成",
       "functionOne": "{count} 个函数",
       "functionOther": "{count} 个函数",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "门禁通过"
     },
     "gate": {
-      "fallback": "质量门失败 - 检查代码运行状况设置中的阈值。",
+      "fallback": "质量门禁未通过 - 请检查 Code Health 设置中的阈值。",
       "failingOne": "{count} 个关卡失败 — 请查看阈值，或复制 JSON 以检查 gates.violations。",
       "failingOther": "{count} 个关卡失败 — 请查看阈值，或复制 JSON 以检查 gates.violations。",
-      "openSettingsTitle": "打开代码运行状况设置以调整阈值。",
-      "openSettingsButton": "开放代码健康设置"
+      "openSettingsTitle": "打开 Code Health 设置以调整阈值。",
+      "openSettingsButton": "打开 Code Health 设置"
     },
     "kpi": {
       "ariaLabel": "代码健康总结",
@@ -1902,13 +1902,13 @@
       "testDriftSub": "测试滞后于函数"
     },
     "toolbar": {
-      "ariaLabel": "守则健康行动卫生活动",
-      "rescanTitle": "重新运行代码健康扫描并刷新这个仪表板.",
+      "ariaLabel": "Code Health 操作",
+      "rescanTitle": "重新运行 Code Health 扫描并刷新此仪表板。",
       "rescan": "重新扫描",
-      "copyJsonTitle": "将原始代码健康JSON复制到剪贴板.",
+      "copyJsonTitle": "将 Code Health 原始 JSON 复制到剪贴板。",
       "copyJson": "复制 JSON",
-      "settingsTitle": "打开\"代码健康设置\".",
-      "settingsButton": "代码健康设置",
+      "settingsTitle": "打开 Code Health 设置。",
+      "settingsButton": "Code Health 设置",
       "filterTitle": "按名称、文件或标志过滤行。",
       "filterLabel": "过滤行",
       "filterPlaceholder": "过滤行..."
@@ -2078,6 +2078,7 @@
     "noData": "还没有 violations.json — 运行分析来填充抑制快照。",
     "zeroTotal": "0分析仪抑制在最新的出口.",
     "noKindBreakdown": "这一出口没有按品种进行细分.",
+    "total": "总计 {total}",
     "title": "删除 (出口) 的情况",
     "readOnlyNote": "(仅供阅读;只有在线) 打开发现以浏览和行动.)",
     "openFindings": "打开发现仪表板"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "已清除 Vibrancy 缓存",
       "copiedInfo": "已将 {package} 信息复制到剪贴板",
       "noPubspecOrLock": "在工作空间中没有发现 pubspec.yaml/pubspec.lock.",
-      "backfillComplete": "包装活力:充满活力的 一次性历史记录备份完成 ({count}快照被导入).",
+      "backfillComplete": "Package Vibrancy：一次性历史记录回填完成（已导入 {count} 个快照）。",
       "runScanFirst": "请先运行扫描",
       "noUpgradable": "未找到可升级的软件包",
       "proceedUpgrades": "继续进行 {count}升级? 失败的步骤倒退,计划继续.",
@@ -2634,12 +2635,12 @@
       "scanOnSaveBaselineCanceled": "整个项目扫描在处理 {scanned}/{total} 文件后取消。",
       "scanOnSaveBaselineFailed": "整个项目扫描失败：{details}",
       "scanOnSaveBaselineDone": "项目级扫描完成：{total} 个文件，{issues} 个问题。",
-      "codeHealthStartFailedDetails": "代码健康扫描启动失败（{command}）：{details}",
-      "codeHealthStartFailed": "代码健康扫描启动失败。请确保已安装 Dart SDK。",
-      "codeHealthScanFailed": "代码健康扫描失败了.",
-      "codeHealthScanFailedDetails": "代码健康扫描失败：{details}",
-      "codeHealthGatesFailed": "代码健康：配置的质量门禁未通过。请打开代码健康设置，或复制 JSON 以检查 gates.violations。",
-      "codeHealthInvalidJson": "代码健康返回了无效的JSON输出.",
+      "codeHealthStartFailedDetails": "Code Health 扫描启动失败（{command}）：{details}",
+      "codeHealthStartFailed": "Code Health 扫描启动失败。请确保已安装 Dart SDK。",
+      "codeHealthScanFailed": "Code Health 扫描失败。",
+      "codeHealthScanFailedDetails": "Code Health 扫描失败：{details}",
+      "codeHealthGatesFailed": "Code Health：配置的质量门禁未通过。请打开 Code Health 设置，或复制 JSON 以检查 gates.violations。",
+      "codeHealthInvalidJson": "Code Health 返回了无效的 JSON 输出。",
       "sidebarSectionUpdateFailed": "Saropa Lints：无法更新活动栏区域 — {message}"
     },
     "vibrancy": {

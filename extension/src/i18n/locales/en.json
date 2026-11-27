@@ -2078,6 +2078,7 @@
     "noData": "No violations.json yet — run analysis to populate the suppression snapshot.",
     "zeroTotal": "0 analyzer suppressions in the latest export.",
     "noKindBreakdown": "No by-kind breakdown in this export.",
+    "total": "Total {total}",
     "title": "Suppressions (export)",
     "readOnlyNote": "(read-only; open Findings to browse and act.)",
     "openFindings": "Open Findings Dashboard"

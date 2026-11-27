@@ -2355,8 +2355,9 @@ int _totalPhysicalMemoryMb() {
 
 /// The uncached platform probe behind [_totalPhysicalMemoryMb].
 ///
-/// Platform-specific: Windows tries PowerShell CIM first (wmic is deprecated
-/// since Win10 21H1), then falls back to wmic. Linux reads `/proc/meminfo`,
+/// Platform-specific: Windows calls `GlobalMemoryStatusEx` in-process first,
+/// then falls back to PowerShell CIM and finally wmic (deprecated since
+/// Win10 21H1). Linux reads `/proc/meminfo`,
 /// macOS uses `sysctl`. All wrapped in try/catch so a failure on an
 /// unknown platform returns -1 (the caller falls back to the fixed default).
 int _probeTotalPhysicalMemoryMb() {
@@ -2370,7 +2371,15 @@ int _probeTotalPhysicalMemoryMb() {
   }
   try {
     if (Platform.isWindows) {
-      // Try PowerShell CIM first — wmic is deprecated since Windows 10 21H1
+      // In-process kernel32 call first. This probe runs inside
+      // Plugin.start(); the PowerShell spawn below took ~360 ms there, which
+      // delayed each plugin isolate long enough for `dart analyze <parent>`
+      // to exit before the second package's isolate reported anything. The
+      // spawn stays only as a fallback when the FFI call fails.
+      final ffiMb = windowsTotalPhysicalMemoryMb();
+      if (ffiMb != null) return ffiMb;
+
+      // Fallback: PowerShell CIM — wmic is deprecated since Windows 10 21H1
       // and may be removed in future builds. CIM returns bytes as a string.
       final cimResult = Process.runSync('powershell', [
         '-NoProfile',

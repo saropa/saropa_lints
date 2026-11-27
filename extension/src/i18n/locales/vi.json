@@ -1818,7 +1818,7 @@
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Mã Dashboard Sức khỏe",
+    "documentTitle": "Bảng điều khiển Saropa Code Health",
     "skipToTable": "Chuyển đến bảng hàm",
     "openWorkspaceFirst": "Mở một Dart/Flutter workspace đầu tiên.",
     "scan": {
@@ -1868,9 +1868,9 @@
     "runReportFirst": "Chạy báo cáo một lần nữa, sau đó sao chép JSON.",
     "copiedJson": "Code Health JSON được sao chép vào clipboard.",
     "couldNotOpenFile": "Không thể mở tệp: {path}",
-    "panelTitle": "Saropa Mã Dashboard Sức khỏe",
+    "panelTitle": "Bảng điều khiển Saropa Code Health",
     "hero": {
-      "title": "Saropa Mã Dashboard Sức khỏe",
+      "title": "Bảng điều khiển Saropa Code Health",
       "generated": "Đã tạo",
       "functionOne": "{count} hàm",
       "functionOther": "{count} hàm",
@@ -1879,11 +1879,11 @@
       "gatesPassing": "cổng đạt"
     },
     "gate": {
-      "fallback": "Cổng chất lượng không thành công - xem lại ngưỡng trong cài đặt Tình trạng mã.",
+      "fallback": "Cổng chất lượng không đạt - xem lại ngưỡng trong cài đặt Code Health.",
       "failingOne": "{count} cổng thất bại — xem lại ngưỡng hoặc sao chép JSON để kiểm tra gates.violations.",
       "failingOther": "{count} cổng thất bại — xem lại ngưỡng hoặc sao chép JSON để kiểm tra gates.violations.",
       "openSettingsTitle": "Mở các cài đặt Code Health để điều chỉnh ngưỡng.",
-      "openSettingsButton": "Mã mở Các thiết lập sức khỏe"
+      "openSettingsButton": "Mở cài đặt Code Health"
     },
     "kpi": {
       "ariaLabel": "Tóm tắt sức khỏe mã số",
@@ -1902,7 +1902,7 @@
       "testDriftSub": "kiểm thử chậm hơn hàm"
     },
     "toolbar": {
-      "ariaLabel": "Bộ luật Các hành động sức khỏe",
+      "ariaLabel": "Hành động của Code Health",
       "rescanTitle": "Chạy lại quét Code Health và làm mới bảng điều khiển này.",
       "rescan": "Quét lại",
       "copyJsonTitle": "Sao chép JSON Code Health thô vào clipboard.",
@@ -2078,6 +2078,7 @@
     "noData": "Chưa có violations.json — chạy phân tích để điền vào bản chụp sự bỏ qua.",
     "zeroTotal": "0 sự kìm nén phân tích trong xuất khẩu mới nhất.",
     "noKindBreakdown": "Không phân loại theo hàng hóa trong xuất khẩu này.",
+    "total": "Tổng cộng {total}",
     "title": "Suppressions (export) - xóa bỏ",
     "readOnlyNote": "(chỉ đọc; mở các kết quả để duyệt và hành động.)",
     "openFindings": "Mở bảng điều khiển phát hiện"
@@ -2457,7 +2458,7 @@
       "cacheCleared": "Đã xóa bộ nhớ đệm Vibrancy",
       "copiedInfo": "Đã sao chép thông tin {package} vào bảng tạm",
       "noPubspecOrLock": "Không có pubspec.yaml/pubspec.lock được tìm thấy trong workspace.",
-      "backfillComplete": "Gói Vibrancy: Sức sống mạnh mẽ: one-time history backfill complete ({count} snapshots imported). - Lấp đầy lịch sử một lần hoàn tất.",
+      "backfillComplete": "Package Vibrancy: đã hoàn tất bổ sung lịch sử một lần (đã nhập {count} bản chụp).",
       "runScanFirst": "Hãy chạy quét trước",
       "noUpgradable": "Không tìm thấy gói có thể nâng cấp",
       "proceedUpgrades": "Tiếp tục nâng cấp {count}? Các bước thất bại sẽ được hoàn nguyên và kế hoạch sẽ tiếp tục.",
@@ -2635,10 +2636,10 @@
       "scanOnSaveBaselineFailed": "Quét toàn bộ dự án thất bại: {details}",
       "scanOnSaveBaselineDone": "Quét toàn bộ dự án hoàn tất: {total} tệp, {issues} vấn đề.",
       "codeHealthStartFailedDetails": "Không khởi động được quét Code Health ({command}): {details}",
-      "codeHealthStartFailed": "Mã Health scan không khởi động được. Đảm bảo Dart SDK được cài đặt.",
-      "codeHealthScanFailed": "Mã Health scan đã thất bại.",
+      "codeHealthStartFailed": "Không khởi động được quá trình quét Code Health. Hãy đảm bảo Dart SDK đã được cài đặt.",
+      "codeHealthScanFailed": "Quét Code Health thất bại.",
       "codeHealthScanFailedDetails": "Quét Code Health thất bại: {details}",
-      "codeHealthGatesFailed": "Mã Sức khỏe: Code Health cấu hình quality gates đã thất bại. Mở Code Health settings hoặc sao chép JSON để kiểm tra gates.violations.",
+      "codeHealthGatesFailed": "Code Health: các quality gate đã cấu hình không đạt. Mở cài đặt Code Health hoặc sao chép JSON để kiểm tra gates.violations.",
       "codeHealthInvalidJson": "Code Health trả về đầu ra JSON không hợp lệ.",
       "sidebarSectionUpdateFailed": "Saropa Lints: không thể cập nhật phần thanh hoạt động — {message}"
     },
