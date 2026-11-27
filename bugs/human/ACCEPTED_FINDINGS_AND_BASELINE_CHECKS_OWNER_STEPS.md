@@ -1,8 +1,10 @@
 # Accepted findings and baseline: owner checks
 
-Status: code merged. Steps 2 to 31 need a person at a VS Code window. Steps 32 to 40 are not run; they need only PowerShell, so an agent may run them later. From `plans/history/2026.11/2026.11.26/accepted_findings_f5_translations_and_baseline_date.md`.
+Status: code merged. Steps 2 to 31 need a person at a VS Code window. Step 32 failed in an agent run; it needs only PowerShell. From `plans/history/2026.11/2026.11.26/accepted_findings_f5_translations_and_baseline_date.md`.
 
 Step 1 (`npm run compile` in `D:\src\saropa_lints\extension`) passed on 2026-11-27 and is left out; run it again first if extension code has changed since.
+
+Steps 33 to 40 (dated baseline under `dart analyze`, and the baseline command) were agent-verified on 2026-11-27 and are left out; the `baseline\` and `dated\` folders are back to their starting state.
 
 ## Setup
 
@@ -143,18 +145,7 @@ Every step says what to do and what a pass looks like. The finding text always s
 
 30. Close the test window. Run `code --new-window --disable-extension saropa.saropa-lints D:\tmp\accepted_check\live`, open both `g.dart` files and wait. Pass: `one` shows `avoid_catch_all` on line 13 only, plus `avoid_print_error` on 6 and 14. `two` shows `avoid_catch_all` on 5 and 13 and no `avoid_print_error`.
 31. In `live\one\saropa_accepted.yaml` change `max: 1` to `max: 2` and save; type a space in `one\lib\g.dart` and save. Pass: no `avoid_catch_all` left in `one`, without restarting; `two` is unchanged. Set it back to `max: 1`.
-32. (Not run) In PowerShell run `dart analyze D:\tmp\accepted_check\live`. Pass: 5 issues (`one`: one `avoid_catch_all`, two `avoid_print_error`; `two`: two `avoid_catch_all`). If no Saropa findings appear at all, also run it on `…\live\one` and `…\live\two` separately and record both.
-33. (Not run) Run `dart analyze D:\tmp\accepted_check\dated`. Pass: `No issues found!`
-34. (Not run) Paste the function from step 20 at the end of `D:\tmp\accepted_check\dated\lib\h.dart`, save, and run the same command. Pass: 2 issues, both inside the new function. Then run `git -C D:\tmp\accepted_check\dated checkout -- lib/h.dart`.
-
-### H. Baseline command (steps 35 to 40: not run)
-
-35. (Not run) Run `cd D:\tmp\accepted_check\baseline` then `dart analyze`. Pass: 4 issues.
-36. (Not run) Run `dart run saropa_lints:baseline`. Pass: `Found 4 violation(s)`, `Files: 1`, `Rules: 2`; `saropa_baseline.json` is created; `analysis_options_custom.yaml` keeps `lane: full` and gains a `baseline:` section.
-37. (Not run) Run `dart analyze`. Pass: `No issues found!`
-38. (Not run) Run `dart run saropa_lints:baseline --update`. Pass: `Previous: 4 violations`, `Current:  4 violations`, `No change`.
-39. (Not run) Paste the function from step 20 at the end of `lib\f.dart`, save, run `dart analyze`. Pass: 2 issues, both inside the new function.
-40. (Not run) Run `dart run saropa_lints:baseline --explain lib/f.dart`. Pass: it lists the baseline file entries with rule and line numbers for `lib/f.dart`.
+32. (Agent run 2026-11-27: FAILED. 3 issues, all in `one`; `two` alone gives its 2 expected issues. See `bugs\infra_dart_analyze_parent_folder_skips_second_package.md`.) In PowerShell run `dart analyze D:\tmp\accepted_check\live`. Pass: 5 issues (`one`: one `avoid_catch_all`, two `avoid_print_error`; `two`: two `avoid_catch_all`). If no Saropa findings appear at all, also run it on `…\live\one` and `…\live\two` separately and record both.
 
 ## If a step fails
 
