@@ -901,19 +901,25 @@ void _reloadRulePacksFromRoot(String projectRoot) {
 /// consumer project. Null [projectRoot] keeps auto-detection from the
 /// current directory (the pre-reload path from `Plugin.start`).
 ///
-/// The in-server plugin additionally reads each analyzed file's own project
-/// section on demand: this loader runs for one root only.
+/// Every caller additionally reads each analyzed file's own project section
+/// on demand, because this loader runs for one root only.
 void _loadBaselineConfig(String? content, String? projectRoot) {
   // A reload for a project without a baseline must not keep the previous one.
   // Config only: blame answers already gathered survive the reload.
   BaselineManager.resetConfig();
-  if (_nativePluginStarted) {
-    BaselineManager.enablePerRoot(
-      (root) => _baselineConfigFrom(
-        _readProjectFile('analysis_options_custom.yaml', root),
-      ),
-    );
-  }
+  // Per-package lookup for every caller, not only the in-server plugin. Bug
+  // fixed: this was gated on _nativePluginStarted, so the scan CLI, scan
+  // daemon and LSP server (which never start the plugin but load config once
+  // per process from the first analyzed file's package) applied that one
+  // package's baseline to every file. A folder holding two packages then
+  // never applied the second package's baseline. The per-root reader returns
+  // the same config for files inside the loaded package, so single-package
+  // runs are unchanged.
+  BaselineManager.enablePerRoot(
+    (root) => _baselineConfigFrom(
+      _readProjectFile('analysis_options_custom.yaml', root),
+    ),
+  );
   final config = _baselineConfigFrom(content);
   if (config != null) {
     BaselineManager.initialize(config, projectRoot: projectRoot);

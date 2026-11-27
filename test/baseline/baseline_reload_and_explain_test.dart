@@ -49,6 +49,10 @@ void main() {
     loadNativePluginConfigFromProjectRoot(dir.path);
     expect(BaselineManager.isBaselined(file, 'r', 1), isFalse);
 
+    // The loader leaves per-package lookup on for every caller, which would
+    // override the direct initialize below. resetConfig drops only the
+    // config, so the blame answers this test is about still survive.
+    BaselineManager.resetConfig();
     BaselineManager.initialize(config, projectRoot: root);
     expect(BaselineManager.isBaselined(file, 'r', 1), isTrue);
 

@@ -66,6 +66,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.10.1] — Unreleased
+
+### Fixed
+
+- The scan CLI, scan daemon and language server now apply each package's own baseline when one run covers a folder with several packages; before, only the first analyzed package's baseline was used for every file. No action required.
+
+### Internal
+
+- Diagnosed why `dart analyze` on a folder holding two packages reports plugin findings for only one: the analysis server tracks one shared "plugin analyzing" flag for all plugin isolates, so it reports idle once the first isolate finishes, before a slower second isolate starts. Upstream; the limit is documented in the configuration guide.
+
+---
+
 ## [17.10.0]
 
 > **Upgrade note:** A plain `dart run saropa_lints scan` no longer skips when the plugin block in `analysis_options.yaml` is commented out, which the language server does by default and `init` can leave behind, so git hooks and CI that passed by skipping can now report findings and fail. To keep skipping, set `"saropaLints.enabled": false` in `.vscode/settings.json` and commit that file; a switch in user settings or a `.code-workspace` file is not seen by the scan.

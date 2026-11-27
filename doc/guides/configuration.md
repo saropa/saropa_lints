@@ -400,6 +400,12 @@ dart run saropa_lints:baseline ./my_project  # Run on specific directory
 dart run saropa_lints:baseline --help        # See all options
 ```
 
+### Folders with several packages
+
+Each package applies its own baseline and `saropa_accepted.yaml`, including when one scan covers a folder that holds several packages.
+
+Known limit: `dart analyze <folder>` on a folder that holds several packages can print plugin findings for only the first package. The Dart analysis server reports "done" when the first package's plugin finishes, before the next package's plugin has started, so `dart analyze` exits early. This comes from the Dart SDK, not from saropa_lints. Run `dart analyze` once per package instead (for example `dart analyze one` and then `dart analyze two`). A scan of such a folder still takes its enabled rules and other settings from the first package it analyzes, so scan each package on its own when their rule settings differ.
+
 ## Severity Levels
 
 Each rule has a fixed severity (ERROR, WARNING, or INFO) defined in the rule itself. Severity cannot be overridden per-project. If a rule's severity doesn't match your needs:

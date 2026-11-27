@@ -1,6 +1,6 @@
 # Accepted findings and baseline: owner checks
 
-Status: code merged. Steps 2 to 31 need a person at a VS Code window. Step 32 failed in an agent run; it needs only PowerShell. From `plans/history/2026.11/2026.11.26/accepted_findings_f5_translations_and_baseline_date.md`.
+Status: code merged. Steps 2 to 31 need a person at a VS Code window. Step 32 now runs per package (a parent-folder run hits an SDK limit); it needs only PowerShell. From `plans/history/2026.11/2026.11.26/accepted_findings_f5_translations_and_baseline_date.md`.
 
 Step 1 (`npm run compile` in `D:\src\saropa_lints\extension`) passed on 2026-11-27 and is left out; run it again first if extension code has changed since.
 
@@ -145,7 +145,7 @@ Every step says what to do and what a pass looks like. The finding text always s
 
 30. Close the test window. Run `code --new-window --disable-extension saropa.saropa-lints D:\tmp\accepted_check\live`, open both `g.dart` files and wait. Pass: `one` shows `avoid_catch_all` on line 13 only, plus `avoid_print_error` on 6 and 14. `two` shows `avoid_catch_all` on 5 and 13 and no `avoid_print_error`.
 31. In `live\one\saropa_accepted.yaml` change `max: 1` to `max: 2` and save; type a space in `one\lib\g.dart` and save. Pass: no `avoid_catch_all` left in `one`, without restarting; `two` is unchanged. Set it back to `max: 1`.
-32. (Agent run 2026-11-27: FAILED. 3 issues, all in `one`; `two` alone gives its 2 expected issues. See `bugs\infra_dart_analyze_parent_folder_skips_second_package.md`.) In PowerShell run `dart analyze D:\tmp\accepted_check\live`. Pass: 5 issues (`one`: one `avoid_catch_all`, two `avoid_print_error`; `two`: two `avoid_catch_all`). If no Saropa findings appear at all, also run it on `…\live\one` and `…\live\two` separately and record both.
+32. (A parent-folder run cannot pass: the Dart analysis server reports done when the first package's plugin finishes, so `dart analyze D:\tmp\accepted_check\live` shows only `one`. Upstream SDK limit, documented in `doc\guides\configuration.md`; see `plans\history\2026.11\2026.11.27\infra_dart_analyze_parent_folder_skips_second_package.md`.) In PowerShell run `dart analyze D:\tmp\accepted_check\live\one`, then `dart analyze D:\tmp\accepted_check\live\two`. Pass: `one` gives 3 issues (one `avoid_catch_all`, two `avoid_print_error`); `two` gives 2 (two `avoid_catch_all`). The agent run of 2026-11-27 already saw `two` give its 2.
 
 ## If a step fails
 
