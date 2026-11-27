@@ -59,18 +59,23 @@ export function planCheckRuns(folders: readonly string[], probes: CheckRootProbe
       .filter((r): r is string => !!r)
       .map((r) => path.resolve(r)),
   )];
-  // A root inside another root is dropped: the CLI already checks every list
-  // under its target, so scanning both would report nested lists twice.
-  const outer = roots.filter((r) => !roots.some((o) => o !== r && isInside(o, r)));
-  const withDep = outer.filter((r) => probes.hasDep(r));
-  const host = withDep[0];
+  // Any root with the package can host runs for roots without it, including
+  // a nested one: an outer plugin-only folder is then scanned from inside.
+  const host = roots.find((r) => probes.hasDep(r));
   if (host === undefined) return [];
-  const runs: CheckRun[] = [];
-  for (const target of outer) {
-    if (probes.hasDep(target)) runs.push({ host: target, target });
-    else if (usesSaropa(target, probes)) runs.push({ host, target });
-  }
-  return runs;
+  // Decide which roots will actually run BEFORE removing nested ones. The
+  // old order dropped every nested root first and filtered by dependency
+  // after, so an outer folder without saropa_lints discarded an inner
+  // package that has it, and that package was never checked.
+  const runnable = roots.filter((r) => probes.hasDep(r) || usesSaropa(r, probes));
+  // A root inside another runnable root is dropped: the CLI already checks
+  // every list under its target, so scanning both would report nested lists
+  // twice. A root inside a folder that will not run is kept.
+  const kept = runnable.filter((r) => !runnable.some((o) => o !== r && isInside(o, r)));
+  return kept.map((target) => ({
+    host: probes.hasDep(target) ? target : host,
+    target,
+  }));
 }
 
 /** True when [child] is strictly inside [parent]. */

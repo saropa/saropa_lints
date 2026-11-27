@@ -295,7 +295,7 @@ This command:
 
 1. Runs analysis to find all current violations.
 2. Creates `saropa_baseline.json` with those violations.
-3. Adds a top-level `baseline:` section to `analysis_options_custom.yaml` (created if missing). The analysis it runs ignores any active baseline, so re-running or `--update` keeps entries that are still present.
+3. Adds a top-level `baseline:` section to `analysis_options_custom.yaml` (created if missing). When a `baseline:` section already exists, its other keys are kept and only its `file:` line is added or changed; the command prints the line it wrote. The analysis it runs ignores the baseline JSON (the `date:` and `paths:` baselines still apply), so re-running or `--update` keeps entries that are still present.
 
 **Result**: Old violations are hidden, new code is still checked.
 
@@ -314,14 +314,33 @@ Both types are combinable: any match suppresses the violation.
 > at the project root (top-level key), and `file:` resolves against that root.
 > The `dart run saropa_lints:baseline` CLI command shown above writes it for you.
 
-The baseline CLI supports these options:
+```yaml
+baseline:
+  file: "saropa_baseline.json" # Specific violations (written by the CLI)
+  date: "2025-01-15"           # Code unchanged since this date (git blame)
+  paths:                       # Whole directories or glob patterns
+    - "lib/legacy/"
+  only_impacts: [info]         # Only baseline these severities
+```
 
-| Option | Description |
+| Key | Description |
 | --- | --- |
-| `--file` | Output file (default: `saropa_baseline.json`) |
-| `--date` | Ignore code unchanged since this date (uses git blame) |
-| `--paths` | Ignore entire directories (glob patterns) |
-| `--only-impacts` | Only baseline certain severities (e.g., `low,medium`) |
+| `file` | Baseline JSON (default from the CLI: `saropa_baseline.json`; change it with `-o`) |
+| `date` | Ignore code unchanged since this date (uses git blame) |
+| `paths` | Ignore entire directories (glob patterns), as a block list or `[a, b]` |
+| `only_impacts` | Only baseline these severities, as `[info]` or a block list |
+
+Trailing `# comments` and both list styles are accepted. `date`, `paths` and `only_impacts` are set by hand; the CLI writes only `file`.
+
+> **Known limit:** `date` does not currently hide findings during analysis (`dart analyze` or the editor), because git blame data is not loaded there.
+
+### Why is a finding hidden?
+
+```bash
+dart run saropa_lints:baseline --explain lib/legacy/old.dart
+```
+
+Read-only; it does not run analysis. For that file it reports the governing project, the `only_impacts` filter, the matching `paths` patterns, the baseline JSON entries (rule and line), and the number of lines older than `date`. It describes what the baseline covers, not which findings the file currently has. A relative file path resolves against the project directory argument (default: the current directory).
 
 ### Path Pattern Examples
 

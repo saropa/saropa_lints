@@ -67,3 +67,11 @@ Still reported by design: the Reproducer snippet as written (public widget, list
 Observed, not changed: in `require_refresh_indicator` the remote-data word `list` also matches `ListView` itself, so that heuristic never filters anything.
 
 Tests: `test/rules/widget/refresh_indicator_static_list_fp_test.dart`.
+
+## Finish Report (2026-11-26)
+
+Status: Fixed.
+
+A follow-up review tightened both skips in `lib/src/widget_ancestor_utils.dart`. Overlay detection stops at navigation calls, page routes and event-handler closures, and the wrapper-name pattern is anchored on the overlay suffix. The constant-list check treats every other binding of the name (loop, catch, pattern, local function, member, possibly inherited member) as not constant.
+
+Verification: `refresh_indicator_static_list_fp_test.dart`, `scroll_rules_test.dart`, `widget_layout_rules_test.dart` and `mobile_tile_and_nonscrolling_list_fp_test.dart` passed. The consumer file named in the report was not re-checked after the tightening.

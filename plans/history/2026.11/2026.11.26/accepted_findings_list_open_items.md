@@ -1,6 +1,6 @@
 # Accepted-findings list: open items
 
-**Status: Open** (agent pass 2026-11-26: fixable items done; remaining items need F5, a translation run, a live analysis server, or a schema decision)
+**Status: Closed** (completed work archived here; unchecked items continue in `bugs/accepted_findings_f5_translations_and_baseline_date.md`)
 
 Created: 2026-11-26
 Source: `plans/history/2026.11/2026.11.26/proposal_infra_accepted_findings_list.md`
@@ -54,3 +54,28 @@ Verified 2026-11-26: `dart test test/accepted/` (31 passed), throwaway project w
 
 - Scan daemon: an entry hid its rule in the listed file only, other findings were unchanged, and deleting the list restored them on the next request without a daemon restart.
 - `scan --check-accepted`: one active entry reported `hides 1`, exit 0.
+
+## Finish Report (2026-11-26)
+
+A review of commit be403f6c7 was closed out. Fixed in the baseline feature: inline lists and trailing comments in the `baseline:` section, activation when the section already exists, the CLI positional project path, `SAROPA_LINTS_SKIP_BASELINE` skipping only the JSON file (this supersedes the "loader skips the baseline" wording under baseline defect 3), and one baseline per project in the plugin. The extension check no longer drops a package nested in a folder that does not run.
+
+Verification: `test/baseline/` and `test/accepted/` passed, `acceptedCheckRoots.test.ts` passed (9 cases), and both extension typechecks passed. One test setup defect in `reporter_multi_root_test.dart` was corrected: the one-time lazy config load reset the reader installed by the test.
+
+Remaining items and blockers:
+
+| Item | Blocker |
+|---|---|
+| F5 check, all nine boxes including the screenshot | A person with an Extension Development Host |
+| Translation catalog regeneration | A person must run the translation pipeline |
+| F5 check for nested packages, second folder, plugin-only folder, rule migration | A person with an Extension Development Host |
+| Per-entry maximum count | Owner decision on the version 1 schema change |
+| Plugin with several project roots in a live analysis server | A person running the IDE or `dart analyze` with the plugin; the new test covers the reporter in the harness only |
+| Scan-on-save through the extension | A person with an Extension Development Host |
+
+Not run end to end: `dart run saropa_lints:baseline` against a real project.
+
+### Follow-up (2026-11-26)
+
+A hardening pass added: blame answers survive a config reload; the loader reading the real `SAROPA_LINTS_SKIP_BASELINE` variable and `bin/baseline.dart` with a positional project path are tested in child processes (the CLI's `dart analyze` call is answered by a stub script, so no analysis runs); legacy `only_impacts` names are tested through the loader; the overlay navigation and handler checks were narrowed; a constant list is no longer treated as shadowed by inherited or mixin members, which Dart does not put in lexical scope. `dart run saropa_lints:baseline --explain <file>` was added.
+
+Open items: `bugs/accepted_findings_f5_translations_and_baseline_date.md`.

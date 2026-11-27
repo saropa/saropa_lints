@@ -28,6 +28,8 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/baseline/analysis_failure.dart';
 import 'package:saropa_lints/src/baseline/baseline_activation.dart';
+import 'package:saropa_lints/src/baseline/baseline_cli_args.dart';
+import 'package:saropa_lints/src/baseline/baseline_explain.dart';
 import 'package:saropa_lints/src/baseline/baseline_file.dart';
 import 'package:saropa_lints/src/violation_parser.dart';
 
@@ -35,6 +37,12 @@ Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
     _printUsage();
 
+    return;
+  }
+
+  // Read-only report: returns before anything that analyzes or writes.
+  if (args.contains('--explain')) {
+    exitCode = await _explain(args);
     return;
   }
 
@@ -54,17 +62,9 @@ Future<void> main(List<String> args) async {
     outputPath = args[outputIndexShort + 1];
   }
 
-  // Parse working directory
-  var workingDir = '.';
-  for (final arg in args) {
-    if (!arg.startsWith('-') &&
-        arg != outputPath &&
-        args.indexOf(arg) != outputIndex + 1 &&
-        args.indexOf(arg) != outputIndexShort + 1) {
-      workingDir = arg;
-      break;
-    }
-  }
+  // Project directory: first positional argument (see baselineWorkingDir for
+  // the argument-0 bug this replaces).
+  final workingDir = baselineWorkingDir(args);
 
   // A relative output path belongs to the analyzed project, not to the
   // shell's directory: `baseline ./my_project` used to write the JSON into
@@ -96,8 +96,8 @@ Future<void> main(List<String> args) async {
   print('Running lint analysis...');
   print('');
 
-  // Run dart analyze with the baseline switched off in the plugin. An active
-  // baseline hides the findings it lists, so this run would otherwise see
+  // Run dart analyze with the baseline JSON ignored by the plugin (`date:`
+  // and `paths:` still apply). An active baseline file hides the findings it lists, so this run would otherwise see
   // only new findings: `--update` dropped every still-present entry, and a
   // plain re-run overwrote the baseline with the new findings alone.
   final result = await Process.run(
@@ -262,12 +262,7 @@ Future<void> main(List<String> args) async {
   print('Baseline written to: $outputPath');
 
   // Activate the baseline where the loader reads it.
-  if (!skipConfig) {
-    final updated = _activateBaseline(workingDir, configPath);
-    if (updated) {
-      print('Updated $kBaselineConfigFileName with baseline configuration');
-    }
-  }
+  if (!skipConfig) _activateBaseline(workingDir, configPath);
 
   print('');
   print('Done! Run `dart analyze` again to see clean output.');
@@ -282,22 +277,40 @@ void _printError(String message) {
   stderr.writeln(message);
 }
 
-/// Adds a top-level `baseline:` section to `analysis_options_custom.yaml` in
-/// [projectDir], creating the file when missing. Returns true when written.
+/// Handles `--explain <file>` and returns the process exit code. A relative
+/// file belongs to the project directory, like a relative output path.
+Future<int> _explain(List<String> args) async {
+  final index = args.indexOf('--explain') + 1;
+  if (index >= args.length || args[index].startsWith('-')) {
+    _printError('ERROR: --explain needs a file path.');
+    return 64;
+  }
+  final path = p.normalize(
+    p.absolute(p.join(baselineWorkingDir(args), args[index])),
+  );
+  if (!File(path).existsSync()) {
+    _printError('ERROR: file not found: $path');
+    return 66;
+  }
+  print(await explainBaseline(path, Platform.environment));
+  return 0;
+}
+
+/// Makes `analysis_options_custom.yaml` in [projectDir] reference
+/// [baselinePath], creating the file when missing, and prints what changed.
 ///
 /// This replaces an insert into the plugin block of `analysis_options.yaml`,
 /// which the loader never read, so a generated baseline was never active.
-bool _activateBaseline(String projectDir, String baselinePath) {
+/// An existing `baseline:` section keeps its other keys; only its `file:`
+/// line is added or changed (and shown), because a section without it, or
+/// naming another file, left the JSON just written unreferenced.
+void _activateBaseline(String projectDir, String baselinePath) {
   final file = File(p.join(projectDir, kBaselineConfigFileName));
   final existing = file.existsSync() ? file.readAsStringSync() : '';
-  final updated = addBaselineActivation(existing, baselinePath);
-
-  // An existing top-level section is the user's own setting: leave it.
-  if (updated == null) {
-    print('Note: baseline already configured in $kBaselineConfigFileName');
-  } else {
-    file.writeAsStringSync(updated);
-  }
+  final activation = planBaselineActivation(existing, baselinePath);
+  final text = activation.text;
+  if (text != null) file.writeAsStringSync(text);
+  print(describeBaselineActivation(activation, kBaselineConfigFileName));
 
   // An older CLI wrote an indented `baseline:` into analysis_options.yaml.
   // It never took effect; point it out so the user can delete it.
@@ -310,8 +323,6 @@ bool _activateBaseline(String projectDir, String baselinePath) {
       'the old entry can be removed.',
     );
   }
-
-  return updated != null;
 }
 
 void _printUsage() {
@@ -334,6 +345,13 @@ void _printUsage() {
     '  --dry-run             Show what would be done without making changes',
   );
   print('  --skip-config         Skip updating $kBaselineConfigFileName');
+  print(
+    '  --explain <file>      Show which baseline settings (date, paths, JSON',
+  );
+  print(
+    '                        entries, only_impacts) hide findings in <file>.',
+  );
+  print('                        Read-only; does not run analysis.');
   print('  -h, --help            Show this help message');
   print('');
   print('Examples:');
@@ -342,6 +360,7 @@ void _printUsage() {
   print('  dart run saropa_lints:baseline --update');
   print('  dart run saropa_lints:baseline --dry-run');
   print('  dart run saropa_lints:baseline ./my_project');
+  print('  dart run saropa_lints:baseline --explain lib/legacy/old.dart');
   print('');
   print('After generating a baseline, run `dart analyze` again.');
   print('Old violations will be hidden, but new ones will still be reported.');

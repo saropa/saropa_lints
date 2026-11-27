@@ -6,6 +6,7 @@ import 'package:saropa_lints/src/analyzer_compat.dart';
 import 'package:saropa_lints/src/rules/packages/equatable_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
+import '../../support/resolved_rule_harness.dart';
 
 /// Tests for 14 Equatable lint rules.
 ///
@@ -173,6 +174,71 @@ class A { final String? extra;
     });
   });
 
-  // Stub-only behavior tests were removed from this file. Keep rule metadata
-  // and fixture verification while migrating to analyzer-backed behavior tests.
+  group('require_copy_with_null_handling - behavior', () {
+    /// Number of diagnostics the rule reports on [code] with full resolution.
+    Future<int> count(String code) async =>
+        (await runRuleResolved(RequireCopyWithNullHandlingRule(), code)).length;
+
+    test('fires on ?? over a nullable field', () async {
+      expect(
+        await count('''
+class A {
+  A({this.name});
+  final String? name;
+  A copyWith({String? name}) => A(name: name ?? this.name);
+}
+'''),
+        1,
+      );
+    });
+
+    // Clearing one field by empty string does not help `hiddenAt`, which has
+    // no empty value, so the declaration is still reported by design.
+    test('fires on a clear-by-empty model', () async {
+      expect(
+        await count('''
+class Group {
+  Group({this.avatarUrl, this.hiddenAt});
+  /// Null keeps the stored value; an empty string clears it.
+  final String? avatarUrl;
+  final DateTime? hiddenAt;
+  Group copyWith({String? avatarUrl, DateTime? hiddenAt}) => Group(
+        avatarUrl: avatarUrl ?? this.avatarUrl,
+        hiddenAt: hiddenAt ?? this.hiddenAt,
+      );
+}
+'''),
+        1,
+      );
+    });
+
+    // Nullable fields go through a wrapper; every remaining `??` targets a
+    // non-nullable field, even though its parameter is nullable.
+    test('silent when every ?? target field is non-nullable', () async {
+      expect(
+        await count('''
+class Keep<T> {
+  const Keep.unset();
+  T? resolve(T? current) => current;
+}
+class Filters {
+  Filters({this.text, this.limit = 1, this.unique = false});
+  final String? text;
+  final int limit;
+  final bool unique;
+  Filters copyWith({
+    Keep<String> text = const Keep<String>.unset(),
+    int? limit,
+    bool? unique,
+  }) => Filters(
+        text: text.resolve(this.text),
+        limit: limit ?? this.limit,
+        unique: unique ?? this.unique,
+      );
+}
+'''),
+        0,
+      );
+    });
+  });
 }

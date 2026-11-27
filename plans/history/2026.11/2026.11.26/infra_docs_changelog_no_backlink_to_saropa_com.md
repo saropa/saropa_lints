@@ -1,6 +1,6 @@
 # BUG: infra — CHANGELOG has no backlink to saropa.com
 
-**Status: Open**
+**Status: Closed** (completed work archived here; open steps continue in `bugs/infra_changelog_saropa_com_links_waiting_on_pages.md`)
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -110,3 +110,18 @@ Needs an owner decision before steps a and b:
 - The header link and the per-release links resolve (HTTP 200).
 - The `pubspec.yaml` homepage shows on pub.dev and the `extension/package.json` homepage shows on the Marketplace after the next publish.
 - The tooling tests pass: `scripts/modules/tests/test_changelog_overview.py` plus any test touching the archive scripts.
+
+## Finish Report (2026-11-26)
+
+The bug stays open. `https://saropa.com/developers/saropa-lints/changelog/` returned HTTP 404 on re-check.
+
+| Remaining item | Blocker |
+|---|---|
+| a. Header changelog link | The saropa.com changelog page must return HTTP 200; owner decision on one slug versus rewriting it for the extension copy |
+| b. Per-release link, maintenance comment, tooling and tests | Same two blockers |
+| d. Archives only on saropa.com (optional) | Owner decision; archive pages must be live |
+| Acceptance: homepage visible on pub.dev and Marketplace | The next publish |
+
+The other three URLs listed under "Blocked on" were not re-checked.
+
+Open items moved to `bugs/infra_changelog_saropa_com_links_waiting_on_pages.md`.

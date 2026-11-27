@@ -169,6 +169,20 @@ class BaselineFile {
     return false;
   }
 
+  /// Every entry that [isBaselined] would match for [filePath], as rule ->
+  /// sorted line numbers.
+  Map<String, List<int>> entriesFor(String filePath) {
+    final normalized = _normalizePath(filePath);
+    final result = <String, Set<int>>{};
+    for (final entry in violations.entries) {
+      if (!_pathsMatch(entry.key, normalized)) continue;
+      for (final rule in entry.value.entries) {
+        result.putIfAbsent(rule.key, () => <int>{}).addAll(rule.value);
+      }
+    }
+    return {for (final e in result.entries) e.key: e.value.toList()..sort()};
+  }
+
   /// Normalizes a file path for consistent lookup.
   String _normalizePath(String path) {
     // Convert backslashes to forward slashes

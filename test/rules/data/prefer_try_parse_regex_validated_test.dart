@@ -4,6 +4,10 @@ library;
 
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:saropa_lints/src/local_binding_utils.dart';
 import 'package:saropa_lints/src/rules/data/json_datetime_rules.dart';
 import 'package:test/test.dart';
 
@@ -11,6 +15,14 @@ import '../../support/resolved_rule_harness.dart';
 import '../../support/syntactic_rule_harness.dart';
 
 const String _id = 'prefer_try_parse_for_dynamic_data';
+
+/// Records the first `catch` clause of a parsed unit.
+class _CatchFinder extends RecursiveAstVisitor<void> {
+  CatchClause? clause;
+
+  @override
+  void visitCatchClause(CatchClause node) => clause ??= node;
+}
 
 /// A guarded parse of [call] against `RegExp([regExp])`, declared outside the
 /// loop that holds the guard.
@@ -32,6 +44,16 @@ void f(String s) {
   final m = re.firstMatch(s);
   if (m == null) return;
   int.parse(m[1]!);
+}''';
+
+/// [body] runs after an outer `m` that is a digits-only match of `s`.
+String _hidden(String body) =>
+    '''
+void f(String s, Object other) {
+  final re = RegExp(r'^(\\d{1,4})\$');
+  final m = re.firstMatch(s);
+  if (m == null) return;
+  $body
 }''';
 
 final Map<String, String> _safe = <String, String>{
@@ -65,6 +87,20 @@ void f(List<String> tokens, RegExp other) {
     int.parse(token.substring(0, 1));
   }
 }''',
+  // In each case below the inner `m` is not the outer `firstMatch` result,
+  // so its text is unknown.
+  'pattern declaration hiding a match': _hidden(
+    '{ final (m, _) = (other, 0); int.parse((m as dynamic)[1]); }',
+  ),
+  'if-case variable hiding a match': _hidden(
+    'if (other case final List<String> m) { int.parse(m[1]); }',
+  ),
+  'switch pattern hiding a match': _hidden(
+    'switch (other) { case final List<String> m: int.parse(m[1]); }',
+  ),
+  'local function hiding a match': _hidden(
+    '{ String m(int i) => s; int.parse(m(1)[1]); }',
+  ),
   'parameter hiding an outer RegExp': r'''
 void f() {
   final re = RegExp(r'^\d+$');
@@ -90,6 +126,22 @@ void main() {
       expect(reportedRuleCodesSyntactic(rule(), c.value), contains(_id));
     });
   }
+
+  // A `catch` clause is always inside a `try` statement, and the rule skips
+  // every parse inside one, so catch shadowing cannot surface as a report.
+  // It is pinned on the shared binding helper, with the skip recorded here.
+  test('a catch parameter hides an outer match', () {
+    final String code = _hidden(
+      'try {} catch (m, st) { int.parse((m as dynamic)[1]); }',
+    );
+    final _CatchFinder finder = _CatchFinder();
+    parseString(content: code).unit.accept(finder);
+    final CatchClause clause = finder.clause!;
+    expect(bindsNameAt(clause, 'm'), isTrue);
+    expect(bindsNameAt(clause, 'st'), isTrue);
+    expect(bindsNameAt(clause, 's'), isFalse);
+    expect(reportedRuleCodesSyntactic(rule(), code), isNot(contains(_id)));
+  });
 
   // The scan integration test skips when no output is produced, so the example
   // fixture is pinned here: reported lines must equal the marked lines.

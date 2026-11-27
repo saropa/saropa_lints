@@ -146,4 +146,4 @@ Extending the baseline file with a version 2 entry shape is an option. A separat
 - Extension: `npm run compile`, `tsc --noEmit -p .`, `tsc -p tsconfig.test.json`: passed. Mocha `acceptedFindings` and `commandCatalogRegistry`: 27 passed.
 - Unverified: extension UI, daemon and LSP filtering, end-to-end `scan --check-accepted` on a sample project, translations.
 
-Open items: `bugs/accepted_findings_list_open_items.md`.
+Open items: `bugs/accepted_findings_f5_translations_and_baseline_date.md`.

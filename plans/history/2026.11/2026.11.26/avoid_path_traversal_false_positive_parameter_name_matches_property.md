@@ -76,3 +76,11 @@ Report confirmed. The parameter test is now an AST reference check shared with `
 Second defect fixed in the same block: only the first matching parameter was checked against the literal-only-call-sites escape, so a literal-only parameter hid a user-supplied one later in the same path. All referenced parameters must now qualify.
 
 Tests: `test/rules/security/avoid_path_traversal_parameter_reference_test.dart`.
+
+## Finish Report (2026-11-26)
+
+Status: Fixed.
+
+The parameter check in `avoid_path_traversal` is an AST reference check shared with `require_file_path_sanitization` (`lib/src/parameter_reference_utils.dart`), and every referenced parameter must qualify for the literal-only escape.
+
+Verification: `test/rules/security/avoid_path_traversal_parameter_reference_test.dart` passed. Behavior in a running editor is unverified.

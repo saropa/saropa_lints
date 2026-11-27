@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../local_binding_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/json_datetime/add_null_aware_access_fix.dart';
 import '../../fixes/json_datetime/replace_dateonly_fix.dart';
@@ -590,14 +591,20 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
   }
 
   /// Initializer of the local variable [name] in scope at [use], searching the
-  /// enclosing block first and then outward. Returns null when a parameter or
-  /// loop variable hides the name, or when an outer-block variable is
-  /// reassignable (its initializer proves nothing about its value later).
+  /// enclosing block first and then outward. Returns null when any other
+  /// binding hides the name (parameter, loop variable, catch parameter,
+  /// pattern variable, local function; see [bindsNameAt]), or when an
+  /// outer-block variable is reassignable (its initializer proves nothing
+  /// about its value later).
   Expression? _visibleInitializer(AstNode use, String name) {
     AstNode child = use;
     bool isOuterBlock = false;
     for (AstNode? node = use.parent; node != null; node = node.parent) {
-      if (_bindsName(node, name)) return null;
+      // Shared binding list: the local `_bindsName` it replaces knew only
+      // parameters and declared loop variables, so a catch parameter or an
+      // if-case / switch pattern named like an outer `firstMatch` result
+      // was read as that result and a parse of it went unreported.
+      if (bindsNameAt(node, name)) return null;
       final NodeList<Statement>? statements = node is Block
           ? node.statements
           : node is SwitchMember
@@ -606,6 +613,9 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
       if (statements != null && child is Statement) {
         for (int i = statements.indexOf(child) - 1; i >= 0; i--) {
           final Statement candidate = statements[i];
+          // `final (m, _) = ...;` or `void m() {}` hides an outer `m`, and
+          // has no initializer that proves anything: unknown value.
+          if (statementBindsName(candidate, name)) return null;
           if (candidate is! VariableDeclarationStatement) continue;
           final VariableDeclarationList list = candidate.variables;
           for (final VariableDeclaration declaration in list.variables) {
@@ -619,31 +629,6 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
       child = node;
     }
     return null;
-  }
-
-  /// Whether [node] introduces [name] as a parameter or loop variable.
-  bool _bindsName(AstNode node, String name) {
-    final FormalParameterList? parameters = node is FunctionExpression
-        ? node.parameters
-        : node is MethodDeclaration
-        ? node.parameters
-        : node is ConstructorDeclaration
-        ? node.parameters
-        : null;
-    if (parameters != null) {
-      return parameters.parameters.any(
-        (FormalParameter p) => p.name?.lexeme == name,
-      );
-    }
-    if (node is! ForStatement) return false;
-    final ForLoopParts parts = node.forLoopParts;
-    if (parts is ForEachPartsWithDeclaration) {
-      return parts.loopVariable.name.lexeme == name;
-    }
-    return parts is ForPartsWithDeclarations &&
-        parts.variables.variables.any(
-          (VariableDeclaration v) => v.name.lexeme == name,
-        );
   }
 
   String? _extractPatternFromRegExpArgs(NodeList<Argument> args) {

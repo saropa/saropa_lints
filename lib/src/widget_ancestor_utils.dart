@@ -12,6 +12,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import 'analyzer_compat.dart';
+import 'local_binding_utils.dart';
 
 /// Returns the widget/constructor name for [node] in either AST shape, or
 /// null when [node] is neither a constructor call nor a method-style call.
@@ -135,7 +136,11 @@ const Set<String> _overlayOpeners = <String>{
 /// and no scroll position worth tracking.
 bool isInsideTransientOverlay(AstNode node) {
   AstNode? current = node.parent;
+  AstNode child = node;
   while (current != null) {
+    // A route pushed from inside a dialog is a full screen, not overlay
+    // content, so the walk must not reach the dialog around it.
+    if (_leavesOverlayContext(current, child)) return false;
     final String? name = widgetCallName(current);
     if (name != null && _overlayWidgets.contains(name)) return true;
     if (current is MethodInvocation &&
@@ -143,6 +148,7 @@ bool isInsideTransientOverlay(AstNode node) {
       return true;
     }
     if (current is MethodDeclaration || current is FunctionDeclaration) break;
+    child = current;
     current = current.parent;
   }
   return false;
@@ -151,9 +157,102 @@ bool isInsideTransientOverlay(AstNode node) {
 /// Project wrappers around the framework openers (`showDialogCommon`,
 /// `showAppBottomSheet`, `_showPickerMenu`). Apps rarely call `showDialog`
 /// directly, so an exact-name list alone misses most real dialogs.
+///
+/// Anchored on the overlay word as the suffix (plus a few wrapper suffixes
+/// such as `Common`): an open tail matched `showMenuPage` or
+/// `showDialogScreen`, which push full screens.
+///
+/// A sheet must be a qualified kind (`BottomSheet`, `ActionSheet`, ...): a
+/// bare `Sheet` suffix also matched `showBalanceSheet` and `showSpreadSheet`,
+/// which name documents shown on ordinary screens.
 final RegExp _overlayWrapperName = RegExp(
-  r'^_?show[A-Za-z0-9]*(?:Dialog|BottomSheet|Popup|Menu)[A-Za-z0-9]*$',
+  r'^_?show[A-Za-z0-9]*'
+  r'(?:Dialog|(?:Bottom|Action|Modal|Picker|Options)Sheet|Popup|Menu)'
+  r'(?:Common|Wrapper|Helper|Internal|Impl|Async)?$',
 );
+
+/// Navigation calls that put a new route on screen. Anything they build is a
+/// page, even when the call itself sits inside a dialog's button. These names
+/// are distinctive enough to count on any receiver.
+const Set<String> _navigationCalls = <String>{
+  'pushReplacement',
+  'pushAndRemoveUntil',
+  'pushAndRemoveAll',
+  'pushNamed',
+  'pushReplacementNamed',
+  'restorablePush',
+  'goNamed',
+  'offAll',
+};
+
+/// Navigation names that are also everyday method names (`stack.push`,
+/// `tween.to`), so the receiver has to look like a navigator.
+const Set<String> _ambiguousNavigationCalls = <String>{
+  'push',
+  'go',
+  'to',
+  'off',
+};
+
+/// Receivers that navigate: `context`/`ctx`, GetX `Get`, or anything naming
+/// a navigator or router (`Navigator.of(context)`, `navigatorKey`).
+final RegExp _navigatorReceiver = RegExp(
+  r'(?:^|\.)(?:context|ctx|Get)[!?]?$|[Nn]avigator|[Rr]outer',
+);
+
+/// True when [call] puts a new route on screen. A bare `push(...)` counts
+/// (project navigation helpers); a bare `go`/`to`/`off` does not.
+bool _isNavigationCall(MethodInvocation call) {
+  final String method = call.methodName.name;
+  if (_navigationCalls.contains(method)) return true;
+  if (!_ambiguousNavigationCalls.contains(method)) return false;
+  final Expression? target = call.realTarget;
+  if (target == null) return method == 'push';
+  return _navigatorReceiver.hasMatch(target.toSource());
+}
+
+/// Route classes whose builder returns a full screen.
+const Set<String> _pageRouteNames = <String>{
+  'MaterialPageRoute',
+  'CupertinoPageRoute',
+  'PageRouteBuilder',
+  'MaterialWithModalsPageRoute',
+  'GoRoute',
+};
+
+/// Event-handler argument names (`onPressed`, `onTap`, `onSelected`).
+///
+/// Matched by the event verb at the end, not just the `on` prefix: `on...`
+/// callbacks that return widgets (`onSuccess:`, `onGenerateRow:`,
+/// `onLoadingBuilder:`) render inside the overlay like any builder.
+///
+/// Verbs use US spelling, as Flutter does (`onCanceled`).
+final RegExp _eventHandlerArg = RegExp(
+  r'^on[A-Za-z0-9]*(?:Press|Pressed|Tap|TapUp|TapDown|Tapped|Click|Clicked|'
+  r'Change|Changed|Select|Selected|Submit|Submitted|Confirm|Confirmed|'
+  r'Cancel|Canceled|Accept|Accepted|Done|Dismissed)$',
+);
+
+/// True when the walk from [child] up to [current] crosses into code that
+/// does not render inside the enclosing overlay: a navigation call, a page
+/// route's builder, or an event-handler closure (`onPressed: () => ...`).
+///
+/// Why: both overlay walks used to accept any ancestor, so a widget pushed
+/// as a full screen by a button inside a dialog counted as dialog content
+/// and lost its refresh lint. A handler closure runs later, on tap; whatever
+/// it builds is not part of the overlay's subtree. An opener called from a
+/// handler is still found first, because the walk reaches it before the
+/// handler closure.
+bool _leavesOverlayContext(AstNode current, AstNode child) {
+  if (current is MethodInvocation && _isNavigationCall(current)) {
+    return true;
+  }
+  final String? name = widgetCallName(current);
+  if (name != null && _pageRouteNames.contains(name)) return true;
+  return child is FunctionExpression &&
+      current is NamedArgument &&
+      _eventHandlerArg.hasMatch(current.name.lexeme);
+}
 
 /// True when [node] sits in a private widget (or its `State`) that this file
 /// only ever constructs inside a dialog, popup, menu or bottom sheet.
@@ -200,7 +299,11 @@ String _hostWidgetName(ClassDeclaration owner) {
 /// overlay widget or an overlay-opening call within the same member.
 bool _isOverlayContent(AstNode site) {
   AstNode? current = site.parent;
+  AstNode child = site;
   while (current != null) {
+    // Same boundary as isInsideTransientOverlay: a construction inside a
+    // navigation call, page route or tap handler is not overlay content.
+    if (_leavesOverlayContext(current, child)) return false;
     final String? name = widgetCallName(current);
     if (name != null && _overlayWidgets.contains(name)) return true;
     if (current is MethodInvocation) {
@@ -211,6 +314,7 @@ bool _isOverlayContent(AstNode site) {
       }
     }
     if (current is MethodDeclaration || current is FunctionDeclaration) break;
+    child = current;
     current = current.parent;
   }
   return false;
@@ -293,43 +397,80 @@ bool isConstBackedList(ArgumentList args) {
 /// True when [name], looked up lexically from [from], is a constant variable.
 /// The nearest declaration wins, so a parameter or local that shadows a
 /// top-level constant is not mistaken for it.
+///
+/// Every binding other than a plain variable or field declaration (loop and
+/// catch variables, pattern bindings, local functions) returns false: none of
+/// them is a const list, and walking past them used to reach a same-named
+/// top-level const and skip the lint on runtime data.
 bool _isConstVariable(AstNode from, String name) {
   AstNode? current = from.parent;
   while (current != null) {
-    final FormalParameterList? parameters = switch (current) {
-      FunctionExpression() => current.parameters,
-      MethodDeclaration() => current.parameters,
-      ConstructorDeclaration() => current.parameters,
-      _ => null,
-    };
-    if (parameters != null &&
-        parameters.parameters.any((p) => p.name?.lexeme == name)) {
+    if (bindsNameAt(current, name)) return false;
+
+    // Pattern declarations and local functions in an enclosing block.
+    if (_localStatements(current).any((s) => statementBindsName(s, name))) {
       return false;
     }
 
-    final List<VariableDeclarationList> lists = switch (current) {
-      Block() => [
-        for (final Statement s in current.statements)
-          if (s is VariableDeclarationStatement) s.variables,
-      ],
-      ClassDeclaration() => [
-        for (final ClassMember m in current.bodyMembers)
-          if (m is FieldDeclaration) m.fields,
-      ],
-      CompilationUnit() => [
-        for (final CompilationUnitMember m in current.declarations)
-          if (m is TopLevelVariableDeclaration) m.variables,
-      ],
-      _ => const <VariableDeclarationList>[],
-    };
-    final bool? isConst = _constnessIn(lists, name);
+    final bool? isConst = _constnessIn(_declaredVariables(current), name);
     if (isConst != null) return isConst;
 
+    // A getter or method of this type hides outer names too, and its value
+    // is computed at runtime.
+    if (_membersOf(
+      current,
+    ).any((m) => m is MethodDeclaration && m.name.lexeme == name)) {
+      return false;
+    }
+
+    // Superclass and mixin members are deliberately not considered: they are
+    // not in lexical scope, so a bare name that also has a top-level
+    // declaration resolves to the top-level one, inherited member or not.
     current = current.parent;
   }
-  // Declared elsewhere (import, superclass): unknown, so keep the lint.
+  // Declared elsewhere (import): unknown, so keep the lint.
   return false;
 }
+
+/// Variable declarations [scope] introduces for code nested inside it: block
+/// or switch-case locals, the fields of any type-like declaration, or
+/// top-level variables.
+List<VariableDeclarationList> _declaredVariables(AstNode scope) {
+  if (scope is CompilationUnit) {
+    return [
+      for (final CompilationUnitMember m in scope.declarations)
+        if (m is TopLevelVariableDeclaration) m.variables,
+    ];
+  }
+  return [
+    for (final ClassMember m in _membersOf(scope))
+      if (m is FieldDeclaration) m.fields,
+    for (final Statement s in _localStatements(scope))
+      if (s is VariableDeclarationStatement) s.variables,
+  ];
+}
+
+/// Members of a type-like declaration, else empty.
+///
+/// Mixins, enums, extensions and extension types are included because their
+/// members shadow top-level names exactly like class members do; skipping
+/// them let a same-named top-level const decide the answer.
+List<ClassMember> _membersOf(AstNode scope) => switch (scope) {
+  ClassDeclaration() => scope.bodyMembers,
+  MixinDeclaration() => scope.bodyMembers,
+  EnumDeclaration() => scope.bodyMembers,
+  ExtensionDeclaration() => scope.bodyMembers,
+  ExtensionTypeDeclaration() => scope.bodyMembers,
+  _ => const <ClassMember>[],
+};
+
+/// Statements that declare locals directly in [scope]. A switch `case` has
+/// no `Block` of its own, so its statements are listed separately.
+List<Statement> _localStatements(AstNode scope) => switch (scope) {
+  Block() => scope.statements,
+  SwitchMember() => scope.statements,
+  _ => const <Statement>[],
+};
 
 /// True when [access] (`Class.field`) names a constant static field of a
 /// class declared in the same file as [from].

@@ -906,6 +906,11 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
 /// `prefer_if_null_operators` suggests exactly that form for copyWith, so
 /// disable `prefer_if_null_operators` for copyWith methods, or use a
 /// sentinel/closure parameter to allow clearing.
+///
+/// Scope: the rule judges the declaration only. A class that clears some
+/// fields with an empty string or list, or whose current callers never pass
+/// null, is still reported: call sites and save-layer conventions are not
+/// visible here, and fields such as `DateTime?` have no empty value at all.
 class RequireCopyWithNullHandlingRule extends SaropaLintRule {
   RequireCopyWithNullHandlingRule() : super(code: _code);
 

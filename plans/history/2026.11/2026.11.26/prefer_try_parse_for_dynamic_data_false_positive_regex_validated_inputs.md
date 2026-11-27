@@ -77,3 +77,13 @@ Fix: lookup walks outward through enclosing blocks (outer variables must be `fin
 Tests: `test/rules/data/prefer_try_parse_regex_validated_test.dart` runs both scans, including the example fixture's exact reported lines.
 
 Not covered: reassignment of the validated string between the guard and the parse is not detected.
+
+## Finish Report (2026-11-26)
+
+Status: Fixed.
+
+A follow-up review found that a catch parameter, pattern variable or local function reusing the name of a checked `firstMatch` result was read as that result. The lookup now uses the shared binding list in `lib/src/local_binding_utils.dart`.
+
+Verification: `prefer_try_parse_regex_validated_test.dart`, `json_datetime_rules_test.dart`, `prefer_try_parse_const_uri_test.dart` and `fixture_lint_integration_test.dart` passed. The new hiding cases cover pattern declarations, if-case and switch patterns and local functions; no dedicated catch-parameter case exists for this rule.
+
+Not covered: reassignment of the validated string between the guard and the parse.

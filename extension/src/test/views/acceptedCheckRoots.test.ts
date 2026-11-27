@@ -87,6 +87,25 @@ describe('planCheckRuns', () => {
     assert.deepStrictEqual(runs, [{ host: a, target: a }]);
   });
 
+  it('keeps an inner package with the dependency when the outer folder will not run', () => {
+    // Outer folder has a pubspec without saropa_lints and no plugin config;
+    // dropping nested roots before this check used to lose `inner` entirely.
+    const a = ws('a');
+    const inner = ws('a', 'pkg');
+    const runs = planCheckRuns([a, inner], probes({ [a]: a, [inner]: inner }, [inner]));
+    assert.deepStrictEqual(runs, [{ host: inner, target: inner }]);
+  });
+
+  it('drops an inner package when the plugin-only outer folder runs, hosted by the inner one', () => {
+    // The outer folder uses the plugin, so its run already covers `inner`;
+    // the inner package is the only possible host.
+    const a = ws('a');
+    const inner = ws('a', 'pkg');
+    const files = { [path.join(a, 'saropa_accepted.yaml')]: '' };
+    const runs = planCheckRuns([a, inner], probes({ [a]: a, [inner]: inner }, [inner], files));
+    assert.deepStrictEqual(runs, [{ host: inner, target: a }]);
+  });
+
   it('returns nothing when no folder can host the CLI or none has a pubspec', () => {
     const a = ws('a');
     const files = { [path.join(a, 'saropa_accepted.yaml')]: '' };

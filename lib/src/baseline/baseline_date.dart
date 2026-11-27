@@ -261,6 +261,19 @@ class BaselineDate {
     }
   }
 
+  /// Lines of [filePath] last changed before [baselineDate], from one blame
+  /// run. Null when blame gives nothing (untracked file, no repository), so a
+  /// caller can tell "no old lines" from "could not tell".
+  Future<List<int>?> oldLines(String filePath, {String? projectRoot}) async {
+    await preloadFile(filePath, projectRoot: projectRoot);
+    final dates = _cache[filePath]?.lineDates;
+    if (dates == null || dates.isEmpty) return null;
+    return [
+      for (final e in dates.entries)
+        if (e.value.isBefore(baselineDate)) e.key,
+    ]..sort();
+  }
+
   /// Parse full git blame output to extract all line dates.
   Map<int, DateTime> _parseFullBlame(String output) {
     final lineDates = <int, DateTime>{};

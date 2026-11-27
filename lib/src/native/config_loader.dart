@@ -26,7 +26,7 @@ import '../config/always_specify_parameter_names_config.dart';
 import '../config/avoid_ignoring_return_values_config.dart';
 import '../config/max_declarations_config.dart';
 import '../baseline/baseline_activation.dart'
-    show isBaselineSkippedByEnv, kSkipBaselineEnvVar;
+    show baselineConfigFromContent, isBaselineSkippedByEnv, kSkipBaselineEnvVar;
 import '../baseline/baseline_config.dart';
 import '../baseline/baseline_manager.dart';
 import '../accepted/accepted_findings_runtime.dart';
@@ -894,102 +894,46 @@ void _reloadRulePacksFromRoot(String projectRoot) {
 
 /// Parse `baseline:` section and initialize [BaselineManager].
 ///
-/// ```yaml
-/// baseline:
-///   file: "saropa_baseline.json"
-///   date: "2025-01-15"
-///   paths:
-///     - "lib/legacy/"
-/// ```
+/// Reads the top-level `baseline:` key from
+/// `analysis_options_custom.yaml` ([content]); `baseline_activation.dart`
+/// writes it there. A relative `file:` resolves against [projectRoot],
+/// because the analysis server's working directory is usually not the
+/// consumer project. Null [projectRoot] keeps auto-detection from the
+/// current directory (the pre-reload path from `Plugin.start`).
 ///
-/// [projectRoot] is the root [content] was read from. The baseline file path
-/// resolves against it, not [Directory.current]: inside the analysis server
-/// the plugin's working directory is the server's, so a relative
-/// `file: "saropa_baseline.json"` used to resolve nowhere and the baseline
-/// loaded as null with no message. Null (plugin start before any file is
-/// known) lets the manager walk up from the working directory to the nearest
-/// `pubspec.yaml`.
+/// The in-server plugin additionally reads each analyzed file's own project
+/// section on demand: this loader runs for one root only.
 void _loadBaselineConfig(String? content, String? projectRoot) {
-  if (content == null) return;
-
-  // The `baseline` CLI sets this on the `dart analyze` run it spawns, so an
-  // active baseline does not hide the findings that run must record.
-  if (isBaselineSkippedByEnv(Platform.environment)) {
-    BaselineManager.reset();
-    PluginLogger.log('Baseline skipped ($kSkipBaselineEnvVar is set).');
-    return;
+  // A reload for a project without a baseline must not keep the previous one.
+  // Config only: blame answers already gathered survive the reload.
+  BaselineManager.resetConfig();
+  if (_nativePluginStarted) {
+    BaselineManager.enablePerRoot(
+      (root) => _baselineConfigFrom(
+        _readProjectFile('analysis_options_custom.yaml', root),
+      ),
+    );
   }
-
-  final sectionMatch = RegExp(
-    r'^baseline:\s*$',
-    multiLine: true,
-  ).firstMatch(content);
-  if (sectionMatch == null) return;
-
-  final map = _parseBaselineSection(content, sectionMatch.end);
-  final config = BaselineConfig.fromYaml(map);
-  if (config.isEnabled) {
+  final config = _baselineConfigFrom(content);
+  if (config != null) {
     BaselineManager.initialize(config, projectRoot: projectRoot);
-    // A configured file that did not load used to fail silently, which looks
-    // exactly like "baseline active, nothing matched". Say so in the log.
-    final file = config.file;
-    if (file != null && BaselineManager.baselineFile == null) {
-      PluginLogger.warning(
-        'Baseline file "$file" not found or unreadable under '
-        '${BaselineManager.projectRoot ?? Directory.current.path}; '
-        'no file-based baseline applied.',
-      );
-    }
   }
 }
 
-/// Parse the baseline section into a Map for [BaselineConfig.fromYaml].
-Map<String, Object> _parseBaselineSection(String content, int offset) {
-  final map = <String, Object>{};
-  final lines = content.afterIndex(offset).split('\n');
-  List<String>? currentList;
-  String? currentListKey;
-
-  for (final line in lines) {
-    if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
-    if (!line.startsWith('  ')) break;
-
-    // List item: "    - value"
-    final listMatch = RegExp(r'^\s+-\s+"?([^"]+)"?$').firstMatch(line);
-    final listItem = listMatch?.group(1);
-    if (listMatch != null && currentList != null && listItem != null) {
-      currentList.add(listItem);
-      continue;
-    }
-
-    // Key-value: "  key: value" or "  key:"
-    final kvMatch = RegExp(r'^\s+(\w+):\s*(.*)$').firstMatch(line);
-    final key = kvMatch?.group(1);
-    final value = (kvMatch?.group(2) ?? '').trim();
-    if (kvMatch == null || key == null || key.isEmpty) continue;
-
-    // Flush previous list
-    if (currentList != null && currentListKey != null) {
-      map[currentListKey] = currentList;
-      currentList = null;
-      currentListKey = null;
-    }
-
-    if (value.isEmpty) {
-      // Start of a list section
-      currentListKey = key;
-      currentList = <String>[];
-    } else {
-      map[key] = value.replaceAll('"', '');
-    }
+/// The baseline in force for custom options [content], or null for none.
+BaselineConfig? _baselineConfigFrom(String? content) {
+  // The `baseline` CLI sets this on the `dart analyze` run it spawns, so the
+  // baseline JSON does not hide the findings that run must record. Only the
+  // file part is dropped: `date:` and `paths:` still apply, otherwise
+  // regeneration would copy every finding they already cover into the JSON
+  // (and a later edit to `paths:` would no longer un-baseline them).
+  if (content != null && isBaselineSkippedByEnv(Platform.environment)) {
+    PluginLogger.log(
+      'Baseline file skipped ($kSkipBaselineEnvVar is set); '
+      'date and path baselines still apply.',
+    );
   }
-
-  // Flush final list
-  if (currentList != null && currentListKey != null) {
-    map[currentListKey] = currentList;
-  }
-
-  return map;
+  return baselineConfigFromContent(content, Platform.environment);
 }
 
 /// Load max_issues and output config (env vars take priority over yaml).

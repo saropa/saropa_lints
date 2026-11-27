@@ -1,22 +1,18 @@
 /// Configuration for the baseline feature.
 ///
-/// Loaded by `config_loader` from analysis_options_custom.yaml / analysis_options;
-/// [BaselineManager] uses it to decide which violations to suppress (file/path/date).
+/// Loaded by `config_loader` from the top-level `baseline:` key of
+/// `analysis_options_custom.yaml` (parsed by `baseline_section_parser.dart`);
+/// [BaselineManager] uses it to decide which violations to suppress
+/// (file/path/date).
 ///
-/// Parses baseline configuration from `analysis_options.yaml`:
 /// ```yaml
-/// plugins:
-///   saropa_lints:
-///     diagnostics:
-///       # ... rule overrides ...
-///
-///     baseline:
-///       file: "saropa_baseline.json"
-///       date: "2025-01-15"
-///       paths:
-///         - "lib/legacy/"
-///         - "lib/deprecated/"
-///       only_impacts: [low, medium]
+/// baseline:
+///   file: "saropa_baseline.json"
+///   date: "2025-01-15"
+///   paths:
+///     - "lib/legacy/"
+///     - "lib/deprecated/"
+///   only_impacts: [info]
 /// ```
 library;
 
@@ -66,13 +62,17 @@ class BaselineConfig {
       }
     }
 
-    // Parse only_impacts (defensive: only non-empty strings)
+    // Parse only_impacts (defensive: only non-empty strings). Legacy
+    // five-bucket names map onto the three severities rules now report, so
+    // `[low, medium]` keeps meaning what it meant; see [_legacyImpacts].
     final impactsRaw = map['only_impacts'];
     final onlyImpacts = <String>[];
     if (impactsRaw is List) {
       for (final i in impactsRaw) {
         if (i is String && i.trim().isNotEmpty) {
-          onlyImpacts.add(i.trim().toLowerCase());
+          final name = i.trim().toLowerCase();
+          final mapped = _legacyImpacts[name] ?? name;
+          if (!onlyImpacts.contains(mapped)) onlyImpacts.add(mapped);
         }
       }
     }
@@ -84,6 +84,23 @@ class BaselineConfig {
       onlyImpacts: onlyImpacts,
     );
   }
+
+  /// Pre-collapse impact names and the severity each became
+  /// (`critical -> error`, `high`/`medium -> warning`,
+  /// `low`/`opinionated -> info`).
+  ///
+  /// Why: rules report `LintImpact.name` (`error` / `warning` / `info`), so
+  /// an unmapped `only_impacts: [low, medium]` would match nothing and
+  /// silently baseline nothing. That was invisible while the line parser
+  /// read every inline list as a plain string (and so as "no filter"); once
+  /// inline lists parse, the documented legacy values must keep working.
+  static const Map<String, String> _legacyImpacts = <String, String>{
+    'critical': 'error',
+    'high': 'warning',
+    'medium': 'warning',
+    'low': 'info',
+    'opinionated': 'info',
+  };
 
   /// Path to the baseline JSON file.
   ///
@@ -102,9 +119,20 @@ class BaselineConfig {
 
   /// Only baseline violations of these impact levels.
   ///
-  /// Valid values: `critical`, `high`, `medium`, `low`, `opinionated`.
+  /// Valid values: `error`, `warning`, `info` (legacy `critical`, `high`,
+  /// `medium`, `low`, `opinionated` are mapped onto them when parsed).
   /// If empty, all impacts are baselined.
   final List<String> onlyImpacts;
+
+  /// This config with the file-based part removed; `date`, `paths` and
+  /// `only_impacts` are kept.
+  ///
+  /// Used while the `baseline` CLI regenerates the JSON: the JSON must not
+  /// hide the findings being recorded, but findings already covered by
+  /// `date:` / `paths:` must stay out of it, or editing those keys later
+  /// would no longer un-baseline them.
+  BaselineConfig withoutFile() =>
+      BaselineConfig(date: date, paths: paths, onlyImpacts: onlyImpacts);
 
   /// Whether any baseline configuration is present.
   bool get isEnabled => file != null || date != null || paths.isNotEmpty;
