@@ -1,6 +1,6 @@
 # BUG: infra — CHANGELOG has no backlink to saropa.com
 
-**Status: Closed** (completed work archived here; open steps continue in `bugs/infra_changelog_saropa_com_links_waiting_on_pages.md`)
+**Status: Closed** (completed work archived here; remaining steps are tracked in `d:\src\saropa.com\bugs\20261126_saropa_lints_changelog_pages_needed.md`)
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -124,4 +124,4 @@ The bug stays open. `https://saropa.com/developers/saropa-lints/changelog/` retu
 
 The other three URLs listed under "Blocked on" were not re-checked.
 
-Open items moved to `bugs/infra_changelog_saropa_com_links_waiting_on_pages.md`.
+Open items moved to `plans/history/2026.11/2026.11.26/infra_changelog_saropa_com_links_waiting_on_pages.md` (since archived); they are tracked in `d:\src\saropa.com\bugs\20261126_saropa_lints_changelog_pages_needed.md`.
