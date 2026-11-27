@@ -30,12 +30,11 @@ DO_NOT_TRANSLATE: list[str] = [
     "Vibrancy",
     # Dart analyzer comment directive — literal code syntax, never translated.
     "// ignore_for_file:",
-    # Version-source labels: "saropa_lints" and "pubspec"/"plugin route" are
-    # config-file / package identifiers, not prose. setdefault keeps any locale
-    # that already carries a curated translation.
+    # Version-source label: "saropa_lints" and "pubspec" are config-file / package
+    # identifiers, not prose. The "plugin route" and "pubspec + plugin" labels are
+    # NOT listed here: the owner ruled they get real translations, which live in
+    # manual_translations_gaps.py (_REPAIRS) for every locale.
     "saropa_lints: pubspec {version}",
-    "saropa_lints: pubspec + plugin {version}",
-    "saropa_lints: plugin route {version}",
     # Memory readout: RSS and heap are process-metric terms, universally English.
     "{rss} RSS · {heap} / {heapTotal} heap",
     # Product/protocol names and abbreviations written the same worldwide.
@@ -2167,7 +2166,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Constraint not verifiable": "Hindi ma-verify ang constraint",
         "Dependency not locked": "Hindi naka-lock ang dependency",
         "Explain Last Vibrancy Skip": "Ipaliwanag ang Huling Vibrancy Skip",
-        "FVM pin (.fvm/flutter_sdk)": "FVM pin (.fvm/flutter_sdk)",
+        # Was identical to English; "pin" stays a loanword, the folder path stays verbatim.
+        "FVM pin (.fvm/flutter_sdk)": "Pin ng FVM (.fvm/flutter_sdk)",
         "Lock SDK constraint": "SDK constraint sa lock file",
         "Locked version outside constraint": "Ang naka-lock na bersyon ay wala sa constraint",
         "Missing or unreadable lock file": "Nawawala o hindi mabasa ang lock file",
@@ -2177,7 +2177,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Package Vibrancy skipped a pub query so pubspec.lock is not rewritten. Click for details.": "Nilaktawan ng Package Vibrancy ang isang pub query para hindi muling masulat ang pubspec.lock. I-click para sa mga detalye.",
         "Path dependency changed": "Nagbago ang path dependency",
         "Project SDK: {value} (from {source})": "Project SDK: {value} (mula sa {source})",
-        "Project folder: {cwd}": "Project folder: {cwd}",
+        # Was identical to English; same "folder ng proyekto" word order as other fil labels.
+        "Project folder: {cwd}": "Folder ng proyekto: {cwd}",
         "Reason: {reason}": "Dahilan: {reason}",
         "Rule: {rule}": "Panuntunan: {rule}",
         "Run pub get anyway": "Patakbuhin pa rin ang pub get",

@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec（尚未锁定）",
-      "plugin": "saropa_lints: plugin route {version}",
-      "both": "saropa_lints：pubspec + plugin {version}",
+      "plugin": "saropa_lints: 插件路由 {version}",
+      "both": "saropa_lints: pubspec + 插件 {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (不同意)",
       "neither": "saropa_lints：未配置",
       "localSource": "saropa_lints: 本地源码",

@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (এখন পর্যন্ত লক করা হয়নি)",
-      "plugin": "saropa_lints: প্লাগিন রুট {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: প্লাগইন রুট {version}",
+      "both": "saropa_lints: pubspec + প্লাগইন {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (বিরোধ)",
       "neither": "saropa_lints: অ্যাক্টিভ করা হয়নি",
       "localSource": "saropa_lints: লোকাল সোর্স",

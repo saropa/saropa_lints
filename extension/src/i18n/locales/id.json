@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (belum terkunci)",
-      "plugin": "saropa_lints: plugin route {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: jalur plugin {version}",
+      "both": "saropa_lints: pubspec dan plugin {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (tidak setuju)",
       "neither": "saropa_lints: tidak dikonfigurasikan",
       "localSource": "saropa_lints: sumber lokal",

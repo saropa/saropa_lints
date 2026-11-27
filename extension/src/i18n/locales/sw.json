@@ -2311,7 +2311,7 @@
     }
   },
   "vibrancyOverride": {
-    "unverifiedLabel": "❓ Unverified",
+    "unverifiedLabel": "❓ Haijathibitishwa",
     "unverifiedTooltip": "Hakuna kujaribu — {reason}. Tafakari kwenye uwezo huu kwa makosa ya kujaribu.",
     "unverifiedStatus": "Hakuna yafanyikwa — {reason}",
     "incompleteData": "data inkompleta",
@@ -2860,7 +2860,7 @@
     "info": {
       "alreadyRunning": "Tafiti ya findings ya kati ya kufungua inaonekana kwa kipindi.",
       "noList": "Saropa_accepted.yaml inakwenda kwenye kila package ya workspace. Tafuta \"Kuamini katika faili hii\" kwenye saropa ya kuzalisha kujaribu kujaribu.",
-      "clean": "Accepted findings: {count} entries checked, none stale or invalid.",
+      "clean": "Matokeo yaliyokubaliwa: maingizo {count} yamekaguliwa, hakuna lililopitwa na wakati wala lisilo sahihi.",
       "issues": "Moto ya kifedha ya kifedha: {stale} ya kifedha ya kifedha na {invalid} ya kifedha ya kifedha, kati ya {count} ya kifedha ya kifedha. Tafakari panel ya Problemas.",
       "added": "Zilizozinga {rule} kwenye {file} kwa {list}. Findings zilizokazwa jeli kama file inyango kushangaza tena."
     },
@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (hakuna kipengele yetu)",
-      "plugin": "saropa_lints: plugin route {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: njia ya programu-jalizi {version}",
+      "both": "saropa_lints: pubspec + programu-jalizi {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (sasa)",
       "neither": "saropa_lints: hakuna kuchaguliwa",
       "localSource": "saropa_lints: chanzo cha ndani",

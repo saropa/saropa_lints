@@ -3051,7 +3051,7 @@
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: पबसेक (अभी लॉक नहीं किया गया)",
       "plugin": "saropa_lints: प्लगइन रूट {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "both": "saropa_lints: pubspec + प्लगइन {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (असहमत)",
       "neither": "saropa_lints: निर्धारित नहीं किया गया",
       "localSource": "saropa_lints: लोकल स्रोत",

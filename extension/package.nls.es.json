@@ -30,7 +30,7 @@
   "command.toggleSeverityInfo.title": "Saropa Lints: Alternar Información Diagnósticos",
   "command.toggleSeverityHint.title": "Saropa Lints: Alternar sugerencias de diagnóstico",
   "command.toggleSeverityInline.title": "Alternar",
-  "command.pickUiLanguage.title": "Saropa Lints: Lenguaje / lengua / lenguaje / 言語 / 语言",
+  "command.pickUiLanguage.title": "Saropa Lints: Idioma / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Gestionar Paquetes de Reglas",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Optimizador de análisis",
   "command.openPackageVibrancy.title": "Saropa Lints: Vibrabilidad de paquete abierto.",

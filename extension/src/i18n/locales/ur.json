@@ -183,7 +183,7 @@
       "noProject": "Saropa: کوئی Dart پروجیکٹ نہیں۔",
       "doneTooltip": "{total} تلاش(s)، {shown} فلٹر کے بعد دکھایا گیا ہے۔",
       "dropped": "Saropa: اسکن مکمل نہ ہو سکا ({count} فائلیں)",
-      "droppedTooltip": "Saropa Lints {count} فائلیں چھوڑ دی گئیں جو آپ کے بجائے دوسرے ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ایک ای\n\n(Note: The original text contains a placeholder token {count} which is kept as-is in the translation.)",
+      "droppedTooltip": "Saropa Lints نے {count} فائلیں چھوڑ دیں جو آپ کے بجائے کسی دوسرے ٹول نے کھولی تھیں۔ کسی فائل کو اسکین کرنے کے لیے اسے محفوظ کریں۔",
       "droppedSuffix": "(+{count} چھوڑ دیا گیا)",
       "droppedSuffixTooltip": "ایک ہی وقت میں دوسرے اوزار کے ذریعہ کھولے گئے {count} فائلز نظر انداز کر دیے گئے ہیں۔ فائل کو بچانے کے لیے اسے اسکن کریں۔"
     },
@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: پب سپسک (بند نہیں ہوچکا)",
-      "plugin": "saropa_lints: پلاگ ان روت {version}",
-      "both": "saropa_lints: پب سپسک + پلاگ ان {version}",
+      "plugin": "saropa_lints: پلگ اِن روٹ {version}",
+      "both": "saropa_lints: pubspec + پلگ اِن {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (تفاو٦)",
       "neither": "saropa_lints: نہ ترتیب دیا گیا",
       "localSource": "saropa_lints: لوكل سرچ",

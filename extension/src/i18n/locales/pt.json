@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (não bloqueado ainda)",
-      "plugin": "saropa_lints: plugin route {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: rota do plugin {version}",
+      "both": "saropa_lints: pubspec e plugin {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (discordante)",
       "neither": "saropa_lints: não configurado",
       "localSource": "saropa_lints: fonte local",

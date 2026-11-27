@@ -30,7 +30,7 @@
   "command.toggleSeverityInfo.title": "Saropa Lints: Chuyển đổi Thông tin Chẩn đoán",
   "command.toggleSeverityHint.title": "Saropa Lints: Chuyển đổi Gợi ý Chẩn đoán",
   "command.toggleSeverityInline.title": "Chuyển đổi",
-  "command.pickUiLanguage.title": "Saropa Lints: là người có thể Ngôn ngữ / Langue / Sprache / 言語 / 语言",
+  "command.pickUiLanguage.title": "Saropa Lints: Ngôn ngữ / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: là người có thể Quản lý Rule Packs",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Bộ Tối Ưu Hóa Phân Tích",
   "command.openPackageVibrancy.title": "Saropa Lints: là người có thể Open Package Vibrancy (Mở gói)",

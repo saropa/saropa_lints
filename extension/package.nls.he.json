@@ -49,7 +49,7 @@
   "command.crossFile.report.title": "Saropa Lints: Cross-File - צור דוח HTML",
   "command.findStaleIgnores.title": "Saropa Lints: איתור הערות התעלמות מיושנות",
   "command.fixStaleIgnores.title": "Saropa Lints: תיקון הערות זכירות להתעלמות",
-  "command.checkAcceptedFindings.title": "Saropa Lints: בדוק תוצאות מתקבלות",
+  "command.checkAcceptedFindings.title": "Saropa Lints: בדוק ממצאים מתקבלים",
   "command.openViolationsWideReport.title": "Saropa Lints: פתח דשבורד ממצאים פתוחים.",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: פתח דש-בורד תוצאות (לשמור על מסננים)",

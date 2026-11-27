@@ -104,6 +104,7 @@ Many lint rules report fewer false positives, covering paths, caches, async guar
 - "Check Accepted Findings" in the VS Code extension now also checks a workspace folder whose `pubspec.yaml` sits one folder down, and a folder that uses saropa_lints without listing it in `pubspec.yaml`. A package nested inside a folder that is not checked is no longer skipped. No action required.
 - "Migrate Renamed Rules" in the VS Code extension now also renames rules in `saropa_accepted.yaml`, so renamed rules keep their reviewed entries. Entries for removed rules are kept and reported by `--check-accepted` for you to delete.
 - The Hebrew VS Code extension no longer shows Arabic or Japanese characters and garbled words in six accepted-findings and stale-override messages, and the language picker title no longer carries extra trailing words. No action required.
+- Translated VS Code extension text no longer falls back to English in the status bar's install-route labels and a few other strings, keeps the command links and code samples that several walkthrough steps and settings had lost, and shows a clean language picker title in 17 languages. The Hebrew accepted-findings messages use consistent wording. No action required.
 
 ### Internal
 

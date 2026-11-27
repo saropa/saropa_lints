@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (ще не закріплено)",
-      "plugin": "saropa_lints: плагін маршрут {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: маршрут плагіна {version}",
+      "both": "saropa_lints: pubspec + плагін {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (відмовлятися)",
       "neither": "saropa_lints: не налаштовано",
       "localSource": "saropa_lints: локальний джерело",

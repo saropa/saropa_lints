@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (chưa khóa)",
-      "plugin": "saropa_lints: plugin route {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: lộ trình plugin {version}",
+      "both": "saropa_lints: pubspec và plugin {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (không đồng ý)",
       "neither": "saropa_lints: chưa được cấu hình",
       "localSource": "saropa_lints: nguồn cục bộ",

@@ -2816,7 +2816,7 @@
     "error": {
       "findFailed": "מצא שגיאות בדמויות שנשכחו: {message}",
       "fixFailed": "תקן איסורים ישנים נכשל: {message}",
-      "noWorkspace": "לא נמצאו תחומים עבודה Dart/Flutter. פתח פרויקט עם pubspec.yaml תחילה.",
+      "noWorkspace": "לא נמצאה סביבת עבודה של Dart/Flutter. פתח תחילה פרויקט עם pubspec.yaml.",
       "missingDep": "הוסף את saropa_lints ל-pubspec.yaml לפני סריקה של הערות ignore מיושנות."
     },
     "info": {
@@ -2844,48 +2844,48 @@
   },
   "acceptedFindings": {
     "progress": {
-      "checking": "בדיקה של תוצאות מתקבלות…"
+      "checking": "בודק ממצאים מתקבלים…"
     },
     "error": {
       "checkFailed": "בדיקת הממצאים המתקבלים נכשלה: {message}",
-      "badOutput": "התוצאה של הסריקה לא ניתנה לקרוא.",
-      "noWorkspace": "לא נמצאו תחומים עבודה Dart/Flutter. פתח פרויקט עם pubspec.yaml תחילה.",
-      "missingDep": "הוסף saropa_lints ל-pubspec.yaml לפני שימוש במצאים מתקבלים.",
-      "noFinding": "השתמש באור לילך על ממצא Saropa Lints בקובץ Dart כדי לאשר אותו.",
+      "badOutput": "לא ניתן היה לקרוא את פלט הסריקה.",
+      "noWorkspace": "לא נמצאה סביבת עבודה של Dart/Flutter. פתח תחילה פרויקט עם pubspec.yaml.",
+      "missingDep": "הוסף את saropa_lints ל-pubspec.yaml לפני השימוש בממצאים מתקבלים.",
+      "noFinding": "השתמש בסמל הנורה של ממצא Saropa Lints בקובץ Dart כדי לקבל אותו.",
       "outsideProject": "הקובץ הזה אינו נמצא בתוך חבילת Dart (אין מעליו pubspec.yaml), ולכן לא ניתן להוסיף אותו ל-saropa_accepted.yaml.",
-      "writeFailed": "לא ניתן לעדכן saropa_accepted.yaml: {message}",
-      "cannotAppend": "saropa_accepted.yaml יש מערך שגיאה שלא ניתן להרחיב אוטומטית. הוסף את הכניסה ידנית.",
-      "entryExists": "saropa_accepted.yaml כבר מכיל רשומה עבור {rule} ב {file}. אם הרשומה מכילה גבול עליון, עלה אותו ידנית."
+      "writeFailed": "לא ניתן לעדכן את saropa_accepted.yaml: {message}",
+      "cannotAppend": "המבנה של saropa_accepted.yaml אינו מאפשר הוספה אוטומטית. הוסף את הרשומה ידנית.",
+      "entryExists": "ב-saropa_accepted.yaml כבר קיימת רשומה עבור {rule} ב-{file}. אם לרשומה יש מספר מרבי (max), הגדל אותו ידנית."
     },
     "info": {
-      "alreadyRunning": "בדיקה של מציאויות מתקבלות כבר בפעולה",
-      "noList": "לא נמצא saropa_accepted.yaml באף חבילת הפרויקט. השתמש ב\"אשר בקובץ זה\" על ממצא כדי להתחיל אחד.",
-      "clean": "ממצאים מתקבלים: {count} רשומות נבדקו, אף אחת לא מתקלקלה או לא תקינה.",
-      "issues": "מציאות מתקבלות: {stale} קדומות ו {invalid} לא תקינות, מתוך {count} רשומות. ראה את painel הבעיות.",
-      "added": "הוספת {rule} ב {file} ל {list}. תוצאות כבר מוצגות ברורה כאשר הקובץ נאנהל שוב."
+      "alreadyRunning": "בדיקת ממצאים מתקבלים כבר פועלת.",
+      "noList": "לא נמצא saropa_accepted.yaml באף חבילה בסביבת העבודה. השתמש ב-\"קבל בקובץ זה\" על ממצא כדי ליצור קובץ כזה.",
+      "clean": "ממצאים מתקבלים: נבדקו {count} רשומות, אף אחת אינה מיושנת או לא תקינה.",
+      "issues": "ממצאים מתקבלים: {stale} מיושנות ו-{invalid} לא תקינות, מתוך {count} רשומות. ראה את חלונית הבעיות (Problems).",
+      "added": "{rule} ב-{file} נוסף ל-{list}. ממצאים שכבר מוצגים ייעלמו כשהקובץ ינותח שוב."
     },
     "action": {
-      "openList": "פתיחה רשימה",
+      "openList": "פתח רשימה",
       "restartAnalysis": "הפעל מחדש את שרת האנליזה"
     },
     "diagnostic": {
       "staleFileMissing": "רשומה מיושנת: {file} כבר לא קיים, ולכן הרשומה הזו עבור {rule} אינה מסתירה דבר.",
       "staleNoFinding": "רשומה מיושנת: {rule} לא מצא דבר ב-{file}. הסר את הרשומה אם הקוד תוקן.",
-      "invalid": "כניסה לא תקינה, מסתיר כלום: {message}"
+      "invalid": "רשומה לא תקינה, אינה מסתירה דבר: {message}"
     },
     "prompt": {
-      "kindTitle": "למה הfinding הזה נחשב תקין?",
+      "kindTitle": "מדוע הממצא הזה מתקבל?",
       "kindAccepted": "מאושר: הממצא אמיתי והקוד נשאר כפי שהוא",
-      "kindFalsePositive": "טעות חיובי: הכלל לא נכון כאן",
-      "reasonTitle": "סיבה לקבל {rule} ב-{file}",
-      "reasonPlaceholder": "נדרש. שמור ב-saropa_accepted.yaml למשתתפים.",
+      "kindFalsePositive": "חיובי שגוי: הכלל שגוי כאן",
+      "reasonTitle": "הסיבה לקבלת {rule} ב-{file}",
+      "reasonPlaceholder": "חובה. נשמר ב-saropa_accepted.yaml עבור הסוקרים.",
       "reasonRequired": "נדרשת סיבה."
     },
     "quickFix": {
-      "title": "השאלה {rule} בקובץ זה…"
+      "title": "קבל את {rule} בקובץ זה…"
     },
     "summary": {
-      "count": "{count} אושר"
+      "count": "{count} מתקבלים"
     }
   },
   "bugArchival": {
@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (לא נעול עדיין)",
-      "plugin": "saropa_lints:plugin route {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: מסלול התוסף {version}",
+      "both": "saropa_lints: pubspec + תוסף {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (לא מסכים)",
       "neither": "saropa_lints: לא מוגדר",
       "localSource": "saropa_lints: מקורות מקומיים",

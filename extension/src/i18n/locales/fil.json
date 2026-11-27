@@ -9,7 +9,7 @@
     "source": {
       "dartSdkPath": "setting na dart.sdkPath",
       "flutterSdkPath": "setting na dart.flutterSdkPath",
-      "fvm": "FVM pin (.fvm/flutter_sdk)",
+      "fvm": "Pin ng FVM (.fvm/flutter_sdk)",
       "path": "PATH"
     },
     "projectSource": {
@@ -30,7 +30,7 @@
       "sdk": "Napiling SDK: {path} (mula sa {source})",
       "toolVersion": "Napiling bersyon ng SDK: {version}",
       "project": "Project SDK: {value} (mula sa {source})",
-      "folder": "Project folder: {cwd}",
+      "folder": "Folder ng proyekto: {cwd}",
       "time": "Nilaktawan noong: {time}",
       "runPubGet": "Patakbuhin ang pub get gamit ang project SDK",
       "pubGetDone": "Natapos ang pub get gamit ang project SDK.",
@@ -1356,8 +1356,8 @@
       "body": "Ang rule na ito ay hindi pa umiikot sa iyong workspace, kaya walang partikular na problema o solusyon na makikita. Pumunta sa analisis upang makita ito sa konteksto, o tingnan ang rule pack nito sa ibaba para malaman ang mga bagay na ito nagsusukat.",
       "bodyDisabled": "Ang rule na ito ay kasalukuyang di nakakaapekto, kaya wala itong makikita sa mga resulta ng analysis. I-enable ito sa ibaba at i-run ang analysis upang makita ang mga bagay na ito nakakatagpo.",
       "tierLine": "Nakuha mula sa tier: {tier}",
-      "packsLine": "Rule pack: {packs}",
-      "packsOverflow": "Rule pack: {packs} (+{count} pa)"
+      "packsLine": "Pakete ng rule: {packs}",
+      "packsOverflow": "Pakete ng rule: {packs} (+{count} pa)"
     }
   },
   "triageDash": {
@@ -2311,10 +2311,10 @@
     }
   },
   "vibrancyOverride": {
-    "unverifiedLabel": "❓ Unverified",
+    "unverifiedLabel": "❓ Hindi pa na-verify",
     "unverifiedTooltip": "Hindi maitataya — {reason}. Panatilihing ito ang override hanggang magtagumpay ang scan.",
     "unverifiedStatus": "Hindi sinuri — {reason}",
-    "incompleteData": "incomplete data",
+    "incompleteData": "kulang na datos",
     "groupUnverifiedTooltip": "{count} override(s) ay hindi maaring masuri; ang pag-scan ay hindi kompletong ginawa."
   },
   "detailView": {
@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (hindi pa nakakalock)",
-      "plugin": "saropa_lints: plugin route {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: ruta ng plugin {version}",
+      "both": "saropa_lints: pubspec at plugin {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (di sumasalungat)",
       "neither": "saropa_lints: hindi nakakonekta",
       "localSource": "saropa_lints: lokal na source",

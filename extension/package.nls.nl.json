@@ -30,7 +30,7 @@
   "command.toggleSeverityInfo.title": "Saropa Lints: Info Diagnostiek in/uit",
   "command.toggleSeverityHint.title": "Saropa Lints: Schakel Hint Diagnostiek in/uit",
   "command.toggleSeverityInline.title": "Schakel om",
-  "command.pickUiLanguage.title": "Saropa Lints: Taal / taal / sprache / 言語 / 语言",
+  "command.pickUiLanguage.title": "Saropa Lints: Taal / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Beheer Regelpakketten",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Analyse Optimaliseer",
   "command.openPackageVibrancy.title": "Saropa Lints: Levendigheid in open verpakking",

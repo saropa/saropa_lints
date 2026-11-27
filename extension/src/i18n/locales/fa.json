@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (هنوز قفل نشده است)",
-      "plugin": "saropa_lints: پلاگین روت {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: مسیر پلاگین {version}",
+      "both": "saropa_lints: pubspec + پلاگین {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (متفق نیست)",
       "neither": "saropa_lints: نمی‌باشد",
       "localSource": "saropa_lints: منبع محلی",

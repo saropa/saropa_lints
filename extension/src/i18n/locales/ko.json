@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (아직 잠금되지 않음)",
-      "plugin": "saropa_lints: 플루그인 라우트 {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: 플러그인 라우트 {version}",
+      "both": "saropa_lints: pubspec + 플러그인 {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (의견 차이)",
       "neither": "saropa_lints: 설정되지 않음",
       "localSource": "saropa_lints: 로컬 소스",

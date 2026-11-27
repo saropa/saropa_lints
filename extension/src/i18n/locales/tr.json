@@ -2973,7 +2973,7 @@
       "suppressOldSdk": "Bastır (bilinçli eski SDK)"
     },
     "staleOverride": {
-      "suppress": "Suppress (override is intentional)"
+      "suppress": "Bastır (geçersiz kılma kasıtlı)"
     }
   },
   "blastRadius": {
@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (hâlâ kilidi açılmadı)",
-      "plugin": "saropa_lints: plugin route {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: eklenti yolu {version}",
+      "both": "saropa_lints: pubspec + eklenti {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (kısmaz)",
       "neither": "saropa_lints: yapılandırılmadı",
       "localSource": "saropa_lints: yerel kaynak",

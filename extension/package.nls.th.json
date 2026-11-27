@@ -30,7 +30,7 @@
   "command.toggleSeverityInfo.title": "Saropa Lints: ปิด-เปิด ข้อมูลการวินิจฉัย",
   "command.toggleSeverityHint.title": "Saropa Lints: ปิดเปิดการแจ้งเตือนข้อผิดพลาด",
   "command.toggleSeverityInline.title": "สลับ",
-  "command.pickUiLanguage.title": "Saropa Lints: ภาษา / Langue / Sprache / 言語 / 语言 เป็นภาษาที่ใช้ในการเขียน",
+  "command.pickUiLanguage.title": "Saropa Lints: ภาษา / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: เป็นการประกอบของ บริหารการใช้ Rule Packs",
   "command.openAnalysisOptimizer.title": "Saropa Lints: ตัวปรับแต่งการวิเคราะห์",
   "command.openPackageVibrancy.title": "Saropa Lints: เปิดแพ็คเก็ต Vibrancy ความกระชับ",

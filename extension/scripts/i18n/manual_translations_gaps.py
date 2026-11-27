@@ -75,13 +75,13 @@ GAPS: Dict[str, Dict[str, str]] = {
     "fil": {
         "Tier: {tier}": "Antas: {tier}", "Tier": "Antas", "Route": "Ruta",
         "Preview diff": "I-preview ang diff", "Restart {name}": "I-restart ang {name}",
-        "Rule pack: {packs}": "Rule pack: {packs}", "Saropa Lints: Off": "Saropa Lints: Naka-off",
+        "Rule pack: {packs}": "Pakete ng rule: {packs}", "Saropa Lints: Off": "Saropa Lints: Naka-off",
         "Saropa Lints: Status Menu": "Saropa Lints: Menu ng Status",
         _WRITES_PKG: "Magsusulat ito ng bagong Dart package sa ilalim ng workspace mo (pubspec.yaml, lib/main.dart, README): isang custom_lint plugin na nagrerehistro sa Saropa at nag-iiwan ng mga hook para sa sarili mong mga rule.\n\nGamitin lang ito kung nagpapadala ka ng mga custom analyzer rule kasama ng Saropa. Puwedeng laktawan ito ng mga karaniwang proyektong Saropa lang—isang plugin entry lang bawat context ang pinapayagan ng analyzer.\n\nSusunod: pumili ng folder na relatibo sa workspace. Kung umiiral na ang folder, tatanungin ka bago may ma-overwrite.",
         "Extension host": "Extension host", "Lint score": "Lint score",
         "Migrate renamed rules": "Ilipat ang mga pinalitang-pangalang rule",
         "Orphaned scan daemons": "Mga naulilang scan daemon", "Overwrite": "I-overwrite",
-        "Rule pack: {packs} (+{count} more)": "Rule pack: {packs} (+{count} pa)",
+        "Rule pack: {packs} (+{count} more)": "Pakete ng rule: {packs} (+{count} pa)",
         "Rule rename: {file}": "Pagpapalit ng pangalan ng rule: {file}",
         "Analyzer Exclusions": "Mga Hindi Isasama ng Analyzer", "Apply {gb}": "Ilapat ang {gb}",
         "List": "Ilista", "Master switch: enabling…": "Master switch: ino-on…", "Memory": "Memorya",
@@ -220,6 +220,175 @@ GAPS: Dict[str, Dict[str, str]] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Hand repairs (2026-11-26): values the MT gap-fill left identical to English,
+# with damaged tokens (dropped links/code spans, placeholder loops), or with MT
+# tails. Written by hand from the English source, no MT engine involved; not
+# reviewed by native speakers. Kept apart from GAPS so build() can let them win
+# over a GAPS entry for the same source.
+# ---------------------------------------------------------------------------
+_PLUGIN = "saropa_lints: plugin route {version}"
+_BOTH = "saropa_lints: pubspec + plugin {version}"
+_PICK = "Saropa Lints: Language / Langue / Sprache / 言語 / 语言"
+_PINNED = "When **on**, pubspec validation prefers exact version pins (`1.2.3`) and flags caret ranges (`^1.2.3`). When **off** (default), it prefers caret syntax and flags bare versions — matching `dart pub add` behavior. Only one mode is active at a time."
+_TIMEOUT = "How long (in seconds) one scan-on-save run may take before it is abandoned and its `dart` process killed. The default of **180** covers the slowest legitimate run measured for this feature: a full 200-file batch at ~3 files/s plus a cold `dart run` compile. Values below **30** or above **1800** are clamped — a shorter timeout kills healthy first runs, and a longer one reinstates the hang this limit exists to prevent."
+_HEALTH = "Your project's quality at a glance: a **0–100 score** in the status bar and Overview view.\n\nGreen (80+), yellow (50–79), red (<50). Errors penalize heavily.\n\n[Run analysis](command:saropaLints.runAnalysis) · [Set up project](command:saropaLints.enable)"
+_ISSUES = "Findings in the **Findings Dashboard** editor tab, grouped by severity and file. **Error Lens-style** annotations show warnings at the end of each line.\n\nFilter by text, severity, impact, or rule. Right-click to suppress noise.\n\n[Run Analysis](command:saropaLints.runAnalysis)"
+_TRENDS = "**File Risk** ranks files by violation density — riskiest first.\n\nThe Status panel shows score progression over time. Regression alerts and milestone celebrations keep you on track.\n\n[Show Status panel](command:saropaLints.status.focus)"
+_TODOS = "Find every `TODO`, `HACK`, and `FIXME` comment across the workspace. Group by tag type or folder, and click to jump to the source.\n\n[Refresh TODOs & Hacks](command:saropaLints.todosAndHacks.refresh)"
+_CATALOG = "115+ commands organized by category with search. Find analysis, security, package health, and reporting commands in one place.\n\n[Browse All Commands](command:saropaLints.showCommandCatalog)"
+_DROPPED = "Saropa Lints skipped {count} files that were opened by another tool rather than by you. Save a file to scan it."
+_CLEAN = "Accepted findings: {count} entries checked, none stale or invalid."
+
+
+def _pick(word: str) -> str:
+    """Language-picker title with only the "Language" slot localized.
+
+    The title is deliberately multilingual so any user can find the picker; MT
+    translated or transliterated the other languages' words and appended tails,
+    so every repaired locale is built from the same template instead.
+    """
+    return f"Saropa Lints: {word} / Langue / Sprache / 言語 / 语言"
+
+
+# Install-route status labels: the owner ruled they get real translations (not
+# an allowlist). "pubspec" and "saropa_lints" stay verbatim as file/package
+# names; "plugin" uses the word each locale already uses for the analyzer plugin.
+_ROUTE_LABELS: Dict[str, tuple] = {
+    "ar": ("مسار الإضافة", "pubspec + الإضافة"),
+    "bn": ("প্লাগইন রুট", "pubspec + প্লাগইন"),
+    "de": ("Plugin-Route", "pubspec + Plugin"),
+    "es": ("ruta del plugin", "pubspec y plugin"),
+    "fa": ("مسیر پلاگین", "pubspec + پلاگین"),
+    "fil": ("ruta ng plugin", "pubspec at plugin"),
+    "fr": ("route du plugin", "pubspec et plugin"),
+    "he": ("מסלול התוסף", "pubspec + תוסף"),
+    "hi": ("प्लगइन रूट", "pubspec + प्लगइन"),
+    "id": ("jalur plugin", "pubspec dan plugin"),
+    "it": ("route del plugin", "pubspec e plugin"),
+    "ja": ("プラグインルート", "pubspec + プラグイン"),
+    "ko": ("플러그인 라우트", "pubspec + 플러그인"),
+    "nl": ("pluginroute", "pubspec en plugin"),
+    "pl": ("ścieżka wtyczki", "pubspec + wtyczka"),
+    "pt": ("rota do plugin", "pubspec e plugin"),
+    "ru": ("маршрут плагина", "pubspec + плагин"),
+    "sw": ("njia ya programu-jalizi", "pubspec + programu-jalizi"),
+    "th": ("เส้นทางปลั๊กอิน", "pubspec + ปลั๊กอิน"),
+    "tr": ("eklenti yolu", "pubspec + eklenti"),
+    "uk": ("маршрут плагіна", "pubspec + плагін"),
+    "ur": ("پلگ اِن روٹ", "pubspec + پلگ اِن"),
+    "vi": ("lộ trình plugin", "pubspec và plugin"),
+    "zh": ("插件路由", "pubspec + 插件"),
+}
+
+_REPAIRS: Dict[str, Dict[str, str]] = {
+    "ar": {_PICK: _pick("اللغة")},
+    "bn": {_PICK: _pick("ভাষা")},
+    "es": {_PICK: _pick("Idioma")},
+    "fa": {
+        # MT dropped every code span; **on**/**off** stay literal as in sibling fa settings.
+        _PINNED: "وقتی **on** باشد، اعتبارسنجی pubspec نسخه‌های دقیق ثابت (`1.2.3`) را ترجیح می‌دهد و بازه‌های caret (`^1.2.3`) را علامت‌گذاری می‌کند. وقتی **off** باشد (پیش‌فرض)، نحو caret را ترجیح می‌دهد و نسخه‌های بدون پیشوند را علامت‌گذاری می‌کند — مطابق رفتار `dart pub add`. در هر زمان فقط یک حالت فعال است.",
+    },
+    "fil": {
+        _PICK: _pick("Wika"),
+        "❓ Unverified": "❓ Hindi pa na-verify",
+        "incomplete data": "kulang na datos",
+        # MT lost the `dart` code span and said "fastest" where the source says "slowest".
+        _TIMEOUT: "Gaano katagal (sa segundo) maaaring tumakbo ang isang scan-on-save bago ito iwanan at patayin ang proseso nitong `dart`. Ang default na **180** ay sumasaklaw sa pinakamabagal na lehitimong takbo na nasukat para sa feature na ito: isang buong batch na 200 file sa ~3 file/s at isang cold `dart run` compile. Ang mga value na mas mababa sa **30** o mas mataas sa **1800** ay inilalapit sa hangganan — pinapatay ng mas maikling timeout ang malulusog na unang takbo, at ibinabalik naman ng mas mahaba ang pagkabitin na pinipigilan ng limitasyong ito.",
+    },
+    # fr, ja and zh: the source already names the language in that locale's own
+    # word (Langue, 言語, 语言), so the title stays exactly as in English (the key
+    # is allowlisted in english_allowed.json, like de).
+    "fr": {_PICK: _PICK},
+    "ja": {_PICK: _PICK},
+    "zh": {
+        _PICK: _PICK,
+        # MT merged the paragraphs and dropped the command link.
+        _ISSUES: "在 **发现仪表板** 编辑器标签页中查看发现的问题，按严重程度和文件分组。**Error Lens 风格** 的注释会在每行末尾显示警告。\n\n按文本、严重程度、影响或规则筛选。右键单击可屏蔽干扰项。\n\n[运行分析](command:saropaLints.runAnalysis)",
+        _CATALOG: "115+ 条命令按类别组织并支持搜索。在一处找到分析、安全、包健康和报告命令。\n\n[浏览所有命令](command:saropaLints.showCommandCatalog)",
+    },
+    "he": {
+        # Review of the older accepted-findings strings: MT used "מציאויות", "תוצאות",
+        # "painel" and "אור לילך" (lilac light) for the same concepts. Unified on the
+        # terms of the earlier repair: "ממצאים מתקבלים", "רשומה", "קבל".
+        "Checking accepted findings…": "בודק ממצאים מתקבלים…",
+        "The scan output could not be read.": "לא ניתן היה לקרוא את פלט הסריקה.",
+        "No Dart/Flutter workspace found. Open a project with pubspec.yaml first.": "לא נמצאה סביבת עבודה של Dart/Flutter. פתח תחילה פרויקט עם pubspec.yaml.",
+        "Add saropa_lints to pubspec.yaml before using accepted findings.": "הוסף את saropa_lints ל-pubspec.yaml לפני השימוש בממצאים מתקבלים.",
+        "Use the light bulb on a Saropa Lints finding in a Dart file to accept it.": "השתמש בסמל הנורה של ממצא Saropa Lints בקובץ Dart כדי לקבל אותו.",
+        "Could not update saropa_accepted.yaml: {message}": "לא ניתן לעדכן את saropa_accepted.yaml: {message}",
+        "saropa_accepted.yaml has a layout that cannot be extended automatically. Add the entry by hand.": "המבנה של saropa_accepted.yaml אינו מאפשר הוספה אוטומטית. הוסף את הרשומה ידנית.",
+        "saropa_accepted.yaml already has an entry for {rule} in {file}. If the entry has a max count, raise it by hand.": "ב-saropa_accepted.yaml כבר קיימת רשומה עבור {rule} ב-{file}. אם לרשומה יש מספר מרבי (max), הגדל אותו ידנית.",
+        "An accepted-findings check is already running.": "בדיקת ממצאים מתקבלים כבר פועלת.",
+        'No saropa_accepted.yaml found in any package of the workspace. Use "Accept in this file" on a finding to start one.': 'לא נמצא saropa_accepted.yaml באף חבילה בסביבת העבודה. השתמש ב-"קבל בקובץ זה" על ממצא כדי ליצור קובץ כזה.',
+        _CLEAN: "ממצאים מתקבלים: נבדקו {count} רשומות, אף אחת אינה מיושנת או לא תקינה.",
+        "Accepted findings: {stale} stale and {invalid} invalid, out of {count} entries. See the Problems panel.": "ממצאים מתקבלים: {stale} מיושנות ו-{invalid} לא תקינות, מתוך {count} רשומות. ראה את חלונית הבעיות (Problems).",
+        "Added {rule} in {file} to {list}. Findings already shown clear when the file is analyzed again.": "{rule} ב-{file} נוסף ל-{list}. ממצאים שכבר מוצגים ייעלמו כשהקובץ ינותח שוב.",
+        "Open List": "פתח רשימה",
+        "Invalid entry, hides nothing: {message}": "רשומה לא תקינה, אינה מסתירה דבר: {message}",
+        "Why is this finding accepted?": "מדוע הממצא הזה מתקבל?",
+        "False positive: the rule is wrong here": "חיובי שגוי: הכלל שגוי כאן",
+        "Reason for accepting {rule} in {file}": "הסיבה לקבלת {rule} ב-{file}",
+        "Required. Saved in saropa_accepted.yaml for reviewers.": "חובה. נשמר ב-saropa_accepted.yaml עבור הסוקרים.",
+        "Accept {rule} in this file…": "קבל את {rule} בקובץ זה…",
+        "{count} accepted": "{count} מתקבלים",
+        "Saropa Lints: Check Accepted Findings": "Saropa Lints: בדוק ממצאים מתקבלים",
+    },
+    "hi": {_PICK: _pick("भाषा")},
+    "id": {_PICK: _pick("Bahasa")},
+    "ko": {_PICK: _pick("언어")},
+    "nl": {_PICK: _pick("Taal")},
+    "ru": {
+        _PICK: _pick("Язык"),
+        # MT kept only the first paragraph and dropped both command links.
+        _HEALTH: "Качество вашего проекта с первого взгляда: **оценка 0–100** в строке состояния и в представлении «Обзор».\n\nЗелёный (80+), жёлтый (50–79), красный (<50). Ошибки сильно снижают оценку.\n\n[Запустить анализ](command:saropaLints.runAnalysis) · [Настроить проект](command:saropaLints.enable)",
+    },
+    "sw": {
+        _PICK: _pick("Lugha"),
+        "❓ Unverified": "❓ Haijathibitishwa",
+        _CLEAN: "Matokeo yaliyokubaliwa: maingizo {count} yamekaguliwa, hakuna lililopitwa na wakati wala lisilo sahihi.",
+        # Both walkthrough steps were truncated, gibberish MT with the command link dropped.
+        _TRENDS: "**File Risk** hupanga faili kwa msongamano wa ukiukaji — zenye hatari kubwa zaidi kwanza.\n\nPaneli ya Status inaonyesha maendeleo ya alama kwa muda. Arifa za kurudi nyuma na sherehe za hatua muhimu hukusaidia kubaki kwenye mstari.\n\n[Onyesha paneli ya Status](command:saropaLints.status.focus)",
+        _TODOS: "Tafuta kila maoni ya `TODO`, `HACK` na `FIXME` katika nafasi nzima ya kazi. Panga kwa aina ya lebo au folda, na ubofye ili kuruka hadi kwenye chanzo.\n\n[Onyesha upya TODOs & Hacks](command:saropaLints.todosAndHacks.refresh)",
+    },
+    "th": {
+        _PICK: _pick("ภาษา"),
+        "{count} override(s) could not be verified; the scan was incomplete.": "ไม่สามารถตรวจสอบการแทนที่ {count} รายการได้ เนื่องจากการสแกนไม่สมบูรณ์",
+    },
+    "tr": {
+        _PICK: _pick("Dil"),
+        "Suppress (override is intentional)": "Bastır (geçersiz kılma kasıtlı)",
+        # MT kept only the first sentence and dropped the command link.
+        _TRENDS: "**Dosya Riski** dosyaları ihlal yoğunluğuna göre sıralar — en riskli olanlar önce.\n\nDurum paneli puanın zaman içindeki gelişimini gösterir. Gerileme uyarıları ve dönüm noktası kutlamaları yolunuzdan sapmamanızı sağlar.\n\n[Durum panelini göster](command:saropaLints.status.focus)",
+    },
+    "ur": {
+        _PICK: _pick("زبان"),
+        # MT looped "ایک" hundreds of times and appended an English note.
+        _DROPPED: "Saropa Lints نے {count} فائلیں چھوڑ دیں جو آپ کے بجائے کسی دوسرے ٹول نے کھولی تھیں۔ کسی فائل کو اسکین کرنے کے لیے اسے محفوظ کریں۔",
+        # MT dropped every code span; **آن**/**آف** match sibling ur settings.
+        _PINNED: "جب **آن** ہو، تو pubspec کی توثیق عین ورژن پِنز (`1.2.3`) کو ترجیح دیتی ہے اور caret رینجز (`^1.2.3`) کی نشاندہی کرتی ہے۔ جب **آف** ہو (ڈیفالٹ)، تو یہ caret نحو کو ترجیح دیتی ہے اور بغیر سابقے والے ورژنز کی نشاندہی کرتی ہے — `dart pub add` کے رویے کے مطابق۔ ایک وقت میں صرف ایک موڈ فعال ہوتا ہے۔",
+    },
+    "vi": {_PICK: _pick("Ngôn ngữ")},
+}
+
+# Fold the route labels into _REPAIRS so each locale's repairs live in one dict.
+for _loc, (_plugin_tr, _both_tr) in _ROUTE_LABELS.items():
+    # French keeps its typographic space before the colon, matching the fr
+    # "saropa_lints : pubspec {version}" sibling label.
+    _sep = " : " if _loc == "fr" else ": "
+    _REPAIRS.setdefault(_loc, {}).update({
+        _PLUGIN: f"saropa_lints{_sep}{_plugin_tr} {{version}}",
+        _BOTH: f"saropa_lints{_sep}{_both_tr} {{version}}",
+    })
+
+
 def build() -> Dict[str, Dict[str, str]]:
-    """Return the gap translations (locale -> {source: translation})."""
-    return GAPS
+    """Return the gap translations (locale -> {source: translation}).
+
+    _REPAIRS overrides GAPS for the same source: a repair replaces a defective
+    value, so it must win rather than be dropped by setdefault downstream.
+    """
+    merged = {loc: dict(entries) for loc, entries in GAPS.items()}
+    for loc, entries in _REPAIRS.items():
+        merged.setdefault(loc, {}).update(entries)
+    return merged

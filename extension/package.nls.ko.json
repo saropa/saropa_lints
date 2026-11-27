@@ -30,7 +30,7 @@
   "command.toggleSeverityInfo.title": "Saropa Lints: 정보 진단 전환",
   "command.toggleSeverityHint.title": "Saropa Lints: 힌트 진단 전환",
   "command.toggleSeverityInline.title": "토글",
-  "command.pickUiLanguage.title": "Saropa Lints: 언어 / 랭귀지 / 스프라체 / 言語 / 语言",
+  "command.pickUiLanguage.title": "Saropa Lints: 언어 / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: 룰 팩 관리",
   "command.openAnalysisOptimizer.title": "Saropa Lints: 분석 최적화",
   "command.openPackageVibrancy.title": "Saropa Lints: 오픈 패키지 진동성",

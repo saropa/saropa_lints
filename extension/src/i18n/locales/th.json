@@ -2315,7 +2315,7 @@
     "unverifiedTooltip": "ไม่สามารถตรวจสอบได้ — {reason} การใช้การแทนที่นี้ให้อยู่จนกว่าการสแกนจะสำเร็จ",
     "unverifiedStatus": "ไม่ได้รับการยืนยัน — {reason}",
     "incompleteData": "ข้อมูลไม่ครบถ้วน",
-    "groupUnverifiedTooltip": "{count} override(s) could not be verified; the scan was incomplete."
+    "groupUnverifiedTooltip": "ไม่สามารถตรวจสอบการแทนที่ {count} รายการได้ เนื่องจากการสแกนไม่สมบูรณ์"
   },
   "detailView": {
     "empty": {
@@ -3050,8 +3050,8 @@
     "status": {
       "pubspec": "saropa_lints: pubspec {version}",
       "pubspecUnlocked": "saropa_lints: pubspec (ยังไม่ล็อก)",
-      "plugin": "saropa_lints: ปลั๊กอิน รูท {version}",
-      "both": "saropa_lints: pubspec + plugin {version}",
+      "plugin": "saropa_lints: เส้นทางปลั๊กอิน {version}",
+      "both": "saropa_lints: pubspec + ปลั๊กอิน {version}",
       "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (ไม่เห็นด้วย)",
       "neither": "saropa_lints: ไม่ได้กำหนด",
       "localSource": "saropa_lints: แหล่งข้อมูลท้องถิ่น",
