@@ -29,9 +29,9 @@ void main() {
       final root = p.join(dir.path, name);
       Directory(root).createSync();
       File(p.join(root, 'pubspec.yaml')).writeAsStringSync('name: $name\n');
-      File(p.join(root, 'analysis_options_custom.yaml')).writeAsStringSync(
-        'baseline:\n  paths: ["lib/$name.dart"]\n',
-      );
+      File(
+        p.join(root, 'analysis_options_custom.yaml'),
+      ).writeAsStringSync('baseline:\n  paths: ["lib/$name.dart"]\n');
       return root;
     }
 
@@ -65,9 +65,9 @@ void main() {
       Directory(root).createSync();
       File(p.join(root, 'pubspec.yaml')).writeAsStringSync('name: t\n');
     }
-    File(p.join(one, 'analysis_options_custom.yaml')).writeAsStringSync(
-      'baseline:\n  paths: ["lib/"]\n',
-    );
+    File(
+      p.join(one, 'analysis_options_custom.yaml'),
+    ).writeAsStringSync('baseline:\n  paths: ["lib/"]\n');
     loadNativePluginConfigFromProjectRoot(one);
 
     expect(
