@@ -159,7 +159,7 @@
       "exportJsonTitle": "Audit sonuçlarını JSON olarak dışa aktar",
       "exportJsonSaved": "JSON çıktısı denetlendi.",
       "exportJsonFailed": "Audit JSON'ı dışa aktarılamadı: {message}",
-      "clearRuleFilter": "Clear açık açık açık",
+      "clearRuleFilter": "Temizle",
       "paginationNote": "Filtrelenmiş sonuçlara sınırlama uygulanır.",
       "sevBarError": "{count} hataları ({pct}%)",
       "sevBarWarning": "{count} uyarıları ({pct}%)",
@@ -426,7 +426,7 @@
         "openTitle": "Düzenleyicide saropa_baseline.json'u açın.",
         "summary": "{files} dosyaları, {violations} ihlalleri temel alınarak {generated} oluşturuldu.",
         "unknownDate": "bilinmeyen bir zamanda",
-        "count": "Sayın sayın, sayın sayınız.",
+        "count": "Sayı",
         "diff": {
           "title": "Fark ve akım",
           "counts": "{resolved} başlangıçtan bu yana çözümlendi · {new} başlangıçtan bu yana yeni.",
@@ -633,11 +633,11 @@
       "searchLabel": "Arama PR'leri ve sorunları aramak.",
       "searchPlaceholder": "Arama PR'leri ve sorunları...",
       "filterAria": "Kategoriye göre filtreleyin.",
-      "filterAll": "Hepsi, hepsi, hepsi.",
+      "filterAll": "Tümü",
       "filterUnreviewed": "Değerlendirilmemişler",
       "filterPrs": "PR'ler",
       "filterIssues": "Konular, konular sorunları.",
-      "typePr": "PR PR PR olarak kullanılır.",
+      "typePr": "PR",
       "typeIssue": "Konuya ilişkin sorunlar.",
       "reviewReviewed": "Tekrar gözden geçirilmiş.",
       "reviewApplicable": "Uygulanabilirlik Uygun",
@@ -1073,7 +1073,7 @@
       "warningsSubBad": "başarısız olabilir veya kötü görünebilir.",
       "warningsSubClear": "hiçbiri - temiz",
       "warningsTitle": "Bulguları uyarılara filtrele (başarısız olabilir veya kötü görünebilir)",
-      "infoLabel": "Bilgi, bilgi, bilgi.",
+      "infoLabel": "Bilgi",
       "infoSub": "Bilginize - stil / öneriler",
       "infoSubNone": "hiçbiri",
       "infoTitle": "Bulguları bilgiye göre filtreleyin (Bilginize — stil ve öneriler)",
@@ -1097,7 +1097,7 @@
       "clearTextFilterAria": "Açık metin filtreleme filtresi.",
       "recentFiltersTitle": "Son filtreler son filtreler",
       "clearRecentTitle": "Son filtreleri temizleyin.",
-      "clearRecentButton": "Clear açık açık açık",
+      "clearRecentButton": "Temizle",
       "recentFiltersListAria": "Son filtreler son filtreler",
       "runAnalysisTitle": "Saropa Lints analizi çalıştırın.",
       "severityGroupAria": "Ciddilik filtrecisi.",
@@ -1187,7 +1187,7 @@
       "topRulesOther": "En üst {count} kuralları.",
       "colRank": "#",
       "colRule": "Kural Kanun kural",
-      "colCount": "Sayın sayın, sayın sayınız.",
+      "colCount": "Sayı",
       "colSeverity": "Ciddilik Ağırlık",
       "colActionsAria": "Sıra eylemleri Sıralı eylemler",
       "filesAffected": "Etkilenen dosyalar ({count})",
@@ -1473,7 +1473,7 @@
       "projectGrade": "Proje Paketi Derecesi Projenin paketi derecesidir.",
       "totalSize": "Toplam Boyut*",
       "gradeTooltip": "Proje sınıfı {avgGrade}\nOrtalama puan: {avgScore}/100\nPaketler: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "Canlı canlı, canlı canlı.",
+      "vibrantTitle": "Canlı",
       "stableTitle": "Stabil, istikrarlı.",
       "outdatedTitle": "Eskişmiş, modası geçmiş.",
       "abandonedTitle": "Terk Edilmiştir.",
@@ -1546,7 +1546,7 @@
       "clearSearchAria": "Aramayı temizle, aramanın açık olması.",
       "ageFilterTitle": "Yayınlama yaşına göre filtrele.",
       "publishedAgeLabel": "Yayınlanan yaş yayınlanmıştır.",
-      "ageMaxAll": "Hepsi, hepsi, hepsi.",
+      "ageMaxAll": "Tümü",
       "presetFilterTitle": "Hızlı filtre ön ayarlarını uygulayın.",
       "presetLabel": "Ön ayar",
       "presetNone": "Hiçbiri yok, hiçbiri yok.",
@@ -1756,7 +1756,7 @@
       "hintLine1": "Her komutanınkiyle eşleşir.",
       "hintStrongTitle": "Başlık başlığı title title",
       "hintStrongDesc": "Description description açıklama tanımlaması",
-      "hintStrongId": "id id id,",
+      "hintStrongId": "id",
       "hintLine2": "(kimlik belirteçleri de aralıklıdır - yazın",
       "hintLine2kbd": "Run Analysis Analiz Çalıştırma Analisi",
       "hintLine2End": "noktasız)."
@@ -1768,7 +1768,7 @@
     "recentPopover": {
       "title": "Son Aramalar son zamanlarda yapılan aramalar",
       "clearTitle": "Son zamanlarda yapılan tüm aramaları temizleyin.",
-      "clearButton": "Clear açık açık açık",
+      "clearButton": "Temizle",
       "listAria": "Son Aramalar son zamanlarda yapılan aramalar"
     },
     "filterChips": {
@@ -1777,10 +1777,10 @@
       "clearAll": "Her şey temiz, her yer boş."
     },
     "bands": {
-      "frequentTitle": "Sık sık sık sıklıklı",
+      "frequentTitle": "Sık kullanılan",
       "frequentHint": "Oturumlarınızda en çok kullanılanlar.",
       "recentTitle": "Son",
-      "recentClear": "Clear açık açık açık",
+      "recentClear": "Temizle",
       "recentHint": "Tekrar çalıştırmak için tıklayın · En yeni önce en son."
     },
     "noResults": {
@@ -1806,7 +1806,7 @@
       "moreSuffix": "+{count} daha fazla",
       "showLess": "Show less daha az göster",
       "runSingular": "Koş, koş, koşu.",
-      "runPlural": "Koşuyor koşuyor koşuyor",
+      "runPlural": " çalıştırma",
       "recentWord": "son",
       "expandAll": "Tümünü genişlet.",
       "collapseAll": "Hepsi çöküyor, hepsi yıkılıyor.",
@@ -2108,7 +2108,7 @@
     "countersAria": "Sayımcıların sayıları.",
     "countersHeading": "Etkinlik sayaçları, olay sayıcılardır.",
     "thEvent": "Etkinlik",
-    "thCount": "Sayın sayın, sayın sayınız.",
+    "thCount": "Sayı",
     "emptyMessage": "Henüz kayıtlı telemetri olayı yok; sayaçları yakalamaya başlamak için Bulgular Kontrol Panelinden bir kural açın.",
     "openFindingsTitle": "Saropa Bulgular Tablosunu açın.",
     "openFindings": "Açık Bulgular Tablosu (Dashboard)",
@@ -2151,9 +2151,9 @@
       },
       "value": {
         "unverified": "— (doğrulanmamış)",
-        "allPlatforms": "Hepsi, hepsi, hepsi.",
-        "yes": "Evet, evet, evet.",
-        "no": "Hayır, hayır, hayır."
+        "allPlatforms": "Tümü",
+        "yes": "Evet",
+        "no": "Hayır"
       },
       "badge": {
         "inProject": "Proje içinde, projeye bağlı olarak."
@@ -2236,7 +2236,7 @@
         "master": "Genel açılım anahtarı (saropaLints.enabled çalışma alanı ayarı). Kapatıldığında, Kaydetme sırasında tarama durur ve panel yan yana bildirir ki eklenti devre dışı bırakılmıştır. Canlı Analiz ve LSP Sunucusu kendi açılım anahtarlarını vardır.",
         "analyzerPlugin": "Dart analiz sunucusunun içinde çalışır; siz yazdıkça düzenleyicide canlı dalgalı çizgiler oluşur, taramaya gerek yoktur. Geçiş, eklentileri yeniden yazar: analysis_options.yaml'deki blok.",
         "scanDaemon": "Arka plan süreci, kaydedilirken tüm projeyi tekrar taramak ve raporlar/.saropa_lints/violations.json yazmak için kullanılır. Aç/kapat butonu ile devre dışı bırakılır; bir sonraki kaydetme işlemiyle devam eder.",
-        "lspServer": "Kısa Kural:  \n1. Sadece çevrilmiş metni döndürün.  \n2. Açıklamalar, giriş, markdown notasyonu veya çevreleyici tırnak işaretlerini içerme.  \n3. Metin içinde yer tutucu tokenlar olabilir: yer tutucu tokenlar. Her birini tam olarak yazılan şekilde, grammatik olarak doğru pozisyonda çeviriyi içine kopyalayın. Hiçbir tokeni çevirme, kaldırma veya biçimlendirme.  \n4. Çıktı, hedef dili için doğru yazım sistemi kullanmalıdır; cümle ortasında başka bir dillere geçme.  \n\nDil sunucusu — açık ve çalışma alanı dosyaları için Sorunlar paneline tanımlamalar yayınlar. Açma-kapatma saropaLints.lspServer.enabled ayarı yazar.",
+        "lspServer": "Ayrı dil sunucusu — açık dosyalar ve çalışma alanı dosyaları için tanılamaları Sorunlar paneline yayınlar. Açıp kapatmak saropaLints.lspServer.enabled ayarını yazar.",
         "ci": ".github/workflows/saropa-lints.yml dosyasını çalışma ağacınızda okuyarak ve yazarak, paketlenen GitHub Actions workflow'ı etkinleştirip devre dışı bırakmanızı sağlar. Bu, şu anki dalınızdaki dosyayı yansıtır — varsayılan dalın kopyası, pull request'leri geçirmek için aslında karar verir ve iki dosya birbirinden ayrı olabilir. Açma/kapatma işlemi hiçbir zaman workflow'ı çalıştırır veya silmez; değişikliği yine kendiniz inceleyip commit edersiniz."
       },
       "recommended": {
@@ -2396,7 +2396,7 @@
       "excludeShared": "Paylaşılanı hariç tutmak paylaşılanları dışlamak."
     },
     "filter": {
-      "clear": "Clear açık açık açık"
+      "clear": "Temizle"
     },
     "bucket": {
       "other": "Diğerleri ({count} {noun})",

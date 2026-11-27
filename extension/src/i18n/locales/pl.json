@@ -72,7 +72,7 @@
     "card": {
       "engine": {
         "header": "KRITYCZNE: Domyślny silnik diagnostyczny zmieniony",
-        "body": "Silne zasady:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE TAK, jak napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie zmieniaj języka pośrodku zdania.\n\nTekst: Silnik, który generuje Twoje diagnozy, nie jest już wewnętrzny wtyczki Analyzer Plugin — teraz to samodzielny serwer LSP, domyślnie włączony dla każdego projektu. To oprogramowanie beta, a jego zachowanie nadal zmienia się między wersjami. Jeśli reguła, na której polegasz, przestanie wykonywać się, zmieni się w działaniu, lub szybki poprawka zniknie, to najbardziej prawdopodobny powód. Wtyczka Analyzer Plugin nadal istnieje i może zostać przywrócona w jednym kliku.",
+        "body": "Silnik, który generuje Twoją diagnostykę, nie jest już wtyczką Analyzer Plugin działającą w procesie — to teraz samodzielny serwer LSP, domyślnie włączony w każdym projekcie. To oprogramowanie w wersji beta, a jego działanie wciąż zmienia się między wydaniami. Jeśli reguła, na której polegasz, przestanie się uruchamiać, zacznie działać inaczej albo zniknie szybka poprawka, to najbardziej prawdopodobna przyczyna. Analyzer Plugin nadal istnieje i można go przywrócić jednym kliknięciem.",
         "why": "To zmiana w tym, co uruchamia analizę, a nie kosmetyczna aktualizacja interfejsu użytkownika. Potwierdź, że diagnozy nadal wyglądają poprawnie, zanim zaufasz im.",
         "actionHealth": "Otwórz Panel Zdrowia",
         "actionRevert": "Cofnij do analizatora Plugin",
@@ -314,7 +314,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX i powiązane biblioteki stanu i wstrzykiwania zależności.",
       "networking-apis": "Klienci HTTP, GraphQL, Firebase, Supabase i łączność.",
       "storage-persistence": "Bazy danych lokalne i magazyny klucz-wartość — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Zasady ścisłe:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zamiennikowe: tokeny zamiennikowe. Skopiuj każdy z nich do tłumaczenia IDEALNIE jak napisany, w poprawnej gramatycznie pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.\n4. Wyjście MUSI używać poprawnego systemu pisania dla języka docelowego; nie zmieniaj się do innego języka w środku zdania.\n\nTekst: Routing i obsługa głębokiego linkowania — auto_route, go_router, app_links, url_launcher, i webview.",
+      "navigation-deep-links": "Routing i obsługa linków głębokich — auto_route, go_router, app_links, url_launcher i webview.",
       "media-graphics": "Obrazy, SVG, animacje, dźwięk, mapy, zbieracze i silnik Flame.",
       "device-platform": "Czujniki, lokalizacja, uprawnienia, dane biometryczne, powiadomienia i prace w tle.",
       "identity-sharing": "Dostawcy usług logowania, udostępnianie i przegląd aplikacji.",
@@ -375,7 +375,7 @@
       },
       "tierCap": {
         "title": "Limit poziomu",
-        "hint": "Zasady świdrujące:  \n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.  \n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.  \n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.  \n4. Wyjście MUSI używać poprawnego systemu zapisu dla języka docelowego; nie zmieniaj się do innego języka w środku zdania.",
+        "hint": "Ogranicza, które poziomy działają podczas analizy, niezależnie od tego, które reguły są jawnie włączone. Pozostaw „Brak”, aby użyć ustawienia Tier rozszerzenia.",
         "none": "Brak (użyj ustawień z karty Tier)"
       },
       "saropaTier": {
@@ -426,7 +426,7 @@
         "openTitle": "Otwórz saropa_baseline.json w edytorze.",
         "summary": "Pliki {files}, {violations} naruszeń zaznaczonych jako bazowe — wygenerowano {generated}.",
         "unknownDate": "w nieznanej chwili",
-        "count": "Liczyć, liczyć, liczyć.",
+        "count": "Liczba",
         "diff": {
           "title": "Różnica vs bieżące",
           "counts": "{resolved} rozwiązane od wersji bazowej · {new} nowe od wersji bazowej.",
@@ -487,7 +487,7 @@
   },
   "startupNudge": {
     "message": "Saropa Lints: jest to grupa, która zawiera {count} reguły pakietu sugestii (s) stosują się do tego projektu.",
-    "review": "Przegląd Review Review Review.",
+    "review": "Przegląd",
     "dismiss": "Zwolnienie z pracy.",
     "reviewFailed": "Nie można otworzyć przeglądu pakietu reguł Saropa Lints. {error}"
   },
@@ -643,10 +643,10 @@
       "reviewApplicable": "Zastosowane Właściwe.",
       "reviewNotApplicable": "brak",
       "notesPlaceholder": "Notatki... notki.",
-      "colType": "Typ typ typ typ rodzaj",
+      "colType": "Typ",
       "colTitle": "Tytuł tytuł Tytułowy Tytuły",
       "colAuthor": "Autor Autora Autorze autorzy",
-      "colReview": "Przegląd Review Review Review.",
+      "colReview": "Przegląd",
       "summaryFooter": "{triaged} z {total} poddane segregacji | {applicable} dotyczy | {notApplicable} Nie dotyczy | Pozostało {unreviewed}",
       "truncated": "Wyniki skrócone do pozycji {limit}."
     },
@@ -867,7 +867,7 @@
       "colPid": "PID",
       "colParent": "Rodzic",
       "colRss": "RSS",
-      "colType": "Typ typ typ typ rodzaj",
+      "colType": "Typ",
       "colCommand": "Polecenie",
       "colAction": "Akcja",
       "typeOrphan": "Orfan",
@@ -978,7 +978,7 @@
     "tooltip": {
       "shedLevel1": "Nacisk na pamięć: {count} drogie reguły usuwają (rozwiązywanie typów + wysokie koszty) aby zmniejszyć RSS",
       "shedLevel2": "Nacisk na pamięć: {count} reguły usuwają (droższe + INFO poziom znaczenia)",
-      "shedLevel3": "Nacisk na pamięć: {count} reguły usuwają (wszystkie niestosowne niestosowne niestosowne)",
+      "shedLevel3": "Presja pamięci: wyłączono {count} reguł (wszystkie niepodstawowe poza ERROR)",
       "hardTripped": "Limit pamięci przekroczony — wszystkie nieistotne reguły zawieszone",
       "pressureNoShed": "Wykryto obciążenie pamięci — włącz zasady odrzucania reguł w analysis_options_custom.yaml, aby automatycznie odrzucać kosztowne reguły pierwsze"
     },
@@ -1187,7 +1187,7 @@
       "topRulesOther": "Najlepsze zasady {count}.",
       "colRank": "#",
       "colRule": "Regulamin regulaminu",
-      "colCount": "Liczyć, liczyć, liczyć.",
+      "colCount": "Liczba",
       "colSeverity": "Poważność Surowość",
       "colActionsAria": "Akcje rzędowe akcje rządów",
       "filesAffected": "Uszkodzone pliki ({count})",
@@ -1639,7 +1639,7 @@
     },
     "cells": {
       "noGithub": "Nie znaleziono repozytorium GitHub.",
-      "devBadge": "dev dev dev to coś",
+      "devBadge": "dev",
       "transitiveBadge": "transytywne, przejściowe.",
       "opportunitiesTooltip": "Nieuzyskane funkcje: {features}",
       "publishDateUnavailable": "Data publikacji nie jest dostępna od pub.dev.",
@@ -1840,7 +1840,7 @@
       },
       "counter": {
         "files": "Pliki plików.",
-        "functions": "Funkcje Funkcje Funkcje",
+        "functions": "Funkcje",
         "problems": "Znaleziono problemy, znalezione problemy."
       },
       "counters": {
@@ -2014,7 +2014,7 @@
       "progress": "{percent}% — {done}/{total} pliki"
     },
     "reports": {
-      "intro": "Zasady ścisłe:\n1. Zwróć TŁYMOŚĆ przetłumaczonych ciągów.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie przekładasz, usuwasz ani zmieniasz format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Raport CLI w jednym kliknięciu, który wcześniej wymagał terminala. Każdy przycisk „Uruchom” przesyła w czasie rzeczywistym wyjście narzędzia poniżej jego karty i zapisuje kopię pod folderem reports/.saropa_lints/reports-tab/",
+      "intro": "Raporty CLI uruchamiane jednym kliknięciem, które wcześniej wymagały terminala. Każdy przycisk Uruchom pokazuje na żywo wynik narzędzia pod jego kartą i zapisuje kopię w reports/.saropa_lints/reports-tab/.",
       "runButton": "Uruchom",
       "notRunYet": "Nie uruchomiono jeszcze",
       "running": "Uruchamianie…",
@@ -2108,7 +2108,7 @@
     "countersAria": "Liczby liczników.",
     "countersHeading": "Liczby zdarzeń liczące wydarzenia.",
     "thEvent": "Wydarzenie",
-    "thCount": "Liczyć, liczyć, liczyć.",
+    "thCount": "Liczba",
     "emptyMessage": "Nie zarejestrowano jeszcze żadnych zdarzeń telemetrycznych — otwórz regułę w panelu wyników, aby rozpocząć rejestrowanie liczników.",
     "openFindingsTitle": "Otwórz pulpit Saropa Findings.",
     "openFindings": "Otwórz paneł kontrolny \"Findings Dashboard\".",
@@ -2153,7 +2153,7 @@
         "unverified": "— (niepotwierdzony)",
         "allPlatforms": "Wszystko",
         "yes": "Tak /nie",
-        "no": "Nie, nie, nie. - Powiedział mu."
+        "no": "Nie"
       },
       "badge": {
         "inProject": "W projekcie In Project."

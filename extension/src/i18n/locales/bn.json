@@ -637,7 +637,7 @@
       "filterUnreviewed": "Unreviewed পর্যালোচনা করা হয়নি",
       "filterPrs": "পিআর",
       "filterIssues": "ইস্যুগুলি সমস্যাগুলি",
-      "typePr": "PR PR PR প্রিন্ট করুন",
+      "typePr": "PR",
       "typeIssue": "ইস্যু ইস্যুর সমস্যা",
       "reviewReviewed": "পর্যালোচনা করা হয়েছে",
       "reviewApplicable": "প্রযোজ্য Applicable প্রয়োগযোগ্য",
@@ -645,7 +645,7 @@
       "notesPlaceholder": "নোট...নোট।",
       "colType": "টাইপ প্রকারের ধরণ",
       "colTitle": "Title শিরোনাম নামকরণ",
-      "colAuthor": "লেখক লেখিকা লেখক লেখক Author",
+      "colAuthor": "লেখক",
       "colReview": "পর্যালোচনা",
       "summaryFooter": "{total} এর {triaged} triaged | {applicable} প্রযোজ্য | {notApplicable} N/A | {unreviewed} বাকি",
       "truncated": "ফলাফলগুলি {limit} আইটেমগুলিতে সংক্ষিপ্ত করা হয়েছে।"
@@ -1249,7 +1249,7 @@
       "subsectionNone": "{title}: স্ক্যান রেঞ্জে কিছুই নেই।",
       "capNote": "স্ক্যানটি তার ফাইলের সীমাতে পৌঁছেছে, তাই কিছু ফাইল বাদ দেওয়া হয়েছে।",
       "raiseCap": "সীমা বাড়ান।",
-      "notePill": "নোট নোট নোটে",
+      "notePill": "নোট",
       "todosLabel": "করণীয়",
       "hacksLabel": "হ্যাকস হ্যাচগুলি"
     },
@@ -1756,7 +1756,7 @@
       "hintLine1": "প্রতিটি কমান্ডের সাথে মেলে।",
       "hintStrongTitle": "Title শিরোনাম পদবি",
       "hintStrongDesc": "বর্ণনা Description description বিবরণী",
-      "hintStrongId": "id id id আইডি",
+      "hintStrongId": "আইডি",
       "hintLine2": "(আইডি টোকেনগুলিও ফাঁকা থাকে — টাইপ",
       "hintLine2kbd": "রান অ্যানালিসিস, রান এনালিসিস।",
       "hintLine2End": "বিন্দু ছাড়া) ।"
@@ -1805,7 +1805,7 @@
     "script": {
       "moreSuffix": "+{count} আরো বেশি",
       "showLess": "Show less কম দেখান",
-      "runSingular": "রান, রান , রান।",
+      "runSingular": " বার",
       "runPlural": "রান, রান করে।",
       "recentWord": "সাম্প্রতিক, সম্প্রতি, অতিসম্প্রতি",
       "expandAll": "সমস্ত প্রসারিত করুন",
@@ -1946,7 +1946,7 @@
         "rule": "LCOV 0% লাইন কভারেজ রিপোর্ট করলে ফ্ল্যাগ করা হয়।"
       },
       "complex": {
-        "label": "জটিল জটিল জটিল কঠিন",
+        "label": "জটিল",
         "evidence": "CC {cc}",
         "rule": "যখন সাইক্লোমেটিক জটিলতা 10 ছাড়িয়ে যায় তখন ফ্ল্যাগ করা হয়।"
       },
@@ -2153,7 +2153,7 @@
         "unverified": "— (যাচাই করা হয়নি)",
         "allPlatforms": "সব, সমস্ত, সকলই",
         "yes": "হ্যাঁ",
-        "no": "না, না,না,না-ই বলেছে।"
+        "no": "না"
       },
       "badge": {
         "inProject": "ইন প্রজেক্ট ইন প্রোজেক্টে"

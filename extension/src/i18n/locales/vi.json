@@ -314,7 +314,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX và các thư viện trạng thái và tiêm phụ thuộc liên quan.",
       "networking-apis": "HTTP client, GraphQL, Firebase, Supabase và kết nối.",
       "storage-persistence": "Các cơ sở dữ liệu địa phương và lưu trữ giá trị khóa — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Quy tắc nghiêm ngặt:\n1. Trả lại CHỈ chuỗi dịch ra.",
+      "navigation-deep-links": "Định tuyến và xử lý liên kết sâu — auto_route, go_router, app_links, url_launcher và webview.",
       "media-graphics": "Hình ảnh, SVG, hoạt hình, âm thanh, bản đồ, máy thu và động cơ Flame.",
       "device-platform": "Cảm biến, vị trí, quyền, sinh trắc học, thông báo và công việc nền.",
       "identity-sharing": "Các nhà cung cấp đăng nhập, chia sẻ và đánh giá trong ứng dụng.",
@@ -426,7 +426,7 @@
         "openTitle": "Mở saropa_baseline.json trong trình chỉnh sửa.",
         "summary": "(Các) tệp {files}, (các) vi phạm {violations} được căn cứ — {generated} đã tạo.",
         "unknownDate": "vào một thời điểm không xác định",
-        "count": "Count Count Count đếm đếm",
+        "count": "Số lượng",
         "diff": {
           "title": "Khác biệt so với hiện tại",
           "counts": "{resolved} đã được giải quyết kể từ đường cơ sở · {new} mới kể từ đường cơ sở.",
@@ -583,7 +583,7 @@
     },
     "community": {
       "stars": "Sao",
-      "likes": "Thích thích thích thích",
+      "likes": "Lượt thích",
       "report": "Báo cáo báo cáo báo chí",
       "openIssues": "Các vấn đề mở",
       "openPrs": "Open PRs (công việc công khai)",
@@ -633,11 +633,11 @@
       "searchLabel": "Tìm kiếm PRs và các vấn đề.",
       "searchPlaceholder": "Tìm kiếm PRs và các vấn đề ...",
       "filterAria": "Lưu trữ các bộ lọc theo loại.",
-      "filterAll": "Tất cả tất cả, tất cả.",
+      "filterAll": "Tất cả",
       "filterUnreviewed": "Không được xem xét lại",
       "filterPrs": "PR",
       "filterIssues": "Các vấn đề về các vấn đề",
-      "typePr": "PR PR PR ĐHĐ",
+      "typePr": "PR",
       "typeIssue": "Vấn đề vấn đề Issue",
       "reviewReviewed": "Xem lại được xem xét.",
       "reviewApplicable": "Có thể áp dụng được",
@@ -984,7 +984,7 @@
     },
     "notification": {
       "shedDisabled": "Áp lực bộ nhớ phân tích được phát hiện (RSS {rssMb} MB, giới hạn mềm {softLimitMb} MB). Bật quy tắc loại bỏ để tự động vô hiệu hóa các quy tắc tốn kém khi có áp lực.",
-      "enableButton": "Enable enable enable cho phép",
+      "enableButton": "Bật",
       "learnMoreButton": "Tìm hiểu thêm Learn More",
       "runInit": "Chạy 'dart run saropa_lints:init' để tạo analysis_options_custom.yaml, sau đó thiết lập shed_rules: true.",
       "enabledConfirmation": "Quy tắc loại bỏ đã được kích hoạt trong analysis_options_custom.yaml. Phân tích sẽ nhận thấy sự thay đổi trong lần tải lại tiếp theo của nó."
@@ -1102,7 +1102,7 @@
       "runAnalysisTitle": "Chạy phân tích Saropa Lints",
       "severityGroupAria": "Bộ lọc độ nghiêm trọng",
       "severityLabel": "Mức độ nghiêm trọng",
-      "moreSummary": "More More More Nhiều hơn",
+      "moreSummary": "Thêm",
       "moreChevron": "▾",
       "copyJsonTitle": "Sao chép các vi phạm được lọc dưới dạng JSON ({count})",
       "saveReportTitle": "Lưu các vi phạm được lọc dưới dạng JSON vào báo cáo/YYY YMMDD/",
@@ -1187,7 +1187,7 @@
       "topRulesOther": "Top {count} quy tắc",
       "colRank": "#",
       "colRule": "Quy tắc của quy định",
-      "colCount": "Count Count Count đếm đếm",
+      "colCount": "Số lượng",
       "colSeverity": "Mức độ nghiêm trọng",
       "colActionsAria": "Các hành động hàng Row actions",
       "filesAffected": "Các tập tin bị ảnh hưởng ({count})",
@@ -1233,7 +1233,7 @@
     },
     "charts": {
       "sectionAria": "Mix chart là bảng kết hợp các biểu đồ.",
-      "heading": "Mix Mix Mix, trộn lẫn.",
+      "heading": "Cơ cấu",
       "metaClickSlice": "click vào một slice để lọc.",
       "severityMix": "Sự pha trộn mức độ nghiêm trọng.",
       "filterBarTitle": "Bộ lọc chỉ cho {key}",
@@ -1258,7 +1258,7 @@
       "headingOff": "Drift Advisor",
       "metaOff": "integration off hội nhập off hội tụ",
       "enableBlurb": "Chạy việc tích hợp Drift Advisor với các đề xuất cơ sở dữ liệu bề mặt ở đây.",
-      "enable": "Enable enable enable cho phép",
+      "enable": "Bật",
       "headingNoServer": "Drift Advisor",
       "metaNoServer": "Không có máy chủ server nào cả.",
       "noServerBlurb": "Không tìm thấy máy chủ Drift Advisor trên các cổng được cấu hình.",
@@ -1366,7 +1366,7 @@
     "enableRules": "Các quy tắc cho phép",
     "issues": "Các vấn đề về các vấn đề",
     "off": "Tắt",
-    "on": "Trên, trên, trên",
+    "on": "Bật",
     "colRule": "Quy tắc của quy định",
     "colIssues": "Các vấn đề về các vấn đề",
     "zeroIssueRules": "{count} quy tắc không có vấn đề — tự động bật trong cấp độ.",
@@ -1518,11 +1518,11 @@
       "openPubspecTitle": "Mở pubspec.yaml ra.",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Sao chép báo cáo JSON (tất cả các hàng + chi tiết)",
-      "copyAllLabel": "Copy copy copy sao chép",
+      "copyAllLabel": "Sao chép",
       "copyOpportunitiesTitle": "Sao chép các yêu cầu nâng cấp AI cho các gói được áp dụng ít nhất lên một lần dán.",
       "copyOpportunitiesLabel": "Sao chép các cơ hội cho AI",
       "saveAllTitle": "Lưu báo cáo JSON vào reports/YYY YMMDD/...",
-      "saveAllLabel": "Save Save Save Giữ",
+      "saveAllLabel": "Lưu",
       "saveUpgradeTitle": "Lưu một báo cáo chỉ bao gồm các gói với bản cập nhật có sẵn cho các báo cáo/YYY YMMDD/...",
       "saveUpgradeLabel": "Lưu báo cáo nâng cấp",
       "resetViewTitle": "Đặt lại bộ lọc, sắp xếp và lưu trạng thái xem.",
@@ -1546,7 +1546,7 @@
       "clearSearchAria": "Clear search tìm kiếm rõ ràng.",
       "ageFilterTitle": "Filter by publish age: Chọn lọc theo độ tuổi xuất bản",
       "publishedAgeLabel": "Tuổi xuất bản:",
-      "ageMaxAll": "Tất cả tất cả, tất cả.",
+      "ageMaxAll": "Tất cả",
       "presetFilterTitle": "Áp dụng các cài đặt trước bộ lọc nhanh (quick filter presets).",
       "presetLabel": "Preset preset là thiết lập trước.",
       "presetNone": "Không có",
@@ -1581,7 +1581,7 @@
         "tooltip": "Code-and-release activity grade từ commit + publish recency (tạm dịch: cam kết và xuất bản gần đây)"
       },
       "likes": {
-        "label": "Thích thích thích thích",
+        "label": "Lượt thích",
         "tooltip": "lượt thích của pub.dev — nhấp để mở trang điểm gói"
       },
       "downloads": {
@@ -1756,7 +1756,7 @@
       "hintLine1": "Khớp với mỗi lệnh của các chỉ huy.",
       "hintStrongTitle": "Tiêu đề: Title tiêu đề title",
       "hintStrongDesc": "Mô tả mô tả mô hình",
-      "hintStrongId": "Id id id id",
+      "hintStrongId": "id",
       "hintLine2": "(mã thông báo id cũng được đặt cách nhau - gõ",
       "hintLine2kbd": "Run Analysis - Phân tích chạy",
       "hintLine2End": "không có dấu chấm)."
@@ -1805,8 +1805,8 @@
     "script": {
       "moreSuffix": "+{count} nhiều hơn",
       "showLess": "Show less - Hiển thị ít hơn",
-      "runSingular": "Chạy, chạy, chạy.",
-      "runPlural": "Chạy chạy, chạy đi.",
+      "runSingular": " lần chạy",
+      "runPlural": " lần chạy",
       "recentWord": "Gần đây gần đây mới đây",
       "expandAll": "Expand all mở rộng tất cả",
       "collapseAll": "Tất cả đều sụp đổ.",
@@ -1860,7 +1860,7 @@
         "empty": "Chưa tìm thấy vấn đề gì..."
       },
       "version": {
-        "engine": "Động cơ Engine Engine Engine",
+        "engine": "Công cụ",
         "detecting": "phát hiện... phát hiện ...",
         "legacy": "di sản - không có tiến triển trực tiếp (saropa_lints của dự án này có trước nó)"
       }
@@ -2053,7 +2053,7 @@
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "chất lượng_gate:\n  điều kiện:\n    - số liệu: new_cript_issues\n      op: eq\n      giá trị: 0\n      on_fail: thất bại",
-        "save": "Save Save Save Giữ",
+        "save": "Lưu",
         "saved": "Đã lưu",
         "saveError": "Không thể lưu"
       },
@@ -2108,7 +2108,7 @@
     "countersAria": "Bộ đếm số lượng",
     "countersHeading": "Bộ đếm sự kiện Event Counter",
     "thEvent": "Sự kiện",
-    "thCount": "Count Count Count đếm đếm",
+    "thCount": "Số lượng",
     "emptyMessage": "Chưa có sự kiện đo từ xa nào được ghi lại - hãy mở quy tắc từ Bảng thông tin phát hiện để bắt đầu ghi lại các bộ đếm.",
     "openFindingsTitle": "Mở bảng điều khiển Saropa Findings.",
     "openFindings": "Mở bảng điều khiển kết quả tìm kiếm.",
@@ -2151,7 +2151,7 @@
       },
       "value": {
         "unverified": "— (chưa xác minh)",
-        "allPlatforms": "Tất cả tất cả, tất cả.",
+        "allPlatforms": "Tất cả",
         "yes": "Vâng, vâng, phải.",
         "no": "Không, không phải là tôi."
       },
@@ -2240,7 +2240,7 @@
         "ci": "Đọc và ghi file .github/workflows/saropa-lints.yml trong cây làm việc của bạn để bật hoặc tắt quy trình hành động GitHub được đóng gói. Điều này phản ánh file trên nhánh hiện tại của bạn — bản sao của nhánh mặc định là điều thực sự kiểm soát các yêu cầu pull, và hai bản có thể tách biệt với nhau. Việc bật/tắt không chạy hoặc xóa quy trình hành động; bạn vẫn phải xem xét và commit thay đổi một cách thủ công."
       },
       "recommended": {
-        "analyzerPlugin": "Các quy tắc nghiêm ngặt:\n1. Trả lời CHỈ CÓ DỮ LIỆU DỊCH THÀNH KÊU.",
+        "analyzerPlugin": "Khuyến nghị: TẮT khi LSP Server đang bật. BẬT lên (với LSP TẮT) nếu một quy tắc ngừng kích hoạt dưới LSP.",
         "scanDaemon": "Khuyến nghị: BẬT",
         "lspServer": "Khuyến nghị: BẬT (mặc định, bản beta). Bao gồm chẩn đoán thời gian thực.",
         "ci": "Khuyến nghị: BẬT chỉ khi bạn muốn các pull request được kiểm tra."
@@ -2268,7 +2268,7 @@
       "lspToggleOff": "LSP Server: đang vô hiệu hóa…",
       "lspStarted": "LSP Server: đã bắt đầu.",
       "lspDisabledPrompt": "LSP server đã bị vô hiệu hóa trong cài đặt (saropaLints.lspServer.enabled). Bật nó và bắt đầu?",
-      "lspEnableButton": "Enable enable enable cho phép",
+      "lspEnableButton": "Bật",
       "lspStopped": "LSP Server: đã dừng.",
       "lspStartFailed": "LSP Server: thất bại khi khởi động (xem thông báo lỗi và kênh đầu ra Saropa Lints LSP).",
       "analyzerToggleOn": "Analyzer Plugin: đang kích hoạt…",
@@ -2294,7 +2294,7 @@
         "introEnable": "{path} đã được viết trong cây làm việc của bạn. Không có gì chạy trong CI cho đến khi nó được đặt trên {base}. Các lệnh này sẽ đặt nó trên một nhánh mới gọi là {branch} và mở một yêu cầu pull để xem xét — chạy chúng trực tiếp của bạn, hoặc nhấn nút và Saropa Lints sẽ chạy chính xác những lệnh này.",
         "introDisable": "{path} đã được chỉnh sửa trong cây làm việc của bạn để tạm dừng mọi công việc. CI sẽ tiếp tục chạy cho đến khi đạt được {base}. Những lệnh này sẽ đưa thay đổi lên một nhánh mới được gọi là {branch} và mở một yêu cầu kéo (pull request) — hãy chạy chúng tự mình, hoặc nhấn nút và Saropa Lints sẽ chạy chính xác những lệnh này. Để dừng CI ngay lập tức thay vào đó, hãy vô hiệu hóa quy trình từ tab Actions của kho lưu trữ.",
         "commandsLabel": "Commands Commands là những lệnh",
-        "copy": "Copy copy copy sao chép",
+        "copy": "Sao chép",
         "copied": "Lệnh đã được sao chép vào clipboard.",
         "createPr": "Tạo nhánh, commit, push và mở yêu cầu pull",
         "notNow": "Không ngay",
@@ -2501,7 +2501,7 @@
       "openReportFailed": "Saropa Lints: không thể mở báo cáo — {message}",
       "noAnalysisData": "Không có dữ liệu phân tích. Đầu tiên hãy chạy phân tích.",
       "actionDisable": "Disable vô hiệu hóa",
-      "actionEnable": "Enable enable enable cho phép",
+      "actionEnable": "Bật",
       "bulkRuleToggleConfirm": "{verb} {count} quy tắc? Điều này cập nhật analysis_options_custom.yaml.",
       "setupPrompt": "Saropa Lints phát hiện một dự án Dart không có saropa_lints được cấu hình. Thiết lập ngay để có 2350+ quy tắc lint.",
       "actionSetUpProject": "Thiết lập dự án thiết lập dự kiến",
@@ -2677,7 +2677,7 @@
       "openFolderBeforeEnablePacks": "Saropa Lints: là người có thể mở một thư mục workspace trước khi kích hoạt pack.",
       "allApplicablePacksEnabled": "Saropa Lints: là người có thể mọi gói quy tắc có thể áp dụng đã được kích hoạt.",
       "noApplicablePacksDetected": "Saropa Lints: không có gói quy tắc nào phù hợp được phát hiện cho dự án này. Chuyển đổi các gói riêng lẻ trong bảng điều khiển Cấu hình.",
-      "actionEnable": "Enable enable enable cho phép",
+      "actionEnable": "Bật",
       "enableRecommendedPacksPrompt": "Enable {count} recommended pack (s)?",
       "enablePacksDetail": "Điều này cập nhật rule_packs.enabled trong analysis_options.yaml. {preview}",
       "enabledRecommendedPacks": "Saropa Lints: là một loại tế bào có thể kích hoạt {count} recommended pack (s).",
@@ -3116,7 +3116,7 @@
       "routes": {
         "dependency": "Dependency trong pubspec.yaml",
         "plugin": "Tải plugin vào analysis_options.yaml chỉ",
-        "both": "Quy tắc nghiêm ngặt:\n1. Trả lại CHỈ OUTPUT chuỗi dịch.",
+        "both": "Phụ thuộc và plugin",
         "none": "Không thể thay đổi"
       }
     },

@@ -189,8 +189,10 @@ When everything passes, tell an agent which steps passed so this file can be clo
 
 ## Translation: still open
 
-Locale parity tests: 49 passing, 0 failing after the hand repairs of 2026-11-26 (written by an agent, not a native speaker, no MT engine).
+Locale parity tests: 49 passing, 0 failing after the hand repairs of 2026-11-26 and 2026-11-27 (written by an agent, not a native speaker, no MT engine).
 
-- 46 values are much longer than English, a sign of leaked MT prompt text or repetition. Confirmed leaks: ru and zh `walkthrough.step.walkthrough.triage.description` contain the MT instructions. A length check found the rest (for example de `triageDash.hintSameAsTree`, it `debug.engine.recommended.analyzerPlugin`, uk `config.property.docPlacement.openSignals.description`). The parity test does not detect them.
-- MT quality outside the repaired keys is often poor. For example, the sw accepted-findings, vibrancy and walkthrough strings are largely nonsense, and several locales still use "plugin route" in English in tooltips.
-- No translation from either hand repair has a native-speaker review.
+- Fixed 2026-11-27: the 46 overlong values (40+ character English, more than 2.5 times as long) plus every leaked MT prompt and looped word or phrase, 387 values in all 24 locales. Repairs are in `extension/scripts/i18n/manual_translations_mt_leaks.py`, folded into `_REPAIRS`. The parity test and `bad_translations.py` now fail on a leaked numbered prompt, a word or phrase repeated three times in a row, or a 40+ character value over 2.5 times the English length.
+- Still open: about 400 values where NLLB inserted an invented sentence, mostly right after "Saropa Lints:" (vi "là người có thể", zh "没有一个人", fr "Il s'agit de", it "è il nome di", es "Es el nombre de la persona") or after a placeholder (pt "É um tipo de vírus"). They are under 2.5 times the English length, so the new check does not catch them. Fixing them needs an owner decision on scope.
+- Still open: many short labels are still wrong without being repeats or overlong (for example fr `packageDetail.versionGap.typePr` "Il s'agit de PR, PR.", ja `commandCatalog.entry.internalBadge` "メニューメニューメヌー").
+- MT quality outside the repaired keys is often poor. For example, much of the sw text is still nonsense, and several locales still use "plugin route" in English in tooltips.
+- No translation from any hand repair has a native-speaker review.

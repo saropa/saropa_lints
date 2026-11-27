@@ -331,7 +331,7 @@
   "walkthrough.step.walkthrough.security.title": "보안 자세 (Security Posture)",
   "walkthrough.step.walkthrough.security.description": "**OWASP 상위 10** 커버리지 매트릭스 — 모바일 및 웹. 각 범주에서 위반 및 규칙 수를 보여줍니다. 클릭하여 위반 필터링.\n\n검토를 위한 준수 보고서를 내보냅니다.\n\n[OWASP 보고서 내보내기](command:saropaLints.exportOwaspReport)",
   "walkthrough.step.walkthrough.triage.title": "트리아지 (Triage) 는 세단으로 분류하는 것이다.",
-  "walkthrough.step.walkthrough.triage.description": "엄격한 규칙:  \n1. 번역된 문자열만 반환합니다.  \n2. 설명, 서론, 마크다운 표기법, 또는 따옴표나 주변의 따옴표는 포함하지 마세요.  \n3. 텍스트에는 플레이스홀더 토큰이 포함될 수 있습니다: 플레이스홀더 토큰. 각 토큰을 정확하게 그대로 그 문법적으로 올바른 위치에 복사하여 번역에 포함하세요. 절대 번역, 제거, 또는 재포맷하지 마세요.  \n4. 필수적: 출력의 모든 글자는 한국어 한글 글자여야 합니다. 모든 단어를 한글로 번역해야 하며, 라틴어, 태국어, 아랍어, 시리아어, 한국어, 일본어 또는 기타 스크립트의 단어를 남겨두거나 대체하지 마세요. 공백, 숫자, 문장 부호 및 플레이스홀더 토큰은 유일한 예외입니다.  \n\n규칙은 우선순위에 따라 그룹화되어 있습니다 — 오류, �音대역, 스타일적인 요소. 각 그룹은 **예상 점수 영향**을 보여줍니다.  \n\n**규칙 팩 관리**를 사용하여 규칙 및 규칙 팩을 활성화하거나 비활성화하십시오; 변경 사항은 YAML에 작성되고 분석을 다시 실행합니다.  \n\n[규칙 팩 관리 열기](command:saropaLints.openConfigDashboard)",
+  "walkthrough.step.walkthrough.triage.description": "우선순위별로 묶인 규칙 — 오류, 발생량 구간, 스타일. 각 그룹에 **예상 점수 영향**이 표시됩니다.\n\n**룰 팩 관리**에서 규칙과 룰 팩을 켜거나 끌 수 있습니다. 변경 사항은 YAML에 기록되고 분석이 다시 실행됩니다.\n\n[룰 팩 관리 열기](command:saropaLints.openConfigDashboard)",
   "walkthrough.step.walkthrough.trends.title": "파일 위험 및 트렌드",
   "walkthrough.step.walkthrough.trends.description": "**파일 리스크**는 위반 밀도에 따라 파일의 순위를 매깁니다 — 가장 위험한 파일이 먼저 표시됩니다.\n\n상태 패널은 시간에 따른 점수 변화를 보여줍니다. 회귀 경고 및 마일스톤 축하 메시지로 진행 상황을 유지합니다.\n\n[상태 패널 표시](command:saropaLints.status.focus)",
   "walkthrough.step.walkthrough.packageVibrancy.title": "패키지 건강 건강",

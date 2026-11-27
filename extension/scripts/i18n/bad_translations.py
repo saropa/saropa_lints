@@ -21,6 +21,7 @@ import argparse
 import json
 import re
 import sys
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -58,6 +59,23 @@ _BLOWUP_SLACK = 10
 # Low floor on purpose: NLLB's measured failure was hallucinated continuations on
 # SHORT labels ("Refresh" -> a full invented sentence), so short sources must count.
 _MIN_EN_LEN_FOR_BLOWUP = 3
+
+# Qwen echoed its own numbered instructions ("Strict rules:\n1. Return ONLY the
+# translated string...") into values, sometimes with no translation after them.
+# UI copy never starts a line with "1.", so a numbered line the English lacks is
+# the prompt. The second branch is the same leak with its newlines collapsed.
+_PROMPT_LIST_RE = re.compile(r"(?m)^\s*[1-4]\.\s|\b1\.\s.*\b2\.\s.*\b3\.\s", re.S)
+
+# NLLB looped words and clauses: "Linea Linea Linea Linea", "PR PR PR ...",
+# "kwa kipindi kwa kipindi ...". One to three words repeated 3+ times in a row.
+_LOOP_RE = re.compile(r"(?<!\w)((?:\w+[\s,]+){0,2}\w+)(?:[\s,]+\1(?!\w)){2,}", re.I)
+
+# Whole-value length check for long sources, separate from the prose blowup above:
+# a leaked prompt keeps the source's code spans and links, so prose stripping can
+# hide it. Every 40+ character value above 2.5x English on 2026-11-27 was a leak or
+# a loop; after the repairs the highest remaining ratio was 2.50.
+_OVERLONG_MIN_EN = 40
+_OVERLONG_FACTOR = 2.5
 
 
 def _brand_terms() -> tuple[str, ...]:
@@ -124,6 +142,7 @@ def detect(en: str, loc: str, locale: str, blocklist: list[dict]) -> list[tuple[
     n_loc = len(_strip_literals(loc).strip())
     if n_en >= _MIN_EN_LEN_FOR_BLOWUP and n_loc > _BLOWUP_FACTOR * n_en + _BLOWUP_SLACK:
         out.append(("hard", f"blowup:{n_loc}>{_BLOWUP_FACTOR}x{n_en}"))
+    out.extend(_mt_echo_flags(en, loc))
 
     # Known-wrong renderings of domain terms (data-driven; add entries as found).
     for entry in blocklist:
@@ -136,6 +155,34 @@ def detect(en: str, loc: str, locale: str, blocklist: list[dict]) -> list[tuple[
     sus = suspicious(en, loc)
     if sus:
         out.append(("soft", f"label:{sus[1]}"))
+    return out
+
+
+def _strip_marks(s: str) -> str:
+    """Drop combining marks so Devanagari/Bengali/Thai words stay whole for \\w.
+
+    Python's \\w excludes vowel signs (category M*), so "संदेश संदेश संदेश" split
+    into fragments and the loop check missed it. Removing the marks changes every
+    copy of a word the same way, so a repeat is still a repeat.
+    """
+    return "".join(ch for ch in s if not unicodedata.category(ch).startswith("M"))
+
+
+def _mt_echo_flags(en: str, loc: str) -> list[tuple[str, str]]:
+    """HARD flags for a leaked MT prompt, a looped word/clause, or an overlong value.
+
+    Each check is excused when the English itself has the pattern, so a source that
+    really is a numbered list or repeats a word is never flagged.
+    """
+    out: list[tuple[str, str]] = []
+    if _PROMPT_LIST_RE.search(loc) and not _PROMPT_LIST_RE.search(en):
+        out.append(("hard", "prompt-leak"))
+    loop = _LOOP_RE.search(_strip_marks(loc))
+    if loop and not _LOOP_RE.search(_strip_marks(en)):
+        out.append(("hard", f"loop:{loop.group(1)[:20]}"))
+    # Whole-string lengths on purpose; see the _OVERLONG_* comment.
+    if len(en) >= _OVERLONG_MIN_EN and len(loc) > _OVERLONG_FACTOR * len(en):
+        out.append(("hard", f"overlong:{len(loc)}>{_OVERLONG_FACTOR}x{len(en)}"))
     return out
 
 

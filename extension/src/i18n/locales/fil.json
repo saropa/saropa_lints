@@ -2153,7 +2153,7 @@
         "unverified": "— (hindi na-verify)",
         "allPlatforms": "Lahat",
         "yes": "Oo",
-        "no": "Hindi, hindi, hindi na."
+        "no": "Hindi"
       },
       "badge": {
         "inProject": "Sa Proyekto sa Project"
@@ -2520,20 +2520,20 @@
       "checkOutput": "Suriin ang Output.",
       "baselineRunning": "Paglikha ng baseline (saropa_baseline.json) upang mapigilan ang mga umiiral na paglabag ...",
       "baselineCreated": "Base line na nilikha: Saropa_baseline.json.jso ay isang domain ng saropa na may mga sumusunod: Ang mga umiiral na natuklasan ay pinigilan; bagong code ay pa rin na-check.",
-      "baselineFailed": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili hindi maaaring lumikha ng baseline. {details}",
+      "baselineFailed": "Saropa Lints: hindi magawa ang baseline. {details}",
       "pubGetNotResolved": "Saropa Lints: Ang mga bagay na may kaugnayan sa pag-aalaga ng katawan. Nagtagumpay ang pub get ngunit hindi nasulbad ang saropa_lints. Suriin ang pubspec.yaml pag-format.",
-      "configWriteFailedNs": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili config write ay nabigo. {details}",
+      "configWriteFailedNs": "Saropa Lints: nabigo ang pagsulat ng config. {details}",
       "disabled": "Saropa Lints ay hindi pinagana. Ang mga file ng proyekto ay hindi binago.",
       "disabledAnalyzer": "Saropa Lints integration tinanggal. Ang mga diagnostic ng analyzer ay magpapalitaw agad; i-activate ang Scan on save para i-back up.",
       "reenabledPlugin": "Saropa Lints plugin na ginamit sa proseso ay nagsimula muli. Nagrerestart ng server ng analisis ng Dart upang i-load ito muli.",
       "reenableNothingToRestore": "Saropa Lints: walang nangangailangan i-restore. Ang plugin na nasa proseso ay hindi kasalukuyang naka-disable sa pamamagitan ng extension.",
       "noOpenDartFiles": "Saropa Lints: ang mga ito ay may _ph0__. walang bukas na Dart file natagpuan. Buksan muli ang isang Dart file o i-off ang \"Open editors only\" setting.",
       "analysisScanning": "Sina-scan ang workspace… {percent}% ({count} isyu sa ngayon)",
-      "configUpdated": "Saropa Lints config na-update (tier: ang antas ng pag-config ay hindi dapat i-upgrade) {tier}). sa pamamagitan ng .",
+      "configUpdated": "Na-update ang config ng Saropa Lints (tier: {tier}).",
       "configWriteFailed": "Ang Config write ay nabigo. {details}",
       "scaffoldGateTitle": "Composite analyzer plugin scaffolding ng mga gusali.",
       "scaffoldGateDetail": "Magsusulat ito ng bagong Dart package sa ilalim ng workspace mo (pubspec.yaml, lib/main.dart, README): isang custom_lint plugin na nagrerehistro sa Saropa at nag-iiwan ng mga hook para sa sarili mong mga rule.\n\nGamitin lang ito kung nagpapadala ka ng mga custom analyzer rule kasama ng Saropa. Puwedeng laktawan ito ng mga karaniwang proyektong Saropa lang—isang plugin entry lang bawat context ang pinapayagan ng analyzer.\n\nSusunod: pumili ng folder na relatibo sa workspace. Kung umiiral na ang folder, tatanungin ka bago may ma-overwrite.",
-      "actionContinue": "Patuloy na patuloy na patuloy na.",
+      "actionContinue": "Magpatuloy",
       "actionOpenGuide": "Buksan ang gabay sa paggabay ng bukás.",
       "scaffoldPathOutsideWorkspace": "Ang landas ng scaffold ay dapat na nasa loob ng folder ng workspace.",
       "scaffoldFolderExists": "Umiiral na ang folder: {folder}. Maaaring idagdag o ma-overwrite ang mga file. Magpatuloy?",
@@ -2680,7 +2680,7 @@
       "actionEnable": "Paganahin",
       "enableRecommendedPacksPrompt": "Pagbibigay ng {count} inirerekomenda na pack (s)?",
       "enablePacksDetail": "Ina-update nito ang rule_packs.enabled sa analysis_options.yaml. {preview}",
-      "enabledRecommendedPacks": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili pinagana ang {count} inirerekomenda na pack ((s).",
+      "enabledRecommendedPacks": "Saropa Lints: pinagana ang {count} inirerekomendang pack.",
       "enableModePacksPrompt": "Pagbibigay ng kakayahan sa {count} {modeLabel} pack ((s)?"
     },
     "misc": {

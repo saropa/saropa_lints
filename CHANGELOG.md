@@ -105,9 +105,11 @@ Many lint rules report fewer false positives, covering paths, caches, async guar
 - "Migrate Renamed Rules" in the VS Code extension now also renames rules in `saropa_accepted.yaml`, so renamed rules keep their reviewed entries. Entries for removed rules are kept and reported by `--check-accepted` for you to delete.
 - The Hebrew VS Code extension no longer shows Arabic or Japanese characters and garbled words in six accepted-findings and stale-override messages, and the language picker title no longer carries extra trailing words. No action required.
 - Translated VS Code extension text no longer falls back to English in the status bar's install-route labels and a few other strings, keeps the command links and code samples that several walkthrough steps and settings had lost, and shows a clean language picker title in 17 languages. The Hebrew accepted-findings messages use consistent wording. No action required.
+- Translated VS Code extension text no longer shows the translator's own instructions ("Strict rules: 1. Return only the translated string…"), labels repeated three or four times ("Linea Linea Linea Linea"), or sentences that run on far past the English, in walkthrough steps, settings, column headers and messages across all 24 languages. No action required.
 
 ### Internal
 
+- The locale parity test and `bad_translations.py` now fail on a leaked numbered translator prompt, a word or phrase repeated three times in a row, or a long value more than 2.5 times the English length; flagged entries are also pruned from the translation cache.
 - Added behavioral tests for `require_copy_with_null_handling` and documented that it judges the `copyWith` declaration only, not callers or clear-by-empty conventions; detection is unchanged.
 
 ---

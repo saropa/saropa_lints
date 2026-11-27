@@ -637,7 +637,7 @@
       "filterUnreviewed": "No revisado.",
       "filterPrs": "relaciones públicas",
       "filterIssues": "Las cuestiones de los problemas.",
-      "typePr": "PR PR PR es el nombre de la persona que se encuentra en una situación similar.",
+      "typePr": "PR",
       "typeIssue": "El número de la cuestión.",
       "reviewReviewed": "Se ha revisado.",
       "reviewApplicable": "Aplicable Se aplica.",
@@ -645,7 +645,7 @@
       "notesPlaceholder": "Las notas... las notas.",
       "colType": "Tipo",
       "colTitle": "Título título del título.",
-      "colAuthor": "El autor es el autor Autor Autor.",
+      "colAuthor": "Autor",
       "colReview": "El análisis de la revisión.",
       "summaryFooter": "{triaged} de {total} clasificados | {applicable} aplicable | {notApplicable} N/A | {unreviewed} restante",
       "truncated": "Los resultados truncados a {limit} artículos."
@@ -1102,7 +1102,7 @@
       "runAnalysisTitle": "Ejecuta el análisis Saropa Lints.",
       "severityGroupAria": "El filtro de gravedad es el que se utiliza.",
       "severityLabel": "Gravedad",
-      "moreSummary": "Más más más más.",
+      "moreSummary": "Más",
       "moreChevron": "▾",
       "copyJsonTitle": "Copia las violaciones filtradas como JSON ({count})",
       "saveReportTitle": "Guardar las violaciones filtradas como JSON en los informes / YYYYMMDD/.",
@@ -1143,7 +1143,7 @@
       "resetAllTitle": "Reinicie todos los filtros."
     },
     "menuPalette": {
-      "help": "Ayuda ayuda ayuda.",
+      "help": "Ayuda",
       "groupBy": "Grupo por... grupo.",
       "textFilter": "El filtro de texto... el filtro.",
       "severityImpact": "Filtro de gravedad ...",
@@ -1264,7 +1264,7 @@
       "noServerBlurb": "No se encontró ningún servidor de Drift Advisor en los puertos configurados.",
       "retry": "Intentar de nuevo.",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "conectado conectado conectado.",
+      "metaConnected": "conectado",
       "noIssues": "Conectado a {label}: sin problemas actuales.",
       "refresh": "Refrescarse y refrescar.",
       "openBrowser": "Abrir en el navegador.",
@@ -1365,7 +1365,7 @@
     "disableRules": "Desactivar las reglas de deshabilitación.",
     "enableRules": "Las reglas de habilitación son las que permiten",
     "issues": "Las cuestiones de los problemas.",
-    "off": "Fuera fuera fuera.",
+    "off": "Desactivado",
     "on": "En el mismo lugar.",
     "colRule": "Regla",
     "colIssues": "Las cuestiones de los problemas.",
@@ -2388,7 +2388,7 @@
       "reportIssue": "Informe de la cuestión del informe."
     },
     "logoAlt": "{packageName} logotipo de la línea",
-    "readMore": "Más más más más.",
+    "readMore": "más",
     "readmeImageAlt": "README imagen de la imagen en el medio."
   },
   "chart": {
@@ -2595,7 +2595,7 @@
       "copyTreeNothingToExport": "No hay nada que exportar.",
       "copyTreeSerializeTreeFailed": "No se pudo serializar el árbol.",
       "copyTreeCopiedFull": "Copiado el árbol completo {viewLabel} ({count} {branchNoun}) como JSON.",
-      "projectMapNoProject": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin abrir un proyecto Dart primero.",
+      "projectMapNoProject": "Saropa Lints: abra primero un proyecto Dart.",
       "projectMapMissingDep": "Saropa Lints: agrega saropa_lints a pubspec.yaml antes de ejecutar el mapa del proyecto Saropa.",
       "projectMapNoHtml": "Saropa Mapa del proyecto: informe HTML no fue producido.",
       "projectMapFailed": "Saropa Mapa del proyecto falló: {message} El hombre de la ciudad",

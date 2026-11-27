@@ -145,7 +145,7 @@
       "copyJson": "Copiar o JSON.",
       "toggleGroup": "Alternar agrupamento",
       "colFile": "Arquivo",
-      "colLine": "Linha linha linha linha.",
+      "colLine": "Linha",
       "colRule": "Regra",
       "colSeverity": "Gravidade da gravidade.",
       "colTier": "Nível",
@@ -291,7 +291,7 @@
       "boolean_naming": "Os booleanos devem usar prefixos is/has/can/should para que a intenção seja clara em condicionais e APIs.",
       "code_style_preferences": "Como returns, condicionais e loops são escritos — retorno imediato, for-in, getter vs método e outros atalhos semelhantes.",
       "function_parameter_style": "Funções de seta quando concisa, todos os parâmetros nomeados, callbacks inline e nenhuma reatribuição de parâmitos.",
-      "widget_style": "Regras Estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramatical correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Flutter escolhas de widget — SizedBox.square, center over align, spacing over SizedBox, e evitar shrinkWrap em scrolls. Flutter projetos apenas.",
+      "widget_style": "Escolhas de widgets Flutter — SizedBox.square, center em vez de align, spacing em vez de SizedBox e evitar shrinkWrap em rolagens. Apenas projetos Flutter.",
       "class_record_style": "Tipo de retorno classe vs registro, prefixos privados para sublinhar e explícito quando esclarece.",
       "formatting": "Posicionamento de linha em branco, vírgulas finais, e estilo de literal e comentário. Pode ser ruim — muitos arquivos podem precisar de edições.",
       "comments_documentation": "O formato TODO e FIXME, caso de frase, um ponto após os comentários do doc, /// sobre //, e nenhum código com o comentário.",
@@ -314,7 +314,7 @@
       "state-management": "Bloc, Riverpod, Provider, GetX e bibliotecas de injeção de dependência e estado relacionadas.",
       "networking-apis": "Clientes HTTP, GraphQL, Firebase, Supabase e conectividade.",
       "storage-persistence": "Bancos de dados locais e armazenamentos chave-valor — Drift, Hive, Isar, sqflite, shared_preferences.",
-      "navigation-deep-links": "Regras estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramaticalmente correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Roteamento e manipulação de links profundos — auto_route, go_router, app_links, url_launcher e webview.",
+      "navigation-deep-links": "Roteamento e tratamento de deep links — auto_route, go_router, app_links, url_launcher e webview.",
       "media-graphics": "Imagens, SVG, animação, áudio, mapas, pickers e o motor Flame.",
       "device-platform": "Sensores, localização, permissões, biometria, notificações e trabalho de fundo.",
       "identity-sharing": "Fornecedores de login, compartilhamento e revisão no aplicativo.",
@@ -347,7 +347,7 @@
     "common": {
       "rule": "Regra",
       "add": "Adicione",
-      "remove": "Remover remover Remover Removação"
+      "remove": "Remover"
     },
     "sdk": {
       "summary": "Pacotes de migração do SDK {total} aplicam-se a este projeto — {breaking} quebra, {deprecation} descontinuação.",
@@ -435,7 +435,7 @@
           "newSection": "Novo desde a baseline ({count})",
           "moreRows": "+{count} mais não mostrado.",
           "fileCol": "Arquivo",
-          "lineCol": "Linha linha linha linha."
+          "lineCol": "Linha"
         }
       },
       "optimizer": {
@@ -633,18 +633,18 @@
       "searchLabel": "Pesquise PRs e questões.",
       "searchPlaceholder": "Pesquise PRs e questões...",
       "filterAria": "Filtre por categoria de filtro.",
-      "filterAll": "Todos, todos, todos.",
+      "filterAll": "Todos",
       "filterUnreviewed": "Não revisado.",
       "filterPrs": "RP",
-      "filterIssues": "Questões questões questões",
-      "typePr": "PR PR PR, é uma questão de tempo.",
+      "filterIssues": "Problemas",
+      "typePr": "PR",
       "typeIssue": "Questão de questão.",
       "reviewReviewed": "Revisado, revisto.",
       "reviewApplicable": "Aplicável aplicável.",
       "reviewNotApplicable": "Não há N/A",
       "notesPlaceholder": "Notas... notas.",
       "colType": "Tipo",
-      "colTitle": "Título Título título.",
+      "colTitle": "Título",
       "colAuthor": "Autor",
       "colReview": "Revisão de revisão Review Review.",
       "summaryFooter": "{triaged} de {total} triados | {applicable} aplicável | {notApplicable} N/A | {unreviewed} restante",
@@ -690,7 +690,7 @@
   },
   "filter": {
     "activeLabel": "Filtro ativo: filtros ativos.",
-    "chipRemove": "Remover remover Remover Removação"
+    "chipRemove": "Remover"
   },
   "a11y": {
     "toggleFullWidth": "Troque de layout em largura total.",
@@ -1102,7 +1102,7 @@
       "runAnalysisTitle": "Execute a análise Saropa Lints.",
       "severityGroupAria": "Filtro de gravidade do filtro.",
       "severityLabel": "Gravidade da gravidade.",
-      "moreSummary": "Mais, mais, mais.",
+      "moreSummary": "Mais",
       "moreChevron": "▾",
       "copyJsonTitle": "Copie as violações filtradas como JSON ({count})",
       "saveReportTitle": "Salvar violações filtradas como JSON para relatórios/AAAAMMDD/.",
@@ -1211,7 +1211,7 @@
       "colSeverity": "Gravidade da gravidade.",
       "colRule": "Regra",
       "colMessage": "Mensagem de mensagem da mensagem.",
-      "colLine": "Linha linha linha linha.",
+      "colLine": "Linha",
       "colActionsAria": "Ações de linha Ações em fila.",
       "selectRowAria": "Selecione esta linha de pesquisa.",
       "copyRowTitle": "Copie esta descoberta como JSON.",
@@ -1282,7 +1282,7 @@
       "unsuppressTitle": "Remova a supressão para que essa descoberta apareça em varreduras normais",
       "unsuppressHint": "Para desbloquear {rule} em {file}:{line}: remova o comentário // ignore: acima dessa linha.",
       "columnFile": "Arquivo",
-      "columnLine": "Linha linha linha linha.",
+      "columnLine": "Linha",
       "columnRule": "Regra",
       "columnKind": "Tipo",
       "columnAction": "Ação"
@@ -1319,8 +1319,8 @@
       "announceStarted": "Começou a análise.",
       "announceComplete": "Análise completa, análise concluída.",
       "announceFailed": "A análise falhou.",
-      "removeRecentAria": "Remover remover Remover Removação",
-      "removeRecentTitle": "Remover remover Remover Removação",
+      "removeRecentAria": "Remover",
+      "removeRecentTitle": "Remover",
       "bulkSelectedTpl": "{n} selecionados",
       "announceSearchVerb": "Buscando",
       "severitiesNoun": "gravidades",
@@ -1364,11 +1364,11 @@
     "showInIssues": "Mostre em questões.",
     "disableRules": "Desativar regras desativam regras.",
     "enableRules": "Regras de habilitação.",
-    "issues": "Questões questões questões",
+    "issues": "Problemas",
     "off": "Desligado",
     "on": "Em seguida, em seguida.",
     "colRule": "Regra",
-    "colIssues": "Questões questões questões",
+    "colIssues": "Problemas",
     "zeroIssueRules": "{count} regras com zero problemas — ativadas automaticamente no nível.",
     "disabledOverrides": "{count} regras desativadas por substituição em `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "Regra triagem de triage.",
@@ -1378,7 +1378,7 @@
     "hintNoPerRule": "Esta exportação não tem contagens de emissão por regra. Reanalisar com um plug-in Saropa Lints atual.",
     "hintBuildFailed": "Não foi possível construir triagem a partir desta exportação. Faça uma nova análise.",
     "summaryVolume": "Regra triagem (volume / deve-fixar / estilística)",
-    "hintSameAsTree": "Regras Estritas:\n1. Retorne APENAS a saída da string traduzida.\n2. NÃO inclua explicações, introdução, notação markdown ou aspas ao redor.\n3. O texto pode conter tokens de placeholder: tokens de placeholder. Copie cada um na tradução EXATAMENTE como escrito, na posição gramatical correta. NUNCA traduza, remova ou reformate um token.\n4. A saída DEVE usar o sistema de escrita correto para a língua alvo; não mude para outra língua no meio da frase.\n\nTexto: Mesma agrupamento da atividade barra de triagem: filtrar Issues, ou desativar/ativar regras em `analysis_options_custom.yaml`. Grupos grandes podem pedir confirmação."
+    "hintSameAsTree": "Mesmo agrupamento da árvore Triage na barra de atividades: filtre Problemas ou desative/ative regras em `analysis_options_custom.yaml`. Grupos grandes podem pedir confirmação."
   },
   "kbdOverlay": {
     "toggleTitle": "Mostrar atalhos de teclado (?)",
@@ -1546,7 +1546,7 @@
       "clearSearchAria": "Limpar a pesquisa de busca.",
       "ageFilterTitle": "Filtrar por idade de publicação.",
       "publishedAgeLabel": "Idade publicada.",
-      "ageMaxAll": "Todos, todos, todos.",
+      "ageMaxAll": "Todos",
       "presetFilterTitle": "Aplique as predefinições rápidas do filtro.",
       "presetLabel": "Predefinido",
       "presetNone": "Não, não há nenhum.",
@@ -1589,7 +1589,7 @@
         "tooltip": "downloads do pub.dev nos últimos 30 dias – clique para abrir a página de pontuação do pacote"
       },
       "issues": {
-        "label": "Questões questões questões",
+        "label": "Problemas",
         "tooltip": "Abertura de questões GitHub (exclui solicitações pull quando disponíveis)"
       },
       "prs": {
@@ -1756,7 +1756,7 @@
       "hintLine1": "Corresponde a cada comando de cada comando.",
       "hintStrongTitle": "Título título de título.",
       "hintStrongDesc": "Descrição descrição descrições descrição",
-      "hintStrongId": "Id id id é uma palavra que significa \"id\".",
+      "hintStrongId": "id",
       "hintLine2": "(os tokens de identificação também são espaçados - digite",
       "hintLine2kbd": "Análise de execução Run Analysis",
       "hintLine2End": "sem pontos)."
@@ -1919,7 +1919,7 @@
       "colScore": "Pontuação da pontuação.",
       "colFunction": "Função de função função.",
       "colFile": "Arquivo",
-      "colLine": "Linha linha linha linha.",
+      "colLine": "Linha",
       "colUsage": "Uso",
       "colCoverage": "Cobertura de cobertura da cobertura.",
       "colComplexity": "Complexidade da complexidade.",
@@ -2058,7 +2058,7 @@
         "saveError": "Não foi possível salvar"
       },
       "colFile": "Arquivo",
-      "colLineNum": "Linha linha linha linha.",
+      "colLineNum": "Linha",
       "colRule": "Regra",
       "colSeverity": "Gravidade da gravidade.",
       "colMessage": "Mensagem de mensagem da mensagem.",
@@ -2151,9 +2151,9 @@
       },
       "value": {
         "unverified": "— (não verificado)",
-        "allPlatforms": "Todos, todos, todos.",
+        "allPlatforms": "Todos",
         "yes": "Sim /não",
-        "no": "Não, não, não."
+        "no": "Não"
       },
       "badge": {
         "inProject": "No projeto In Project."
@@ -2384,11 +2384,11 @@
       "documentation": "Documentação Documentos de documentação.",
       "changelog": "Changelog de mudanças.",
       "repository": "Repositório de dados.",
-      "issues": "Questões questões questões",
+      "issues": "Problemas",
       "reportIssue": "Relatório de Emissão do relatório"
     },
     "logoAlt": "{packageName} logotipo",
-    "readMore": "Mais mais mais mais.",
+    "readMore": "mais",
     "readmeImageAlt": "README imagem de imagem do Readme."
   },
   "chart": {
@@ -2533,7 +2533,7 @@
       "configWriteFailed": "Escrever configuração falhou. {details}",
       "scaffoldGateTitle": "Plugin analisador composto e o andaime do plugin.",
       "scaffoldGateDetail": "Isso escreve um novo pacote Dart em sua área de trabalho (pubspec.yaml, lib/main.dart, README): um plugin custom_lint que registra Saropa e deixa ganchos para suas próprias regras.\n\nUse isso apenas quando você enviar regras de analisador personalizadas juntamente com Saropa. Normalmente, apenas projetos Saropa podem ignorá-lo. o analisador permite uma única entrada de plugin por contexto.\n\nPróximo: O que fazer? escolher uma pasta relativa ao espaço de trabalho. Se essa pasta já existe, você será solicitado antes de qualquer coisa ser sobrescrita.",
-      "actionContinue": "Continuar continuar continuar.",
+      "actionContinue": "Continuar",
       "actionOpenGuide": "Abra o guia de abertura.",
       "scaffoldPathOutsideWorkspace": "O caminho do andaime deve estar dentro da pasta de espaço de trabalho.",
       "scaffoldFolderExists": "A pasta já existe: {folder}. . . é um dos mais antigos Arquivos podem ser adicionados ou substituídos. Continuar? continuar?",
@@ -2655,7 +2655,7 @@
       "registryRemoveFailed": "Não conseguiu remover o registro: {message} É um termo usado para descrever a",
       "registryTokenUpdated": "✓ Token atualizado.",
       "registryTokenUpdateFailed": "Falhou na atualização do token: {message} É um termo usado para descrever a",
-      "actionRemove": "Remover remover Remover Removação",
+      "actionRemove": "Remover",
       "removeAuthPrompt": "Remover a autenticação para {name}?",
       "annotateInProgress": "Anotation já em andamento.",
       "noPubspecInWorkspace": "Não foi encontrado nenhum pubspec.yaml no espaço de trabalho.",
@@ -2706,7 +2706,7 @@
       "reportViewCopiedRowOther": "Copiado {count} linhas para a área de transferência.",
       "reportViewAlreadySuppressed": "'{flag}' já está suprimido em {file}.",
       "reportViewSuppressed": "Suprimido '{flag}' em {file}.",
-      "reportViewCouldNotSuppress": "Não conseguiu suprimir '{flag}' em {file}: {error} É um tipo de molécula que se encontra no interior do corpo humano.",
+      "reportViewCouldNotSuppress": "Não foi possível suprimir '{flag}' em {file}: {error}",
       "actionRescan": "Rescan de ressonância",
       "bulkUpdateNoUpdates": "Não há atualizações disponíveis.",
       "bulkUpdateNoUpdatesFiltered": "Não há atualizações {filter} disponíveis.",
@@ -2744,7 +2744,7 @@
     "applyAll": "Aplicar todos",
     "applySelected": "Aplicar selecionado",
     "apply": "Aplicar",
-    "remove": "Remover remover Remover Removação",
+    "remove": "Remover",
     "selectAll": "Selecione tudo",
     "defaultLabel": "Padrão",
     "sortHint": "Clique para ordenar",

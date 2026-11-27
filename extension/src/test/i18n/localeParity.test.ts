@@ -2,6 +2,7 @@
  * Locale parity: every locale must contain every English key and keep
  * placeholders ({name}, `code`, markdown/command links) identical to English.
  * Values still identical to English fail too, unless allowlisted in scripts/i18n/english_allowed.json.
+ * Leaked MT prompts, looped words and overlong values fail as "mt-echo" (see mtEchoProblems).
  * Full audit lives in scripts/i18n/verify_locales.py.
  */
 import * as assert from 'node:assert';
@@ -80,6 +81,36 @@ function placeholderProblems(en: string, loc: string): string[] {
     .map(([name]) => name);
 }
 
+/**
+ * MT echo guard (mirrors _mt_echo_flags in scripts/i18n/bad_translations.py).
+ * Qwen leaked its numbered prompt ("Strict rules:\n1. Return ONLY...") into values,
+ * NLLB looped words ("Linea Linea Linea Linea"), and both produced values far longer
+ * than English. Each check is excused when English has the same pattern.
+ */
+const PROMPT_LIST = /^\s*[1-4]\.\s|\b1\.\s[\s\S]*\b2\.\s[\s\S]*\b3\.\s/m;
+// One to three words repeated 3+ times in a row. Combining marks (Devanagari and
+// Bengali vowel signs) are stripped first, exactly as the Python check does, so
+// both guards flag the same values.
+const LOOP = /(?<![\p{L}\p{N}_])((?:[\p{L}\p{N}_]+[\s,]+){0,2}[\p{L}\p{N}_]+)(?:[\s,]+\1(?![\p{L}\p{N}_])){2,}/iu;
+const MARKS = /\p{M}/gu;
+
+function hasLoop(s: string): boolean {
+  return LOOP.test(s.replace(MARKS, ''));
+}
+// Every 40+ character value above 2.5x English on 2026-11-27 was a leak or a loop;
+// after the hand repairs the highest remaining ratio was 2.50.
+const OVERLONG_MIN_EN = 40;
+const OVERLONG_FACTOR = 2.5;
+
+function mtEchoProblems(en: string, loc: string): string[] {
+  const out: string[] = [];
+  if (PROMPT_LIST.test(loc) && !PROMPT_LIST.test(en)) { out.push('prompt-leak'); }
+  if (hasLoop(loc) && !hasLoop(en)) { out.push('loop'); }
+  // Whole-string lengths: a leaked prompt keeps the source's links and code spans.
+  if (en.length >= OVERLONG_MIN_EN && loc.length > OVERLONG_FACTOR * en.length) { out.push('overlong'); }
+  return out;
+}
+
 const localeCodes = fs
   .readdirSync(LOCALES_DIR)
   .filter((f) => f.endsWith('.json') && f !== 'en.json')
@@ -105,6 +136,7 @@ describe('locale parity', () => {
         const loc = readFlat(p);
         const missing = Object.keys(en).filter((k) => !(k in loc));
         const bad: string[] = [];
+        const echo: string[] = [];
         const identical: string[] = [];
         for (const k of Object.keys(en)) {
           const lv = loc[k];
@@ -112,6 +144,8 @@ describe('locale parity', () => {
           const ev = String(en[k]);
           const pp = placeholderProblems(ev, lv);
           if (pp.length) { bad.push(`${k} (${pp.join(',')})`); }
+          const me = mtEchoProblems(ev, lv);
+          if (me.length) { echo.push(`${k} (${me.join(',')})`); }
           if (
             lv === ev &&
             !ALLOW.reviewedOk[l]?.has(k) &&
@@ -126,6 +160,7 @@ describe('locale parity', () => {
         const problems = [
           ...missing.map((k) => `missing ${k}`),
           ...bad.map((k) => `placeholder ${k}`),
+          ...echo.map((k) => `mt-echo ${k}`),
           ...(FAIL_ON_IDENTICAL ? identical.map((k) => `identical ${k}`) : []),
         ];
         assert.strictEqual(problems.length, 0,

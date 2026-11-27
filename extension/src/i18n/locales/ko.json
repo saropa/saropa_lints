@@ -1169,7 +1169,7 @@
       "menuGroupBulk": "대량 작업",
       "menuGroupFilter": "필터 & 초점이 맞춰져 있습니다.",
       "menuGroupOpen": "대시보드를 열고, 대시 보드를 열어보세요.",
-      "menuGroupSystem": "시스템 시스템 시스템"
+      "menuGroupSystem": "시스템"
     },
     "progress": {
       "runningLabel": "분석을 실행하고 있습니다...",
@@ -1366,7 +1366,7 @@
     "enableRules": "적당히 하는 규칙은 Enable Rules입니다.",
     "issues": "이슈는 문제, 문제는 문제가",
     "off": "오프 오프 아웃 아웃",
-    "on": "그리고 또 또 또",
+    "on": "켜짐",
     "colRule": "규칙 규정 규칙",
     "colIssues": "이슈는 문제, 문제는 문제가",
     "zeroIssueRules": "문제가 없는 {count}개 규칙 — 해당 계층에서 자동 활성화되었습니다.",
@@ -1478,7 +1478,7 @@
       "outdatedTitle": "오래된, 시대에 뒤떨어진",
       "abandonedTitle": "버려진 채로 버림받았다.",
       "eolTitle": "삶의 끝을 의미하는 말.",
-      "updates": "업데이트 업데이트 업데이트",
+      "updates": "업데이트",
       "unused": "사용되지 않은 비사용",
       "singleUse": "단독 사용 용품으로 한 번만 사용할 수 있습니다.",
       "vulnerable": "취약한 취약한",
@@ -2146,7 +2146,7 @@
         "codeSize": "코드 크기와 코드의 크기",
         "bloatRating": "부풀어가는 평가",
         "license": "라이선스, 허가증",
-        "platforms": "플랫폼 플랫폼 플랫폼",
+        "platforms": "플랫폼",
         "inThisProject": "이 프로젝트에서,이 프로젝트는"
       },
       "value": {
@@ -2533,7 +2533,7 @@
       "configWriteFailed": "구성 작성 실패. {details}",
       "scaffoldGateTitle": "복합 분석기 플러그인 스캐폴드",
       "scaffoldGateDetail": "이것은 새로운 Dart 패키지를 작업 공간 (pubspec.yaml, lib/main.dart, README) 아래로 작성합니다: Saropa를 등록하고 자신의 규칙에 대한 후크를 남기는 하나의 custom_lint 플러그인입니다.\n\nSaropa.와 함께 사용자 정의 분석기 규칙을 전송할 때만 이것을 사용하십시오. 정상적인 Saropa 프로젝트만 있으면 건너뛰을 수 있습니다.분석기는 컨텍스트당 하나의 플러그인 항목만을 허용합니다.\n\n다음: 다음: 작업 공간에 관련된 폴더를 선택합니다. 해당 폴더가 이미 존재한다면, 어떤 것이 덮어 쓰기 전에 요청됩니다.",
-      "actionContinue": "계속 계속 계속 계속해서",
+      "actionContinue": "계속",
       "actionOpenGuide": "가이드를 열어 안내서를 열으십시오.",
       "scaffoldPathOutsideWorkspace": "스캐폴드 경로는 작업 공간 폴더 안에 있어야 합니다.",
       "scaffoldFolderExists": "폴더는 이미 존재합니다: {folder}. . . ᄋᄃᄃᄃ 파일은 추가되거나 덮어 쓸 수 있습니다. 계속할 것인가?",

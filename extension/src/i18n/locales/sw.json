@@ -55,14 +55,14 @@
     }
   },
   "about": {
-    "ruleCountStrip": "{total} maelezo ya kusandika kwa sasa inapakia katika versi hii (mazungumzaji {essential} · mazungumzaji ya kuchangia {recommended} · mazungumzaji ya kifalme {professional} · mazungumzaji ya kifalme {comprehensive} · mazungumzaji ya kifalme {pedantic} · {stylistic} mazungumzaji ya kuchangia)"
+    "ruleCountStrip": "Sheria {total} za lint zinakuja na toleo hili (essential {essential} · recommended {recommended} · professional {professional} · comprehensive {comprehensive} · pedantic {pedantic} · {stylistic} za mtindo za hiari)"
   },
   "welcome": {
     "panel": {
       "title": "Mapya"
     },
     "hero": {
-      "subtitle": "Unganisha hali ya kipindi kwa kuzungumza kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kip."
+      "subtitle": "Toleo hili linabadilisha injini chaguomsingi ya uchunguzi. Soma hili kabla ya kuendelea kufanya kazi — linaathiri kile utakachoona kwenye paneli ya Problems."
     },
     "checkbox": {
       "label": "Tazama hiki kwa muda mwingi",
@@ -80,7 +80,7 @@
       },
       "monitoring": {
         "header": "Moto: Uchunguzi wa Uzalishaji wa Mchakato",
-        "body": "Extension ina kufungua RAM ya system, kila server ya analysis ya Dart, daemon ya Flutter na proses ya background — hakuna kwa kuchagua yake. Indikator ya Budget ya Dev Tool ina kushinda kama dev tools yakupata kutoa kati ya RAM ya kutoa, na proses ya kuzalishwa kutokana na sesion ya kuzalishwa kuzalishwa kuzalishwa kwa kuanza.",
+        "body": "Kiendelezi sasa kinafuatilia RAM ya mfumo, kila seva ya uchambuzi ya Dart, daemon ya Flutter na mchakato wa chinichini — si wake tu. Kiashiria cha Dev Tool Budget kinaonya zana za uundaji zinapozidi sehemu ya RAM inayoweza kusanidiwa, na michakato iliyoachwa na vipindi vilivyoanguka hugunduliwa wakati wa kuanza.",
         "why": "Proyeksi mbalimbali kuzalishia kwa muda mrefu kwa server ya analizi. Unaweza kushuhudia kwa kipato kila siku kila siku kwa muda mrefu kwa makini yako.",
         "actionDashboard": "Fungua Afya ya Mashine",
         "actionThresholds": "Tumia Mshabiki"
@@ -149,7 +149,7 @@
       "colRule": "Kanuni",
       "colSeverity": "Ugumu wa Hali.",
       "colTier": "Daraja",
-      "colMessage": "Ujumbe ujumbe ujumbe ujumbe.",
+      "colMessage": "Ujumbe",
       "empty": "Hakuna matokeo — project inaheshima.",
       "filteredEmpty": "Hakuna matokeo ya kujifunza kwa filtrasi ya sasa.",
       "loadMore": "Tazama zaidi",
@@ -297,7 +297,7 @@
       "comments_documentation": "TODO na FIXME format, sentensi case, period baada ya doc comments, /// over //, and no commented-out code.",
       "testing_style": "Pendelea kutarajia juu ya kudai katika vipimo ili kutofaulu kuonyesha inatarajiwa dhidi ya kweli.",
       "debug_test_utility": "Wasaidizi wa mtihani kama vile prefer_fail_test_case ambayo inashindwa kwa sauti wakati jaribio linapiga njia isiyotarajiwa.",
-      "opinionated_rules": "Moto ya kifungu mbalimbali — jina mbalimbali, enums ya kifungu, clauses ya kifungu, conditions ya kifungu, na zaidi. Zaidi ya kifungu; inaweza kusababisha kifungu."
+      "opinionated_rules": "Machaguo mbalimbali ya mtindo — majina mafupi, enums kamili, guard clauses, masharti chanya na mengineyo. Sheria nyingi; zinaweza kuleta kelele nyingi."
     }
   },
   "packs": {
@@ -402,7 +402,7 @@
       },
       "bannedUsage": {
         "title": "Motoa ya kufunga",
-        "hint": "Kupiga kipengele kati ya kipengele kati ya kipengele (fungu, klasa, au jina ya mene) kwa kila muda mwingi kwenye project, na sababu ya kipengele kati ya kipengele kati ya kipengele.",
+        "hint": "Huweka alama kwenye kitambulisho mahususi (jina la function, class au member) popote kinapoonekana katika mradi, pamoja na sababu maalum inayoonyeshwa katika ujumbe wa uchunguzi.",
         "identifier": "Kitambulisho",
         "identifierPlaceholder": "k.m. chapa",
         "reason": "Sababu",
@@ -556,7 +556,7 @@
       "latest": "Latest Karibuni Sana Latest",
       "prerelease": "Pre-release ya kutolewa mapema.",
       "published": "Imechapishwa Ilichapishwa Iliyochapishwa.",
-      "update": "Update update update ya mambo.",
+      "update": "Sasisho",
       "blockedBy": "Imefungwa na Blocked by",
       "blockedVia": "{blocker} kofia {dep} {constraint} ({resolvable} inaweza kutatuliwa, {latest} hivi karibuni zaidi)",
       "blockedViaSdk": "imebandikwa na {blocker} (Flutter SDK) kwa {dep} ({resolvable} inayoweza kutatuliwa, {latest} ya hivi punde zaidi)",
@@ -633,11 +633,11 @@
       "searchLabel": "Tafuta PRs na maswala ya utaftaji.",
       "searchPlaceholder": "Tafuta PRs na masuala ...",
       "filterAria": "Chuja kwa kategoria Filter by category.",
-      "filterAll": "All All All",
+      "filterAll": "Zote",
       "filterUnreviewed": "Unreviewed Hakuna Matata.",
       "filterPrs": "PR",
       "filterIssues": "Masuala masuala maswala.",
-      "typePr": "PR PR PR Kika",
+      "typePr": "PR",
       "typeIssue": "Suala la suala la suala.",
       "reviewReviewed": "Imepitishwa upya.",
       "reviewApplicable": "Inatumika inatumika.",
@@ -797,7 +797,7 @@
   },
   "systemHealth": {
     "heapCap": {
-      "noneMessage": "Machingi yako ina {totalGb} ya memory. Server ya analysis Dart ina kufanya memory ceiling, kwa hiyo ina kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzalishwa kwa kuzal. Kipengele kifurani: {recommendedGb}.",
+      "noneMessage": "Kompyuta yako ina kumbukumbu ya {totalGb}. Seva ya uchambuzi ya Dart haina kikomo cha kumbukumbu, kwa hiyo inaweza kukua hadi kompyuta ipunguze kasi au ianze kutumia swap. Kikomo kinachopendekezwa: {recommendedGb}.",
       "tooHighMessage": "Machingi yako ina {totalGb} ya memory. Server ya analysis ya Dart ina kujaribu kuzalishia {capGb} (inapangwa katika {location}), inayoyogofa {freeGb} kwa OS, VS Code na programu ya Dart nyingine, kwa hiyo machingi inaweza kuzalishia au kuzalishia. Cap ya mazungumzaji: {recommendedGb}.",
       "locationGlobal": "moto ya wazee wako",
       "locationWorkspace": "mipango ya kazi ya workspace hii",
@@ -840,7 +840,7 @@
     "cleanup": {
       "noOrphans": "Hakuna daemons ya kihofu.",
       "confirm": "Imeongezwa {count} process ya daemon ya kifalme (kifalme) kwa kutumia {size}. Uko kujikosoa?",
-      "killButton": "Kifungu Kifungu Kifungu",
+      "killButton": "Komesha Michakato Yatima",
       "cancelButton": "Cancel cancel kufuta"
     },
     "orphanPreflight": {
@@ -1065,7 +1065,7 @@
       "allMatched": "Wote walikuwa sawa na walilingana.",
       "ofTotal": "ya jumla {total} jumla.",
       "clearFiltersTitle": "Bonyeza ili kufuta vichungi vyote.",
-      "errorsLabel": "Makosa Makosa makosa Makosa.",
+      "errorsLabel": "Makosa",
       "errorsSubFix": "lazima fix must fix",
       "errorsSubClear": "hakuna - wazi",
       "errorsTitle": "Chuja matokeo kwa makosa (lazima kurekebisha - iliyovunjika / itaanguka / kunyonywa)",
@@ -1178,7 +1178,7 @@
     "topRules": {
       "sectionAria": "Sheria za juu kwa kuhesabu.",
       "hideTitle": "Nifiche pekee - kiwango cha nafasi ya kazi, inayoweza kutenduliwa kupitia Ukandamizaji Wazi",
-      "hideButton": "Hide hide hide, kujificha.",
+      "hideButton": "Ficha",
       "disableTitle": "Zima kwa mradi mzima - anaandika analysis_options_custom.yaml na kufanya uchambuzi upya",
       "disableButton": "Disable Disable Kulemaza",
       "workspaceOnlyShort": "workspace tu nafasi ya kazi.",
@@ -1210,7 +1210,7 @@
       "selectAllAria": "Chagua matokeo yote yanayoonekana.",
       "colSeverity": "Ugumu wa Hali.",
       "colRule": "Kanuni",
-      "colMessage": "Ujumbe ujumbe ujumbe ujumbe.",
+      "colMessage": "Ujumbe",
       "colLine": "Mstari",
       "colActionsAria": "Hatua za safu Matendo ya safu.",
       "selectRowAria": "Chagua safu hii ya kutafuta chaguo.",
@@ -1366,7 +1366,7 @@
     "enableRules": "Kuwezesha sheria za sheria.",
     "issues": "Masuala masuala maswala.",
     "off": "Imezimwa",
-    "on": "On on on kwenye kwenye kwenye",
+    "on": "Imewashwa",
     "colRule": "Kanuni",
     "colIssues": "Masuala masuala maswala.",
     "zeroIssueRules": "sheria {count} zisizo na matatizo — zimewezeshwa kiotomatiki kwenye kiwango.",
@@ -1411,7 +1411,7 @@
       "upgradesDesc": "Kagua masasisho ya kifurushi yanayopatikana, yaliyowekwa kulingana na hatari, na mbofyo mmoja itatumika.",
       "upgradesGenerating": "Kusimamia project yako kwa kuzingatia mfumo mwingi na matokeo ya kushiriki. Hutokea kwa kipili kwa kusimamia na inaonekana kwenye cache hadi unisimamia kipili.",
       "fullReport": "Ujumbe Mwili",
-      "fullReportDesc": "Tumia matokeo ya kuhusisha kuhusisha kuhusisha (kila paketi ya kuzingatia, kila kifungu cha changelog ya kuzingatia) kama faili ya HTML/Markdown/JSON na kipande.",
+      "fullReportDesc": "Hamisha ripoti kamili ya matumizi ya vipengele (kila kifurushi kilichochanganuliwa, kila kipengele kilichotolewa kwenye changelog) kama faili ya HTML/Markdown/JSON na uifungue.",
       "fullReportGenerating": "Kuondoa raporti ya kati — kila paketi ya kuzinga, kila miongo wa changelog. Hiki ina kufanya kila muda mmoja kwa kuzinga na ina kushuka kwenye cache hadi unakuzinga tena.",
       "knownIssues": "Masuala yanayojulikana",
       "knownIssuesDesc": "Tazama vitu vya kifua vya kwanza na matokeo ya mchoro zilizopewa kwa kuzungumza na vikombina vyingi.",
@@ -1518,7 +1518,7 @@
       "openPubspecTitle": "Fungua pubspec.yaml.",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Nakili ripoti JSON (safu zote + maelezo)",
-      "copyAllLabel": "Nakala nakala nakala.",
+      "copyAllLabel": "Nakili",
       "copyOpportunitiesTitle": "Nakili maombi ya kuboresha AI kwa vifurushi vya juu vilivyochukuliwa chini katika moja na kuweka.",
       "copyOpportunitiesLabel": "Nakili fursa za AI kwa AI.",
       "saveAllTitle": "Hifadhi ripoti JSON kwa ripoti/YYY YMMDD/...",
@@ -1546,7 +1546,7 @@
       "clearSearchAria": "Futa utafutaji wa wazi.",
       "ageFilterTitle": "Chuja kwa umri kuchapisha filter by publish age",
       "publishedAgeLabel": "Umri uliochapishwa umri kuchapishwa.",
-      "ageMaxAll": "All All All",
+      "ageMaxAll": "Zote",
       "presetFilterTitle": "Tumia presets za kichujio cha haraka.",
       "presetLabel": "Preset preset presets preset",
       "presetNone": "Hakuna, hakuna hata mmoja.",
@@ -1621,7 +1621,7 @@
         "tooltip": "SPDX kitambulisho cha leseni kutoka kwa pub.dev."
       },
       "update": {
-        "label": "Update update update ya mambo.",
+        "label": "Sasisho",
         "tooltip": "Sasisho la toleo linalopatikana: kubwa, ndogo au patch."
       },
       "opportunities": {
@@ -1724,7 +1724,7 @@
       "releaseActivity": "Activity Release Shughuli ya kutolewa.",
       "dormancySignal": "Ishara ya usingizi wa ishara.",
       "ago": "{age} iliyopita",
-      "qualityExample": "+mfano mfano mfano",
+      "qualityExample": "+mfano",
       "qualityExampleTitle": "Meli ya demo inayoweza kuendeshwa.",
       "qualityTests": "+ vipimo vya majaribio.",
       "qualityTestsTitle": "Inasafirisha seti ya majaribio.",
@@ -1745,7 +1745,7 @@
     "heroTitle": "Katalogi ya Amri ya Saropa",
     "status": {
       "internalHidden": "menyu muktadha pekee {count} (imefichwa)",
-      "wordCommands": "amri ya amri amri amri.",
+      "wordCommands": "amri",
       "wordCategories": "makundi makundi categories makundi category",
       "wordRecent": "hivi karibuni recent"
     },
@@ -1756,7 +1756,7 @@
       "hintLine1": "Inalingana na kila amri ya amri.",
       "hintStrongTitle": "title jina la cheo title",
       "hintStrongDesc": "maelezo ya ufafanuzi wa maelezo Maelezo",
-      "hintStrongId": "Id id id id ya mtu.",
+      "hintStrongId": "id",
       "hintLine2": "(ishara za kitambulisho zimewekwa kwa nafasi pia - aina",
       "hintLine2kbd": "Tumia uchambuzi wa kukimbia.",
       "hintLine2End": "bila nukta)."
@@ -1946,7 +1946,7 @@
         "rule": "Imewekwa alama wakati LCOV inaripoti chanjo ya mstari wa 0%."
       },
       "complex": {
-        "label": "Complex complex complex ngumu sana.",
+        "label": "changamani",
         "evidence": "CC {cc}",
         "rule": "Inaonyeshwa wakati utata wa cyclomatic unazidi 10."
       },
@@ -2061,7 +2061,7 @@
       "colLineNum": "Mstari",
       "colRule": "Kanuni",
       "colSeverity": "Ugumu wa Hali.",
-      "colMessage": "Ujumbe ujumbe ujumbe ujumbe.",
+      "colMessage": "Ujumbe",
       "colKey": "Moto ya kifedha"
     },
     "shortcuts": {
@@ -2151,8 +2151,8 @@
       },
       "value": {
         "unverified": "— (haijathibitishwa)",
-        "allPlatforms": "All All All",
-        "yes": "Yes, yes, yes - Kinda.",
+        "allPlatforms": "Zote",
+        "yes": "Ndiyo",
         "no": "Hapana, hapana, hakuna kitu kama hicho."
       },
       "badge": {
@@ -2294,7 +2294,7 @@
         "introEnable": "{path} imebadilika katika wakati wako. Hata kama kuna kuchapisha kwenye CI kama {base} inaunda. Nafasi hizi inaunda kwenye branch mpya inayemkia {branch} na inaunda request ya pull kwa kusafisha — tafuta kuchapisha kwenye wakati wako, au tafuta kuchapisha kwenye tofauti na Saropa Lints inaunda kuchapisha kwenye wakati wako.",
         "introDisable": "{path} imefungwa katika mbingu wako wa kazi ili kufungua kila kazi. CI inapakia kwa muda mlelo kama huo inaongeza {base}. Nafasi hizi inapakia uwezo wa kuzalisha kwenye branch mpya inametajwa kama {branch} na inaongeza request ya pull — tafuta kufanya wakati wakati, au piga tofauti na Saropa Lints inapakia kwa muda mlelo nafasi hizi. Kwa kuzunguka CI kwa muda mlelo, ongeza workflow kutoka kwenye tab ya Actions ya repository.",
         "commandsLabel": "Amri za amri.",
-        "copy": "Nakala nakala nakala.",
+        "copy": "Nakili",
         "copied": "Kipengele kozalishwa kwenye kipapera.",
         "createPr": "Tuma branch, commit, push na kifungua pull request",
         "notNow": "Hakuna sasa",
@@ -2563,7 +2563,7 @@
       "writeFailed": "Saropa Lints: uliokokotia kujisajili kwa mstari ya analizi. {message}"
     },
     "divergence": {
-      "enabledButPluginOff": "Saropa Lints inatoa, lakini diagnostics ya kwenye editor inaofaa: plugin ya analyzer ilifunguka kutikwa extension huu na ilisimamika kufunguka, kwa hiyo maslahi yango yango yango kama baadhi ya scan. Tafuta diagnostics ya kwenye editor ya kutoa kwa muda mrefu, au tafuta kutoa scan kwa kuzalisha?",
+      "enabledButPluginOff": "Saropa Lints imewashwa, lakini uchunguzi ndani ya kihariri umezimwa: programu-jalizi ya analyzer ilizimwa kutoka kiendelezi hiki na haikurejeshwa, kwa hiyo matatizo huonekana tu baada ya uchanganuzi. Rejesha uchunguzi wa moja kwa moja ndani ya kihariri, au endelea na uchanganuzi wakati wa kuhifadhi pekee?",
       "actionRestorePlugin": "Kufunga diagnostics katika editor",
       "actionKeepScanOnly": "Tuma scan-on-save kwa muda mmoja",
       "disabledButPluginOn": "Saropa Lints inatikisa, lakini plugin ya analyzer inatikisa kwa mbele katika analysis_options.yaml, kwa hiyo inatikisa na inatokana na miongoni mwa GB mwingi wakati ya kuanza server ya analysis ya Dart. Tumia plugin kwenye kufuta au kufanya kwa mbele?",
@@ -2861,7 +2861,7 @@
       "alreadyRunning": "Tafiti ya findings ya kati ya kufungua inaonekana kwa kipindi.",
       "noList": "Saropa_accepted.yaml inakwenda kwenye kila package ya workspace. Tafuta \"Kuamini katika faili hii\" kwenye saropa ya kuzalisha kujaribu kujaribu.",
       "clean": "Matokeo yaliyokubaliwa: maingizo {count} yamekaguliwa, hakuna lililopitwa na wakati wala lisilo sahihi.",
-      "issues": "Moto ya kifedha ya kifedha: {stale} ya kifedha ya kifedha na {invalid} ya kifedha ya kifedha, kati ya {count} ya kifedha ya kifedha. Tafakari panel ya Problemas.",
+      "issues": "Matokeo yaliyokubaliwa: {stale} yamepitwa na wakati na {invalid} si sahihi, kati ya maingizo {count}. Angalia paneli ya Problems.",
       "added": "Zilizozinga {rule} kwenye {file} kwa {list}. Findings zilizokazwa jeli kama file inyango kushangaza tena."
     },
     "action": {
@@ -3179,7 +3179,7 @@
     "deepNotEnoughMemory": "Scan ya kuzinga kwa kuzingatia mswalano inahitajika kwa kasi {needed}, lakini kuna kasi kati ya {free} (kuzingatia kasi ya {reserve} kwa kila miongoni mwa wengine). Scan ya kuzinga kwa kuzingatia mswalano inafinisha kwa kasi kubwa na inaunda kasi kubwa ya memory.",
     "deepPaused": "Scan ya kwanza iliyopata: maelezo ya mifano ya memory ni {free}, kati ya {reserve} ya mifano ya memory ya kwanza kwa kompyuta wako. Iliyopata kwa muda mwingi kama memory ina kufaniki.",
     "fastDone": "Kuzingia kifanisi kikubwa: {files} faili, {issues} miongoni mwa masalama kwenye {seconds}.",
-    "fastDoneOfferDeep": "Scan ya kifaa ya kutosha: {files} faili, {issues} maswala ya kifaa ya kutosha kwenye {seconds}. Scan ya kifaa ya kutosha ya kifaa ya kutosha ina kufanya zaidi, lakini ina kufanya kifaa ya kutosha kwenye {minutes} minuta na {memory} ya kifaa ya kutosha.",
+    "fastDoneOfferDeep": "Uchanganuzi wa haraka umekamilika: faili {files}, matatizo {issues} kwa sekunde {seconds}. Uchanganuzi unaozingatia aina unaweza kupata zaidi, lakini huchukua takriban dakika {minutes} na kumbukumbu ya {memory}.",
     "fastDoneDeepUnavailable": "Scan ya kifaa ya kutosha: {files} faili, {issues} maswala(s) katika {seconds}s. Scan ya kifaa ya kutosha ya kifaa ina kuhusika {needed}, lakini kuna {free} kwa sasa.",
     "daemonLowMemory": "Kuzingia kwa kutoa kwa {needed}, lakini kuna muda muda mwa {free} ya memory (kutumia {reserve} kwa kila nini). Kuzingia kwa kutoa kwa kila nini kwa sasa kwa kuzalisha kompyuta yako kuzalisha.",
     "action": {

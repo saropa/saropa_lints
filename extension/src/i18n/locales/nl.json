@@ -243,7 +243,7 @@
       "noChangelog": "Geen changelog is gevonden voor deze package, dus zijn functies kunnen niet worden gelijst. Dit is een beperking van de functiebron die afkomstig is van de changelog, niet een teken dat de package geen functies heeft.",
       "noFeatures": "Een changelog is gevonden, maar geen functies konden daaruit worden geëxtraheerd.",
       "linkPubDev": "pub.dev",
-      "linkDocs": "Documentatie Documentatie documentatie.",
+      "linkDocs": "Documentatie",
       "linkRepository": "Repositorium voor gegevensbestanden."
     },
     "category": {
@@ -293,7 +293,7 @@
       "function_parameter_style": "Pijlfuncties wanneer beknopt, alle genoemde parameters, inline callbacks en geen parameterhertoewijzing.",
       "widget_style": "Flutter widget keuzes — SizedBox.square, center over align, spacing over SizedBox, en het vermijden van shrinkWrap in scrolls. Flutter projecten alleen.",
       "class_record_style": "Class vs record retour typen, private onderstreep prefixen en expliciet dit waar het verduidelijkt.",
-      "formatting": "Stricte regels:\n1. Geef ALLEEN de vertaalde tekst weer.",
+      "formatting": "Plaatsing van lege regels, afsluitende komma's en de stijl van literals en commentaar. Kan veel meldingen geven — veel bestanden hebben mogelijk aanpassingen nodig.",
       "comments_documentation": "TODO en FIXME formaat, zinssamenstelling, een punt na doc opmerkingen, /// over //, en geen gecommenteerde-out code.",
       "testing_style": "Prefer expect over assert in tests, zodat een fout verwacht versus daadwerkelijk blijkt.",
       "debug_test_utility": "Testhelpers zoals prefer_fail_test_case die luid mislukken wanneer een test op een onverwacht pad komt.",
@@ -637,15 +637,15 @@
       "filterUnreviewed": "Niet beoordeeld.",
       "filterPrs": "PR's zijn pr-diensten.",
       "filterIssues": "Issues issues zijn kwesties.",
-      "typePr": "PR PR PR is een soort van PR.",
+      "typePr": "PR",
       "typeIssue": "Uitgave van het probleem.",
       "reviewReviewed": "Herzien door de review.",
       "reviewApplicable": "Toepasselijk Van toepassing.",
       "reviewNotApplicable": "N/A Geen of geen",
       "notesPlaceholder": "Notities... aantekeningen.",
-      "colType": "Type type type type soort",
-      "colTitle": "Titel titel titel",
-      "colAuthor": "Auteur auteur auteur schrijver",
+      "colType": "Soort",
+      "colTitle": "Titel",
+      "colAuthor": "Auteur",
       "colReview": "Beoordeling",
       "summaryFooter": "{triaged} of {total} getrieerd | {applicable} van toepassing | {notApplicable} N.v.t. | {unreviewed} resteert",
       "truncated": "Resultaten gekort tot {limit} items."
@@ -658,7 +658,7 @@
     },
     "links": {
       "viewOnPubDev": "Uitzicht op pub.dev",
-      "documentation": "Documentatie Documentatie documentatie.",
+      "documentation": "Documentatie",
       "changelog": "Changelog is een changelog.",
       "versions": "Versies Versieversieversies",
       "repository": "Repositorium voor gegevensbestanden.",
@@ -867,7 +867,7 @@
       "colPid": "PID",
       "colParent": "Ouder",
       "colRss": "RSS",
-      "colType": "Type type type type soort",
+      "colType": "Soort",
       "colCommand": "Commando",
       "colAction": "Actie",
       "typeOrphan": "Wees",
@@ -1102,7 +1102,7 @@
       "runAnalysisTitle": "Voer Saropa Lints analyse uit.",
       "severityGroupAria": "De ernstfilter filter.",
       "severityLabel": "De ernst van de situatie",
-      "moreSummary": "Meer meer meer meer",
+      "moreSummary": "Meer",
       "moreChevron": "▾",
       "copyJsonTitle": "Kopieer gefilterde schendingen als JSON ({count})",
       "saveReportTitle": "Bewaar gefilterde schendingen als JSON in rapporten/JJJMMDD.",
@@ -1522,7 +1522,7 @@
       "copyOpportunitiesTitle": "Kopieer de AI-upgrade-aanwijzingen voor de top ondergeadopteerde pakketten in één plakvorm.",
       "copyOpportunitiesLabel": "Copy kansen voor AI.",
       "saveAllTitle": "Bewaar het rapport JSON in reports/YYY YMMDD/...",
-      "saveAllLabel": "Save Save Save Bewaar het",
+      "saveAllLabel": "Opslaan",
       "saveUpgradeTitle": "Bewaar een rapport van alleen pakketten met een beschikbare update voor rapporten/JJJMMDD/...",
       "saveUpgradeLabel": "Bewaar de upgrade-rapport.",
       "resetViewTitle": "Reset filters, sorteren en opslaan van de weergave staat.",
@@ -1754,9 +1754,9 @@
       "ariaLabel": "Zoekcommando's zoeken naar commando's.",
       "clearAria": "Zoeken wissen",
       "hintLine1": "Past bij elk commando's.",
-      "hintStrongTitle": "titel titel titel van de titel",
+      "hintStrongTitle": "titel",
       "hintStrongDesc": "Beschrijving beschrijving van de omschrijving",
-      "hintStrongId": "Id id id id is een afkorting voor",
+      "hintStrongId": "id",
       "hintLine2": "(ID-tokens staan ​​ook op afstand — type",
       "hintLine2kbd": "Run analyse run analyse",
       "hintLine2End": "zonder stippen)."
@@ -1805,7 +1805,7 @@
     "script": {
       "moreSuffix": "+{count} meer meer",
       "showLess": "Toon minder toont minder.",
-      "runSingular": "Loop, loop, loop.",
+      "runSingular": " uitvoering",
       "runPlural": "Rennen, rennen, lopen.",
       "recentWord": "recent",
       "expandAll": "Uitbreiden van alles.",
@@ -2053,7 +2053,7 @@
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml-drempels",
         "placeholder": "quality_gate:\n  voorwaarden:\n    - statistiek: nieuwe_kritieke_problemen\n      op: eq\n      waarde: 0\n      on_fail: mislukt",
-        "save": "Save Save Save Bewaar het",
+        "save": "Opslaan",
         "saved": "Opgeslagen",
         "saveError": "Kon niet opslaan"
       },
@@ -2153,7 +2153,7 @@
         "unverified": "— (niet geverifieerd)",
         "allPlatforms": "Alle",
         "yes": "Ja /neen",
-        "no": "Nee, nee, nee. - Ik ben een man van de wereld."
+        "no": "Nee"
       },
       "badge": {
         "inProject": "In project in het project."
@@ -2236,7 +2236,7 @@
         "master": "Algemene schakelaar voor de extensie (saropaLints.enabled workspace instelling). Wanneer deze uit is, stopt Scan op Bewaren en rapporteert de zijbalk de extensie als uitgeschakeld. Live Analyse en LSP Server hebben hun eigen schakelaars.",
         "analyzerPlugin": "Werkt binnen de Dart analyse-server — live squiggles in de editor terwijl je typt, geen scan nodig. Schakelen herleest de plug-ins: blok in analysis_options.yaml.",
         "scanDaemon": "Achtergrondproces dat het hele project opslaat en rapporten opnieuw scant/.saropa_lints/violations.json. Uitschakelen onderbreekt het; de volgende opslag herstart het.",
-        "lspServer": "Stricte regels:\n1. Geef ALLEEN de vertaalde tekst weer.",
+        "lspServer": "Aparte taalserver — publiceert diagnostiek in het paneel Problemen voor geopende bestanden en werkruimtebestanden. Omschakelen schrijft de instelling saropaLints.lspServer.enabled.",
         "ci": "Leest en schrijft .github/workflows/saropa-lints.yml in je werkmap om de ingepakte GitHub Actions workflow in te schakelen of uit te schakelen. Dit reflecteert het bestand op je huidige tak — de kopie van de standaardtak bepaalt in werkelijkheid of pull requests worden toegestaan, en de twee kunnen afwijken. Het schakelen voert nooit een workflow uit of verwijdert deze; je moet de wijziging zelf nog steeds beoordelen en committen."
       },
       "recommended": {
@@ -2381,14 +2381,14 @@
     "links": {
       "viewFullDetails": "Bekijk volledige details.",
       "pubDev": "pub.dev",
-      "documentation": "Documentatie Documentatie documentatie.",
+      "documentation": "Documentatie",
       "changelog": "Changelog is een changelog.",
       "repository": "Repositorium voor gegevensbestanden.",
       "issues": "Issues issues zijn kwesties.",
       "reportIssue": "Rapport Uitgave Verslag Issue"
     },
     "logoAlt": "Logo van {packageName}",
-    "readMore": "Meer meer meer meer.",
+    "readMore": "meer",
     "readmeImageAlt": "README afbeelding van de Readme-afbeelding."
   },
   "chart": {
@@ -2775,7 +2775,7 @@
       "generated": "Genereerde code (*.g.dart, *.freezed.dart, etc.) is veilig om te uitsluiten — het wordt altijd opnieuw gegenereerd vanuit de bron.",
       "build": "Build output (build/, .dart_tool/) bevat tussentijdse artikelen die niet nodig zijn voor live analyse.",
       "inactive": "Mappen zonder recente git-activiteit kunnen dood of gearchiveerde code bevatten.",
-      "protected": "Strict Regels:\n1. Kern bronmappen (lib/, lib/src/, bin/) worden nooit aanbevolen voor uitsluiting.",
+      "protected": "Kernbronmappen (lib/, lib/src/, bin/) worden nooit aanbevolen voor uitsluiting.",
       "backup": "Een kopie van analysis_options.yaml wordt opgeslagen als analysis_options.yaml.bak voor elke wijziging die hier wordt gemaakt."
     },
     "notify": {

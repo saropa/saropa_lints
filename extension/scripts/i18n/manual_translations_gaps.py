@@ -9,6 +9,11 @@ from __future__ import annotations
 
 from typing import Dict
 
+# Repairs for MT prompt leaks, overlong values and looped words live in their own
+# module (this one would pass 600 lines); WIDGET_STYLE is shared so the English
+# source is spelled once.
+from manual_translations_mt_leaks import LEAK_REPAIRS, WIDGET_STYLE
+
 # Long English sources are spelled once here and referenced by alias below, so each
 # literal lives in one place (and a typo fails the alias lookup, not silently).
 _NEWEST = "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}."
@@ -30,7 +35,7 @@ _MAJOR = "Saropa Lints {label}: {from} → {to}. This is a major version and may
 _UNCOMMITTED = "pubspec.yaml already had uncommitted edits of yours. A commit takes whole files, so publishing from here would push those edits too. Commit or stash them, then run the commands above yourself."
 _NESTED = "{folders} contains {count} nested Dart package root(s) that git ignores. Each is analyzed as a separate context and can bloat the analysis server's memory."
 _THLANE = "Analysis lane set to {lane}. Restarting the Dart analysis server to apply it."
-_THFLUTTER = "Flutter widget choices — SizedBox.square, center over align, spacing over SizedBox, and avoiding shrinkWrap in scrolls. Flutter projects only."
+_THFLUTTER = WIDGET_STYLE
 _KOSTYLE = "How returns, conditionals, and loops are written — immediate return, for-in, getter vs method, and similar shorthands."
 _SWIMPACT = "Identical output to Severity Report — impact_report is the pre-2026-06-05 name, kept only so existing scripts and muscle memory keep working."
 _SWREENABLE = "Re-enable this rule — removes the override in analysis_options_custom.yaml. Run analysis again to see the change take effect."
@@ -380,6 +385,15 @@ for _loc, (_plugin_tr, _both_tr) in _ROUTE_LABELS.items():
         _PLUGIN: f"saropa_lints{_sep}{_plugin_tr} {{version}}",
         _BOTH: f"saropa_lints{_sep}{_both_tr} {{version}}",
     })
+
+# Fold the MT-leak repairs in the same way. A source repaired twice would make the
+# winner depend on merge order, so an overlap is a hard error, not a silent pick.
+for _loc, _entries in LEAK_REPAIRS.items():
+    _target = _REPAIRS.setdefault(_loc, {})
+    _overlap = sorted(set(_target) & set(_entries))
+    if _overlap:
+        raise ValueError(f"LEAK_REPAIRS[{_loc!r}] repeats _REPAIRS sources: {_overlap}")
+    _target.update(_entries)
 
 
 def build() -> Dict[str, Dict[str, str]]:

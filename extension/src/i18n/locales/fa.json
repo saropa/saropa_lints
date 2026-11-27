@@ -145,7 +145,7 @@
       "copyJson": "کپی JSON را کپی کنید",
       "toggleGroup": "گروه بندی را فعال / غیر فعال کنید",
       "colFile": "فایل",
-      "colLine": "خط خط خط",
+      "colLine": "خط",
       "colRule": "قاعده قانون اساسی",
       "colSeverity": "شدت: میزان شدید بودن",
       "colTier": "تیر",
@@ -435,7 +435,7 @@
           "newSection": "جدید از پایه ({count})",
           "moreRows": "+{count} بیشتر نمایش داده نشده است.",
           "fileCol": "فایل",
-          "lineCol": "خط خط خط"
+          "lineCol": "خط"
         }
       },
       "optimizer": {
@@ -584,7 +584,7 @@
     "community": {
       "stars": "ستاره ها ستارگان ستارگان",
       "likes": "لایک ها را دوست دارد",
-      "report": "گزارش گزارش گزارش گزارشی",
+      "report": "گزارش",
       "openIssues": "مسائل باز (Open Issues)",
       "openPrs": "روابط عمومی باز (Open PRs)",
       "activity": "فعالیت (90d)",
@@ -637,14 +637,14 @@
       "filterUnreviewed": "بررسی نشده است.",
       "filterPrs": "PRs (اعلام عمومی)",
       "filterIssues": "مسائل و مسائلی که مطرح می شود",
-      "typePr": "PR PR PR در حال حاضر",
+      "typePr": "PR",
       "typeIssue": "موضوع: مسئله ی قضایی",
       "reviewReviewed": "بررسی شده است.",
       "reviewApplicable": "قابل استفاده قابل اجرا",
       "reviewNotApplicable": "قابل اجرا نیست",
       "notesPlaceholder": "یادداشت ها...",
-      "colType": "نوع: نوع نوع نوع",
-      "colTitle": "عنوان عنوان عنوان نام",
+      "colType": "نوع",
+      "colTitle": "عنوان",
       "colAuthor": "نویسنده ی کتاب: مؤلف",
       "colReview": "بررسی Review Review بازبینی",
       "summaryFooter": "{triaged} از {total} تریاژ شده | {applicable} قابل اجرا | {notApplicable} N/A | {unreviewed} باقی مانده است",
@@ -867,7 +867,7 @@
       "colPid": "PID",
       "colParent": "والد",
       "colRss": "RSS",
-      "colType": "نوع: نوع نوع نوع",
+      "colType": "نوع",
       "colCommand": "کامند",
       "colAction": "عملیات",
       "typeOrphan": "رهاشده",
@@ -1102,7 +1102,7 @@
       "runAnalysisTitle": "Saropa Lints تحلیل را اجرا کنید.",
       "severityGroupAria": "فیلتر شدت: فیلتری که در آن میزان شدید بودن بیماری مشخص می شود.",
       "severityLabel": "شدت: میزان شدید بودن",
-      "moreSummary": "بیشتر بیشتر بیشتر More",
+      "moreSummary": "بیشتر",
       "moreChevron": "▾",
       "copyJsonTitle": "کپی کردن نقض های فیلتر شده به عنوان JSON ({count})",
       "saveReportTitle": "ذخیره نقض فیلتر شده به عنوان JSON در گزارش ها / YYYYMMDD/",
@@ -1211,7 +1211,7 @@
       "colSeverity": "شدت: میزان شدید بودن",
       "colRule": "قاعده قانون اساسی",
       "colMessage": "پیام پیغام پیام پیام",
-      "colLine": "خط خط خط",
+      "colLine": "خط",
       "colActionsAria": "اقدامات صف (Row actions) اعمال ردیف",
       "selectRowAria": "این ردیف یافتن را انتخاب کنید.",
       "copyRowTitle": "این یافته را به عنوان JSON کپی کنید.",
@@ -1282,7 +1282,7 @@
       "unsuppressTitle": "محدودیت را حذف کنید تا این یافته در اسکن‌های معمولی ظاهر شود",
       "unsuppressHint": "برای غیر فعال کردن {rule} در {file}:{line}: نظریه // ignore: را بالای خط حذف کنید.",
       "columnFile": "فایل",
-      "columnLine": "خط خط خط",
+      "columnLine": "خط",
       "columnRule": "قاعده قانون اساسی",
       "columnKind": "کیند",
       "columnAction": "عملیات"
@@ -1291,7 +1291,7 @@
       "sectionAria": "سرکوب های سرکوب",
       "headingExport": "حذف (صادرات)",
       "viewHidesHeading": "دیدگاه مسائل پنهان می کند",
-      "viewHidesMetaActive": "فعالان فعال فعال فعال هستند.",
+      "viewHidesMetaActive": "فعال",
       "viewHidesMetaNone": "هیچ کدام",
       "noneInExport": "هیچ توقف کننده تحلیل کننده ای در `violations.json` صادرات جاری وجود ندارد. پس از ویرایش توقف کننده ها یا پایه ها تحلیل را اجرا کنید.",
       "totalRow": "مجموع - فیلترها را پاک کنید و یافته‌ها را باز کنید",
@@ -1754,9 +1754,9 @@
       "ariaLabel": "دستورات جستجو فرمان های جستجو",
       "clearAria": "پاک کردن جستجو از جستجوی واضح",
       "hintLine1": "با هر فرماندهی مطابقت دارد.",
-      "hintStrongTitle": "عنوان عنوان عنوان title",
+      "hintStrongTitle": "عنوان",
       "hintStrongDesc": "توضیحات: توصیف مشخصات",
-      "hintStrongId": "id id id Id این است که",
+      "hintStrongId": "شناسه",
       "hintLine2": "(توکن‌های شناسه نیز با فاصله هستند — تایپ کنید",
       "hintLine2kbd": "تحلیل اجرا، تجزیه و تحلیل اجرا",
       "hintLine2End": "بدون نقطه).) ، و در این صورت،"
@@ -1919,7 +1919,7 @@
       "colScore": "امتیاز نمره ای را بدست آورید",
       "colFunction": "عملکرد تابع تابع",
       "colFile": "فایل",
-      "colLine": "خط خط خط",
+      "colLine": "خط",
       "colUsage": "استفاده از کاربرد Usage",
       "colCoverage": "پوشش: پوشش کلیه",
       "colComplexity": "پیچیدگی: پیچیده بودن",
@@ -2058,7 +2058,7 @@
         "saveError": "نمی توان ذخیره کرد"
       },
       "colFile": "فایل",
-      "colLineNum": "خط خط خط",
+      "colLineNum": "خط",
       "colRule": "قاعده قانون اساسی",
       "colSeverity": "شدت: میزان شدید بودن",
       "colMessage": "پیام پیغام پیام پیام",
@@ -2152,7 +2152,7 @@
       "value": {
         "unverified": "- (تأیید نشده)",
         "allPlatforms": "همه، همه، همگی",
-        "yes": "بله بله بله، بله بله.",
+        "yes": "بله",
         "no": "نه، نه، ننه."
       },
       "badge": {
@@ -2217,7 +2217,7 @@
       "rss": "RSS:",
       "statusLabel": "وضعیت:",
       "statusValue": {
-        "active": "فعالان فعال فعال فعال هستند.",
+        "active": "فعال",
         "idle": "آیدل",
         "running": "اجرای کردن",
         "stopped": "توقف کرده است",
@@ -2388,7 +2388,7 @@
       "reportIssue": "گزارش موضوعی، مسئله ای"
     },
     "logoAlt": "آرم {packageName}",
-    "readMore": "بیشتر بیشتر بیشتر بیش تر",
+    "readMore": "بیشتر",
     "readmeImageAlt": "تصویر README image را بخوانید"
   },
   "chart": {

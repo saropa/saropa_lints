@@ -331,7 +331,7 @@
   "walkthrough.step.walkthrough.security.title": "安全姿势安全姿态",
   "walkthrough.step.walkthrough.security.description": "**OWASP 顶级 10** 覆盖矩阵 — 移动端和网页。每个类别显示违规和规则数量。点击以筛选违规。\n\n为审计导出合规性报告。\n\n[导出 OWASP 报告](command:saropaLints.exportOwaspReport)",
   "walkthrough.step.walkthrough.triage.title": "分诊",
-  "walkthrough.step.walkthrough.triage.description": "严格规则：\n1. 仅返回翻译后的字符串输出。\n2. 不包括解释、引言、markdown 标记或周围引号。\n3. 文本可能包含占位符令牌：占位符令牌。将每个令牌复制到翻译中，完全按照原文中的语法正确位置。绝不翻译、删除或重新格式化令牌。\n4. 关键：输出中的每个字母必须是简体汉字字母。将每个单词翻译成简体汉字——不要留下或替换任何拉丁、泰语、阿拉伯语、西里尔语、韩语、日语或其他脚本中的单词。空格、数字、标点和占位符令牌是唯一例外。\n\n规则按优先级分组 —— 错误、体积带宽和风格。每个组显示 **预估分数影响**。\n\n使用 **管理规则包** 启用或禁用规则和规则包；更改会写入 YAML 并重新运行分析。\n\n[打开管理规则包](command:saropaLints.openConfigDashboard)",
+  "walkthrough.step.walkthrough.triage.description": "规则按优先级分组 — 错误、数量区间和风格类。每个分组显示**预估分数影响**。\n\n使用**管理规则包**启用或禁用规则和规则包；更改会写入 YAML 并重新运行分析。\n\n[打开管理规则包](command:saropaLints.openConfigDashboard)",
   "walkthrough.step.walkthrough.trends.title": "文件风险与趋势",
   "walkthrough.step.walkthrough.trends.description": "**文件风险** 根据违规密度对文件进行排序 —— 风险最高的排在最前面。\n\n状态面板显示分数随时间的变化。回归警报和里程碑庆祝活动将帮助您保持进度。\n\n[显示状态面板](command:saropaLints.status.focus)",
   "walkthrough.step.walkthrough.packageVibrancy.title": "包装健康保健 这些",

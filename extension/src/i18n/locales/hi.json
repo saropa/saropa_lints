@@ -145,11 +145,11 @@
       "copyJson": "JSON को कॉपी करें।",
       "toggleGroup": "स्विच ग्रुपिंग",
       "colFile": "File फ़ाइल फाइल",
-      "colLine": "लाइन लाइन लाइन रेखा",
+      "colLine": "पंक्ति",
       "colRule": "नियम और विनियम।",
       "colSeverity": "गंभीरता की डिग्री।",
       "colTier": "तिर",
-      "colMessage": "संदेश संदेश संदेश।",
+      "colMessage": "संदेश",
       "empty": "कोई अनुसंधान नहीं - प्रोजेक्ट स्वच्छ है।",
       "filteredEmpty": "कोई मिलाने वाला नहीं है वर्तमान फ़िल्टर के।",
       "loadMore": "अधिक दिखाएं",
@@ -225,7 +225,7 @@
       "title": "पैकेज सारांश",
       "sortHint": "इस स्तम्भ पर तार्किक करें",
       "colPackage": "पैकेजिंग पैकेज",
-      "colVersion": "संस्करण संस्करण संस्करण",
+      "colVersion": "संस्करण",
       "colFeatures": "विशेषताएँ",
       "colAdopted": "अDOPTED",
       "colUnadopted": "अपरिग्रहित",
@@ -355,7 +355,7 @@
       "enableAllTitle": "सभी SDK मूवमेंट पैक को चालू करें जिनके Dart/Flutter संस्करण द्वारा इस प्रोजेक्ट के लिए आवश्यकता बर्बाद हो चुके हैं।",
       "enableAll": "सभी लागू ({count}) सक्षम करें",
       "enableBreakingTitle": "केवल ऐसे SDK पैक्स को सक्रिय करें जो आपके लक्ष्य संस्करण में पहले से ही हटा दिए गए API को चिह्नित करते हों।",
-      "enableBreaking": "सिरेट नियम:\n1. केवल टूटना सक्षम करें ({count})",
+      "enableBreaking": "केवल ब्रेकिंग सक्षम करें ({count})",
       "enableDeprecationTitle": "केवल उन SDK पैक्स को सक्रिय करें जो आपके लक्ष्य संस्करण में अपडेट नहीं हुए (लेकिन काम करते हुए) API को चिह्नित करते हैं।",
       "enableDeprecation": "अकेले प्रतिष्ठापन केवल सक्षम करें ({count})",
       "noPacksInCatalogue": "कोई एसडीकेडी मिग्रेशन पैक नोंकर किया गया है।"
@@ -435,7 +435,7 @@
           "newSection": "नई ({count}) बेसलाइन से",
           "moreRows": "+{count} अधिक दिखाए गए नहीं।",
           "fileCol": "File फ़ाइल फाइल",
-          "lineCol": "लाइन लाइन लाइन रेखा"
+          "lineCol": "पंक्ति"
         }
       },
       "optimizer": {
@@ -637,15 +637,15 @@
       "filterUnreviewed": "अनरीव्यूड Unreviewed समीक्षा की गई",
       "filterPrs": "पीआरएस (PRs) के लिए।",
       "filterIssues": "मुद्दों के मुद्दे हैं।",
-      "typePr": "PR PR PR पीआर",
+      "typePr": "PR",
       "typeIssue": "मुद्दा-प्रश्न का विषय।",
       "reviewReviewed": "समीक्षा की गई।",
       "reviewApplicable": "लागू करने योग्य Applicable",
       "reviewNotApplicable": "N/A नहीं /नहीं",
       "notesPlaceholder": "नोट्स ... नोट्स।",
       "colType": "प्रकार",
-      "colTitle": "शीर्षक शीर्षक शीर्षक।",
-      "colAuthor": "लेखक लेखिका लेखक लेखक",
+      "colTitle": "शीर्षक",
+      "colAuthor": "लेखक",
       "colReview": "समीक्षा की समीक्षा करें",
       "summaryFooter": "{total} का {triaged} ट्राइएज्ड | {applicable} लागू | {notApplicable} एन/ए | {unreviewed} शेष",
       "truncated": "परिणामों को {limit} आइटम में संकुचित किया गया।"
@@ -746,7 +746,7 @@
         "vibrancy": "पैकेज डैशबोर्ड खोलें"
       },
       "project": {
-        "version": "संस्करण संस्करण संस्करण",
+        "version": "संस्करण",
         "tier": "तिर",
         "vibrancy": "ऊर्जा",
         "packages": "पैकेज स्कैन किए गए",
@@ -1073,7 +1073,7 @@
       "warningsSubBad": "असफल हो सकता है या खराब दिख सकता है।",
       "warningsSubClear": "कोई नहीं - स्पष्ट",
       "warningsTitle": "चेतावनी के लिए फ़िल्टर निष्कर्ष (असफल हो सकता है या बुरा लग रहा है)",
-      "infoLabel": "जानकारी सूचना सूचना सूचना।",
+      "infoLabel": "जानकारी",
       "infoSub": "आपकी जानकारी के लिए - शैली/सुझाव",
       "infoSubNone": "कोई नहीं, कोई भी नहीं।",
       "infoTitle": "जानकारी के लिए निष्कर्षों को फ़िल्टर करें (FYI करें - शैली और सुझाव)",
@@ -1169,7 +1169,7 @@
       "menuGroupBulk": "बल्क कार्रवाइयां",
       "menuGroupFilter": "फ़िल्टर और फोकस करें।",
       "menuGroupOpen": "डैशबोर्ड खोलें।",
-      "menuGroupSystem": "सिस्टम सिस्टम सिस्टम।"
+      "menuGroupSystem": "सिस्टम"
     },
     "progress": {
       "runningLabel": "विश्लेषण चल रहा है ...",
@@ -1210,8 +1210,8 @@
       "selectAllAria": "सभी दृश्यमान निष्कर्षों का चयन करें।",
       "colSeverity": "गंभीरता की डिग्री।",
       "colRule": "नियम और विनियम।",
-      "colMessage": "संदेश संदेश संदेश।",
-      "colLine": "लाइन लाइन लाइन रेखा",
+      "colMessage": "संदेश",
+      "colLine": "पंक्ति",
       "colActionsAria": "पंक्ति क्रियाएँ Row actions",
       "selectRowAria": "इस खोज पंक्ति का चयन करें।",
       "copyRowTitle": "इस खोज को JSON के रूप में कॉपी करें।",
@@ -1249,7 +1249,7 @@
       "subsectionNone": "{title}: स्कैन सीमा में कोई नहीं।",
       "capNote": "स्कैन अपनी फ़ाइल सीमा तक पहुंच गया, इसलिए कुछ फाइलों को छोड़ दिया गया।",
       "raiseCap": "सीमा बढ़ाएं।",
-      "notePill": "नोट नोट नोट ध्यान दें",
+      "notePill": "नोट",
       "todosLabel": "सभी चीजें हैं।",
       "hacksLabel": "HACKS हैक्स"
     },
@@ -1282,7 +1282,7 @@
       "unsuppressTitle": "सामान्य स्कैन में इस खोज को दिखाने के लिए विरोधाभास को हटा दें",
       "unsuppressHint": "{rule} को {file}:{line} पर अन-अवरोधित करने के लिए, उस लाइन के ऊपर // ignore: कमेंट हटा दें।",
       "columnFile": "File फ़ाइल फाइल",
-      "columnLine": "लाइन लाइन लाइन रेखा",
+      "columnLine": "पंक्ति",
       "columnRule": "नियम और विनियम।",
       "columnKind": "किंड",
       "columnAction": "कार्यविधि"
@@ -1474,7 +1474,7 @@
       "totalSize": "कुल आकार*",
       "gradeTooltip": "प्रोजेक्ट ग्रेड {avgGrade}\nऔसत स्कोर: {avgScore}/100\nपैकेज: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "जीवंत, जीवंत।",
-      "stableTitle": "स्थिर स्थिर स्थिर।",
+      "stableTitle": "स्थिर",
       "outdatedTitle": "पुराना हो गया है, पुराने समय से बाहर।",
       "abandonedTitle": "परित्यक्त छोड़ दिया गया",
       "eolTitle": "जीवन का अंत।",
@@ -1490,7 +1490,7 @@
     "breakdown": {
       "title": "ग्रेड {grade} क्यों? - {pkgCount} पैकेजों में {avgScore}/100 औसत",
       "hint": "विस्तार करने के लिए क्लिक करें।",
-      "distributionHeading": "वितरण वितरण वितरण।",
+      "distributionHeading": "वितरण",
       "signalsHeading": "जोखिम संकेत स्कोर को नीचे खींचते हुए।",
       "signalFlagged": "{count} ध्वजांकित (त्याग दिया / जीवन के अंत)",
       "signalVulnerable": "{count} ज्ञात कमजोरियों के साथ।",
@@ -1565,11 +1565,11 @@
         "tooltip": "पैकेज का नाम - pubspec.yaml प्रविष्टि खोलने के लिए क्लिक करें"
       },
       "version": {
-        "label": "संस्करण संस्करण संस्करण",
+        "label": "संस्करण",
         "tooltip": "pubspec.lock से स्थापित संस्करण।"
       },
       "score": {
-        "label": "श्रेणी वर्ग श्रेणी श्रेणी श्रेणी।",
+        "label": "श्रेणी",
         "tooltip": "जीवंतता वर्गीकरण और स्वास्थ्य स्कोर (0-10)"
       },
       "published": {
@@ -1756,7 +1756,7 @@
       "hintLine1": "प्रत्येक कमांड के साथ मेल खाता है।",
       "hintStrongTitle": "शीर्षक शीर्षक का नाम",
       "hintStrongDesc": "विवरण वर्णन का वर्णन",
-      "hintStrongId": "id id id आईडी",
+      "hintStrongId": "आईडी",
       "hintLine2": "(आईडी टोकन भी दूरी पर हैं - टाइप करें",
       "hintLine2kbd": "रन विश्लेषण, विश्लेषण चलाएं।",
       "hintLine2End": "बिना डॉट्स के) ।"
@@ -1860,7 +1860,7 @@
         "empty": "अभी तक कोई समस्या नहीं मिली है ..."
       },
       "version": {
-        "engine": "इंजन इंजन इंजन के लिए।",
+        "engine": "इंजन",
         "detecting": "पता लगाना ... का पता लगाने...",
         "legacy": "पुराना — कोई जीवित प्रगति नहीं (इस परियोजना के saropa_lints पुराना है)"
       }
@@ -1919,7 +1919,7 @@
       "colScore": "स्कोर स्कोर करें।",
       "colFunction": "फ़ंक्शन फंक्शन फ़ंक्शंस",
       "colFile": "File फ़ाइल फाइल",
-      "colLine": "लाइन लाइन लाइन रेखा",
+      "colLine": "पंक्ति",
       "colUsage": "प्रयोग",
       "colCoverage": "कवरेज का दायरा कवर करें",
       "colComplexity": "जटिलता की जटिलता।",
@@ -1946,7 +1946,7 @@
         "rule": "LCOV 0% लाइन कवरेज की रिपोर्ट करते समय चिह्नित किया गया।"
       },
       "complex": {
-        "label": "जटिल जटिल जटिल",
+        "label": "जटिल",
         "evidence": "सीसी {cc}",
         "rule": "फ्लैग किया गया जब चक्रवात जटिलता 10 से अधिक हो।"
       },
@@ -2058,10 +2058,10 @@
         "saveError": "/नो_थिंक सेव नहीं किया जा सकता है"
       },
       "colFile": "File फ़ाइल फाइल",
-      "colLineNum": "लाइन लाइन लाइन रेखा",
+      "colLineNum": "पंक्ति",
       "colRule": "नियम और विनियम।",
       "colSeverity": "गंभीरता की डिग्री।",
-      "colMessage": "संदेश संदेश संदेश।",
+      "colMessage": "संदेश",
       "colKey": "की (Key)"
     },
     "shortcuts": {
@@ -2136,7 +2136,7 @@
     "table": {
       "row": {
         "vibrancyGrade": "जीवंतता ग्रेड",
-        "category": "श्रेणी वर्ग श्रेणी श्रेणी श्रेणी।",
+        "category": "श्रेणी",
         "latestVersion": "नवीनतम संस्करण।",
         "published": "प्रकाशित किया गया प्रकाशित किया",
         "publisher": "प्रकाशक प्रकाशक।",

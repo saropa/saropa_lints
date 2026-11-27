@@ -81,7 +81,7 @@
       "monitoring": {
         "header": "Nuovo: Monitoraggio Salute Macchina",
         "body": "L'estensione monitora ora la RAM del sistema, ogni server di analisi Dart, daemon Flutter e processo di background — non solo il proprio. Un indicatore del Budget degli Strumenti di Sviluppo avvisa quando gli strumenti di sviluppo superano una quota configurabile di RAM, e i processi orfani da sessioni crashate vengono rilevati all'avvio.",
-        "why": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotta.",
+        "why": "I progetti grandi lasciano spesso server di analisi orfani in esecuzione. Ora lo vedrai prima che il computer rallenti.",
         "actionDashboard": "Apri Salute Macchina",
         "actionThresholds": "Configura Soglie"
       },
@@ -145,7 +145,7 @@
       "copyJson": "Copia JSON.",
       "toggleGroup": "Attiva/disattiva gruppo",
       "colFile": "File",
-      "colLine": "Linea Linea Linea Linea",
+      "colLine": "Riga",
       "colRule": "Regolamento Regola.",
       "colSeverity": "Gravità della gravità.",
       "colTier": "Livello",
@@ -225,7 +225,7 @@
       "title": "Riepilogo package",
       "sortHint": "Seleziona per ordinare per questa colonna",
       "colPackage": "Pacchetto di pacchetti:",
-      "colVersion": "Versione versione versione.",
+      "colVersion": "Versione",
       "colFeatures": "Funzionalità",
       "colAdopted": "Adottato",
       "colUnadopted": "Non adottato",
@@ -291,7 +291,7 @@
       "boolean_naming": "I booleani devono usare i prefissi is/has/can/should in modo che l'intento sia chiaro nei condizionali e nelle API.",
       "code_style_preferences": "Come vengono scritti i return, i condizionali e i cicli — return immediato, for-in, getter vs metodo, e simili shortcut.",
       "function_parameter_style": "Le funzioni freccia quando concise, tutti i parametri nominati, callback in linea e nessuna riassegnazione di parametro.",
-      "widget_style": "Regole rigorose:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Flutter scelte widget — SizedBox.square, center over align, spacing over SizedBox, e evitare shrinkWrap in scrolls. Flutter progetti solo.",
+      "widget_style": "Scelte di widget Flutter — SizedBox.square, center al posto di align, spacing al posto di SizedBox ed evitare shrinkWrap negli scroll. Solo progetti Flutter.",
       "class_record_style": "Tipo di ritorno classe vs record, prefissi sottolineati privati e esplicito dove chiarisce.",
       "formatting": "Posizionamento delle righe vuote, virgole finali, e stile di letterali e commenti. Può essere rumoroso — molti file potrebbero richiedere modifiche.",
       "comments_documentation": "TODO e FIXME formato, caso di frase, un periodo dopo i commenti del documento, /// oltre //, e nessun codice commentato.",
@@ -313,8 +313,8 @@
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX e librerie di stato e iniezione delle dipendenze correlate.",
       "networking-apis": "Clienti HTTP, GraphQL, Firebase, Supabase e connettività.",
-      "storage-persistence": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotto.",
-      "navigation-deep-links": "Regole rigorose:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo di una frase.\n\nTesto: Routing e gestione dei deep-link — auto_route, go_router, app_links, url_launcher e webview.",
+      "storage-persistence": "Database locali e archivi chiave-valore — Drift, Hive, Isar, sqflite, shared_preferences.",
+      "navigation-deep-links": "Routing e gestione dei deep link — auto_route, go_router, app_links, url_launcher e webview.",
       "media-graphics": "Immagini, SVG, animazione, audio, mappe, pickers e il motore Flame.",
       "device-platform": "Sensori, posizione, autorizzazioni, biometria, notifiche e lavoro in background.",
       "identity-sharing": "Fornitori di accesso, condivisione e revisione in-app.",
@@ -375,7 +375,7 @@
       },
       "tierCap": {
         "title": "Limite di livello",
-        "hint": "Regole rigorose:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua durante la frase.",
+        "hint": "Limita quali livelli vengono eseguiti durante l'analisi, indipendentemente dalle regole abilitate esplicitamente. Lascia «Nessuno» per usare l'impostazione Tier dell'estensione.",
         "none": "Nessuno (utilizza la impostazione della scheda Tier)"
       },
       "saropaTier": {
@@ -435,7 +435,7 @@
           "newSection": "Nuovo dalla baseline ({count})",
           "moreRows": "+{count} non mostrati.",
           "fileCol": "File",
-          "lineCol": "Linea Linea Linea Linea"
+          "lineCol": "Riga"
         }
       },
       "optimizer": {
@@ -633,18 +633,18 @@
       "searchLabel": "Cerca PR e temi di ricerca.",
       "searchPlaceholder": "Cerca PR e problemi...",
       "filterAria": "Filtra per categoria.",
-      "filterAll": "Tutti tutti, tutti.",
+      "filterAll": "Tutti",
       "filterUnreviewed": "Non recensito",
       "filterPrs": "PR",
       "filterIssues": "I problemi sono questioni.",
-      "typePr": "PR PR PR, è un'altra cosa.",
+      "typePr": "PR",
       "typeIssue": "Il problema è il numero.",
       "reviewReviewed": "Rivisto in rassegna.",
       "reviewApplicable": "Applicabile applicabile.",
       "reviewNotApplicable": "N/A Non è possibile.",
       "notesPlaceholder": "Note... appunti.",
       "colType": "Tipo",
-      "colTitle": "Titolo titolo titolo",
+      "colTitle": "Titolo",
       "colAuthor": "Autore autore autrice autore",
       "colReview": "Rivedi",
       "summaryFooter": "{triaged} di {total} triage | {applicable} applicabile | {notApplicable} N/D | {unreviewed} rimanenti",
@@ -746,7 +746,7 @@
         "vibrancy": "Apri il Dashboard del Pacchetto."
       },
       "project": {
-        "version": "Versione versione versione.",
+        "version": "Versione",
         "tier": "Livello",
         "vibrancy": "Vibrante",
         "packages": "Pacchetti analizzati",
@@ -1065,7 +1065,7 @@
       "allMatched": "Tutti corrispondenti, tutti abbinati.",
       "ofTotal": "di {total} totale.",
       "clearFiltersTitle": "Clicca per cancellare tutti i filtri.",
-      "errorsLabel": "Errori errori Errori.",
+      "errorsLabel": "Errori",
       "errorsSubFix": "deve fissare deve aggiustare",
       "errorsSubClear": "nessuno: chiaro",
       "errorsTitle": "Filtra i risultati in base agli errori (da risolvere: rotto/si blocca/sfruttabile)",
@@ -1102,7 +1102,7 @@
       "runAnalysisTitle": "Eseguire l'analisi Saropa Lints.",
       "severityGroupAria": "Filtro di gravità.",
       "severityLabel": "Gravità della gravità.",
-      "moreSummary": "Più più più More More",
+      "moreSummary": "Altro",
       "moreChevron": "▾",
       "copyJsonTitle": "Copia le violazioni filtrate come JSON ({count})",
       "saveReportTitle": "Salva le violazioni filtrate come JSON nei report/YYY YMMDD.",
@@ -1211,7 +1211,7 @@
       "colSeverity": "Gravità della gravità.",
       "colRule": "Regolamento Regola.",
       "colMessage": "Messaggio di messaggio di messaggio.",
-      "colLine": "Linea Linea Linea Linea",
+      "colLine": "Riga",
       "colActionsAria": "Azioni di riga azioni in fila.",
       "selectRowAria": "Selezionare questa riga di ricerca.",
       "copyRowTitle": "Copia questo risultato come JSON.",
@@ -1249,7 +1249,7 @@
       "subsectionNone": "{title}: nessuno nell'intervallo di scansione.",
       "capNote": "La scansione ha raggiunto il suo limite di file, quindi alcuni file sono stati saltati.",
       "raiseCap": "Alzare il limite di soglia.",
-      "notePill": "Nota nota nota nota note",
+      "notePill": "nota",
       "todosLabel": "TODOs è tutto.",
       "hacksLabel": "I MUSCHIATTI SONO DIVINATI."
     },
@@ -1282,7 +1282,7 @@
       "unsuppressTitle": "Rimuovi la suppression in modo che questa finding appaia in scans normali",
       "unsuppressHint": "Per desupprimere {rule} in {file}:{line}, rimuovi il commento // ignore: sopra quella riga.",
       "columnFile": "File",
-      "columnLine": "Linea Linea Linea Linea",
+      "columnLine": "Riga",
       "columnRule": "Regolamento Regola.",
       "columnKind": "Tipo",
       "columnAction": "Azione"
@@ -1366,7 +1366,7 @@
     "enableRules": "Regole abilitanti per le regole.",
     "issues": "I problemi sono questioni.",
     "off": "Spento",
-    "on": "Su su su su.",
+    "on": "Attivo",
     "colRule": "Regolamento Regola.",
     "colIssues": "I problemi sono questioni.",
     "zeroIssueRules": "{count} regole con zero problemi — abilitate automaticamente nel tier.",
@@ -1518,7 +1518,7 @@
       "openPubspecTitle": "Aprire pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Copia il report JSON (tutte le righe + dettagli)",
-      "copyAllLabel": "Copia copia copia.",
+      "copyAllLabel": "Copia",
       "copyOpportunitiesTitle": "Copia le richieste di aggiornamento dell'IA per i pacchetti meno adottati in un unico incolla.",
       "copyOpportunitiesLabel": "Copia le opportunità per l'IA.",
       "saveAllTitle": "Salva il report JSON in reports/YYY YMMDD/...",
@@ -1546,7 +1546,7 @@
       "clearSearchAria": "Cancellare la ricerca Clear search.",
       "ageFilterTitle": "Filtrare per età di pubblicazione.",
       "publishedAgeLabel": "Età pubblicata età.",
-      "ageMaxAll": "Tutti tutti, tutti.",
+      "ageMaxAll": "Tutti",
       "presetFilterTitle": "Applicare i preset del filtro rapido.",
       "presetLabel": "Preset preset è un preimpostato.",
       "presetNone": "Nessuno, nessuno, nessun.",
@@ -1565,7 +1565,7 @@
         "tooltip": "Nome del pacchetto: fai clic per aprire la voce pubspec.yaml"
       },
       "version": {
-        "label": "Versione versione versione.",
+        "label": "Versione",
         "tooltip": "Versione installata da pubspec.lock."
       },
       "score": {
@@ -1746,7 +1746,7 @@
     "status": {
       "internalHidden": "{count} solo menu contestuale (nascosto)",
       "wordCommands": "I comandi comandano i comandi.",
-      "wordCategories": "categorie categorie categorie categoria.",
+      "wordCategories": "categorie",
       "wordRecent": "recente, recenti."
     },
     "search": {
@@ -1754,7 +1754,7 @@
       "ariaLabel": "Comandi di ricerca comandi di perquisizione",
       "clearAria": "Cancellare la ricerca Clear search.",
       "hintLine1": "Corrisponde a quello di ogni comando.",
-      "hintStrongTitle": "Titolo titolo titolo titolo.",
+      "hintStrongTitle": "titolo",
       "hintStrongDesc": "Descrizione descrizione descrizioni descrizione",
       "hintStrongId": "id",
       "hintLine2": "(Anche i token ID sono distanziati: type",
@@ -1917,9 +1917,9 @@
       "ariaLabel": "Le funzioni peggiori per punteggio.",
       "heading": "Le funzioni peggiori sono quelle di funzione.",
       "colScore": "Score del punteggio.",
-      "colFunction": "Funzione funzione funzione.",
+      "colFunction": "Funzione",
       "colFile": "File",
-      "colLine": "Linea Linea Linea Linea",
+      "colLine": "Riga",
       "colUsage": "Uso di utilizzo Usage Usage",
       "colCoverage": "Copertura della copertura di copertura.",
       "colComplexity": "Complessità La complessità.",
@@ -2058,7 +2058,7 @@
         "saveError": "Non è stato possibile salvare"
       },
       "colFile": "File",
-      "colLineNum": "Linea Linea Linea Linea",
+      "colLineNum": "Riga",
       "colRule": "Regolamento Regola.",
       "colSeverity": "Gravità della gravità.",
       "colMessage": "Messaggio di messaggio di messaggio.",
@@ -2151,9 +2151,9 @@
       },
       "value": {
         "unverified": "— (non verificato)",
-        "allPlatforms": "Tutti tutti, tutti.",
-        "yes": "Sì, sì, sì.",
-        "no": "No, no, no. Non è vero."
+        "allPlatforms": "Tutti",
+        "yes": "Sì",
+        "no": "No"
       },
       "badge": {
         "inProject": "In progetto, in progetto."
@@ -2236,11 +2236,11 @@
         "master": "Interruttore a livello di estensione (impostazione workspace saropaLints.enabled). Quando disattivato, Scan on Save si ferma e il pannello laterale segnala l'estensione come disattivata. Live Analysis e LSP Server hanno i propri interruttori.",
         "analyzerPlugin": "Esegue all'interno del server di analisi Dart — squigglie in tempo reale nell'editor mentre si digita, senza necessità di scansione. L'attivazione riscrive i plugin: blocco in analysis_options.yaml.",
         "scanDaemon": "Processo di background che riscansiona l'intero progetto su salvataggio e scrive report/.saropa_lints/violations.json. Disattivare sospende il processo; il salvataggio successivo lo riprende.",
-        "lspServer": "Regole rigorose:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.",
+        "lspServer": "Server di linguaggio separato — pubblica la diagnostica nel pannello Problemi per i file aperti e per quelli dell'area di lavoro. L'attivazione o disattivazione scrive l'impostazione saropaLints.lspServer.enabled.",
         "ci": "Legge e scrive .github/workflows/saropa-lints.yml nel tuo albero di lavoro per abilitare o disabilitare il workflow bundled GitHub Actions. Questo riflette il file sulla tua ramo corrente — la copia del ramo di default è ciò che effettivamente gate le richieste di pull, e i due possono divergere. L'abilitazione/non abilitazione non esegue mai né elimina il workflow; tu stesso ancora revisioni e commit il cambiamento."
       },
       "recommended": {
-        "analyzerPlugin": "Regole Rigide:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzione, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare la corretta rappresentazione grafica del sistema di scrittura della lingua di destinazione; non passare a un'altra lingua durante la frase.\n\nTesto: Consigliato: OFF mentre il Server LSP è acceso. Accendi (con LSP disattivato) se una regola smette di attivarsi con LSP.",
+        "analyzerPlugin": "Consigliato: DISATTIVATO mentre il server LSP è attivo. ATTIVALO (con LSP DISATTIVATO) se una regola smette di attivarsi con LSP.",
         "scanDaemon": "Raccomandato: ACCESO.",
         "lspServer": "Raccomandato: ON (predefinito, beta). Copre la diagnostica in tempo reale.",
         "ci": "Consigliato: ACCESO solo se desideri che le richieste di pull siano soggette a verifica."
@@ -2294,7 +2294,7 @@
         "introEnable": "{path} è stato scritto nel tuo albero di lavoro. Nulla esegue in CI fino a quando non è su {base}. Questi comandi lo posizionano su una nuova branch chiamata {branch} e aprono una richiesta di pull per la revisione — eseguili tu stesso, o premi il pulsante e Saropa Lints eseguirà esattamente questi.",
         "introDisable": "{path} è stato modificato nel tuo albero di lavoro per sospendere ogni job. CI continua a eseguirsi fino a quando non raggiunge {base}. Questi comandi mettono la modifica su una nuova branch chiamata {branch} e apre una richiesta di pull — eseguili tu stesso, oppure premi il pulsante e Saropa Lints eseguirà esattamente questi. Per fermare CI immediatamente invece, disattiva il workflow dalla scheda Actions del repository.",
         "commandsLabel": "Comandi di comando.",
-        "copy": "Copia copia copia.",
+        "copy": "Copia",
         "copied": "Comandi copiati negli appunti.",
         "createPr": "Crea ramo, commit, push e apri richiesta di pull",
         "notNow": "Non adesso",
@@ -2388,7 +2388,7 @@
       "reportIssue": "Relazione Issue Report Issue"
     },
     "logoAlt": "Logo {packageName}",
-    "readMore": "Più più più più ancora.",
+    "readMore": "altro",
     "readmeImageAlt": "Immagine di README immagine."
   },
   "chart": {
@@ -2520,9 +2520,9 @@
       "checkOutput": "Controlla l'output.",
       "baselineRunning": "Creare una base di riferimento (saropa_baseline.json) per sopprimere le violazioni esistenti...",
       "baselineCreated": "Baseline creato: baseline creata. saropa_baseline.json.jso Saropa_Baseline.Json.Jsono I risultati esistenti vengono soppressi; Il nuovo codice è ancora in fase di verifica.",
-      "baselineFailed": "Saropa Lints: è il nome di una cellula che si sviluppa attraverso la crescita non è stato possibile creare una linea di base. {details}",
+      "baselineFailed": "Saropa Lints: impossibile creare la baseline. {details}",
       "pubGetNotResolved": "Saropa Lints: è il numero di PH che si trova in una cellula. pub get è riuscito ma il problema di saropa_lints non si è risolto. Controllare la formattazione pubspec.yaml.",
-      "configWriteFailedNs": "Saropa Lints: è il nome di una cellula che si sviluppa attraverso la crescita Config write non è riuscito. {details}",
+      "configWriteFailedNs": "Saropa Lints: scrittura della configurazione non riuscita. {details}",
       "disabled": "Saropa Lints è disabilitato. I file del progetto non sono stati modificati.",
       "disabledAnalyzer": "Integrazione Saropa Lints disattivata. Le diagnostiche dell'analizzatore si limiteranno presto; attiva Scan on save On per ripristinare.",
       "reenabledPlugin": "Saropa Lints plugin riattivato in-processo. Riavviando il server di analisi Dart per ricollegarlo.",
@@ -2533,7 +2533,7 @@
       "configWriteFailed": "Config write non è riuscito. {details}",
       "scaffoldGateTitle": "Composite analizzatore plugin scaffolding composto.",
       "scaffoldGateDetail": "Questo scrive un nuovo pacchetto Dart sotto il tuo spazio di lavoro (pubspec.yaml, lib/main.dart, README): un plugin custom_lint che registra Saropa e lascia ganci per le tue regole.\n\nUtilizzare solo quando si spediscono regole analizzatore personalizzato insieme a Saropa. I normali progetti solo Saropa possono saltarlo, l'analizzatore consente un singolo ingresso di plugin per contesto.\n\nSuccessivo: scegliere una cartella relativa all'area di lavoro. Se quella cartella esiste già, ti viene chiesto prima che qualcosa venga sovrascritta.",
-      "actionContinue": "Continua, continua, continua...",
+      "actionContinue": "Continua",
       "actionOpenGuide": "Apri la guida aperta.",
       "scaffoldPathOutsideWorkspace": "Il percorso dello scaffold deve essere all'interno della cartella dell'area di lavoro.",
       "scaffoldFolderExists": "La cartella esiste già: {folder}. . . . è stato un successo I file possono essere aggiunti o sovrascritti. Continuare?",
@@ -2730,7 +2730,7 @@
     "kpi": {
       "filesInScope": "File in ambito",
       "lines": "righe",
-      "files": "file files file file file.",
+      "files": "file",
       "estimatedCost": "Costo stimato dell'analisi",
       "costUnits": "unità di costo",
       "potentialSavings": "Savings potenziali",

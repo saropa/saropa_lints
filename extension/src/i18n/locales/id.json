@@ -137,7 +137,7 @@
       "searchPlaceholder": "Filter berdasarkan aturan, file, atau pesan…",
       "filterTier": "Tingkat",
       "filterSeverity": "Tingkat keparahan",
-      "filterImpact": "Dampak dampak dampak dampak",
+      "filterImpact": "Dampak",
       "filterBaselineStatus": "Dasar",
       "baselineNew": "Baru",
       "baselineUnchanged": "Tidak berubah",
@@ -145,11 +145,11 @@
       "copyJson": "Salin JSON dengan cara mengkliknya.",
       "toggleGroup": "Beralih kelompokkan",
       "colFile": "File yang berupa file.",
-      "colLine": "Garis garis garis garis",
+      "colLine": "Baris",
       "colRule": "Aturan",
       "colSeverity": "Tingkat keparahan",
       "colTier": "Tingkat",
-      "colMessage": "Pesan pesan pesan pesan.",
+      "colMessage": "Pesan",
       "empty": "Tidak ada temuan — proyek ini bersih.",
       "filteredEmpty": "Tidak ada temuan yang sesuai dengan filter saat ini.",
       "loadMore": "Tampilkan lebih banyak",
@@ -225,12 +225,12 @@
       "title": "Ringkasan paket",
       "sortHint": "Pilih untuk mengurutkan berdasarkan kolom ini",
       "colPackage": "Paket paket yang tersedia.",
-      "colVersion": "Versi versi versi versi",
+      "colVersion": "Versi",
       "colFeatures": "Fitur",
       "colAdopted": "Diterapkan",
       "colUnadopted": "Tidak diadopsi",
       "colUsages": "Penggunaan",
-      "colScore": "Skor skor skor yang diperoleh."
+      "colScore": "Skor"
     },
     "packages": {
       "title": "Paket paket yang tersedia."
@@ -435,7 +435,7 @@
           "newSection": "Baru sejak baseline ({count})",
           "moreRows": "+{count} lebih tidak ditampilkan.",
           "fileCol": "File yang berupa file.",
-          "lineCol": "Garis garis garis garis"
+          "lineCol": "Baris"
         }
       },
       "optimizer": {
@@ -644,7 +644,7 @@
       "reviewNotApplicable": "N/A Tidak ada",
       "notesPlaceholder": "Catatan... catatan.",
       "colType": "Tipe",
-      "colTitle": "Judul Judul judul Judul",
+      "colTitle": "Judul",
       "colAuthor": "Penulis adalah Author Pengarang.",
       "colReview": "Tinjau",
       "summaryFooter": "{triaged} dari {total} diprioritaskan | {applicable} berlaku | {notApplicable} T/A | {unreviewed} tersisa",
@@ -746,7 +746,7 @@
         "vibrancy": "Buka Dashboard Paket."
       },
       "project": {
-        "version": "Versi versi versi versi",
+        "version": "Versi",
         "tier": "Tingkat",
         "vibrancy": "Vibrasi",
         "packages": "Paket yang di-scan",
@@ -1049,7 +1049,7 @@
     "groupBy": {
       "severity": "Tingkat keparahan",
       "file": "File yang berupa file.",
-      "impact": "Dampak dampak dampak dampak",
+      "impact": "Dampak",
       "rule": "Aturan",
       "owasp": "OWASP",
       "ruleType": "Jenis aturan jenis peraturan.",
@@ -1210,8 +1210,8 @@
       "selectAllAria": "Pilih semua temuan yang terlihat.",
       "colSeverity": "Tingkat keparahan",
       "colRule": "Aturan",
-      "colMessage": "Pesan pesan pesan pesan.",
-      "colLine": "Garis garis garis garis",
+      "colMessage": "Pesan",
+      "colLine": "Baris",
       "colActionsAria": "Tindakan baris Row actions.",
       "selectRowAria": "Pilih baris pencarian ini.",
       "copyRowTitle": "Salin temuan ini sebagai JSON.",
@@ -1264,7 +1264,7 @@
       "noServerBlurb": "Tidak ada server Drift Advisor yang ditemukan pada port yang dikonfigurasi.",
       "retry": "Cobalah untuk kembali.",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "Terhubung terhubung terhubung.",
+      "metaConnected": "terhubung",
       "noIssues": "Terhubung ke {label} — tidak ada masalah saat ini.",
       "refresh": "Refreshing dan menyegarkan.",
       "openBrowser": "Buka di browser yang terbuka.",
@@ -1282,7 +1282,7 @@
       "unsuppressTitle": "Hapus pengabaian sehingga temuan ini muncul dalam pemindaian normal",
       "unsuppressHint": "Untuk menghilangkan pemberitahuan {rule} di {file}:{line}, hapus komentar // ignore: di atas baris tersebut.",
       "columnFile": "File yang berupa file.",
-      "columnLine": "Garis garis garis garis",
+      "columnLine": "Baris",
       "columnRule": "Aturan",
       "columnKind": "Jenis",
       "columnAction": "Aksi"
@@ -1565,7 +1565,7 @@
         "tooltip": "Nama paket — klik untuk membuka entri pubspec.yaml"
       },
       "version": {
-        "label": "Versi versi versi versi",
+        "label": "Versi",
         "tooltip": "Versi yang diinstal dari pubspec.lock."
       },
       "score": {
@@ -1754,9 +1754,9 @@
       "ariaLabel": "Perintah pencarian perintah pencarian.",
       "clearAria": "Clear search Search jelaskan pencarian.",
       "hintLine1": "Cocok dengan masing-masing perintah setiap komando.",
-      "hintStrongTitle": "Judul judul judul judul",
+      "hintStrongTitle": "judul",
       "hintStrongDesc": "Deskripsi deskripsi deskriptif",
-      "hintStrongId": "Id id id id adalah",
+      "hintStrongId": "id",
       "hintLine2": "(token id juga diberi spasi — ketik",
       "hintLine2kbd": "Analisis Run Analysis adalah analisis yang dilakukan pada",
       "hintLine2End": "tanpa titik)."
@@ -1777,7 +1777,7 @@
       "clearAll": "Semua jelas, semuanya bersih."
     },
     "bands": {
-      "frequentTitle": "Sering sering sering sering.",
+      "frequentTitle": "Sering",
       "frequentHint": "Paling sering digunakan di seluruh sesi Anda.",
       "recentTitle": "Baru-baru ini Terakhir Saat Ini",
       "recentClear": "Clear (bahasa Inggris)",
@@ -1840,7 +1840,7 @@
       },
       "counter": {
         "files": "File",
-        "functions": "Fungsi-fungsi Fungsi Fungsi",
+        "functions": "Fungsi",
         "problems": "Masalah yang ditemukan masalah."
       },
       "counters": {
@@ -1916,10 +1916,10 @@
     "table": {
       "ariaLabel": "Fungsi terburuk menurut skor.",
       "heading": "Fungsi terburuk adalah fungsi yang buruk.",
-      "colScore": "Skor skor skor yang diperoleh.",
-      "colFunction": "Fungsi fungsi fungsi.",
+      "colScore": "Skor",
+      "colFunction": "Fungsi",
       "colFile": "File yang berupa file.",
-      "colLine": "Garis garis garis garis",
+      "colLine": "Baris",
       "colUsage": "Penggunaan: penggunaan.",
       "colCoverage": "Cakupan cakupan yang luas.",
       "colComplexity": "Kompleksitas Kerumitan",
@@ -2058,10 +2058,10 @@
         "saveError": "Tidak dapat menyimpan"
       },
       "colFile": "File yang berupa file.",
-      "colLineNum": "Garis garis garis garis",
+      "colLineNum": "Baris",
       "colRule": "Aturan",
       "colSeverity": "Tingkat keparahan",
-      "colMessage": "Pesan pesan pesan pesan.",
+      "colMessage": "Pesan",
       "colKey": "Kunci"
     },
     "shortcuts": {
@@ -2152,8 +2152,8 @@
       "value": {
         "unverified": "— (tidak diverifikasi)",
         "allPlatforms": "Semua",
-        "yes": "Ya, ya, ya. (tertawa)",
-        "no": "Tidak, tidak, tidak."
+        "yes": "Ya",
+        "no": "Tidak"
       },
       "badge": {
         "inProject": "Dalam Proyek In Project"
@@ -2191,7 +2191,7 @@
       "packages": "Paket paket yang tersedia.",
       "packagesTitle": "Jumlah paket dibandingkan side-by-side.",
       "inComparison": "dibandingkan dalam perbandingan.",
-      "dimensions": "Dimensi Dimensi dimensi.",
+      "dimensions": "Dimensi",
       "dimensionsTitle": "Jumlah dimensi di mana pemenang bisa diberi peringkat.",
       "ranked": "berperingkat"
     },
@@ -2404,7 +2404,7 @@
       "sharedTransitives": "Transitif bersama ({count})"
     },
     "noun": {
-      "package": "Paket paket paket paket yang bagus.",
+      "package": "paket",
       "packages": "paket-paket yang dikemas."
     }
   },

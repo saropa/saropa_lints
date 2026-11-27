@@ -1639,7 +1639,7 @@
     },
     "cells": {
       "noGithub": "GitHub リポジトリが見つかりませんでした.",
-      "devBadge": "dev dev dev について",
+      "devBadge": "dev",
       "transitiveBadge": "変形性 (トランジティブ)",
       "opportunitiesTooltip": "未使用の機能:未使用の機能を表示する {features} フォローしている",
       "publishDateUnavailable": "公開日: pub.dev から利用できません.",
@@ -1756,7 +1756,7 @@
       "hintLine1": "各コマンドのそれぞれにマッチする.",
       "hintStrongTitle": "タイトル タイトルの名前",
       "hintStrongDesc": "記述の説明は,描写",
-      "hintStrongId": "id id id について",
+      "hintStrongId": "ID",
       "hintLine2": "(ID トークンも間隔をあけて配置します — タイプ",
       "hintLine2kbd": "ラン分析,ラン解析",
       "hintLine2End": "ポイントなし)."
@@ -2152,7 +2152,7 @@
       "value": {
         "unverified": "—（未検証）",
         "allPlatforms": "すべて,すべて,全て.",
-        "yes": "はい,はい,はい. ありがとうございました.",
+        "yes": "はい",
         "no": "違う,違う,いいじゃない."
       },
       "badge": {

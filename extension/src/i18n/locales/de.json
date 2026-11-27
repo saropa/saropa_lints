@@ -105,7 +105,7 @@
       },
       "rules": {
         "label": "Regeln & Ebenen",
-        "description": "Strict Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: placeholder tokens. Kopieren Sie jeden Token genau so, wie er geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals einen Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Konfigurieren Sie, welche der über 2.350 Regeln laufen und mit welcher Schweregrad."
+        "description": "Legen Sie fest, welche der 2.350+ Regeln laufen und mit welchem Schweregrad."
       },
       "catalog": {
         "label": "Befehlskatalog, der Katalog für die Kommandoführung.",
@@ -375,7 +375,7 @@
       },
       "tierCap": {
         "title": "Tier-Limit",
-        "hint": "Strict Regeln:  \n1. Geben Sie lediglich den übersetzten Text aus.  \n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.  \n3. Der Text kann Platzhalter-Token enthalten: placeholder tokens. Kopieren Sie jeden Token genau so, wie er geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.  \n4. Die Ausgabe MUSS das richtige Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.",
+        "hint": "Begrenzt, welche Tiers zur Analysezeit laufen, unabhängig davon, welche Regeln ausdrücklich aktiviert sind. Lassen Sie „Keine“ stehen, um die Tier-Einstellung der Erweiterung zu verwenden.",
         "none": "Keine (verwende die Einstellung der Tier-Tab)"
       },
       "saropaTier": {
@@ -644,7 +644,7 @@
       "reviewNotApplicable": "N/A Nein",
       "notesPlaceholder": "Notizen...",
       "colType": "Typ",
-      "colTitle": "Titel Titel Titel Der Titel",
+      "colTitle": "Titel",
       "colAuthor": "Autor",
       "colReview": "Rezension",
       "summaryFooter": "{triaged} von {total} triagiert | {applicable} anwendbar | {notApplicable} N/A | {unreviewed} übrig",
@@ -1102,7 +1102,7 @@
       "runAnalysisTitle": "Führen Sie Saropa Lints Analyse durch.",
       "severityGroupAria": "Schweregrad-Filter: Der Filter wird nach der Schwere des Falles",
       "severityLabel": "Schwere der Erkrankung",
-      "moreSummary": "Mehr mehr mehr mehr",
+      "moreSummary": "Mehr",
       "moreChevron": "▾",
       "copyJsonTitle": "Kopieren Sie gefilterte Verstöße als JSON ({count})",
       "saveReportTitle": "Speichern Sie gefilterte Verstöße als JSON in Berichten/JJJMMDD/",
@@ -1366,7 +1366,7 @@
     "enableRules": "Ermöglichen Sie Regeln.",
     "issues": "Themen, Probleme und Fragen.",
     "off": "Aus",
-    "on": "Auf auf auf auf.",
+    "on": "An",
     "colRule": "Artikel Regel Regeln",
     "colIssues": "Themen, Probleme und Fragen.",
     "zeroIssueRules": "{count} Regeln mit null Problemen — im Tier automatisch aktiviert.",
@@ -1378,7 +1378,7 @@
     "hintNoPerRule": "Diese Ausfuhr hat keine pro-Regel Ausgabe zählt. Wieder analysieren mit einem aktuellen Saropa Lints Plugin.",
     "hintBuildFailed": "konnte keine Triage aus dieser Export-Datenbank erstellen. Führen Sie eine neue Analyse durch.",
     "summaryVolume": "Regeln Triage (Volumen / müssen fixieren / stilistisch)",
-    "hintSameAsTree": "Strengere Regeln:\n1. Geben Sie lediglich den übersetzten Text aus.\n2. Fügen Sie keine Erklärungen, Einführung, Markdown-Notation oder umgebende Anführungszeichen hinzu.\n3. Der Text kann Platzhalter-Token enthalten: Platzhalter-Token. Kopieren Sie jedes Token genau so, wie es geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals ein Token.\n4. Die Ausgabe MUSS das korrekte Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.\n\nText: Gleiche Gruppierung wie im Triage-Aktivitätsleiste-Baum: filtern Sie Issues oder deaktivieren/aktivieren Sie Regeln in `analysis_options_custom.yaml`. Große Gruppen können eine Bestätigung erfordern."
+    "hintSameAsTree": "Gleiche Gruppierung wie im Triage-Baum der Aktivitätsleiste: Probleme filtern oder Regeln in `analysis_options_custom.yaml` deaktivieren/aktivieren. Bei großen Gruppen kann eine Bestätigung abgefragt werden."
   },
   "kbdOverlay": {
     "toggleTitle": "Zeigen Sie Tastatur-Verknüpfungen (?) an.",
@@ -1756,7 +1756,7 @@
       "hintLine1": "Passt zu den Befehlen jedes einzelnen Kommandos.",
       "hintStrongTitle": "Titel",
       "hintStrongDesc": "Beschreibung beschreibung description.",
-      "hintStrongId": "Id id id ist eine ausführliche Darstellung.",
+      "hintStrongId": "ID",
       "hintLine2": "(ID-Tokens sind ebenfalls beabstandet – Typ",
       "hintLine2kbd": "Laufanalyse Analyse laufen Sie die Analyse.",
       "hintLine2End": "ohne Punkte)."
@@ -1805,8 +1805,8 @@
     "script": {
       "moreSuffix": "+{count} mehr mehr",
       "showLess": "Zeigen Sie weniger.",
-      "runSingular": "Lauf, lauf, laufe.",
-      "runPlural": "Läuft läuft, läuft.",
+      "runSingular": " Ausführung",
+      "runPlural": " Ausführungen",
       "recentWord": "Die jüngsten aktuellen letzten.",
       "expandAll": "Expandieren Sie alle.",
       "collapseAll": "Alles zusammenbrechen.",
@@ -2153,7 +2153,7 @@
         "unverified": "– (nicht bestätigt)",
         "allPlatforms": "Alle",
         "yes": "Ja",
-        "no": "Nein, nein, nein. Es ist ein"
+        "no": "Nein"
       },
       "badge": {
         "inProject": "In Projekt im Projekt."
@@ -2388,7 +2388,7 @@
       "reportIssue": "Bericht Ausgabe der Berichtsfrage"
     },
     "logoAlt": "{packageName} Logo mit dem Namen",
-    "readMore": "Mehr mehr mehr mehr.",
+    "readMore": "mehr",
     "readmeImageAlt": "README Bildbild im Readme-Format"
   },
   "chart": {

@@ -637,7 +637,7 @@
       "filterUnreviewed": "לא נבדק",
       "filterPrs": "PRs (החברה הציבורית)",
       "filterIssues": "נושאים סוגיות",
-      "typePr": "PR PR PR פרט לכך",
+      "typePr": "PR",
       "typeIssue": "נושא הנושא של הנושא",
       "reviewReviewed": "ביקורת על ספריו",
       "reviewApplicable": "חל על כל דבר.",
@@ -1639,7 +1639,7 @@
     },
     "cells": {
       "noGithub": "לא נמצא מאגר GitHub.",
-      "devBadge": "דב Dev dev dev הוא לא.",
+      "devBadge": "dev",
       "transitiveBadge": "טרנזיטיבי - עברי.",
       "opportunitiesTooltip": "תכונות לא בשימוש: {features}",
       "publishDateUnavailable": "תאריך פרסום לא זמין מ pub.dev",
@@ -1756,7 +1756,7 @@
       "hintLine1": "תואם לכל פקודה של כל הפקוד.",
       "hintStrongTitle": "שם הכותרת כותרת התואר",
       "hintStrongDesc": "תיאור תואר התיאוריה",
-      "hintStrongId": "id id id זהות",
+      "hintStrongId": "מזהה",
       "hintLine2": "(גם אסימוני מזהה מרווחים - הקלד",
       "hintLine2kbd": "ניתוח ריצה, Run Analysis - בדיקת ריצה",
       "hintLine2End": "ללא נקודות)."
@@ -2388,7 +2388,7 @@
       "reportIssue": "דו\"ח דיווח נושא הנושא"
     },
     "logoAlt": "סמל {packageName}",
-    "readMore": "יותר יותר יותר עוד",
+    "readMore": "עוד",
     "readmeImageAlt": "תמונת README בתמונה"
   },
   "chart": {
