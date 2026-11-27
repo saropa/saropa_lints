@@ -77,6 +77,20 @@ _LOOP_RE = re.compile(r"(?<!\w)((?:\w+[\s,]+){0,2}\w+)(?:[\s,]+\1(?!\w)){2,}", r
 _OVERLONG_MIN_EN = 40
 _OVERLONG_FACTOR = 2.5
 
+# CJK labels loop without spaces ("メニューメニューメヌー", "版本版本版本的版本"),
+# which _LOOP_RE cannot see because it needs word breaks. Flag a 3+ character run
+# repeated back to back, a 2-character run three times, or one character four
+# times. Thai is left out: it legitimately doubles words (ที่ที่, นาทีที่).
+# Measured 2026-11-27: 50 hits in the old zh/ja/ko catalogs, 0 after the repairs.
+_CJK = "[぀-ヿ㐀-鿿가-힯]"
+_CJK_LOOP_RE = re.compile(rf"({_CJK}{{3,}})\1|({_CJK}{{2}})\2\2|({_CJK})\3\3\3")
+
+# Sentences NLLB invented ("Es el nombre de la persona que tiene", "là người có
+# thể", "没有一个人"), shared with the TypeScript parity test. A phrase is excused
+# only when the English matches its en_excuse regex.
+INVENTED_PHRASES_PATH = HERE / "invented_phrases.json"
+_invented_cache: dict[str, list[tuple[str, re.Pattern | None]]] | None = None
+
 
 def _brand_terms() -> tuple[str, ...]:
     """Do-not-translate terms, imported lazily so the CLI works without mt_fallback."""
@@ -143,6 +157,7 @@ def detect(en: str, loc: str, locale: str, blocklist: list[dict]) -> list[tuple[
     if n_en >= _MIN_EN_LEN_FOR_BLOWUP and n_loc > _BLOWUP_FACTOR * n_en + _BLOWUP_SLACK:
         out.append(("hard", f"blowup:{n_loc}>{_BLOWUP_FACTOR}x{n_en}"))
     out.extend(_mt_echo_flags(en, loc))
+    out.extend(_invented_flags(en, loc, locale))
 
     # Known-wrong renderings of domain terms (data-driven; add entries as found).
     for entry in blocklist:
@@ -183,7 +198,44 @@ def _mt_echo_flags(en: str, loc: str) -> list[tuple[str, str]]:
     # Whole-string lengths on purpose; see the _OVERLONG_* comment.
     if len(en) >= _OVERLONG_MIN_EN and len(loc) > _OVERLONG_FACTOR * len(en):
         out.append(("hard", f"overlong:{len(loc)}>{_OVERLONG_FACTOR}x{len(en)}"))
+    # Spaceless loop; English never contains CJK, so no excuse check is needed.
+    cjk = _CJK_LOOP_RE.search(loc)
+    if cjk:
+        out.append(("hard", f"loop:{cjk.group(0)[:20]}"))
     return out
+
+
+def load_invented_phrases(path: Path | None = None) -> dict[str, list[tuple[str, re.Pattern | None]]]:
+    """Locale -> [(lowercased phrase, compiled en_excuse or None)], cached.
+
+    A missing file yields {} so the detector degrades instead of crashing a run.
+    """
+    global _invented_cache
+    if path is None and _invented_cache is not None:
+        return _invented_cache
+    p = path or INVENTED_PHRASES_PATH
+    table: dict[str, list[tuple[str, re.Pattern | None]]] = {}
+    if p.is_file():
+        data = json.loads(p.read_text(encoding="utf-8")).get("phrases", {})
+        for locale, items in data.items():
+            # An empty en_excuse means the phrase is never legitimate.
+            table[locale] = [
+                (it["phrase"].lower(), re.compile(it["en_excuse"], re.I) if it.get("en_excuse") else None)
+                for it in items
+            ]
+    if path is None:
+        _invented_cache = table
+    return table
+
+
+def _invented_flags(en: str, loc: str, locale: str) -> list[tuple[str, str]]:
+    """HARD flag for a known NLLB-invented phrase that the English does not justify."""
+    low = loc.lower()
+    for phrase, excuse in load_invented_phrases().get(locale, []):
+        # Excused when the English really talks about the same thing (e.g. "person").
+        if phrase in low and not (excuse and excuse.search(en)):
+            return [("hard", f"invented:{phrase[:30]}")]
+    return []
 
 
 def prune_bad_cache_entries(

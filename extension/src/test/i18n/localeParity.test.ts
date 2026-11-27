@@ -2,7 +2,8 @@
  * Locale parity: every locale must contain every English key and keep
  * placeholders ({name}, `code`, markdown/command links) identical to English.
  * Values still identical to English fail too, unless allowlisted in scripts/i18n/english_allowed.json.
- * Leaked MT prompts, looped words and overlong values fail as "mt-echo" (see mtEchoProblems).
+ * Leaked MT prompts, looped words (spaced or CJK), overlong values and known invented
+ * phrases (scripts/i18n/invented_phrases.json) fail as "mt-echo" (see mtEchoProblems).
  * Full audit lives in scripts/i18n/verify_locales.py.
  */
 import * as assert from 'node:assert';
@@ -102,12 +103,43 @@ function hasLoop(s: string): boolean {
 const OVERLONG_MIN_EN = 40;
 const OVERLONG_FACTOR = 2.5;
 
-function mtEchoProblems(en: string, loc: string): string[] {
+// CJK labels loop without spaces ("メニューメニューメヌー"), which LOOP cannot see.
+// Same pattern as _CJK_LOOP_RE in bad_translations.py: a 3+ character run twice,
+// a 2-character run three times, or one character four times. Thai is excluded
+// because it legitimately doubles words.
+const CJK = '[\\u3040-\\u30ff\\u3400-\\u9fff\\uac00-\\ud7af]';
+const CJK_LOOP = new RegExp(`(${CJK}{3,})\\1|(${CJK}{2})\\2\\2|(${CJK})\\3\\3\\3`, 'u');
+
+interface InventedPhrase { phrase: string; excuse: RegExp | null }
+
+/**
+ * NLLB-invented sentences ("Es el nombre de la persona que tiene", "là người có thể"),
+ * shared with bad_translations.py through scripts/i18n/invented_phrases.json.
+ * A phrase is excused only when the English matches its en_excuse regex.
+ */
+function loadInvented(): Record<string, InventedPhrase[]> {
+  const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'i18n', 'invented_phrases.json'), 'utf8'));
+  const out: Record<string, InventedPhrase[]> = {};
+  for (const [l, items] of Object.entries<{ phrase: string; en_excuse?: string }[]>(d.phrases ?? {})) {
+    // An empty en_excuse means the phrase is never legitimate.
+    out[l] = items.map((it) => ({ phrase: it.phrase.toLowerCase(), excuse: it.en_excuse ? new RegExp(it.en_excuse, 'i') : null }));
+  }
+  return out;
+}
+
+const INVENTED = loadInvented();
+
+function mtEchoProblems(en: string, loc: string, locale: string): string[] {
   const out: string[] = [];
   if (PROMPT_LIST.test(loc) && !PROMPT_LIST.test(en)) { out.push('prompt-leak'); }
   if (hasLoop(loc) && !hasLoop(en)) { out.push('loop'); }
+  // English never contains CJK, so the spaceless loop needs no excuse check.
+  if (CJK_LOOP.test(loc)) { out.push('loop'); }
   // Whole-string lengths: a leaked prompt keeps the source's links and code spans.
   if (en.length >= OVERLONG_MIN_EN && loc.length > OVERLONG_FACTOR * en.length) { out.push('overlong'); }
+  const low = loc.toLowerCase();
+  const hit = (INVENTED[locale] ?? []).find((p) => low.includes(p.phrase) && !(p.excuse && p.excuse.test(en)));
+  if (hit) { out.push(`invented:${hit.phrase.slice(0, 30)}`); }
   return out;
 }
 
@@ -144,7 +176,7 @@ describe('locale parity', () => {
           const ev = String(en[k]);
           const pp = placeholderProblems(ev, lv);
           if (pp.length) { bad.push(`${k} (${pp.join(',')})`); }
-          const me = mtEchoProblems(ev, lv);
+          const me = mtEchoProblems(ev, lv, l);
           if (me.length) { echo.push(`${k} (${me.join(',')})`); }
           if (
             lv === ev &&

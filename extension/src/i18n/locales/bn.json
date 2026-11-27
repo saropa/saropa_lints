@@ -128,7 +128,7 @@
       "canceled": "অডিট বাতিল হয়েছে।"
     },
     "report": {
-      "title": "Saropa Lints অ্যাউডিট",
+      "title": "Saropa Lints অডিট",
       "heading": "অডিট রিপোর্ট",
       "errorHeading": "অডিট ব্যর্থ হয়েছে",
       "canceledHeading": "অডিট বাতিল হয়েছে",
@@ -136,7 +136,7 @@
       "baselineSubtitle": "{date} এর বেসলাইন তুলনায়",
       "searchPlaceholder": "রুল, ফাইল বা মেসেজ অনুযায়ী ফিল্টার করুন…",
       "filterTier": "তারাচ্ছাড়া স্তর",
-      "filterSeverity": "গুরুতরতা Severity",
+      "filterSeverity": "গুরুতরতা",
       "filterImpact": "প্রভাব",
       "filterBaselineStatus": "বেসলাইন",
       "baselineNew": "নতুন",
@@ -144,12 +144,12 @@
       "saveBaseline": "বেসলাইন হিসাবে সংরক্ষণ করুন",
       "copyJson": "JSON কপি করুন",
       "toggleGroup": "গ্রুপ টুগেল",
-      "colFile": "ফাইলের নাম File file",
-      "colLine": "লাইন, লাইন, লাইনের মধ্যে",
-      "colRule": "নিয়মকানুন Rule Rule",
-      "colSeverity": "গুরুতরতা Severity",
+      "colFile": "ফাইল",
+      "colLine": "লাইন",
+      "colRule": "নিয়ম",
+      "colSeverity": "গুরুতরতা",
       "colTier": "তারাচ্ছাড়া স্তর",
-      "colMessage": "বার্তা বার্তা মেসেজ",
+      "colMessage": "বার্তা",
       "empty": "কোন ফাইন্ডিং নেই — প্রকল্পটি সাধারণ।",
       "filteredEmpty": "বর্তমান ফিল্টারগুলির সাথে মেলে কোনও ফাইন্ডিং নেই।",
       "loadMore": "বেশি দেখুন",
@@ -183,7 +183,7 @@
       "noProject": "Saropa: কোন কোন Dart প্রকল্প নেই",
       "doneTooltip": "{total} খুঁজে পাওয়া (s), {shown} ফিল্টারের পরে দেখানো হয়েছে",
       "dropped": "Saropa: স্ক্যান অবমুক্ত ({count} ফাইল)",
-      "droppedTooltip": "Saropa Lints ফাইলগুলো আপনি দ্বারা খোলা হয়নি বলে অবহেলা করা হয়েছে {count}। ফাইলটি সংরক্ষণ করুন এবং এটি স্ক্যান করুন।",
+      "droppedTooltip": "Saropa Lints {count}টি ফাইল এড়িয়ে গেছে যেগুলি আপনি নয়, অন্য কোনো টুল খুলেছিল। কোনো ফাইল স্ক্যান করতে সেটি সংরক্ষণ করুন।",
       "droppedSuffix": "(+( {count} ) কেটে গেছে)",
       "droppedSuffixTooltip": "সেগুলো আপনি দ্বারা খোলা হয়নি, অন্য একটি টুল দ্বারা খোলা হয়েছিল, তাই {count}টি ফাইল অবহেলা করা হয়েছে। ফাইলটি সংরক্ষণ করুন যাতে এটি স্ক্যান করা যায়।"
     },
@@ -201,7 +201,7 @@
       "noFolder": "কোন রিপোর্ট ফোল্ডার তৈরি করা যায়নি, তাই রিপোর্টটি লেখা হয়নি।",
       "failed": "প্রতিবেদনটি লেখা যায়নি: {error}",
       "large": "বিবরণটি {megabytes} MB এবং এটি পরিদর্শন করা অত্যন্ত ধীর হতে পারে। এটির সাথে অবস্থিত জেসন ফাইলটি টুলিং জন্য একই ডেটা ধারণ করে।",
-      "done": "অবসর প্রতিবেদন লেখা হয়েছে {path}-এর জন্য"
+      "done": "সুযোগ প্রতিবেদন {path}-এ লেখা হয়েছে"
     },
     "documentTitle": "প্যাকেজ ফিচার ইনভেন্টরি",
     "heroTitle": "প্যাকেজ ফিচার ইনভেন্টরি",
@@ -224,16 +224,16 @@
     "summary": {
       "title": "প্যাকেজ সারাংশ",
       "sortHint": "এই কলাম অনুসারে সাজানো নির্বাচন করুন",
-      "colPackage": "প্যাকেজিংয়ের জন্য একটি ভাল মানের।",
-      "colVersion": "সংস্করণ সংস্করণ Version",
+      "colPackage": "প্যাকেজ",
+      "colVersion": "সংস্করণ",
       "colFeatures": "বৈশিষ্ট্যগুলি",
       "colAdopted": "ব্যবহার করা হয়েছে",
-      "colUnadopted": "অনুগ্রহ করে গ্রহণ করা হয়নি",
+      "colUnadopted": "গৃহীত হয়নি",
       "colUsages": "ব্যবহার",
-      "colScore": "স্কোর স্কোর করুন।"
+      "colScore": "স্কোর"
     },
     "packages": {
-      "title": "প্যাকেজিংয়ের জন্য প্যাকেট"
+      "title": "প্যাকেজ"
     },
     "empty": {
       "body": "কোন প্যাকেজ স্ক্যান করা হয়নি, তাই কোন ফিচার তালিকাভুক্ত করা হয়নি।"
@@ -244,7 +244,7 @@
       "noFeatures": "একটি চেংগলজ খুঁজে পাওয়া গেল, কিন্তু এর থেকে কোনও ফিচার উত্পন্ন করা যায়নি।",
       "linkPubDev": "pub.dev",
       "linkDocs": "ডকুমেন্টেশন নথিভুক্তকরণ",
-      "linkRepository": "রেপোজিটরি রিপজিটরি।"
+      "linkRepository": "রিপোজিটরি"
     },
     "category": {
       "heading": "{category} ({count})",
@@ -280,11 +280,11 @@
     "title": "স্টাইল ও মতামত",
     "intro": "মতামতযুক্ত শৈলীর নিয়ম, ডিফল্টরূপে বন্ধ। আপনার টিম যেটা করতে রাজি হবে, শুধু সেটা চালু করুন। দ্বন্দ্বপূর্ণ পছন্দগুলি গ্রুপে ভাগ করা হয় যাতে আপনি একটি বেছে নেন।",
     "searchPlaceholder": "অনুসন্ধান শৈলী নিয়ম ...",
-    "pickOne": "একটি বেছে নিন, এক চয়ন করুন।",
-    "none": "না, না, কেউ নেই।",
-    "enableAll": "সব সক্ষম করুন সমস্ত সক্রিয় করুন",
+    "pickOne": "একটি বেছে নিন",
+    "none": "কোনোটি নয়",
+    "enableAll": "সব সক্ষম করুন",
     "disableAll": "সব অক্ষম করুন",
-    "noMatch": "কোন স্টাইল নিয়ম মিলছে না. ম্যাচ।",
+    "noMatch": "কোনো স্টাইল নিয়ম মেলেনি।",
     "desc": {
       "ordering_sorting": "সদৃশ সদস্য, প্যারামিটার, ফিল্ড এবং ম্যাপ কীগুলো সাজায় যাতে অনুমানযোগ্য ব্যবস্থাপনা হয়। বর্তমান কোডে খুব শব্দ করে — নতুন কোড বা ছোট রিপোজিটরিতে সবচেয়ে ভালো।",
       "naming_conventions": "ফাইল, পদ্ধতি, ব্যতিক্রম, কলব্যাক এবং ব্লক ইভেন্টস এবং স্টেটের জন্য নামকরণ। বড় কোডবেসে শব্দ হতে পারে; ধীরে ধীরে সক্ষম করুন।",
@@ -319,7 +319,7 @@
       "device-platform": "সেন্সর, অবস্থান, অনুমতি, বায়োমেট্রিক্স, বিজ্ঞপ্তি এবং ব্যাকগ্রাউন্ড কাজ।",
       "identity-sharing": "সাইন-ইন সরবরাহকারী, ভাগ করে নেওয়া এবং ইন-অ্যাপ পর্যালোচনা।",
       "utilities-config": "সাধারণ সাহায্যকারী — ইউইউডিএস, পরিবেশ কনফিগারেশন, ফন্ট এবং কলেকশন সংঘাত।",
-      "sdk-migrations": "Dart এবং Flutter সংস্করণ-আপগ্রেড নিয়মগুলি যে পতাকা API গুলি একটি প্রদত্ত SDK. এ সরানো বা অপ্রচলিত।"
+      "sdk-migrations": "Dart এবং Flutter সংস্করণ-আপগ্রেড নিয়ম, যা কোনো নির্দিষ্ট SDK-তে সরানো বা অপ্রচলিত API চিহ্নিত করে।"
     }
   },
   "tierPicker": {
@@ -330,7 +330,7 @@
       "ariaLabel": "নিয়ম এবং তালিকা ড্যাশবোর্ড ট্যাবসমূহ"
     },
     "ruleFinder": {
-      "disableButton": "অক্ষম করুন নিষ্ক্রিয় করুন",
+      "disableButton": "অক্ষম করুন",
       "disableTitle": "এই নিয়মটি পুরো প্রকল্পের জন্য অক্ষম করুন — analysis_options_custom.yaml লিখুন এবং বিশ্লেষণ পুনরাবৃত্তি করুন",
       "enableButton": "ব্যবহার করা হয়েছে",
       "enableTitle": "এই নিয়মটিকে ফেরত দিন — এটি analysis_options_custom.yaml এর ওভাররাইড অপসারণ করে এবং বিশ্লেষণ পুনরাবৃত্তি করে"
@@ -345,9 +345,9 @@
       "extension": "প্রসাধন একসাথে"
     },
     "common": {
-      "rule": "নিয়মকানুন Rule Rule",
+      "rule": "নিয়ম",
       "add": "যোগ করুন",
-      "remove": "Remove remove অপসারণ করা"
+      "remove": "সরান"
     },
     "sdk": {
       "summary": "{total} SDK মাইগ্রেশন প্যাক (গুলি) এই প্রকল্পে প্রয়োগ করা হয় — {breaking} ভাঙ্গন, {deprecation} বিরতি।",
@@ -385,7 +385,7 @@
         "label": "runtime_tier"
       },
       "lane": {
-        "title": "পরিশীলন লেন",
+        "title": "বিশ্লেষণ লেন",
         "hint": "কোন নিয়মগুলি একটি প্রক্রিয়ায় এনালাইজার প্লাগইন এডিটরে জীবনে চালায় বা কেবলমাত্র সেভ করার সময় (স্ক্যান ডেমন মাধ্যমে) চালায়।"
       },
       "platforms": {
@@ -412,7 +412,7 @@
       "diagnosticStats": {
         "title": "ডায়নোস্টিক সীমা",
         "hint": "সিই-স্টাইল বাজেট গেটস: একটি নিয়মের ভঙ্গ হওয়ার সংখ্যা একটি সীমা পেরে গেলে চেতাবনি বা ব্যর্থ হওয়ার বিষয়ে বিবেচনা করুন।",
-        "warn": "/নো_থিং করুন চেতাবনি দিন",
+        "warn": "সতর্কতার সীমা",
         "fail": "ফেইল করুন",
         "empty": "কোনো নির্দিষ্ট সীমা নির্ধারণ করা হয়নি।"
       },
@@ -426,7 +426,7 @@
         "openTitle": "এডিটরে সারোপা_বেসলাইন_জেসন খুলুন।",
         "summary": "{files} ফাইল(গুলো), {violations} ভংগিত করা হয়েছে — উত্পন্ন হয়েছে {generated}।",
         "unknownDate": "অজানা সময়ে",
-        "count": "কাউন্ট কান্ট কাউন্ট কাউন্ট",
+        "count": "সংখ্যা",
         "diff": {
           "title": "বর্তমানের সাথে তফাত",
           "counts": "{resolved} বেসলাইন থেকে সমাপ্ত হয়েছে · {new} বেসলাইন থেকে নতুন",
@@ -434,8 +434,8 @@
           "resolvedSection": "বর্তমান ({count})",
           "newSection": "নতুন বেসলাইন থেকে ({count})",
           "moreRows": "+{count} বেশি দেখানো হয়নি।",
-          "fileCol": "ফাইলের নাম File file",
-          "lineCol": "লাইন, লাইন, লাইনের মধ্যে"
+          "fileCol": "ফাইল",
+          "lineCol": "লাইন"
         }
       },
       "optimizer": {
@@ -453,7 +453,7 @@
       "scanning": "কাজ করছে...",
       "affected": "{count} প্রভাবিত",
       "list": "তালিকা",
-      "recommended": "পরামর্শ দেওয়া বাদ দেওয়া করা হয়নি ফাইলগুলি.ওয়াচার বাদ দেওয়া /নো_থিং"
+      "recommended": "প্রস্তাবিত বাদ যা এখনও files.watcherExclude-এ নেই"
     },
     "extension": {
       "hint": "প্রস্তুতকরণ ব্যাপক প্রদর্শন পছন্দগুলি",
@@ -527,24 +527,24 @@
       "community": "কমিউনিটি সম্প্রদায়ের সদস্যরা।",
       "dependencies": "ডিপেনডেন্সিগুলি",
       "alerts": "সতর্কতা Alerts",
-      "platforms": "প্ল্যাটফর্মগুলি প্ল্যাটଫর্মগুলির জন্য উপযুক্ত",
+      "platforms": "প্ল্যাটফর্ম",
       "suggestions": "পরামর্শগুলি সুপারিশ করুন",
       "readmeImages": "README ইমেজগুলি পড়ুন"
     },
     "header": {
       "logoAlt": "{name} লোগো",
       "grade": "গ্রেড {grade}",
-      "licenseTitle": "লাইসেন্স লাইসেন্সিং",
+      "licenseTitle": "লাইসেন্স",
       "published": "প্রকাশিত {date}"
     },
     "partialBanner": {
       "partReadme": "README এবং লোগো।",
       "partGap": "সংস্করণ-বিভাজন পিআর এবং ইস্যুগুলির সমস্যাগুলি।",
       "partReverseDeps": "বিপরীত নির্ভরতা গণনা কাউন্টার",
-      "listTwo": "{first} এবং {second} এর মধ্যে _",
+      "listTwo": "{first} এবং {second}",
       "listMany": "{head}, এবং {last}।",
       "message": "কিছু বিভাগ লোড করা যায়নিঃ {list}.",
-      "retry": "পুনরায় চেষ্টা করুন Retry.",
+      "retry": "পুনরায় চেষ্টা করুন",
       "retrying": "আবার চেষ্টা করছি...",
       "retryTitle": "ব্যর্থ fetches পুনরায় চেষ্টা করুন।"
     },
@@ -554,9 +554,9 @@
     "version": {
       "constraint": "সীমাবদ্ধতা প্রতিবন্ধকতা",
       "latest": "সর্বশেষ Latest সাম্প্রতিকতম",
-      "prerelease": "প্রি-রিলিজ প্রাক রিলিজ",
-      "published": "প্রকাশিত প্রকাশিত Published",
-      "update": "আপডেট করুন Update Update",
+      "prerelease": "প্রি-রিলিজ",
+      "published": "প্রকাশিত",
+      "update": "আপডেট করুন",
       "blockedBy": "দ্বারা ব্লক করা হয়েছে",
       "blockedVia": "{blocker} ক্যাপস {dep} {constraint} ({resolvable} সমাধানযোগ্য, {latest} সর্বশেষ)",
       "blockedViaSdk": "{dep} ({resolvable} সমাধানযোগ্য, {latest} সর্বশেষ) জন্য {blocker} (Flutter SDK) দ্বারা পিন করা হয়েছে",
@@ -569,10 +569,10 @@
       "driftDiffers": "পার্থক্য: {siblings} (আপনার {own} আছে)",
       "codeSize": "কোডের আকার, কোড সাইজ",
       "archiveSize": "আর্কাইভের আকার আর্কইভের আয়তন",
-      "bloat": "({rating}/10 bloat) এর সাথে সম্পর্কিত",
+      "bloat": "({rating}/10 ব্লোট)",
       "onDisk": "ডিস্ক অন ডিস্কে",
-      "upgrade": "আপগ্রেড করুন আপগ্রিড আপগ্রেস।",
-      "upgrading": "আপগ্রেডিং ... আপগ্রিড করা হচ্ছে।",
+      "upgrade": "আপগ্রেড করুন",
+      "upgrading": "আপগ্রেড করা হচ্ছে…",
       "viewChangelog": "চেঞ্জলগ দেখুন"
     },
     "changelog": {
@@ -582,11 +582,11 @@
       "viewFull": "pub.dev এ সম্পূর্ণ পরিবর্তন লগ দেখুন"
     },
     "community": {
-      "stars": "নক্ষত্র তারকা তারা",
+      "stars": "স্টার",
       "likes": "পছন্দগুলি পছন্দ করে",
       "report": "রিপোর্ট, প্রতিবেদন",
       "openIssues": "উন্মুক্ত সমস্যাসমূহ",
-      "openPrs": "ওপেন পিআরএস (Open PRs) এর মাধ্যমে।",
+      "openPrs": "খোলা পিআর",
       "activity": "কার্যকলাপ (90d)",
       "activityValue": "{closed} ইস্যু বন্ধ, {merged} PRs একত্রিত।",
       "noActivity": "সাম্প্রতিক কোন কার্যকলাপ নেই",
@@ -629,29 +629,29 @@
       "noDates": "এই প্যাকেজের জন্য সংস্করণ তারিখগুলি নির্ধারণ করতে পারেনি।",
       "noItems": "এই সংস্করণগুলির মধ্যে কোনও পিআর বা সমস্যা পাওয়া যায় নি।",
       "prsMerged": "পিআরএস একত্রিত হয়েছে।",
-      "issuesClosed": "ইস্যুগুলি বন্ধ হয়েছে, সমস্যাগুলি বন্ধ হয়ে গেছে।",
+      "issuesClosed": "বন্ধ ইস্যু",
       "searchLabel": "PRs এবং সমস্যা অনুসন্ধান করুন।",
-      "searchPlaceholder": "পিআর এবং ইস্যু অনুসন্ধান করুন ... সমস্যাগুলি সন্ধান করুন।",
+      "searchPlaceholder": "পিআর এবং ইস্যু অনুসন্ধান করুন...",
       "filterAria": "বিভাগ অনুযায়ী ফিল্টার করুন।",
       "filterAll": "সব, সমস্ত, সকলই",
-      "filterUnreviewed": "Unreviewed পর্যালোচনা করা হয়নি",
+      "filterUnreviewed": "পর্যালোচনা করা হয়নি",
       "filterPrs": "পিআর",
       "filterIssues": "ইস্যুগুলি সমস্যাগুলি",
       "typePr": "PR",
-      "typeIssue": "ইস্যু ইস্যুর সমস্যা",
+      "typeIssue": "ইস্যু",
       "reviewReviewed": "পর্যালোচনা করা হয়েছে",
-      "reviewApplicable": "প্রযোজ্য Applicable প্রয়োগযোগ্য",
-      "reviewNotApplicable": "প্রযোজ্য নয়",
-      "notesPlaceholder": "নোট...নোট।",
+      "reviewApplicable": "প্রযোজ্য",
+      "reviewNotApplicable": "N/A",
+      "notesPlaceholder": "নোট...",
       "colType": "টাইপ প্রকারের ধরণ",
-      "colTitle": "Title শিরোনাম নামকরণ",
+      "colTitle": "শিরোনাম",
       "colAuthor": "লেখক",
       "colReview": "পর্যালোচনা",
       "summaryFooter": "{total} এর {triaged} triaged | {applicable} প্রযোজ্য | {notApplicable} N/A | {unreviewed} বাকি",
       "truncated": "ফলাফলগুলি {limit} আইটেমগুলিতে সংক্ষিপ্ত করা হয়েছে।"
     },
     "platforms": {
-      "wasm": "WASM এর অর্থ হচ্ছে ওয়াসম।"
+      "wasm": "WASM"
     },
     "images": {
       "alt": "README ইমেজ চিত্র Readme"
@@ -659,9 +659,9 @@
     "links": {
       "viewOnPubDev": "pub.dev এ দেখুন",
       "documentation": "ডকুমেন্টেশন নথিভুক্তকরণ",
-      "changelog": "পরিবর্তনের লগ পরিবর্তন করুন",
+      "changelog": "পরিবর্তন লগ",
       "versions": "সংস্করণগুলি Versions",
-      "repository": "রেপোজিটরি রিপজিটরি।",
+      "repository": "রিপোজিটরি",
       "openIssues": "উন্মুক্ত সমস্যাসমূহ",
       "reportIssue": "রিপোর্ট ইস্যু সমস্যা"
     },
@@ -676,7 +676,7 @@
   "toolbar": {
     "runAnalysis": "Run analysis চালান বিশ্লেষণ",
     "copyJson": "JSON কপি করুন",
-    "saveReport": "Save report save the report. প্রতিবেদন সংরক্ষণ করুন।",
+    "saveReport": "প্রতিবেদন সংরক্ষণ করুন",
     "moreActions": "আরও কর্মকাণ্ড, আরো পদক্ষেপ",
     "clearAll": "সব পরিষ্কার, সবকিছু সাফ।"
   },
@@ -690,7 +690,7 @@
   },
   "filter": {
     "activeLabel": "সক্রিয় ফিল্টারঃ",
-    "chipRemove": "Remove remove অপসারণ করা"
+    "chipRemove": "সরান"
   },
   "a11y": {
     "toggleFullWidth": "টগল করুন পূর্ণ-প্রস্থের লেআউট।",
@@ -704,9 +704,9 @@
       "auto": "অটো (পরবর্তী VS Code প্রদর্শন ভাষা)",
       "coverage": "{pct}% অনূদিত — বাকি দেখায় ইংরেজিতে"
     },
-    "reloadPrompt": "ভাষা {locale}. সেট করা আছে। সাইডবার এবং কমান্ড লেবেল আপডেট করতে উইন্ডোটি পুনরায় লোড করুন।",
+    "reloadPrompt": "ভাষা {locale}-এ সেট করা হয়েছে। সাইডবার এবং কমান্ড লেবেল আপডেট করতে উইন্ডোটি পুনরায় লোড করুন।",
     "reloadNow": "এখনই পুনরায় লোড করুন।",
-    "reloadLater": "পরে পরবর্তীতে পরে পরে"
+    "reloadLater": "পরে"
   },
   "statusBar": {
     "error": {
@@ -726,7 +726,7 @@
         "project": "প্রকল্প",
         "problems": "সমস্যা",
         "memory": "মেমরি",
-        "actions": "কর্মকাণ্ড কার্যক্রম কর্মকান্ড"
+        "actions": "কার্যক্রম"
       },
       "cause": {
         "on": "বিশ্লেষণ চালু হচ্ছে: সেটিং এবং এনালাইজার প্লাগইন উভয়ই চালু।",
@@ -746,14 +746,14 @@
         "vibrancy": "প্যাকেজ ড্যাশবোর্ড খুলুন।"
       },
       "project": {
-        "version": "সংস্করণ সংস্করণ Version",
+        "version": "সংস্করণ",
         "tier": "তারাচ্ছাড়া স্তর",
         "vibrancy": "বিবর্ণতা",
         "packages": "প্যাকেজ স্ক্যান করা হয়েছে",
         "packagesSuppressed": "{count} ({suppressed} বাদ দেওয়া হয়েছে)",
         "score": "লিংট স্কোর",
         "scorePending": "পূর্ণ বিশ্লেষণ (অংশীদার স্ক্যান) চালানো",
-        "findings": "ফলাফলঃ অনুসন্ধানগুলি পাওয়া গেছে।",
+        "findings": "ফলাফল",
         "updates": "আপডেট উপলব্ধ",
         "actionItems": "ক্রিয়া পদক্ষেপ",
         "route": "রুট"
@@ -823,7 +823,7 @@
     "notification": {
       "critical": "Dart প্রক্রিয়াগুলো ব্যবহার করছে {size} এবং {orphaned} অরফান ডেমন। পরিষ্কার করুন?",
       "possibleLeak": "Saropa RSS স্থিরভাবে বৃদ্ধি পাচ্ছে ({size} এবং উঠছে)। সম্ভাব্য মেমরি লিক — হেলথ প্যানেল দেখুন।",
-      "result": "{count} অর্থাত মৃত ডেমন কিল করা হয়েছে, ~{size} ফ্রিড করা হয়েছে",
+      "result": "{count}টি অনাথ ডেমন বন্ধ করা হয়েছে, ~{size} মুক্ত হয়েছে",
       "systemLowMemory": "আপনার মেশিনে কেবলমাত্র {free} এর মান {total} এর মান RAM ফ্রিতে রয়েছে। ব্যবহার করা হয়নি উইন্ডো বা অ্যাপ্লিকেশন বন্ধ করুন।",
       "analysisServerLarge": "একটি Dart এনালাইসিস সার্ভার বর্তমানে {size} ব্যবহার করছে। মেমোরি মুক্ত করতে এটিকে পুনরাবৃত্তি করুন?",
       "sessionStartLow": "আপনার মেশিনে মুক্ত মেমোরি আছে {free} এবং মোট মেমোরি আছে {total}। কাজ শুরু করার আগে ব্যবহার করা হয়নি VS Code ও অলামা মডেলগুলি বন্ধ করুন।"
@@ -835,7 +835,7 @@
       "optimizeAnalysis": "অ্যানালিসিস অপ্টিমাইজ করুন",
       "dontShowAgain": "আবার দেখাও না",
       "openMachineDashboard": "মেশিন স্বাস্থ্য খুলুন",
-      "restartAnalysisServer": "পুনরায় চালু করুন, আবার শুরু করুন।"
+      "restartAnalysisServer": "পুনরায় চালু করুন"
     },
     "cleanup": {
       "noOrphans": "কোনও অপসারিত ডেমন খুঁজে পাওয়া যায়নি।",
@@ -848,14 +848,14 @@
       "reclaimAction": "মেমরি ফিরে পান",
       "detailsAction": "বিস্তারিত দেখাও",
       "none": "কোনও অপসারিত মডেল হোস্ট প্রক্রিয়া খুঁজে পাওয়া যায়নি।",
-      "confirmTitle": "সমাপ্ত হয়েছে {count} অপ্রাপ্ত প্রক্রিয়া(গুলি) যেগুলি {size} ধারণ করছে?",
+      "confirmTitle": "{size} ধরে রাখা {count}টি অনাথ প্রক্রিয়া বন্ধ করবেন?",
       "confirmDetail": "এই প্রক্রিয়াগুলি মুহূর্তে সমাপ্ত হবে এবং আবার ফিরে পাওয়া যাবে না:",
       "confirmKill": "প্রক্রিয়া শেষ করুন",
       "listEntry": "{name} (PID {pid}) — {size}",
-      "reclaimed": "অপরিচিত প্রক্রিয়া(গুলি) {count} সমাপ্ত হয়েছে, প্রায় {size} ফিরিয়ে নেওয়া হয়েছে।",
+      "reclaimed": "{count}টি অনাথ প্রক্রিয়া বন্ধ করা হয়েছে, প্রায় {size} পুনরুদ্ধার হয়েছে।",
       "reclaimFailed": "{count} প্রক্রিয়া(গুলি) সমাপ্ত করতে সক্ষম হয়নি। তাদের উন্নত অনুমতি প্রয়োজন হতে পারে।",
       "bannerTitle": "{count} অরফান মডেল হোস্ট প্রক্রিয়া(গুলি) আটক করে রেখেছে {size}",
-      "bannerReclaim": "পুনরায় অধিকার করুন"
+      "bannerReclaim": "পুনরুদ্ধার করুন"
     },
     "panel": {
       "title": "প্রক্রিয়া স্বাস্থ্য",
@@ -863,7 +863,7 @@
       "processes": "প্রক্রিয়াগুলি",
       "totalRss": "মোট RSS",
       "orphaned": "অরফানেড",
-      "refresh": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
+      "refresh": "রিফ্রেশ করুন",
       "colPid": "PID",
       "colParent": "পিতা",
       "colRss": "RSS",
@@ -918,10 +918,10 @@
   },
   "machineDashboard": {
     "title": "মেশিন হিলথ",
-    "refresh": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
+    "refresh": "রিফ্রেশ করুন",
     "systemUnknown": "এই প্ল্যাটফর্মে সিস্টেম মেমরি পড়া যায়নি।",
     "platformUnsupported": "মেশিন হিলথ এই প্ল্যাটফর্মে উপলব্ধ নয় — প্রসেস কুয়েরি সাপোর্ট করে ওইন্ডোজ, ম্যাক অ্যান্ড লিনাক্স।",
-    "freeOf": "ফ্রি অফ /নো_থিং",
+    "freeOf": "এর মধ্যে মুক্ত",
     "used": "ব্যবহৃত",
     "recommendationsTitle": "পরামর্শ",
     "recommendationsNone": "কোনো সমস্যা পাওয়া গেল না।",
@@ -947,8 +947,8 @@
       "budgetOverspend": "ডেভ টুলগুলো সিস্টেম এর মেমোরি ব্যবহার করেছে {used}% ({size}), যা {budget}% বাজেট অতিক্রম করেছে। ব্যবহার করা হয়নি তালিকায় থাকা VS Code ওপেন করুন বা অনুবাদ মডেল বুঝিয়ে দিন।"
     },
     "action": {
-      "reclaim": "পুনরায় অধিকার করুন",
-      "restartAnalysisServer": "পুনরায় চালু করুন, আবার শুরু করুন।",
+      "reclaim": "পুনরুদ্ধার করুন",
+      "restartAnalysisServer": "পুনরায় চালু করুন",
       "setHeapCap": "সেট ক্যাপ",
       "unloadModel": "অপসারণ"
     },
@@ -984,7 +984,7 @@
     },
     "notification": {
       "shedDisabled": "এ্যানালাইজার মেমোরি চাপ প্রকাশ হয়েছে (RSS {rssMb} এমবি, সফ্ট লিমিট {softLimitMb} এমবি)। চাপে সাধারণ নিয়মগুলি বন্ধ করতে নিয়ম কাটানো সক্ষম করুন।",
-      "enableButton": "Enable সক্ষম করুন সক্রিয় করুন",
+      "enableButton": "সক্ষম করুন",
       "learnMoreButton": "আরও জানুন Learn More",
       "runInit": "'dart run saropa_lints:init' চালান যেহেতু analysis_options_custom.yaml তৈরি করুন, তারপর shed_rules: true সেট করুন।",
       "enabledConfirmation": "analysis_options_custom.yaml এ নিয়ম ছাড়া হওয়া সক্ষম। এনালাইজার তার অग্রাধিকার পুনরায় চালানোর সময় পরিবর্তনটি ধরে পেয়ে যাবে।"
@@ -997,8 +997,8 @@
       "categoryTypeResolving": "টাইপ বিশ্লেষণ (খরচসাপেক্ষ)",
       "categoryHighCost": "উচ্চ খরচ",
       "categoryInfoSeverity": "তথ্য গুরুত্ব",
-      "categoryWarningSeverity": "২০২৪ সালের জন্য সামগ্রিক স্বাস্থ্য বৃদ্ধি পরিকল্পনা",
-      "moreRules": "বেশি অ্যাক্টিভ নয় /নো_থিং",
+      "categoryWarningSeverity": "WARNING গুরুতরতা",
+      "moreRules": "আরও, তালিকাভুক্ত নয়",
       "restartButton": "অ্যানালাইজার পুনরাবৃত্তি করুন",
       "restartTooltip": "Dart বিশ্লেষণ সার্ভারটি পুনরাবৃত্তি করুন মেমরি চাপ দূর করার এবং শেড নিয়মগুলি ফিরিয়ে আনার জন্য।"
     }
@@ -1006,7 +1006,7 @@
   "findingsDash": {
     "pageTitle": "Saropa ফলাফল ড্যাশবোর্ড",
     "documentTitle": "Saropa ফলাফল ড্যাশবোর্ড",
-    "skipToFindings": "ফলাফল এড়িয়ে যান।",
+    "skipToFindings": "ফলাফলে যান",
     "secondaryAsideLabel": "সেকেন্ডারি ডায়াগনস্টিকস",
     "hero": {
       "gaugeTitle": "স্বাস্থ্য স্কোর {score} (গ্রেড {grade}) । ভুলের ওজন সবচেয়ে বেশি।",
@@ -1019,7 +1019,7 @@
       "daysAgo": "{day} দিন আগে"
     },
     "status": {
-      "updatedPrefix": "আপডেট করা হয়েছে Updated",
+      "updatedPrefix": "আপডেট করা হয়েছে",
       "refreshHint": "বিশ্লেষক থেকে রিফ্রেশ করতে ক্লিক করুন।",
       "lastRunUnknown": "শেষ চালানো অজানা",
       "noTimestampTitle": "violations.json এ কোন টাইমস্ট্যাম্প নেই।",
@@ -1047,10 +1047,10 @@
       "qualityGateFailingPill": "প্রবেশদ্বার ব্যর্থ হয়েছে"
     },
     "groupBy": {
-      "severity": "গুরুতরতা Severity",
-      "file": "ফাইলের নাম File file",
+      "severity": "গুরুতরতা",
+      "file": "ফাইল",
       "impact": "প্রভাব",
-      "rule": "নিয়মকানুন Rule Rule",
+      "rule": "নিয়ম",
       "owasp": "OWASP",
       "ruleType": "নিয়মের ধরন Rule type",
       "ruleStatus": "Rule Status রুল স্ট্যাটাস",
@@ -1061,7 +1061,7 @@
       "toggleSeverityTitle": "টগল {v} তীব্রতা।"
     },
     "kpi": {
-      "visibleLabel": "দৃশ্যমান ফলাফলগুলি দৃশ্যমান।",
+      "visibleLabel": "দৃশ্যমান ফলাফল",
       "allMatched": "সবগুলোই মিলছে, সবগুলো মিলে গেছে।",
       "ofTotal": "মোট {total} এর",
       "clearFiltersTitle": "ক্লিক করুন সমস্ত ফিল্টার সাফ করতে।",
@@ -1073,16 +1073,16 @@
       "warningsSubBad": "ব্যর্থ হতে পারে বা খারাপ দেখায়।",
       "warningsSubClear": "কোনটি - পরিষ্কার",
       "warningsTitle": "সতর্কতা (ব্যর্থ হতে পারে বা খারাপ দেখতে) জন্য ফিল্টার ফলাফল",
-      "infoLabel": "ইনফো ইনফোর ইনফোতে তথ্য",
+      "infoLabel": "তথ্য",
       "infoSub": "FYI — শৈলী / পরামর্শ",
       "infoSubNone": "না, কোনটিই নয়।",
       "infoTitle": "তথ্য ফিল্টার অনুসন্ধান (FYI — শৈলী এবং পরামর্শ)",
       "filesLabel": "ক্ষতিগ্রস্ত ফাইলগুলি প্রভাবিত হয়েছে",
-      "filesSubAcross": "রপ্তানি-রফতানির পুরো প্রক্রিয়া জুড়ে।",
+      "filesSubAcross": "পুরো রপ্তানি জুড়ে",
       "filesSubNone": "কোন ফাইল প্রভাবিত হয় নি",
       "filesTitle": "স্বতন্ত্র ফাইলগুলি কমপক্ষে একটি সন্ধান অবদান রাখে",
       "topRuleLabel": "শীর্ষ নিয়ম, সর্বোচ্চ নিয়ম।",
-      "topRuleTitle": "{name} নিয়মের জন্য ফিল্টার ফলাফলগুলি ফিল্টর করুন।",
+      "topRuleTitle": "{name} নিয়ম অনুযায়ী ফলাফল ফিল্টার করুন",
       "sectionHeading": "অ্যাওভারভিশ বা সারাংশ",
       "sectionAria": "সারাংশ স্ট্যাটিস্টিকস"
     },
@@ -1091,7 +1091,7 @@
       "groupByFieldTitle": "নির্বাচিত মাত্রা অনুযায়ী গ্রুপের ফলাফল",
       "groupByLabel": "গ্রুপ অনুযায়ী গোষ্ঠী।",
       "textFilterTitle": "ফাইল পাথ, নিয়ম বা বার্তা পাঠ্যের দ্বারা অনুসন্ধানগুলি ফিল্টার করুন।",
-      "textFilterPlaceholder": "ফাইল, নিয়ম বা বার্তা... অনুসারে ফিল্টার করুন।",
+      "textFilterPlaceholder": "ফাইল, নিয়ম বা বার্তা অনুসারে ফিল্টার করুন…",
       "textFilterAria": "টেক্সট ফিল্টার - পাঠ্য ফিল্টারের জন্য।",
       "clearTextFilterTitle": "ক্লিয়ার টেক্সট ফিল্টার সাফ করুন",
       "clearTextFilterAria": "ক্লিয়ার টেক্সট ফিল্টার সাফ করুন",
@@ -1100,9 +1100,9 @@
       "clearRecentButton": "পরিষ্কার",
       "recentFiltersListAria": "সাম্প্রতিক ফিল্টারগুলি",
       "runAnalysisTitle": "Saropa Lints বিশ্লেষণ চালান।",
-      "severityGroupAria": "গুরুতরতা ফিল্টার করুন।",
-      "severityLabel": "গুরুতরতা Severity",
-      "moreSummary": "More More আরো More আরও",
+      "severityGroupAria": "গুরুতরতা ফিল্টার",
+      "severityLabel": "গুরুতরতা",
+      "moreSummary": "আরও",
       "moreChevron": "▾",
       "copyJsonTitle": "JSON ({count}) হিসাবে ফিল্টার করা লঙ্ঘনগুলি অনুলিপি করুন।",
       "saveReportTitle": "ফিল্টার করা লঙ্ঘনগুলি JSON হিসাবে রিপোর্ট / YYYYMMDD/ এ সংরক্ষণ করুন।",
@@ -1121,7 +1121,7 @@
       "scopeFieldTitle": "নিচের খো",
       "scopeLabel": "সূত্র",
       "scopeLive": "জীবন ডায়নামিকস",
-      "scopeFull": "পুরো প্রকল্প পরিদর্শন",
+      "scopeFull": "পুরো প্রকল্প অডিট",
       "scopeChangedMain": "পরিবর্তিত vs মেইন",
       "scopeChangedBranch": "পরিবর্তন করা হয়েছে vs শ",
       "branchPlaceholder": "ব্রাংচ নাম",
@@ -1144,10 +1144,10 @@
     },
     "menuPalette": {
       "help": "সাহায্য",
-      "groupBy": "গ্রুপ দ্বারা ... দ্বারা... গ্রুপ।",
+      "groupBy": "অনুসারে গ্রুপ করুন…",
       "textFilter": "টেক্সট ফিল্টার...",
-      "severityImpact": "গুরুতরতা ফিল্টার ... তীব্রতা ফিল্ডার।",
-      "hideRules": "গোপন নিয়ম... লুকানো নিয়ম।",
+      "severityImpact": "গুরুতরতা ফিল্টার…",
+      "hideRules": "নিয়ম লুকান…",
       "ruleMetadata": "নিয়ম মেটাডেটা।",
       "clearFilters": "ফিল্টার সাফ করুন।",
       "clearSuppressions": "সুস্পষ্টভাবে দমন করা।",
@@ -1160,16 +1160,16 @@
       "openLintsConfig": "নিয়ম প্যাকগুলি পরিচালনা করুন",
       "reloadFromDisk": "ডিস্ক থেকে পুনরায় লোড করুন",
       "reloadFromDiskTitle": "বিশ্লেষকটি পুনরায় চালানো ছাড়াই শেষ violations.json থেকে ড্যাশবোর্ডটিকে আবার রেন্ডার করুন।",
-      "reEnableDisabledRules": "পুনরায় সক্ষম করুন অক্ষম নিয়ম ... নিষ্ক্রিয় নিয়মগুলি।",
+      "reEnableDisabledRules": "অক্ষম নিয়ম পুনরায় সক্ষম করুন…",
       "reEnableDisabledRulesTitle": "analysis_options_custom.yaml এ বর্তমানে নিষ্ক্রিয় নিয়মগুলির একটি দ্রুত-পিক খুলুন এবং নির্বাচিতগুলি পুনরায় সক্ষম করুন।",
-      "reEnableNoneMessage": "analysis_options_custom.yaml.am এর মাধ্যমে বর্তমানে কোনও নিয়ম অক্ষম করা হয়নি।",
+      "reEnableNoneMessage": "বর্তমানে analysis_options_custom.yaml-এর মাধ্যমে কোনো নিয়ম অক্ষম করা হয়নি।",
       "reEnableQuickPickTitle": "পুনরায় সক্ষম করুন অক্ষম নিয়মগুলিকে আবার সক্ষম করুন",
       "reEnableQuickPickPlaceholder": "পুনরায় সক্ষম করতে এক বা একাধিক নিয়ম নির্বাচন করুন।",
       "menuGroupExport": "রপ্তানি এক্সপোর্ট",
       "menuGroupBulk": "বৃহত্তম ক্রিয়া",
       "menuGroupFilter": "ফিল্টার এবং ফোকাস করুন",
       "menuGroupOpen": "ড্যাশবোর্ড খুলুন।",
-      "menuGroupSystem": "সিস্টেম সিস্টেম System"
+      "menuGroupSystem": "সিস্টেম"
     },
     "progress": {
       "runningLabel": "চলমান বিশ্লেষণ ...",
@@ -1180,15 +1180,15 @@
       "hideTitle": "আমার জন্য কেবলমাত্র works কর্মক্ষেত্রের স্তরের লুকান, ক্লিয়ার সাপ্রেসনের মাধ্যমে বিপরীতমুখী।",
       "hideButton": "লুকান",
       "disableTitle": "পুরো প্রকল্পের জন্য নিষ্ক্রিয় করুন — analysis_options_custom.yaml লিখে এবং বিশ্লেষণ পুনরায় চালায়",
-      "disableButton": "অক্ষম করুন নিষ্ক্রিয় করুন",
+      "disableButton": "অক্ষম করুন",
       "workspaceOnlyShort": "শুধুমাত্র ওয়ার্কস্পেস (Work Space)",
       "projectConfigShort": "project config (লেখা হয় analysis_options_custom.yaml) ।",
       "topRulesOne": "শীর্ষ {count} নিয়ম",
       "topRulesOther": "শীর্ষ {count} নিয়মগুলি",
       "colRank": "#",
-      "colRule": "নিয়মকানুন Rule Rule",
-      "colCount": "কাউন্ট কান্ট কাউন্ট কাউন্ট",
-      "colSeverity": "গুরুতরতা Severity",
+      "colRule": "নিয়ম",
+      "colCount": "সংখ্যা",
+      "colSeverity": "গুরুতরতা",
       "colActionsAria": "সারি ক্রিয়াকলাপগুলি রোল ক্রিয়া",
       "filesAffected": "ক্ষতিগ্রস্ত ফাইলগুলি ({count})",
       "howToFixHeading": "কিভাবে ঠিক করবেন",
@@ -1200,18 +1200,18 @@
       "supersedesLabel": "বিস্তারিত:"
     },
     "findings": {
-      "sectionAria": "ফলাফলঃ অনুসন্ধানগুলি পাওয়া গেছে।",
-      "heading": "ফলাফলঃ অনুসন্ধানগুলি পাওয়া গেছে।",
+      "sectionAria": "ফলাফল",
+      "heading": "ফলাফল",
       "expandAll": "সমস্ত প্রসারিত করুন",
       "collapseAll": "সব ভেঙে পড়ুক,",
       "bulkSelected": "{count} নির্বাচিত",
       "bulkCopy": "JSON হিসাবে নির্বাচিত কপি অনুলিপি করুন।",
       "selectAllTitle": "সমস্ত দৃশ্যমান ফলাফল নির্বাচন করুন।",
       "selectAllAria": "সমস্ত দৃশ্যমান ফলাফল নির্বাচন করুন।",
-      "colSeverity": "গুরুতরতা Severity",
-      "colRule": "নিয়মকানুন Rule Rule",
-      "colMessage": "বার্তা বার্তা মেসেজ",
-      "colLine": "লাইন, লাইন, লাইনের মধ্যে",
+      "colSeverity": "গুরুতরতা",
+      "colRule": "নিয়ম",
+      "colMessage": "বার্তা",
+      "colLine": "লাইন",
       "colActionsAria": "সারি ক্রিয়াকলাপগুলি রোল ক্রিয়া",
       "selectRowAria": "এই সন্ধান সারিটি নির্বাচন করুন।",
       "copyRowTitle": "এই ফলাফলটি JSON হিসাবে অনুলিপি করুন।",
@@ -1235,16 +1235,16 @@
       "sectionAria": "মিক্স চার্টগুলি মিশ্রিত করুন।",
       "heading": "মিক্স",
       "metaClickSlice": "ফিল্টার করতে একটি স্লাইসে ক্লিক করুন।",
-      "severityMix": "গুরুতরতা মিশ্রণ।",
+      "severityMix": "গুরুতরতা মিশ্রণ",
       "filterBarTitle": "শুধুমাত্র {key} এ ফিল্টার করুন।",
-      "donutTotal": "মোটামুটি, পুরো সংখ্যাটি।"
+      "donutTotal": "মোট"
     },
     "todoHack": {
       "sectionAria": "টোডো এবং হ্যাকস।",
       "headingDisabled": "করণীয় ও হ্যাকস",
       "metaDisabled": "স্ক্যান অক্ষম করা হয়েছে",
       "scanOff": "ওয়ার্কস্পেস স্ক্যান বন্ধ আছে — প্রোজেক্ট ফাইল থেকে সারফেস মার্কার করতে সক্ষম করুন।",
-      "enableScan": "স্ক্যানিং সক্ষম করুন স্ক্যান সক্রিয় করুন",
+      "enableScan": "স্ক্যান সক্ষম করুন",
       "heading": "করণীয় ও হ্যাকস",
       "subsectionNone": "{title}: স্ক্যান রেঞ্জে কিছুই নেই।",
       "capNote": "স্ক্যানটি তার ফাইলের সীমাতে পৌঁছেছে, তাই কিছু ফাইল বাদ দেওয়া হয়েছে।",
@@ -1258,15 +1258,15 @@
       "headingOff": "Drift Advisor",
       "metaOff": "ইন্টিগ্রেশন অফ ইন্ডিগ্রেশন বন্ধ।",
       "enableBlurb": "এখানে ডাটাবেস প্রস্তাবনাগুলি পৃষ্ঠায় Drift Advisor ইন্টিগ্রেশন সক্ষম করুন।",
-      "enable": "Enable সক্ষম করুন সক্রিয় করুন",
+      "enable": "সক্ষম করুন",
       "headingNoServer": "Drift Advisor",
-      "metaNoServer": "কোন সার্ভার নেই, কোনও সার্ভারের প্রয়োজন নেই।",
+      "metaNoServer": "কোনো সার্ভার নেই",
       "noServerBlurb": "কনফিগার করা পোর্টগুলিতে কোনও Drift Advisor সার্ভার পাওয়া যায় নি।",
-      "retry": "পুনরায় চেষ্টা করুন Retry.",
+      "retry": "পুনরায় চেষ্টা করুন",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "সংযুক্ত সংযুক্ত সংযোগযুক্ত সংযুক্তিযুক্ত",
+      "metaConnected": "সংযুক্ত",
       "noIssues": "{label} এর সাথে সংযুক্ত — কোন বর্তমান সমস্যা নেই।",
-      "refresh": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
+      "refresh": "রিফ্রেশ করুন",
       "openBrowser": "ব্রাউজারে খুলুন",
       "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor নিষ্ক্রিয় করুন"
@@ -1277,13 +1277,13 @@
       "byKind": "{count} দ্বারা {kind}",
       "kindIgnore": "// অবহেলা:",
       "kindIgnoreForFile": "// ignore_for_file:",
-      "kindBaseline": "বেসলাইন /নো_থিং",
+      "kindBaseline": "বেসলাইন",
       "unsuppressButton": "অপ্রতিহত করুন",
       "unsuppressTitle": "সাধারণ স্ক্যানে এই খুঁজতে সাপ্রেসন অপসারণ করুন",
       "unsuppressHint": "{rule} এর জন্য অনুমতি বাতিল করুন যেখানে {file}:{line} রয়েছে: সেই লাইনের উপরে থাকা // ignore: কমেন্টটি অপসারণ করুন।",
-      "columnFile": "ফাইলের নাম File file",
-      "columnLine": "লাইন, লাইন, লাইনের মধ্যে",
-      "columnRule": "নিয়মকানুন Rule Rule",
+      "columnFile": "ফাইল",
+      "columnLine": "লাইন",
+      "columnRule": "নিয়ম",
       "columnKind": "কাইন্ড",
       "columnAction": "অ্যাকশন"
     },
@@ -1306,7 +1306,7 @@
       "severityHides": "{count} তীব্রতা হাইড",
       "impactHides": "{count} ইমপ্যাক্ট হাইড",
       "activeHides": "সক্রিয় চামড়াঃ {counts}. .",
-      "viewHidesFooter": "এই হিলগুলি কেবলমাত্র ইস্যু / ড্যাশবোর্ড তালিকাটি সঙ্কুচিত করে; তারা `violations.json`. এ লেখা হয় না।",
+      "viewHidesFooter": "এই লুকানোগুলি কেবল ইস্যু / ড্যাশবোর্ড তালিকা ছোট করে; এগুলি `violations.json`-এ লেখা হয় না।",
       "clearViewHides": "Clear all view hides ক্লিয়ার অল ভিউ লুকিয়ে রাখে",
       "foldersSample": "ফোল্ডার (নমুনা)",
       "filesSample": "ফাইল / গ্লোব (নমুনা)",
@@ -1319,8 +1319,8 @@
       "announceStarted": "বিশ্লেষণ শুরু হয়েছে, শুরু হয়েছে।",
       "announceComplete": "বিশ্লেষণ সম্পূর্ণ করুন, সমাপ্তি।",
       "announceFailed": "বিশ্লেষণ ব্যর্থ হয়েছে",
-      "removeRecentAria": "Remove remove অপসারণ করা",
-      "removeRecentTitle": "Remove remove অপসারণ করা",
+      "removeRecentAria": "সরান",
+      "removeRecentTitle": "সরান",
       "bulkSelectedTpl": "{n} নির্বাচিত",
       "announceSearchVerb": "অনুসন্ধান",
       "severitiesNoun": "সার্ভিসিটিজ",
@@ -1341,7 +1341,7 @@
     "supplementary": {
       "scannerPromo": "TODO/HACK স্ক্যানার সক্ষম করুন।",
       "tooltipScanner": "Saropa ফাইল-সিস্টেম স্ক্যানার — উৎসে খোলা TODO/HACK মার্কার গণনা করে।",
-      "tooltipPromoClickToOn": "সক্ষম করতে ক্লিক করুন সক্রিয় করতে ক্লिक করুন।"
+      "tooltipPromoClickToOn": "সক্ষম করতে ক্লিক করুন"
     }
   },
   "ruleExplain": {
@@ -1366,14 +1366,14 @@
     "enableRules": "নিয়মগুলি সক্ষম করুন।",
     "issues": "ইস্যুগুলি সমস্যাগুলি",
     "off": "বন্ধ",
-    "on": "উপর, উপরে, ওপর",
-    "colRule": "নিয়মকানুন Rule Rule",
+    "on": "চালু",
+    "colRule": "নিয়ম",
     "colIssues": "ইস্যুগুলি সমস্যাগুলি",
     "zeroIssueRules": "শূন্য ইস্যু সহ {count} রুল — টিয়ারে স্বয়ংক্রিয়ভাবে সক্ষম।",
     "disabledOverrides": "`analysis_options_custom.yaml` এ ওভাররাইড দ্বারা {count} রুল অক্ষম করা হয়েছে।",
     "summaryRuleTriage": "রুল ট্রায়াগার ট্রায়াজেড।",
     "hintNoViolations": "কোন `reports/.saropa_lints/violations.json` নেই। বিশ্লেষণ চালান, তারপর এই ট্যাবটি আপডেট করুন।",
-    "hintUnreadable": "কোন পাঠযোগ্য লঙ্ঘন রপ্তানি. এক্সপোর্ট. প্রথমে Saropa Lints বিশ্লেষণ চালান।",
+    "hintUnreadable": "কোনো পাঠযোগ্য লঙ্ঘন রপ্তানি নেই। প্রথমে Saropa Lints বিশ্লেষণ চালান।",
     "hintStale": "ট্রায়াজ ডেটা পুরানো হতে পারে (এক্সপোর্ট {age} পুরাতন) । বর্তমান গ্রুপগুলির জন্য পুনরায় চালিত বিশ্লেষণ।",
     "hintNoPerRule": "এই রপ্তানির কোনও নিয়ম-প্রণালী নেই। একটি বর্তমান Saropa Lints প্লাগইন দিয়ে পুনরায় বিশ্লেষণ করুন।",
     "hintBuildFailed": "এই রফতানি থেকে ট্রায়াল তৈরি করতে পারেনি। একটি নতুন বিশ্লেষণ চালান।",
@@ -1390,11 +1390,11 @@
   "wideReport": {
     "openWorkspaceFirst": "প্রথমে একটি ওয়ার্কস্পেস ফোল্ডার খুলুন।",
     "clipboardCopyFailed": "ক্লিপবোর্ডে অনুলিপি করা যায়নি।",
-    "copiedViolationsJson": "JSON. হিসাবে {count} লঙ্ঘন কপি করা হয়েছে (s) ।",
+    "copiedViolationsJson": "{count}টি লঙ্ঘন JSON হিসাবে কপি করা হয়েছে।",
     "copiedEverythingJson": "{count} ফিল্টার করা না থাকা ফাইন্ডিং ক্লিপবোর্ডে কপি করা হয়েছে।",
-    "copiedOneViolationJson": "JSON. হিসাবে 1 টি লঙ্ঘন অনুলিপি করা হয়েছে।",
+    "copiedOneViolationJson": "1টি লঙ্ঘন JSON হিসাবে কপি করা হয়েছে।",
     "driftNotConnected": "Drift Advisor সার্ভার সংযুক্ত নয়।",
-    "copiedBulkFindings": "JSON. হিসাবে {count} নির্বাচিত সন্ধানগুলি (s) অনুলিপি করা হয়েছে।",
+    "copiedBulkFindings": "{count}টি নির্বাচিত ফলাফল JSON হিসাবে কপি করা হয়েছে।",
     "noMatchingFindingsCopy": "কপি করার জন্য কোনও মিলছে না।",
     "couldNotOpenFile": "ফাইলটি খুলতে পারেনিঃ {path}",
     "saveReportNoWorkspace": "প্রতিবেদন সংরক্ষণ করার আগে একটি কর্মক্ষেত্র ফোল্ডার খুলুন।",
@@ -1417,21 +1417,21 @@
       "knownIssuesDesc": "আপনার প্রতিভু বিরুদ্ধে বিবৃত জানা ক্ষতিকর বৈশিষ্ট্য এবং পরামর্শ অ্যাক্সেস করুন।",
       "compare": "তুলনা করুন Compare",
       "compareDesc": "স্কোর, সাইজ এবং কার্যকারিতা অনুযায়ী দুই বা তিনটি প্যাকেজ তুলনা করুন।",
-      "settings": "সেটিংসেটস সেটিংস",
+      "settings": "সেটিংস",
       "openButton": "{tab} খুলুন"
     },
     "settingsTab": {
       "intro": "প্রতিটি packageVibrancy.* সেটিং, গ্রুপ করা। পরিবর্তনগুলো আপনার ওয়ার্কস্পেস সেটিংস এ মুহূর্তে সংরক্ষণ করা হবে।",
-      "noLimit": "নো লিমিট /নো_থিং",
+      "noLimit": "কোনো সীমা নেই",
       "group": {
         "access": "প্রবেশ এবং রেজিস্ট্রি",
         "scan": "স্ক্যান",
         "display": "প্রদর্শন করুন",
         "weights": "স্কোর ওজন",
-        "upgrade": "আপগ্রেড করুন আপগ্রিড আপগ্রেস।",
+        "upgrade": "আপগ্রেড করুন",
         "watch": "ওয়াচ",
         "budget": "বাজেট",
-        "vuln": "ভুল বা ক্ষতির সম্ভাবনা"
+        "vuln": "দুর্বলতা"
       }
     },
     "detailPane": {
@@ -1458,7 +1458,7 @@
       "daysAgo": "{day} দিন আগে"
     },
     "scanning": {
-      "heading": "স্ক্যানিং প্যাকেজগুলি স্ক্রিন করুন",
+      "heading": "প্যাকেজ স্ক্যান করা হচ্ছে",
       "body1": "Saropa এই প্রকল্পের প্রতিটি সরাসরি নির্ভরতার জন্য pub.dev মেটাডেটা, GitHub ক্রিয়াকলাপ এবং নির্ভরতা গ্রাফগুলি আনছে।",
       "body2": "স্ক্যান শেষ হলে এই পৃষ্ঠাটি স্বয়ংক্রিয়ভাবে রিফ্রেশ হবে। আপনি নীচের ডানদিকে অগ্রগতি বিজ্ঞপ্তি থেকে বাতিল করতে পারেন।",
       "versionStamp": "Saropa প্যাকেজ ড্যাশবোর্ড v{version}"
@@ -1469,14 +1469,14 @@
     },
     "gaugeTitle": "প্রকল্প প্যাকেজ গ্রেডঃ {grade}",
     "summary": {
-      "packages": "প্যাকেজিংয়ের জন্য প্যাকেট",
+      "packages": "প্যাকেজ",
       "projectGrade": "প্রকল্প প্যাকেজ গ্রেডিং",
       "totalSize": "মোট আকার*",
       "gradeTooltip": "প্রকল্প গ্রেড {avgGrade}\nগড় স্কোর: {avgScore}/100\nপ্যাকেজ: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "প্রাণবন্ত, সজীব।",
       "stableTitle": "স্থিতিশীল স্থির",
       "outdatedTitle": "পুরানো, অপ্রচলিত।",
-      "abandonedTitle": "পরিত্যক্ত, পরিত্যাক্ত",
+      "abandonedTitle": "পরিত্যক্ত",
       "eolTitle": "জীবনের শেষের দিকে",
       "updates": "আপডেটগুলি আপডেটের জন্য",
       "unused": "অব্যবহৃত, অপ্রয়োজনীয়।",
@@ -1506,29 +1506,29 @@
       "jumpTooltip": "প্যাকেজিং টেবিলের {name} এ ঝাঁপিয়ে পড়ুন।"
     },
     "network": {
-      "summary": "ডিপেনডেন্সি নেটওয়ার্ক (Dependency Network) এর উপর নির্ভরশীল"
+      "summary": "নির্ভরতা নেটওয়ার্ক"
     },
     "sections": {
       "sizeDistribution": "আকার বন্টন, আকার বিতরণ।",
       "sizeDistributionCaption": "dev_dependencies বাদ দেয় — এগুলি কখনই APK/IPA/ওয়েব বান্ডেলে পাঠানো হয় না।",
       "filters": "ফিল্টারগুলি ফিল্টারের মতো।",
-      "packages": "প্যাকেজিংয়ের জন্য প্যাকেট"
+      "packages": "প্যাকেজ"
     },
     "toolbar": {
       "openPubspecTitle": "খোলা pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "প্রতিবেদন JSON (সমস্ত সারি + বিবরণ) অনুলিপি করুন।",
-      "copyAllLabel": "কপি,কপি,অনুলিপি করে দিন।",
+      "copyAllLabel": "কপি করুন",
       "copyOpportunitiesTitle": "শীর্ষস্থানীয় কম গৃহীত প্যাকেজগুলির জন্য এআই আপগ্রেড প্রম্পটগুলি একটি পেস্টের মধ্যে অনুলিপি করুন।",
       "copyOpportunitiesLabel": "এআই এর জন্য কপি সুযোগগুলি অনুলিপি করুন।",
-      "saveAllTitle": "প্রতিবেদন JSON সংরক্ষণ করুন reports/YYY YMMDD/... এ",
-      "saveAllLabel": "Save save সংরক্ষণ করুন",
-      "saveUpgradeTitle": "রিপোর্ট/YYY YMMDD/... এর একটি উপলব্ধ আপডেট সহ শুধুমাত্র প্যাকেজগুলির একটি প্রতিবেদন সংরক্ষণ করুন।",
+      "saveAllTitle": "প্রতিবেদন JSON reports/YYYYMMDD/...-এ সংরক্ষণ করুন",
+      "saveAllLabel": "সংরক্ষণ করুন",
+      "saveUpgradeTitle": "শুধুমাত্র উপলব্ধ আপডেটসহ প্যাকেজগুলির একটি প্রতিবেদন reports/YYYYMMDD/...-এ সংরক্ষণ করুন",
       "saveUpgradeLabel": "আপগ্রেড রিপোর্ট সংরক্ষণ করুন",
       "resetViewTitle": "ফিল্টারগুলি রিসেট করুন, বাছাই করুন এবং দৃশ্যের স্থিতি সংরক্ষণ করুন।",
       "resetViewLabel": "রিসেট ভিউতে, পুনরায় সেট করুন।",
       "rescanTitle": "প্যাকেজগুলি পুনরায় স্ক্যান করুন — pub.dev ক্যাশে সাফ করে এবং সংস্করণগুলি পুনরায় আনয়ন করে",
-      "rescanLabel": "পুনরায় স্ক্যান করুন Rescan",
+      "rescanLabel": "পুনরায় স্ক্যান করুন",
       "openOtherTitle": "ভাইব্র্যান্সি স্ক্যানের জন্য একটি নতুন উইন্ডোতে অন্য pubspec.yaml এর প্রকল্পটি খুলুন।",
       "openOtherLabel": "ওপেন প্রজেক্ট...",
       "footprintGroupAria": "আকার কলাম ফুটপ্রিন্ট মোড",
@@ -1545,15 +1545,15 @@
       "clearSearchTitle": "অনুসন্ধান সাফ করুন পরিষ্কার অনুসন্ধান",
       "clearSearchAria": "অনুসন্ধান সাফ করুন পরিষ্কার অনুসন্ধান",
       "ageFilterTitle": "বয়স প্রকাশের দ্বারা ফিল্টার করুন",
-      "publishedAgeLabel": "প্রকাশিত বয়স বয়স।",
+      "publishedAgeLabel": "প্রকাশের বয়স",
       "ageMaxAll": "সব, সমস্ত, সকলই",
       "presetFilterTitle": "দ্রুত ফিল্টার প্রিসেটগুলি প্রয়োগ করুন",
       "presetLabel": "প্রিসেট প্রেস সেট",
-      "presetNone": "না, না, কেউ নেই।",
+      "presetNone": "কোনোটি নয়",
       "presetModernization": "আধুনিকীকরণ।",
-      "presetRiskHotspots": "ঝুঁকি হটস্পটগুলি হ'ল ঝুঁকির হট স্পট।",
-      "presetCleanup": "ক্লিনআপ প্রার্থী প্রার্থীদের",
-      "presetDirectOnly": "শুধুমাত্র সরাসরি কেবলমাত্র প্রত্যক্ষ",
+      "presetRiskHotspots": "ঝুঁকির হটস্পট",
+      "presetCleanup": "পরিষ্কারের প্রার্থী",
+      "presetDirectOnly": "শুধুমাত্র সরাসরি",
       "devToggleTitle": "টেবিল এবং মোটের মধ্যে dev নির্ভরতা অন্তর্ভুক্ত করুন।",
       "includeDev": "অন্তর্ভুক্ত dev dev.",
       "activeFiltersLabel": "সক্রিয় ফিল্টারঃ",
@@ -1561,23 +1561,23 @@
     },
     "columns": {
       "name": {
-        "label": "প্যাকেজিংয়ের জন্য একটি ভাল মানের।",
+        "label": "প্যাকেজ",
         "tooltip": "প্যাকেজের নাম — pubspec.yaml এন্ট্রি খুলতে ক্লিক করুন"
       },
       "version": {
-        "label": "সংস্করণ সংস্করণ Version",
+        "label": "সংস্করণ",
         "tooltip": "pubspec.lock থেকে ইনস্টল করা সংস্করণ।"
       },
       "score": {
-        "label": "Category শ্রেণীবিভাগের বিষয়শ্রেণী বিভাগ",
+        "label": "বিভাগ",
         "tooltip": "ভাইব্রেন্সি শ্রেণীবিভাগ এবং স্বাস্থ্য স্কোর (0-10)"
       },
       "published": {
-        "label": "প্রকাশিত প্রকাশিত Published",
+        "label": "প্রকাশিত",
         "tooltip": "ইনস্টল করা সংস্করণটি pub.dev এ প্রকাশিত হওয়ার তারিখ।"
       },
       "activity": {
-        "label": "কার্যকলাপ ক্রিয়াকলাপ",
+        "label": "কার্যকলাপ",
         "tooltip": "কোড-এবং-রিলিজ কার্যকলাপ গ্রেড থেকে প্রতিশ্রুতি + প্রকাশের সাম্প্রতিকতা।"
       },
       "likes": {
@@ -1597,11 +1597,11 @@
         "tooltip": "GitHub টান অনুরোধগুলি খুলুন।"
       },
       "size": {
-        "label": "আকার মাপ সাইজ আকার আকার",
+        "label": "আকার",
         "tooltip": "কোড আকার (লিব + ঘোষিত সম্পদ); যখন কোডের আকার অনুপলব্ধ থাকে তখন pub.dev সংরক্ষণাগার আকারে ফিরে আসে।"
       },
       "deps": {
-        "label": "ডিপস ডেপস",
+        "label": "নির্ভরতা",
         "tooltip": "প্রত্যক্ষ ট্রানজিটিভ নির্ভরতা — ভাগ করা ডিপগুলি হাইলাইট করা হয়েছে৷"
       },
       "files": {
@@ -1609,7 +1609,7 @@
         "tooltip": "এই প্যাকেজটি আমদানি করে এমন উৎস ফাইলের সংখ্যা — অনুসন্ধান করতে ক্লিক করুন"
       },
       "transitives": {
-        "label": "ট্রানজিটিভস (Transitive) -এর অর্থ হলো-অস্থায়ী।",
+        "label": "ট্রানজিটিভ",
         "tooltip": "এই প্যাকেজটি যে পরিমাণ ট্রানজিটিভ (অপ্রত্যক্ষ) নির্ভরতা টানছে তার সংখ্যা।"
       },
       "vulns": {
@@ -1617,11 +1617,11 @@
         "tooltip": "OSV এবং GitHub উপদেষ্টা ডাটাবেস থেকে পরিচিত নিরাপত্তা দুর্বলতা।"
       },
       "license": {
-        "label": "লাইসেন্স লাইসেন্সিং",
+        "label": "লাইসেন্স",
         "tooltip": "pub.dev থেকে SPDX লাইসেন্স আইডেন্টিফায়ার।"
       },
       "update": {
-        "label": "আপডেট করুন Update Update",
+        "label": "আপডেট করুন",
         "tooltip": "উপলব্ধ সংস্করণ আপডেটঃ প্রধান, ছোটখাটো বা প্যাচ।"
       },
       "opportunities": {
@@ -1633,7 +1633,7 @@
         "tooltip": "ব্যবহারের অবস্থাঃ আপনার কোডে প্যাকেজটি অব্যবহৃত হিসাবে উপস্থিত কিনা তা নির্ধারণ করুন।"
       },
       "description": {
-        "label": "বর্ণনা Description Description বিবরণী",
+        "label": "বিবরণ",
         "tooltip": "pub.dev থেকে প্যাকেজিংয়ের বর্ণনা।"
       }
     },
@@ -1729,10 +1729,10 @@
       "qualityTests": "+পরীক্ষা-নিরীক্ষা",
       "qualityTestsTitle": "একটি পরীক্ষার স্যুট শিপিং করে।",
       "qualityTools": "+ সরঞ্জামসমূহ",
-      "qualityToolsTitle": "জাহাজ রক্ষণাবেক্ষণকারী সরঞ্জাম সরঞ্জামের সরঞ্জামাদি",
-      "qualityDocs": "+docs ডকুমেন্টস",
-      "qualityDocsTitle": "জাহাজগুলি প্রসারিত ডকুমেন্টেশন নথিভুক্ত করে।",
-      "healthScore": "স্বাস্থ্য স্কোর (Health Score) -এর মাধ্যমে।",
+      "qualityToolsTitle": "রক্ষণাবেক্ষণকারী টুলিং অন্তর্ভুক্ত",
+      "qualityDocs": "+docs",
+      "qualityDocsTitle": "বর্ধিত ডকুমেন্টেশন অন্তর্ভুক্ত",
+      "healthScore": "স্বাস্থ্য স্কোর",
       "resolutionVelocity": "রেজোলিউশন গতিবেগ",
       "engagementLevel": "Engagement Level (প্রবৃত্তি স্তর)",
       "popularity": "জনপ্রিয়তা Popularity জনপ্রিয়তা",
@@ -1755,7 +1755,7 @@
       "clearAria": "অনুসন্ধান সাফ করুন পরিষ্কার অনুসন্ধান",
       "hintLine1": "প্রতিটি কমান্ডের সাথে মেলে।",
       "hintStrongTitle": "Title শিরোনাম পদবি",
-      "hintStrongDesc": "বর্ণনা Description description বিবরণী",
+      "hintStrongDesc": "বিবরণ",
       "hintStrongId": "আইডি",
       "hintLine2": "(আইডি টোকেনগুলিও ফাঁকা থাকে — টাইপ",
       "hintLine2kbd": "রান অ্যানালিসিস, রান এনালিসিস।",
@@ -1772,12 +1772,12 @@
       "listAria": "সাম্প্রতিক অনুসন্ধানগুলি"
     },
     "filterChips": {
-      "ariaRegion": "সক্রিয় ফিল্টারগুলি অ্যাক্টিভ ফিল্টারের সাথে যুক্ত।",
+      "ariaRegion": "সক্রিয় ফিল্টার",
       "activeLabel": "সক্রিয় ফিল্টারঃ",
       "clearAll": "সব পরিষ্কার, সবকিছু সাফ।"
     },
     "bands": {
-      "frequentTitle": "প্রায়শই ঘন ঘন",
+      "frequentTitle": "ঘন ঘন",
       "frequentHint": "আপনার সেশন জুড়ে সর্বাধিক ব্যবহৃত।",
       "recentTitle": "সাম্প্রতিক",
       "recentClear": "পরিষ্কার",
@@ -1806,7 +1806,7 @@
       "moreSuffix": "+{count} আরো বেশি",
       "showLess": "Show less কম দেখান",
       "runSingular": " বার",
-      "runPlural": "রান, রান করে।",
+      "runPlural": " রান",
       "recentWord": "সাম্প্রতিক, সম্প্রতি, অতিসম্প্রতি",
       "expandAll": "সমস্ত প্রসারিত করুন",
       "collapseAll": "সব ভেঙে পড়ুক,",
@@ -1822,37 +1822,37 @@
     "skipToTable": "ফাংশন টেবিলের দিকে ঝাঁপিয়ে পড়ুন।",
     "openWorkspaceFirst": "প্রথমে একটি Dart/Flutter ওয়ার্কস্পেস খুলুন।",
     "scan": {
-      "title": "স্ক্যানিং প্রকল্প স্বাস্থ্য স্বাস্থ্য",
+      "title": "প্রকল্প স্বাস্থ্য স্ক্যান করা হচ্ছে",
       "subtitle": "আপনার কোড পড়া. স্ক্যান আরও শিখলে ড্যাশবোর্ডটি ভরাট করে।",
       "waiting": "স্ক্যান শুরু হচ্ছে ...",
       "launching": "লঞ্চিং স্ক্যানার...",
       "collect": "ফাইলগুলি আবিষ্কার করা ...",
       "firstRunHint": "প্রথম রান স্ক্যানারটি সংকলন করে; বড় প্রকল্পগুলি ফাইল প্রদর্শিত হওয়ার আগে কিছুক্ষণ সময় নেয়।",
-      "paused": "Paused স্থগিত করা হয়েছে",
+      "paused": "স্থগিত",
       "stopped": "স্ক্যানিং বন্ধ হয়ে গেছে।",
       "elapsed": "elapsed গত হয়েছে",
       "phase": {
         "parse": "ফাইল পার্সিং করা হচ্ছে",
         "history": "গিট ইতিহাস পড়া git ইতিহাস পড়ার।",
-        "blame": "কম্পিউটিং কোড বয়স বয়স",
+        "blame": "কোডের বয়স গণনা করা হচ্ছে",
         "usage": "রেফারেন্স গণনা করা হচ্ছে",
         "score": "স্কোরিং ফাংশনগুলি পয়েন্টারিংয়ের কাজ করে।"
       },
       "counter": {
-        "files": "ফাইলগুলি ফাইলগুলি",
-        "functions": "ফাংশনগুলি ফাংশনের কাজ করে।",
+        "files": "ফাইল",
+        "functions": "ফাংশন",
         "problems": "সমস্যা পাওয়া গেছে Problems found"
       },
       "counters": {
-        "aria": "লাইভ স্ক্যান কাউন্টারগুলি লাইভ স্কেন কাউন্টারে পরিণত হয়"
+        "aria": "লাইভ স্ক্যান কাউন্টার"
       },
       "controls": {
-        "aria": "স্ক্যান কন্ট্রোলগুলি স্ক্রিন করুন"
+        "aria": "স্ক্যান নিয়ন্ত্রণ"
       },
       "btn": {
         "pause": "Pause বিরতি",
         "resume": "সিভি রিজিউম করুন।",
-        "restart": "পুনরায় চালু করুন, আবার শুরু করুন।",
+        "restart": "পুনরায় চালু করুন",
         "cancel": "বাতিল করুন Cancel"
       },
       "preview": {
@@ -1860,21 +1860,21 @@
         "empty": "এখনও কোনও সমস্যা পাওয়া যায়নি ..."
       },
       "version": {
-        "engine": "ইঞ্জিন মেশিন ইঞ্জিন ইঞ্জিনে,",
-        "detecting": "সনাক্তকরণ ... সনাক্ত করা হচ্ছে ...",
+        "engine": "ইঞ্জিন",
+        "detecting": "সনাক্ত করা হচ্ছে…",
         "legacy": "উত্তরাধিকার - কোন লাইভ অগ্রগতি নেই (এই প্রকল্পের saropa_lints এটি পূর্ববর্তী)"
       }
     },
-    "runReportFirst": "রিপোর্টটি আবার চালান, তারপরে JSON. কপি করুন।",
+    "runReportFirst": "রিপোর্টটি আবার চালান, তারপর JSON কপি করুন।",
     "copiedJson": "কোড হেলথ JSON ক্লিপবোর্ডে অনুলিপি করা হয়েছে।",
     "couldNotOpenFile": "ফাইলটি খুলতে পারেনিঃ {path}",
     "panelTitle": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
     "hero": {
       "title": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
-      "generated": "উত্পন্ন জেনারেট করা হয়েছে",
+      "generated": "তৈরি হয়েছে",
       "functionOne": "{count} ফাংশন",
       "functionOther": "{count} ফাংশন",
-      "avgFormat": "avg {score} ({grade}) এর মধ্যে রয়েছে।",
+      "avgFormat": "গড় {score} ({grade})",
       "gatesFailing": "দরজা ব্যর্থ হচ্ছে",
       "gatesPassing": "গেটগুলি পাস করে যাওয়া গেটস।"
     },
@@ -1888,11 +1888,11 @@
     "kpi": {
       "ariaLabel": "কোড স্বাস্থ্য সারসংক্ষেপ",
       "allClear": "কোনো বিভাগ জুড়ে কোনো পতাকাঙ্কিত ফাংশন নেই — সব পরিষ্কার।",
-      "clickToFilter": "{flag}. পতাকাযুক্ত ফাংশনগুলিতে টেবিলটি ফিল্টার করতে ক্লিক করুন।",
+      "clickToFilter": "{flag} চিহ্নিত ফাংশনগুলিতে টেবিল ফিল্টার করতে ক্লিক করুন।",
       "noFlagged": "কোন ফাংশন পতাকাঙ্কিত {flag}. .",
       "unused": "অব্যবহৃত, অপ্রয়োজনীয়।",
       "unusedSub": "ফাংশনগুলিকে কোথাও উল্লেখ করা হয়নি।",
-      "uncovered": "উন্মুক্ত করা হয়েছে Uncovered",
+      "uncovered": "কভার করা হয়নি",
       "uncoveredSub": "কোন LCOV কভারেজ নেই",
       "stubTested": "স্টব-পরীক্ষিত স্টাব টেস্ট করা।",
       "stubTestedSub": "পরীক্ষা বিদ্যমান কিন্তু সামান্য দাবি করে।",
@@ -1904,26 +1904,26 @@
     "toolbar": {
       "ariaLabel": "কোড স্বাস্থ্য কর্ম স্বাস্থ্য ব্যবস্থা",
       "rescanTitle": "কোড হেলথ স্ক্যানটি আবার চালান এবং এই ড্যাশবোর্ডটি রিফ্রেশ করুন।",
-      "rescan": "পুনরায় স্ক্যান করুন Rescan",
+      "rescan": "পুনরায় স্ক্যান করুন",
       "copyJsonTitle": "কাঁচা কোড স্বাস্থ্য JSON ক্লিপবোর্ডে অনুলিপি করুন।",
       "copyJson": "JSON কপি করুন",
       "settingsTitle": "কোড স্বাস্থ্য সেটিংস খুলুন।",
       "settingsButton": "কোড স্বাস্থ্য সেটিংসে",
       "filterTitle": "নাম, ফাইল বা পতাকা অনুসারে ফিল্টার সারিগুলি।",
-      "filterLabel": "ফিল্টার সারিগুলিকে ফিল্টারের সাথে সংযুক্ত করুন",
+      "filterLabel": "সারি ফিল্টার করুন",
       "filterPlaceholder": "ফিল্টার সারি..."
     },
     "table": {
       "ariaLabel": "স্কোর অনুযায়ী সবচেয়ে খারাপ ফাংশন",
       "heading": "সবচেয়ে খারাপ ফাংশনগুলি কাজ করে।",
-      "colScore": "স্কোর স্কোর করুন।",
-      "colFunction": "ফাংশন ফাংশনের ফাংশনে",
-      "colFile": "ফাইলের নাম File file",
-      "colLine": "লাইন, লাইন, লাইনের মধ্যে",
-      "colUsage": "ব্যবহার Usage Usage এর অর্থ",
+      "colScore": "স্কোর",
+      "colFunction": "ফাংশন",
+      "colFile": "ফাইল",
+      "colLine": "লাইন",
+      "colUsage": "ব্যবহার",
       "colCoverage": "কভারেজ আওতায় রাখুন",
       "colComplexity": "জটিলতা কমপ্লেক্সিটি",
-      "colFlags": "পতাকা, পতাকাধ্বনি।",
+      "colFlags": "ফ্ল্যাগ",
       "noMatch": "কোন ফাংশন বর্তমান ফিল্টারগুলির সাথে মেলে না।",
       "resetFiltersTitle": "অনুসন্ধান এবং যে কোনও সক্রিয় পতাকা ফিল্টার সাফ করুন।",
       "resetFilters": "রিসেট ফিল্টারগুলি পুনরায় সেট করুন",
@@ -1951,7 +1951,7 @@
         "rule": "যখন সাইক্লোমেটিক জটিলতা 10 ছাড়িয়ে যায় তখন ফ্ল্যাগ করা হয়।"
       },
       "undocumented": {
-        "label": "নথিভুক্ত নয় এমন অভিবাসীদের জন্য",
+        "label": "নথিভুক্ত নয়",
         "evidence": "সিসি {cc}, কোন ডক নেই।",
         "rule": "একটি জটিল ফাংশন (সিসি > 10) কোন ডক মন্তব্য নেই যখন পতাকাঙ্কিত।"
       },
@@ -1972,7 +1972,7 @@
       },
       "fresh_code": {
         "label": "তাজা কোড",
-        "evidence": "CC {cc}, , সিসি সম্প্রতি পুনর্লিখিত, নতুন করে লেখা হয়েছে",
+        "evidence": "CC {cc}, সম্প্রতি পুনর্লিখিত",
         "rule": "সাইক্লোমেটিক জটিলতা 10 ছাড়িয়ে গেলে ফ্ল্যাগ করা হয় এবং গত 90 দিনের মধ্যে ফাংশন বডি লেখা বা পুনঃলিখন করা হয়। সম্প্রতি পুনর্লিখিত জটিল কোড বৈধকরণে পুরানো কোডের চেয়ে অনেক বেশি ঘটনা ঘটায়।"
       }
     },
@@ -1986,7 +1986,7 @@
     "script": {
       "activeFiltersLabel": "সক্রিয় ফিল্টারঃ",
       "clearAll": "সব পরিষ্কার, সবকিছু সাফ।",
-      "neverRun": "কখনো দৌড়াও না, কখনোই পালাবে না।"
+      "neverRun": "কখনো চালানো হয়নি"
     },
     "freshness": {
       "justNow": "এইমাত্র, এখনই।",
@@ -2007,9 +2007,9 @@
       "subtitle": "প্রকল্পের আকার, জটিলতা এবং গরম স্থানগুলি স্ক্যান করা হচ্ছে...",
       "elapsed": "elapsed গত হয়েছে",
       "cancel": "বাতিল করুন Cancel",
-      "restart": "পুনরায় চালু করুন, আবার শুরু করুন।",
+      "restart": "পুনরায় চালু করুন",
       "stopped": "স্টপ করা হয়েছে",
-      "logHeading": "কার্যকলাপ ক্রিয়াকলাপ",
+      "logHeading": "কার্যকলাপ",
       "logEmpty": "কোনও আউটপুট নেই — এই লগটি স্ক্যানটি একটি ডায়নোস্টিক মেসেজ প্রিন্ট করলে ভরে ওঠে।",
       "progress": "{percent}% — {done}/{total} ফাইল"
     },
@@ -2018,7 +2018,7 @@
       "runButton": "চালাও",
       "notRunYet": "এখন পর্যন্ত চালু হয়নি",
       "running": "চালু হচ্ছে…",
-      "exitOk": "এক্সিট ০ — পাস /নো_থিং",
+      "exitOk": "এক্সিট 0 — পাস",
       "exitFail": "নিউ জারো এক্সিট — দেখুন আউটপুট",
       "colLine": "#",
       "colText": "আউটপুট",
@@ -2053,15 +2053,15 @@
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "quality_gate:\n  শর্ত:\n    - মেট্রিক: নতুন_গুরুত্বপূর্ণ_সমস্যা\n      op: eq\n      মান: 0\n      on_fail: ব্যর্থ",
-        "save": "Save save সংরক্ষণ করুন",
+        "save": "সংরক্ষণ করুন",
         "saved": "সংরক্ষিত",
-        "saveError": "/নো_থিং সংরক্ষণ করা যায়নি"
+        "saveError": "সংরক্ষণ করা যায়নি"
       },
-      "colFile": "ফাইলের নাম File file",
-      "colLineNum": "লাইন, লাইন, লাইনের মধ্যে",
-      "colRule": "নিয়মকানুন Rule Rule",
-      "colSeverity": "গুরুতরতা Severity",
-      "colMessage": "বার্তা বার্তা মেসেজ",
+      "colFile": "ফাইল",
+      "colLineNum": "লাইন",
+      "colRule": "নিয়ম",
+      "colSeverity": "গুরুতরতা",
+      "colMessage": "বার্তা",
       "colKey": "কীয়"
     },
     "shortcuts": {
@@ -2069,9 +2069,9 @@
       "showOverlay": "এই শর্টকাট ওভারলে প্রদর্শন করুন।"
     },
     "hero": {
-      "files": "ফাইলগুলি ফাইলগুলি",
+      "files": "ফাইল",
       "lines": "লাইনস",
-      "size": "আকার মাপ সাইজ আকার আকার"
+      "size": "আকার"
     }
   },
   "suppressionsStrip": {
@@ -2080,7 +2080,7 @@
     "noKindBreakdown": "এই রপ্তানির কোনও প্রকারের বিশ্লেষণ নেই।",
     "title": "নিষ্ক্রিয়করণ (রপ্তানি)",
     "readOnlyNote": "(শুধুমাত্র পাঠযোগ্য; ব্রাউজ এবং কাজ করার জন্য Findings খুলুন।",
-    "openFindings": "খোলা ফলাফল ড্যাশবোর্ড"
+    "openFindings": "ফলাফল ড্যাশবোর্ড খুলুন"
   },
   "configMirrors": {
     "noFileRisk": "ফাইল-প্রতি ঝুঁকির বিশ্লেষণ নেই (স্কোপে কোনও লঙ্ঘন নেই) ।",
@@ -2101,17 +2101,17 @@
     "noCountersTitle": "রিসেট করার মতো কাউন্টার নেই।",
     "resetTitle": "সমস্ত কাউন্টার পুনরায় সেট করুন।",
     "refreshTitle": "ডিস্ক থেকে টেলিমেট্রি কাউন্টারগুলি পুনরায় লোড করুন।",
-    "refresh": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
+    "refresh": "রিফ্রেশ করুন",
     "copyTitle": "স্ন্যাপশটটি JSON হিসাবে অনুলিপি করুন।",
     "copyJson": "JSON কপি করুন",
     "resetCounters": "রিসেট কাউন্টারগুলি পুনরায় সেট করুন।",
     "countersAria": "কাউন্টারগুলি গণনা করে।",
     "countersHeading": "ইভেন্ট কাউন্টারগুলি ইভেন্টে পরিমাপ করে।",
-    "thEvent": "ঘটনা ঘটল, ঘটনা ঘটেছে।",
-    "thCount": "কাউন্ট কান্ট কাউন্ট কাউন্ট",
+    "thEvent": "ঘটনা",
+    "thCount": "সংখ্যা",
     "emptyMessage": "এখনও কোনও টেলিমেট্রি ইভেন্ট রেকর্ড করা হয়নি Find কাউন্টারগুলি ক্যাপচার শুরু করতে ফাইন্ডিং ড্যাশবোর্ড থেকে একটি নিয়ম খুলুন।",
     "openFindingsTitle": "Saropa Findings ড্যাশবোর্ড খুলুন।",
-    "openFindings": "খোলা ফলাফল ড্যাশবোর্ড",
+    "openFindings": "ফলাফল ড্যাশবোর্ড খুলুন",
     "lastPropsHeading": "শেষ ইভেন্টের বৈশিষ্ট্যগুলি",
     "copiedJson": "Saropa Lints: সম্পর্কিত নিয়ম টেলিমেট্রি JSON অনুলিপি করা হয়েছে।",
     "countersReset": "Saropa Lints: সম্পর্কিত নিয়ম টেলিমেট্রি কাউন্টার রিসেট।"
@@ -2136,16 +2136,16 @@
     "table": {
       "row": {
         "vibrancyGrade": "প্রাণশক্তি গ্রেডের মান।",
-        "category": "Category শ্রেণীবিভাগের বিষয়শ্রেণী বিভাগ",
+        "category": "বিভাগ",
         "latestVersion": "সর্বশেষ সংস্করণ সর্বশেষতম সংস্করণ",
-        "published": "প্রকাশিত প্রকাশিত Published",
+        "published": "প্রকাশিত",
         "publisher": "প্রকাশক সম্পাদক প্রকাশক।",
         "pubPoints": "পাব পয়েন্টস (Pub Points)",
         "githubStars": "GitHub তারকাদের তারা",
         "openIssues": "উন্মুক্ত সমস্যাসমূহ",
         "codeSize": "কোডের আকার, কোড সাইজ",
         "bloatRating": "ব্লাউট রেটিং",
-        "license": "লাইসেন্স লাইসেন্সিং",
+        "license": "লাইসেন্স",
         "platforms": "প্ল্যাটফর্মগুলি প্ল্যাটଫর্মগুলি",
         "inThisProject": "এই প্রকল্পে In This Project এর মাধ্যমে"
       },
@@ -2160,7 +2160,7 @@
       }
     },
     "status": {
-      "packagesSelected": "{count} প্যাকেজগুলি নির্বাচিত প্যাকেটগুলির সাথে সংযুক্ত করা হয়।",
+      "packagesSelected": "{count}টি প্যাকেজ নির্বাচিত",
       "packagesCompared": "{count} প্যাকেজগুলির তুলনা করা হয়েছে।",
       "dimensionsRankedOne": "{count} মাত্রা র্যাঙ্কড ডিমেনশন।",
       "dimensionsRankedOther": "{count} মাত্রা র্যাঙ্কড আকারের।",
@@ -2168,14 +2168,14 @@
     },
     "empty": {
       "ariaLabel": "কোন প্যাকেজ নেই",
-      "message": "তুলনার জন্য কোন প্যাকেজ নির্বাচন করা হয়নি। প্যাকেজ ড্যাশবোর্ডে দুটি বা ততোধিক প্যাকেট রাইট ক্লিক করুন এবং {compare}. নির্বাচন করুন।",
+      "message": "তুলনার জন্য কোনো প্যাকেজ নির্বাচন করা হয়নি। প্যাকেজ ড্যাশবোর্ডে দুই বা ততোধিক প্যাকেজে রাইট-ক্লিক করুন এবং {compare} নির্বাচন করুন।",
       "compareWord": "তুলনা করুন Compare",
       "openDashboard": "প্যাকেজ ড্যাশবোর্ড খুলুন",
       "openDashboardTitle": "Saropa প্যাকেজ ড্যাশবোর্ড খুলুন।"
     },
     "a11y": {
       "skipToTable": "তুলনা টেবিল এড়িয়ে যান।",
-      "recommendation": "সুপারিশ Recommendation সুপারেশনের পরামর্শ",
+      "recommendation": "সুপারিশ",
       "addingToProject": "প্রকল্পে {name} যুক্ত করা হচ্ছে"
     },
     "shortcuts": {
@@ -2184,11 +2184,11 @@
     },
     "kpi": {
       "ariaLabel": "তুলনা সারাংশের সারসংক্ষেপ।",
-      "leading": "লিডিং লিডিশন",
+      "leading": "এগিয়ে",
       "leadingTitle": "প্যাকেজটি সর্বাধিক মাত্রা দ্বারা নেতৃত্ব দিচ্ছে wins.",
       "dimensionWinsOne": "{count} মাত্রা জয় জিতেছে",
       "dimensionWinsOther": "{count} মাত্রা জিতেছে",
-      "packages": "প্যাকেজিংয়ের জন্য প্যাকেট",
+      "packages": "প্যাকেজ",
       "packagesTitle": "প্যাকেজগুলির সংখ্যা পাশাপাশি তুলনা করা হয়েছে।",
       "inComparison": "তুলনায়, তুলনা করার জন্য।",
       "dimensions": "মাত্রা পরিমাপ",
@@ -2222,7 +2222,7 @@
         "running": "চালানো",
         "stopped": "স্টপ করা হয়েছে",
         "suspended": "স্থগিত",
-        "starting": "প্রারম্ভণ/নো_থিং",
+        "starting": "শুরু হচ্ছে",
         "scanning": "স্ক্যান করা হচ্ছে",
         "notConfigured": "নয় সেট করা হয়নি"
       },
@@ -2249,7 +2249,7 @@
       "ci": "GitHub ক্রিয়া সমূহ CI"
     },
     "toggle": {
-      "on": "অন/নো_থিং",
+      "on": "চালু",
       "off": "বন্ধ"
     },
     "action": {
@@ -2268,7 +2268,7 @@
       "lspToggleOff": "এলএসপি সার্ভার: অক্ষমকরণ…",
       "lspStarted": "এলএসপি সার্ভার: শুরু হয়েছে।",
       "lspDisabledPrompt": "এলএসপি সার্ভার সেটিংসে (সারোপা লিন্টস. এলএসপি সার্ভার. এনাবলড) অক্ষম করা হয়েছে। সক্রিয় করুন এবং শুরু করুন?",
-      "lspEnableButton": "Enable সক্ষম করুন সক্রিয় করুন",
+      "lspEnableButton": "সক্ষম করুন",
       "lspStopped": "এলএসপি সার্ভার: বন্ধ হয়ে গেল।",
       "lspStartFailed": "LSP সার্ভার: চালু করা যায়নি (ত্রুটির বার্তা এবং Saropa Lints LSP আউটপুট চ্যানেল দেখুন)।",
       "analyzerToggleOn": "এনালাইজার প্লাগইন: সক্রিয় করা হচ্ছে…",
@@ -2294,7 +2294,7 @@
         "introEnable": "{path} আপনার ওয়ার্কিং ট্রিতে লেখা হয়েছে। এটি {base}-এ না আসা পর্যন্ত CI-তে কিছু চলবে না। এই কমান্ডগুলো এটিকে {branch} নামের নতুন ব্রাঞ্চে রাখে এবং রিভিউয়ের জন্য একটি পুল রিকোয়েস্ট খোলে — নিজে চালান, অথবা বোতামে চাপ দিন, Saropa Lints ঠিক এগুলোই চালাবে।",
         "introDisable": "{path} আপনার কাজের গাছে সম্পাদিত হয়েছে এবং সব কাজ বন্ধ করে দেয়। CI এই পর্যন্ত চালু থাকে যতক্ষণ না {base} পৌঁছে। এই কমান্ডগুলি পরিবর্তনটি একটি নতুন শাখায় যেখানে নাম দেয়া হয়েছে {branch} এবং একটি পুল রিকুয়েস্ট খুলে দেয় — আপনি নিজে চালান, অথবা বুটন চাপুন এবং Saropa Lints ঠিক এইগুলি চালাবে। যদি আপনি CI কে মুক্তিমুক্ত করতে চান, তবে রিপোজিটরির Actions ট্যাব থেকে কার্যপ্রণালীটি অক্ষম করুন।",
         "commandsLabel": "কমান্ডস কম্যান্ডস",
-        "copy": "কপি,কপি,অনুলিপি করে দিন।",
+        "copy": "কপি করুন",
         "copied": "কমান্ড ক্লিপবোর্ডে কপি করা হয়েছে।",
         "createPr": "শাখা তৈরি করুন, কমিট করুন, পাঠান এবং পুল রিকুয়েস্ট খুলুন",
         "notNow": "না এখন",
@@ -2323,13 +2323,13 @@
     },
     "section": {
       "version": "VERSION সংস্করণ",
-      "update": "আপডেট করুনঃ আপডেটের সময়।",
+      "update": "UPDATE",
       "suggestion": "পরামর্শঃ সুপারিশ।",
       "community": "কমিউনিটি সম্প্রদায়ের সদস্যরা।",
       "dependencies": "ডিপেনডেন্সিগুলি",
       "alerts": "সতর্কতা Alerts",
-      "platforms": "প্ল্যাটফর্মগুলি প্ল্যাটଫর্মগুলির জন্য উপযুক্ত",
-      "directDeps": "ডাইরেক্ট ডিপজট (Direct Deposits) -এর মাধ্যমে আম",
+      "platforms": "প্ল্যাটফর্ম",
+      "directDeps": "সরাসরি নির্ভরতা",
       "readmeImages": "README ইমেজগুলি পড়ুন"
     },
     "version": {
@@ -2341,12 +2341,12 @@
       "replace": "প্রতিস্থাপন করুনঃ {summary}"
     },
     "update": {
-      "upgrade": "আপগ্রেড করুন আপগ্রিড আপগ্রেস।",
-      "changelog": "পরিবর্তনের লগ পরিবর্তন করুন",
+      "upgrade": "আপগ্রেড করুন",
+      "changelog": "পরিবর্তন লগ",
       "blockedBy": "{package} দ্বারা ব্লক করা হয়েছে"
     },
     "suggestion": {
-      "migrateTo": "{package}. এ স্থানান্তর করার বিষয়টি বিবেচনা করুন।",
+      "migrateTo": "{package}-এ স্থানান্তরের কথা বিবেচনা করুন।",
       "consider": "বিবেচনা করুনঃ {text}. .",
       "alternatives": "বিকল্পঃ {names}",
       "unused": "এই প্যাকেজটি অব্যবহৃত বলে মনে হচ্ছে — এটি সরানোর কথা বিবেচনা করুন।"
@@ -2376,19 +2376,19 @@
       "sharedList": "শেয়ার করাঃ {names}"
     },
     "platforms": {
-      "wasm": "WASM এর অর্থ হচ্ছে ওয়াসম।"
+      "wasm": "WASM"
     },
     "links": {
       "viewFullDetails": "View Full Details সম্পূর্ণ বিবরণ দেখুন",
       "pubDev": "pub.dev",
       "documentation": "ডকুমেন্টেশন নথিভুক্তকরণ",
-      "changelog": "পরিবর্তনের লগ পরিবর্তন করুন",
-      "repository": "রেপোজিটরি রিপজিটরি।",
+      "changelog": "পরিবর্তন লগ",
+      "repository": "রিপোজিটরি",
       "issues": "ইস্যুগুলি সমস্যাগুলি",
       "reportIssue": "রিপোর্ট ইস্যু সমস্যা"
     },
     "logoAlt": "{packageName} লোগো",
-    "readMore": "আরো বেশি আরও বেশি",
+    "readMore": "আরও",
     "readmeImageAlt": "README ইমেজ চিত্র Readme"
   },
   "chart": {
@@ -2404,8 +2404,8 @@
       "sharedTransitives": "শেয়ার্ড ট্রানজিটিভস ({count})"
     },
     "noun": {
-      "package": "প্যাকেজিংয়ের জন্য একটি ভাল প্যাকেট।",
-      "packages": "প্যাকেজিংয়ের জন্য, এটি একটি ভাল ধারণা।"
+      "package": "প্যাকেজ",
+      "packages": "প্যাকেজ"
     }
   },
   "suite": {
@@ -2419,17 +2419,17 @@
     },
     "openFinding": {
       "noWorkspace": "একটি সন্ধান খোলার জন্য কোনও ওয়ার্কস্পেস ফোল্ডার খুলুন।",
-      "notFound": "{file}. খুলতে পারেনি।"
+      "notFound": "{file} খোলা যায়নি।"
     },
     "crashNudge": {
       "message": "লগ ক্যাপচার একটি ক্র্যাশ {count} সময় দেখেছিল যে নিয়মটি {ruleId} ধরা পড়ত। এই নিয়মটি বর্তমানে অক্ষম করা আছে।",
-      "enable": "নিয়ম সক্ষম করুন নিয়ম সক্রিয় করুন।"
+      "enable": "নিয়ম সক্ষম করুন"
     },
     "deepLink": {
       "showDriftIssues": "লাইভ দেখান ড্রিফট সমস্যা (Drift Advisor)"
     },
     "nudge": {
-      "message": "এই প্রকল্পটি Drift Advisor. ব্যবহার করে। এই স্ট্যাটিক ফলাফলের সাথে রানটাইম এসকিউএল সম্পর্কিত করার জন্য Saropa লগ ক্যাপচার এক্সটেনশনটি ইনস্টল করুন।",
+      "message": "এই প্রকল্পটি Drift Advisor ব্যবহার করে। এই স্ট্যাটিক ফলাফলের সাথে রানটাইম SQL মেলাতে Saropa Log Capture এক্সটেনশনটি ইনস্টল করুন।",
       "install": "লগ ক্যাপচার ইনস্টল করুন",
       "dismiss": "বরখাস্ত করা হয়।"
     },
@@ -2448,11 +2448,11 @@
       "runScanFirst": "প্রথমে একটি স্ক্যান চালান।",
       "noUpgradable": "আপগ্রেডযোগ্য প্যাকেজ পাওয়া যায়নি।",
       "proceedUpgrades": "{count} আপগ্রেডের সাথে এগিয়ে যান? ব্যর্থ পদক্ষেপগুলি পিছনে ফিরে যায় এবং পরিকল্পনাটি অব্যাহত থাকে।",
-      "actionExecute": "Execute এক্সিকিউট করুন চালান",
+      "actionExecute": "কার্যকর করুন",
       "actionCancel": "বাতিল করুন Cancel",
       "upgradeStopped": "{failedAt} এ আপগ্রেড বন্ধ হয়ে গেল — {completed}/{total} সম্পন্ন",
       "upgradeAllComplete": "সমস্ত {count} আপগ্রেড সফলভাবে সম্পন্ন হয়েছে।",
-      "notPubspec": "নির্বাচিত ফাইলটি pubspec.yaml. নয়।",
+      "notPubspec": "নির্বাচিত ফাইলটি pubspec.yaml নয়।",
       "suppressedPackage": "\"{package}\" বাধ্যতামূলক করা হয়েছে — বিশ্লেষণ গুলো ছুপিয়ে রাখা হবে",
       "noPackagesToSuppress": "কোন প্যাকেজ দমন করার জন্য নেই।",
       "suppressedCount": "দমন করা {count} প্যাকেজ (গুলি)",
@@ -2490,7 +2490,7 @@
       "openWorkspaceFirst": "প্রথমে একটি ওয়ার্কস্পেস ফোল্ডার খুলুন।",
       "createInstructionsDone": "এআই এজেন্টদের জন্য .cursor/rules/saropa_lints_instructions.mdc তৈরি করা হয়েছে।",
       "createInstructionsFailed": "Saropa Lints নির্দেশনা তৈরি করতে ব্যর্থ হয়েছে: {message}",
-      "openFileForIssues": "Saropa Lints. এ এর সমস্যাগুলি দেখানোর জন্য একটি ফাইল খুলুন।",
+      "openFileForIssues": "Saropa Lints-এ কোনো ফাইলের সমস্যা দেখাতে সেটি খুলুন।",
       "driftAdvisorNotConnected": "Drift Advisor সংযুক্ত নয়. সার্ভারটি চালু করার পরে রিফ্রেশ ক্লিক করুন।",
       "noViolationsRunAnalysis": "বর্তমান ডেটাতে কোনও লঙ্ঘন নেই। প্রথমে বিশ্লেষণ চালান।",
       "telemetryReset": "Saropa Lints: সম্পর্কিত নিয়ম টেলিমেট্রি কাউন্টার রিসেট।",
@@ -2500,10 +2500,10 @@
       "readReportFailed": "Saropa Lints: রিপোর্ট পড়তে ব্যর্থ — {message}",
       "openReportFailed": "Saropa Lints: রিপোর্ট খুলতে ব্যর্থ — {message}",
       "noAnalysisData": "কোন বিশ্লেষণের তথ্য নেই। প্রথমে বিশ্লেষণ চালান।",
-      "actionDisable": "অক্ষম করুন নিষ্ক্রিয় করুন",
-      "actionEnable": "Enable সক্ষম করুন সক্রিয় করুন",
-      "bulkRuleToggleConfirm": "{verb} {count} নিয়ম? এই আপডেট analysis_options_custom.yaml.am এর সাথে মিলিত হয়েছে।",
-      "setupPrompt": "Saropa Lints একটি Dart প্রকল্প বিনা saropa_lints এর সাথে প্রক্ষেতা করেছে। 2350+ লিন্ট নিয়ম সেট আপ করুন।",
+      "actionDisable": "অক্ষম করুন",
+      "actionEnable": "সক্ষম করুন",
+      "bulkRuleToggleConfirm": "{verb} {count}টি নিয়ম? এটি analysis_options_custom.yaml আপডেট করে।",
+      "setupPrompt": "Saropa Lints saropa_lints কনফিগার করা ছাড়া একটি Dart প্রকল্প সনাক্ত করেছে। 2350+ লিন্ট নিয়মের জন্য এখনই সেট আপ করুন।",
       "actionSetUpProject": "প্রকল্প সেট আপ করুন প্রজেক্ট সেটআপ করুন",
       "actionNotNow": "এখন না, এখন নয়।"
     },
@@ -2516,27 +2516,27 @@
       "requiresDartProject": "Saropa Lints এর জন্য একটি Dart বা Flutter প্রকল্প প্রয়োজন (কোনও pubspec.yaml পাওয়া যায় নি) ।",
       "actionLearnMore": "আরও জানুন Learn More",
       "noWorkspaceFolder": "কোন ওয়ার্কস্পেস ফোল্ডার খোলা নেই।",
-      "pubGetFailed": "Saropa Lints: পাব ব্যর্থ হয়েছে। {details}",
+      "pubGetFailed": "Saropa Lints: pub get ব্যর্থ হয়েছে। {details}",
       "checkOutput": "চেক আউটপুট.",
       "baselineRunning": "বিদ্যমান লঙ্ঘনগুলি দমন করতে বেসলাইন (saropa_baseline.json) তৈরি করা হচ্ছে ...",
-      "baselineCreated": "বেসলাইন তৈরি করা হয়েছেঃ saropa_baseline.json.jsoun.jssn সারোপা_বেসলাইন। বিদ্যমান ফলাফলগুলি দমন করা হয়; নতুন কোডটি এখনও চেক করা হচ্ছে।",
+      "baselineCreated": "বেসলাইন তৈরি হয়েছে: saropa_baseline.json। বিদ্যমান ফলাফলগুলি দমন করা হয়েছে; নতুন কোড এখনও পরীক্ষা করা হয়।",
       "baselineFailed": "Saropa Lints: বেসলাইন তৈরি করা যায়নি। {details}",
       "pubGetNotResolved": "Saropa Lints: pub get সফল হয়েছে কিন্তু saropa_lints এর সমাধান করা হয়নি। pubspec.yaml ফরম্যাটিং চেক করুন।",
       "configWriteFailedNs": "Saropa Lints: কনফিগার লিখতে ব্যর্থ হয়েছে। {details}",
       "disabled": "Saropa Lints নিষ্ক্রিয় করা হয়েছে. প্রকল্পের ফাইল পরিবর্তন করা হয়নি।",
-      "disabledAnalyzer": "Saropa Lints ইন্টিগ্রেশন অন করা হয়েছে। এনালাইজার ডায়নোস্টিকস শীঘ্রই পরিষ্কার হবে; স্ক্যান অন সেভ টুগেল অন করে ফিরে আসুন।",
-      "reenabledPlugin": "Saropa Lints প্রক্রিয়ায় প্লাগইন ফেরত সক্রিয় করা হয়েছে। Dart বিশ্লেষণ সার্ভারটিকে পুনরাবৃত্তি করে এটিকে পুনরায় চালু করা হচ্ছে।",
-      "reenableNothingToRestore": "Saropa Lints: কিছু ফিরিয়ে আনা যাবে না। বর্তমানে এক্সটেনশন দ্বারা ইন-প্রসেস প্লাগইনটি অক্ষম করা হয়নি।",
-      "noOpenDartFiles": "Saropa Lints: কোন খোলা Dart ফাইল খুঁজে পাওয়া যায়নি। একটি Dart ফাইল আবার খুলুন বা \"বাইরের এডিটর কেবল\" সেটিং অন করুন।",
+      "disabledAnalyzer": "Saropa Lints ইন্টিগ্রেশন বন্ধ করা হয়েছে। এনালাইজার ডায়াগনস্টিকস শীঘ্রই মুছে যাবে; পুনরুদ্ধার করতে \"সেভ করার সময় স্ক্যান\" চালু করুন।",
+      "reenabledPlugin": "Saropa Lints ইন-প্রসেস প্লাগইন পুনরায় সক্রিয় করা হয়েছে। এটি পুনরায় লোড করতে Dart বিশ্লেষণ সার্ভার পুনরায় চালু করা হচ্ছে।",
+      "reenableNothingToRestore": "Saropa Lints: পুনরুদ্ধার করার কিছু নেই। বর্তমানে এক্সটেনশন দ্বারা ইন-প্রসেস প্লাগইনটি অক্ষম করা হয়নি।",
+      "noOpenDartFiles": "Saropa Lints: কোনো খোলা Dart ফাইল পাওয়া যায়নি। একটি Dart ফাইল আবার খুলুন বা \"শুধুমাত্র খোলা এডিটর\" সেটিং বন্ধ করুন।",
       "analysisScanning": "ওয়ার্কস্পেস স্ক্যান করা হচ্ছে… {percent}% (এখন পর্যন্ত {count}টি সমস্যা)",
-      "configUpdated": "Saropa Lints কনফিগ আপডেট করা হয়েছে (স্তরঃ স্তরঃ {tier}). . . এইচপিও",
+      "configUpdated": "Saropa Lints কনফিগ আপডেট করা হয়েছে (স্তর: {tier})।",
       "configWriteFailed": "কনফিগ লিখতে ব্যর্থ হয়েছে. {details}",
       "scaffoldGateTitle": "কম্পোজিট বিশ্লেষক প্লাগইন স্কেফোল্ড কাঠামোর স্ক্যাফোর্ড",
       "scaffoldGateDetail": "এটি আপনার ওয়ার্কস্পেসে (pubspec.yaml, lib/main.dart, README) একটি নতুন Dart প্যাকেজ লিখে দেয়: একটি কাস্টম_লিন্ট প্লাগিন যেটি Saropa নিবন্ধন করে এবং আপনার নিজস্ব নিয়মগুলির জন্য হুক রেখে দেয়।\n\nআপনি যখন নিজের অ্যানালাইজার নিয়মগুলি সাথে Saropa ছাড়া ব্যবহার করবেন তখন কেবল এটি ব্যবহার করুন। সাধারণ Saropa ব্যবহার করা প্রকল্পগুলি এটি ছাড়া করতে পারে—অ্যানালাইজার একটি প্লাগিন এন্ট্রি প্রতি কন্টেক্স্ট অনুমতি দেয়।\n\nপরবর্তী: একটি ওয়ার্কস্পেস-সম্পর্কিত ফোল্ডার নির্বাচন করুন। যদি সেই ফোল্ডারটি বর্তমানে থাকে, তবে কিছু পুনরায় লেখা হওয়ার আগে আপনাকে জিজ্ঞাসা করা হবে।",
       "actionContinue": "চলতে থাকুক, চলবেই।",
       "actionOpenGuide": "ওপেন গাইড খুলুন",
       "scaffoldPathOutsideWorkspace": "স্কেফোল্ডের পথ অবশ্যই ওয়ার্কস্পেস ফোল্ডারের ভিতরে থাকতে হবে।",
-      "scaffoldFolderExists": "ফোল্ডারটি ইতিমধ্যে বিদ্যমানঃ {folder}. . . . এইচ পি ও ফাইভ। ফাইলগুলি যুক্ত বা ওভাররাইট করা যেতে পারে। চালিয়ে যেতে?",
+      "scaffoldFolderExists": "ফোল্ডারটি ইতিমধ্যে বিদ্যমান: {folder}। ফাইল যোগ বা ওভাররাইট করা হতে পারে। চালিয়ে যাবেন?",
       "scaffoldCreated": "কম্পোজিট প্লাগইন স্কেফোল্ড তৈরি করা হয়েছে। ওপেন জেনারেটেড মেইন.ডার্ট?",
       "actionOpenMainDart": "খোলা main.dart ডার্ট",
       "actionOpenReadme": "README খুলুন",
@@ -2549,7 +2549,7 @@
       "progressBaseline": "বেসলাইন স্ক্যান চালানো হচ্ছে… ({elapsed}s)"
     },
     "lane": {
-      "pickerTitle": "Saropa Lints: অ্যানালাইসিস লেন",
+      "pickerTitle": "Saropa Lints: বিশ্লেষণ লেন সেট করুন",
       "pickerPlaceholder": "বর্তমান: {lane}",
       "lightLabel": "সুস্পষ্ট (ডিফল্ট)",
       "lightDescription": "কেবল ~200 ত্রুটি/বার্তা নিয়ম এডিটরে চালানো হয়",
@@ -2566,7 +2566,7 @@
       "enabledButPluginOff": "Saropa Lints চালু, কিন্তু সম্পাদনা করার সময় ডায়নোস্টিকস অফ: এই এক্সটেনশন থেকে এনালাইজার প্লাগইন বন্ধ করে দেওয়া হয়েছিল এবং আবার ফিরিয়ে না আনা হয়েছিল, তাই স্ক্যানের পরে শুধুমাত্র সমস্যা দেখা যায়। সম্পাদনা করার সময় জীবন্ত ডায়নোস্টিকস ফিরিয়ে আনুন, নাকি শুধুমাত্র সেইভ করার সময় স্ক্যান করুন?",
       "actionRestorePlugin": "সম্পাদনার সময় ডায়নোস্টিকস ফিরিয়ে আনুন",
       "actionKeepScanOnly": "সংরক্ষণ করার সময় স্ক্যান করুন কেবল",
-      "disabledButPluginOn": "Saropa Lints অফ আছে, কিন্তু analysis_options.yaml এ এনালাইজার প্লাগইন আলাদা করা হয়েছে, তাই পরবর্তী কোনো সময় Dart এনালাইজার সার্ভার চালু হলে এটি কয়েক জিবি মেমরি ধরে রাখবে। প্লাগইনটিকে অফ করুন না কিন্তু চালু রাখুন?",
+      "disabledButPluginOn": "Saropa Lints বন্ধ আছে, কিন্তু analysis_options.yaml-এ এনালাইজার প্লাগইন এখনও ঘোষিত, তাই পরের বার Dart বিশ্লেষণ সার্ভার চালু হলে এটি লোড হবে এবং কয়েক GB ধরে রাখবে। প্লাগইনটিও বন্ধ করবেন, নাকি চালু রাখবেন?",
       "actionTurnOffPlugin": "অ্যানালাইজার প্লাগইন অফ করুন",
       "actionKeepPluginOn": "প্লাগইন চালু রাখুন"
     },
@@ -2584,25 +2584,25 @@
       "crossFileSnapshotNoJson": "ক্রস-ফাইল স্ন্যাপশট সম্পন্ন হয়েছে তবে JSON ফাইল পাওয়া যায় নি।",
       "crossFileSnapshotWritten": "ক্রস-ফাইল স্ন্যাপশট প্রতিবেদনগুলিতে লেখা হয়েছে/.saropa_lints/cross_file_snapshot.json",
       "crossFileNoWorkspace": "Saropa Lints: কোন Dart/Flutter ওয়ার্কস্পেস পাওয়া যায়নি। প্রথমে pubspec.yaml দিয়ে একটি প্রকল্প খুলুন।",
-      "crossFileMissingDep": "Saropa Lints: saropa_lints কে pubspec.yaml এ যোগ করুন যখন ক্রস ফাইল বিশ্লেষণ চালানো হবে।",
+      "crossFileMissingDep": "Saropa Lints: ক্রস-ফাইল বিশ্লেষণ চালানোর আগে saropa_lints কে pubspec.yaml-এ যোগ করুন।",
       "issuesNoViolationsRunAnalysis": "বর্তমান ডেটাতে কোনও লঙ্ঘন নেই। প্রথমে বিশ্লেষণ চালান।",
       "issuesNoAnalysisData": "কোন বিশ্লেষণের তথ্য নেই। প্রথমে বিশ্লেষণ চালান।",
       "issuesNoHotspots": "বর্তমান প্রতিবেদনে কোনও সুরক্ষা হটস্পট পাওয়া যায় নি।",
-      "issuesHotspotMarked": "হটস্পট {state}. হিসাবে চিহ্নিত করা হয়েছে।",
+      "issuesHotspotMarked": "হটস্পট {state} হিসাবে চিহ্নিত করা হয়েছে।",
       "copyTreeNoSelection": "কোন গাছ আইটেম নির্বাচিত.",
       "copyTreeSerializeFailed": "নির্বাচিত আইটেমটি সিরিয়ালাইজ করতে পারেনি।",
       "copyTreeCopied": "JSON হিসাবে ক্লিপবোর্ডে {count} {viewLabel} {noun} অনুলিপি করা হয়েছে৷",
       "copyTreeNothingToExport": "রপ্তানির জন্য কিছুই নেই।",
       "copyTreeSerializeTreeFailed": "সিরিয়ালাইজ করতে পারলাম না গাছ.",
       "copyTreeCopiedFull": "JSON হিসাবে পূর্ণ {viewLabel} গাছ ({count} {branchNoun}) অনুলিপি করা হয়েছে।",
-      "projectMapNoProject": "Saropa Lints: একটি Dart প্রকল্প খুলুন।",
-      "projectMapMissingDep": "Saropa Lints: saropa_lints কে pubspec.yaml এ যোগ করুন আগে চালান আপনার Saropa প্রকল্প ম্যাপ।",
+      "projectMapNoProject": "Saropa Lints: প্রথমে একটি Dart প্রকল্প খুলুন।",
+      "projectMapMissingDep": "Saropa Lints: Saropa প্রকল্প ম্যাপ চালানোর আগে saropa_lints কে pubspec.yaml-এ যোগ করুন।",
       "projectMapNoHtml": "Saropa প্রকল্পের মানচিত্র: HTML রিপোর্ট তৈরি করা হয়নি।",
       "projectMapFailed": "Saropa প্রকল্প ম্যাপ ব্যর্থ হয়েছে: {message}",
       "projectMapScanFailed": "Saropa প্রকল্প মানচিত্র স্ক্যান ব্যর্থ হয়েছে (প্রস্থান {code}). {details}",
-      "projectMapCouldNotOpen": "Saropa প্রকল্পের মানচিত্র: {file}. খুলতে পারেনি।",
+      "projectMapCouldNotOpen": "Saropa প্রকল্প ম্যাপ: {file} খোলা যায়নি।",
       "issuesNoQuickFix": "এই লঙ্ঘনের জন্য কোনও দ্রুত সমাধান উপলব্ধ নেই।",
-      "issuesFileNotFound": "ফাইল পাওয়া যায়নিঃ {file}. . . . এইচ পি ও ফাইভ। আপডেট করার জন্য বিশ্লেষণ পুনরায় চালান।",
+      "issuesFileNotFound": "ফাইল পাওয়া যায়নি: {file}। আপডেট করতে বিশ্লেষণ আবার চালান।",
       "actionFixAll": "ফিক্স অল, ফিক্স ওয়াল্ল্ড",
       "issuesConfirmFixAll": "{fileName} এ {count} লঙ্ঘনগুলি ঠিক করুন?",
       "issuesBulkFixResult": "স্থির করা হয়েছে {fixed}. . স্কোর আপডেট করতে বিশ্লেষণ চালান।",
@@ -2616,7 +2616,7 @@
       "scanOnSaveDaemonTimeout": "স্ক্যান প্রক্রিয়াটি সময়মত প্রতিক্রিয়া করেনি।",
       "scanOnSaveDaemonExited": "স্ক্যান প্রক্রিয়া অপ্রত্যাশিতভাবে বন্ধ হয়ে গেল। এটি পরবর্তী সেভ করার সময় পুনরাবৃত্তি করবে।",
       "scanOnSaveDaemonBackoff": "স্ক্যান প্রক্রিয়া পরে বন্ধ হয়েছিল এবং আবার শুরু করতে অপেক্ষা করছে। কিছুক্ষণ পরে আবার সংরক্ষণ করুন।",
-      "scanOnSaveBaselineDisabled": "Saropa Lints অনুপস্থিত — পুরো প্রকল্প স্ক্যান চালানোর আগে \"সেভ করার সময় স্ক্যান করুন\" চালু করুন।",
+      "scanOnSaveBaselineDisabled": "Saropa Lints বন্ধ আছে — পুরো প্রকল্প স্ক্যান চালানোর আগে \"সেভ করার সময় স্ক্যান করুন\" চালু করুন।",
       "scanOnSaveBaselineAlreadyRunning": "একটি পুরো প্রকল্প স্ক্যান বর্তমানে চালু আছে।",
       "scanOnSaveBaselineCanceled": "{scanned}/{total} ফাইল পরিসংখ্যানের পর সম্পূর্ণ প্রকল্প স্ক্যান বাতিল হয়েছে।",
       "scanOnSaveBaselineFailed": "সম্পূর্ণ প্রকল্প স্ক্যান ব্যর্থ হয়েছে: {details}",
@@ -2625,12 +2625,12 @@
       "codeHealthStartFailed": "কোড স্বাস্থ্য স্ক্যান শুরু করতে ব্যর্থ হয়েছে। নিশ্চিত করুন যে Dart SDK ইনস্টল করা আছে।",
       "codeHealthScanFailed": "কোড স্বাস্থ্য স্ক্যান ব্যর্থ হয়েছে।",
       "codeHealthScanFailedDetails": "কোড হেলথ স্ক্যান ব্যর্থ হয়েছে: {details}",
-      "codeHealthGatesFailed": "কোড স্বাস্থ্যঃ কোড হেলথ: কনফিগার করা মানের গেটগুলি ব্যর্থ হয়েছে। কোড স্বাস্থ্য সেটিংস খুলুন বা JSON অনুলিপি করুন gates.violations.inspect করতে।",
+      "codeHealthGatesFailed": "কোড হেলথ: কনফিগার করা মানের গেট ব্যর্থ হয়েছে। gates.violations পরীক্ষা করতে কোড হেলথ সেটিংস খুলুন বা JSON কপি করুন।",
       "codeHealthInvalidJson": "কোড হেলথ অবৈধ JSON আউটপুট ফেরত দিয়েছে।",
-      "sidebarSectionUpdateFailed": "Saropa Lints: ক্রমাগত অ্যাক্টিভিটি বার সেকশন আপডেট করা যায়নি — {message}"
+      "sidebarSectionUpdateFailed": "Saropa Lints: অ্যাক্টিভিটি বার সেকশন আপডেট করা যায়নি — {message}"
     },
     "vibrancy": {
-      "couldNotOpenPubspec": "pubspec.yaml. খুলতে পারেনি।",
+      "couldNotOpenPubspec": "pubspec.yaml খোলা যায়নি।",
       "couldNotOpenFileRef": "ফাইল তথ্য খুঁজে পাওয়া যায়নি: {filePath}",
       "savedReportJson": "সংরক্ষিত রিপোর্ট JSON: {path}",
       "couldNotSaveReportJson": "রিপোর্ট JSON সংরক্ষণ করতে ব্যর্থ।",
@@ -2655,8 +2655,8 @@
       "registryRemoveFailed": "রেজিস্ট্রি অপসারণ করতে ব্যর্থ: {message}",
       "registryTokenUpdated": "✓ টোকেন আপডেট করা হয়েছে",
       "registryTokenUpdateFailed": "টোকেন আপডেট করতে ব্যর্থ: {message}",
-      "actionRemove": "Remove remove অপসারণ করা",
-      "removeAuthPrompt": "{name}? এর জন্য প্রমাণীকরণ সরান",
+      "actionRemove": "সরান",
+      "removeAuthPrompt": "{name}-এর জন্য প্রমাণীকরণ সরাবেন?",
       "annotateInProgress": "ইতিমধ্যে অ্যানোটেড প্রক্রিয়া চলছে",
       "noPubspecInWorkspace": "ওয়ার্কস্পেসে কোন pubspec.yaml পাওয়া যায়নি।",
       "noDependenciesToAnnotate": "কোনও নির্ভরতা নেই মন্তব্য করার জন্য।",
@@ -2668,16 +2668,16 @@
       "upgradeRolledBack": "{name} আপগ্রেড রোল ব্যাক করা হয়েছে — {phase} ব্যর্থ হয়েছে। বিস্তারিত দেখুন আউটপুটে।",
       "saveTaskFailed": "টাস্ক সংরক্ষণ করা ব্যর্থ হয়েছে: {message}",
       "openFolderBeforeCopyConfig": "Saropa Lints: কনফিগ কপি করার আগে একটি ওয়ার্কস্পেস ফোল্ডার খুলুন।",
-      "copiedConfigSnippet": "Saropa Lints: কপি করা কনফিগ স্নিপেট (টার: {tier}, {packsLine})",
+      "copiedConfigSnippet": "Saropa Lints: কনফিগ স্নিপেট কপি করা হয়েছে (স্তর: {tier}, {packsLine})।",
       "couldNotCopyClipboard": "Saropa Lints: ক্লিপবোর্ডে কপি করতে পারছি না — {message}।",
       "couldNotWriteRulePacks": "Saropa Lints: লিখতে পারছি না analysis_options.yaml (rule_packs)",
       "couldNotReadPubspec": "Saropa Lints: পড়তে পারিনি pubspec.yaml।",
-      "noAdditionalSdkPacks": "Saropa Lints: কোন অতিরিক্ত ব্যবহারযোগ্য SDK প্যাক সক্রিয় করতে হবে না।",
+      "noAdditionalSdkPacks": "Saropa Lints: সক্রিয় করার মতো কোনো অতিরিক্ত প্রযোজ্য SDK প্যাক নেই।",
       "enabledApplicableSdkPacks": "Saropa Lints: সক্রিয় করা হয়েছে {added} বাস্তবায়নযোগ্য {modeLabel} প্যাক (গুলি)।",
       "openFolderBeforeEnablePacks": "Saropa Lints: কাজ করার ফোল্ডারটি খুলুন প্যাকগুলি সক্রিয় করার আগে।",
-      "allApplicablePacksEnabled": "Saropa Lints: প্রতিটি যোগ্য নিয়ম প্যাক এবং সক্রিয় করা হয়েছে।",
+      "allApplicablePacksEnabled": "Saropa Lints: প্রতিটি প্রযোজ্য নিয়ম প্যাক ইতিমধ্যে সক্রিয় করা হয়েছে।",
       "noApplicablePacksDetected": "Saropa Lints: এই প্রকল্পে অ্যাপ্লিকেবল রুল প্যাক নেই। কনফিগ ড্যাশবোর্ডে প্যাকগুলি ব্যক্তিগতভাবে টুগেল করুন।",
-      "actionEnable": "Enable সক্ষম করুন সক্রিয় করুন",
+      "actionEnable": "সক্ষম করুন",
       "enableRecommendedPacksPrompt": "{count} সুপারিশ প্যাকগুলি সক্ষম করুন?",
       "enablePacksDetail": "এটি analysis_options.yaml-এ rule_packs.enabled আপডেট করে। {preview}",
       "enabledRecommendedPacks": "Saropa Lints: সক্রিয় করা হয়েছে {count} পরামর্শ দেওয়া প্যাক (গুলি)।",
@@ -2685,18 +2685,18 @@
     },
     "misc": {
       "actionDontAskForVersion": "এই সংস্করণ চাওয়া দেখো না",
-      "actionLater": "পরে পরবর্তীতে পরে পরে",
-      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}। এটি একটি মূল্যবোধ সংস্করণ এবং সেটিতে কনফিগ পরিবর্তন করতে হতে পারে — পরিবর্তন লগ দেখুন।",
+      "actionLater": "পরে",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}। এটি একটি প্রধান সংস্করণ এবং কনফিগ পরিবর্তনের প্রয়োজন হতে পারে — পরিবর্তন লগ দেখুন।",
       "upgradeCheckerMajorUpdate": "মেজর আপডেটঃ বড় আপডেটের জন্য।",
       "upgradeCheckerMinorUpdate": "ছোটখাট আপডেট, ক্ষুদ্রতর আপডেটের জন্য।",
       "upgradeCheckerPatchUpdate": "প্যাচ আপডেট, প্যাচের আপডেটের জন্য।",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: pubspec.yaml আপডেট করা যায়নি — saropa_lints এন্ট্রি খুঁজে পাওয়া যায়নি।",
       "upgradeCheckerCancelled": "Saropa Lints আপগ্রেড বাতিল করা হয়েছে৷ pubspec.yaml আপডেট করা হয়েছে ^{version}; শেষ করতে `{cmd} pub get` চালান বা পরিবর্তনটি প্রত্যাবর্তন করুন।",
-      "upgradeCheckerPubGetFailed": "Saropa Lints: পাব ব্যর্থ হয়েছে। {detail}",
+      "upgradeCheckerPubGetFailed": "Saropa Lints: pub get ব্যর্থ হয়েছে। {detail}",
       "upgradeCheckerCheckOutput": "চেক আউটপুট.",
       "upgradeCheckerUpgraded": "Saropa Lints আপগ্রেড করা হয়েছে {version}.",
-      "actionUpgrade": "আপগ্রেড করুন আপগ্রিড আপগ্রেস।",
+      "actionUpgrade": "আপগ্রেড করুন",
       "actionViewChangelog": "চেঞ্জলগ দেখুন",
       "healthCodeLensEnabled": "Saropa প্রকল্প মানচিত্র তাপ কোডলেনস সক্ষম.",
       "healthCodeLensDisabled": "Saropa প্রকল্প মানচিত্র তাপ কোডলেন্স অক্ষম.",
@@ -2705,9 +2705,9 @@
       "reportViewCopiedRowOne": "ক্লিপবোর্ডে {count} সারি অনুলিপি করা হয়েছে।",
       "reportViewCopiedRowOther": "ক্লিপবোর্ডে {count} সারিগুলি অনুলিপি করা হয়েছে।",
       "reportViewAlreadySuppressed": "'{flag}' ইতিমধ্যে {file} এ দমন করা হয়েছে।",
-      "reportViewSuppressed": "{file}. . মধ্যে '{flag}' দমন করা হয়েছে।",
+      "reportViewSuppressed": "{file}-এ '{flag}' দমন করা হয়েছে।",
       "reportViewCouldNotSuppress": "{flag} বাদ দিতে পারিনি {file}: {error}",
-      "actionRescan": "পুনরায় স্ক্যান করুন Rescan",
+      "actionRescan": "পুনরায় স্ক্যান করুন",
       "bulkUpdateNoUpdates": "কোন আপডেট পাওয়া যায় না",
       "bulkUpdateNoUpdatesFiltered": "কোন {filter} আপডেট পাওয়া যায় না",
       "bulkUpdateFailed": "বৃহত আপডেট ব্যর্থ হয়েছে: {error}",
@@ -2723,7 +2723,7 @@
     "subtitle": "অ্যানালাইজার মেমরি কমানো হবে অপ্রয়োজনীয় ফাইলগুলো বাদ দিয়ে বিশ্লেষণ থেকে",
     "emptyDescription": "আপনার ওয়ার্কস্পেস স্ক্যান করুন যাতে আপনি মেমোরি ব্যবহার কমানোর জন্য Dart এনালাইজার থেকে বাদ দেওয়া যেতে পারে উচ্চ খরচ বিশিষ্ট ফাইল এবং ফোল্ডারগুলি চিহ্নিত করতে পারেন।",
     "scanButton": "ওয়ার্কস্পেস স্ক্যান করুন",
-    "rescanButton": "পুনরায় স্ক্যান করুন Rescan",
+    "rescanButton": "পুনরায় স্ক্যান করুন",
     "scanning": "কাজ করছি...",
     "openConfig": "analysis_options.yaml খুলুন",
     "lastScan": "শেষ স্ক্যান: {time}",
@@ -2744,7 +2744,7 @@
     "applyAll": "সবগুলো প্রয়োগ করুন",
     "applySelected": "নির্বাচিত প্রয়োগ করুন",
     "apply": "অ্যাপ্লাই",
-    "remove": "Remove remove অপসারণ করা",
+    "remove": "সরান",
     "selectAll": "সম্পূর্ণ বাছুন",
     "defaultLabel": "ডিফল্ট",
     "sortHint": "ক্লিক করে সাজান ✅",
@@ -2753,8 +2753,8 @@
     "previewApprox": "প্রায় সঠিক — প্রয়োগ করা হলে এটি আপনার ফাইলে অ্যাক্সাক্স ইনডেন্টেশন এবং কমেন্ট স্থাপন সাথে মেলে",
     "col": {
       "status": "স্ট্যাটাস",
-      "pattern": "প্যাটার্ন /নো_থিং",
-      "files": "ফাইলগুলি ফাইলগুলি",
+      "pattern": "প্যাটার্ন",
+      "files": "ফাইল",
       "cost": "প্রাপ্ত খরচ",
       "priority": "প্রাথমিকতা"
     },
@@ -2765,7 +2765,7 @@
     "priority": {
       "high": "উচ্চ",
       "medium": "মাঝারি",
-      "low": "নিম্ন /নো_থিং"
+      "low": "নিম্ন"
     },
     "activeFilesWarning": "এই ফোল্ডারটি পরিবর্তিত ফাইলগুলি সম্পর্কে ধারণ করে",
     "folderHeatMap": "ফোল্ডার বিশ্লেষণ খরচ",
@@ -2823,7 +2823,7 @@
       "noneFound": "স্থায়ী নগন্বিত কমেন্ট খুঁজে পাওয়া যায়নি।",
       "found": "{count} পুরানো অগ্নো করা {fileCount} ফাইলে। বিস্তারিত দেখুন প্রবলেম প্যানেলটি।",
       "fixed": "বৃথা অগ্রাহ কমেন্ট অপসারণ করা হয়েছে। বিস্তারিত দেখুন আউটপুট প্যানেলে।",
-      "fixedInFile": "Saropa Lints: এই ফাইলে বাক্স করা অবহেলাগুলো সঠিক করা হয়েছে",
+      "fixedInFile": "Saropa Lints: এই ফাইলে স্টেল ইগনর ঠিক করা হয়েছে",
       "alreadyRunning": "একটি স্টেল ইগনর স্ক্যান বর্তমানে চালানো হচ্ছে।"
     },
     "confirm": {
@@ -2877,7 +2877,7 @@
       "kindTitle": "এই ফাইন্ডিংটি কেন গ্রহণযোগ্য?",
       "kindAccepted": "গ্রহণযোগ্য: এটি সত্য এবং কোডটি এমন থাকবে কিনা",
       "kindFalsePositive": "প্রতিকূল ফলাফল: এখানে নিয়মটি ভুল হয়েছে",
-      "reasonTitle": "{rule} গ্রহণের কারণ কী আছে এবং {file} এর জন্য কারণ কী আছে",
+      "reasonTitle": "{file}-এ {rule} গ্রহণের কারণ",
       "reasonPlaceholder": "অপরিহার্য। saropa_accepted.yaml এ সংরক্ষিত হয় পরীক্ষকদের জন্য।",
       "reasonRequired": "একটি কারণ প্রয়োজন।"
     },
@@ -2970,7 +2970,7 @@
   },
   "vibrancy": {
     "sdkConstraint": {
-      "suppressOldSdk": "সাপ্প্রেস (উদ্দেশ্যমূলক পুরাতন SDK) /নো_থিং"
+      "suppressOldSdk": "দমন করুন (ইচ্ছাকৃত পুরানো SDK)"
     },
     "staleOverride": {
       "suppress": "বাধা দিন (অবরোধ করা হয়েছে বলে মনে হচ্ছে)"
@@ -2978,7 +2978,7 @@
   },
   "blastRadius": {
     "label": {
-      "upgrade": "আপগ্রেড করুন আপগ্রিড আপগ্রেস।",
+      "upgrade": "আপগ্রেড করুন",
       "breaks": "ভাঙ্গা",
       "breaksLower": "ভাঙ্গে",
       "upgradeNotRecommended": "⚠️ আপগ্রেড করা সুপরাক নয়"
@@ -3020,7 +3020,7 @@
     "pickPlaceholder": "প্রাপ্ত ফাইলগুলো নির্বাচন করুন",
     "fileHits": "{hits} পরিবর্তন(গুলো)",
     "diffTitle": "ৰুল নাম পরিবর্তন: {file}",
-    "confirm": "রুল পুনরায় নামকরণ প্রয়োগ করুন কি? {count} ফাইলগুলির? ডিফ খুলে অ্যাপ্রুভ করার জন্য প্রস্তুত।",
+    "confirm": "{count}টি ফাইলে নিয়মের নতুন নাম প্রয়োগ করবেন? পর্যালোচনার জন্য ডিফগুলি খোলা আছে।",
     "apply": "অ্যাপ্লাই",
     "progress": "পুনরায় নাম দেওয়া নিয়মগুলি স্থানান্তরিত করুন",
     "applied": "আপডেট করা হয়েছে {hits} নিয়ম তালিকা(গুলি) এর জন্য {count} ফাইল(গুলি) এ: {files}।",
@@ -3067,7 +3067,7 @@
     "recommend": {
       "latestOk": "saropa_lints {version} হল সবচেয়ে নতুন রিলিজ এবং এটি এই প্রকল্পের সাথে কাজ করে। ^{version} ব্যবহার করুন।",
       "alreadyCorrect": "এই প্রকল্পটি ইতিমধ্যে পরামর্শ দেওয়া হয়েছে saropa_lints কনফিগারেশন। কোনও ক্রিয়া প্রয়োজন নয়।",
-      "needsNewerDart": "saropa_lints {newest} এর জন্য একটি নতুন খুব আপডেট করা হয়েছে Dart SDK প্রয়োজন ({dart})। ^{chosen} বজায় রাখুন, অথবা Flutter আপগ্রেড করুন যাতে {newest} ব্যবহার করা যায়।",
+      "needsNewerDart": "saropa_lints {newest}-এর জন্য এই প্রকল্পের ({dart}) চেয়ে নতুন Dart SDK প্রয়োজন। ^{chosen} বজায় রাখুন, অথবা {newest} ব্যবহার করতে Flutter আপগ্রেড করুন।",
       "metaExcludesPin": "saropa_lints {newest}-এর জন্য আপনার Flutter SDK যে meta প্যাকেজ পিন করেছে ({pin}) তার চেয়ে নতুন সংস্করণ দরকার। ^{chosen} রাখুন, অথবা {newest} ব্যবহার করতে Flutter আপগ্রেড করুন।",
       "packageHoldsAnalyzer": "প্যাকেজ {package} এনালাইজারকে পিছনে রাখে, তাই saropa_lints {newest} ইনস্টল করা যাবে না। ^{chosen} ব্যবহার করুন, বা {package} আপডেট করে {newest} ব্যবহার করুন।",
       "noVersionResolves": "কোনও saropa_lints ভার্সন ডিপেন্ডেন্সি হিসাবে ইনস্টল করা যাবে না কারণ {package} একটি পুরানো এনালাইজার প্রয়োজন করে। প্লাগইন রুট এখনও কাজ করে।",
@@ -3131,11 +3131,11 @@
     }
   },
   "lintsSwitch": {
-    "statusOn": "Saropa Lints: অন /নো_থিং",
+    "statusOn": "Saropa Lints: চালু",
     "statusOff": "Saropa Lints: বন্ধ",
     "statusPartial": "Saropa Lints: কিছুটা বন্ধ",
-    "tooltipOn": "Saropa Lints এ সেটিং এবং এনালাইজার প্লাগইন চালু (। অফ করতে ক্লিক করুন।",
-    "tooltipOff": "Saropa Lints বন্ধ (সেটিং এবং এনালাইজার প্লাগইন)। টিক করুন এবং চালু করুন।",
+    "tooltipOn": "Saropa Lints চালু আছে (সেটিং এবং এনালাইজার প্লাগইন)। এটি বন্ধ করতে ক্লিক করুন।",
+    "tooltipOff": "Saropa Lints বন্ধ (সেটিং এবং এনালাইজার প্লাগইন)। এটি চালু করতে ক্লিক করুন।",
     "tooltipPartialSetting": "অংশত অফ: সারোপা লিন্টস এনাবেলড সেটিং অফ আছে কিন্তু এনালাইজার প্লাগইন চালু আছে। ফিক্স করতে ক্লিক করুন (উভয়কে চালু করে)",
     "tooltipPartialPlugin": "অংশত বন্ধ: এনালাইজার প্লাগইন এ একটি সেটিং অন আছে কিন্তু analysis_options.yaml এ বন্ধ আছে। ফিক্স করুন (উভয়কে অন করে)",
     "dashboardOff": "লিংট অফ হয়েছে।",

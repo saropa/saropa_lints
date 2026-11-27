@@ -1,0 +1,395 @@
+{
+  "_comment": [
+    "Phrases NLLB invented in shipped values (2026-11-27 audit); never a correct rendering of UI copy.",
+    "A value containing a phrase (case-insensitive) fails unless its English matches en_excuse (a case-insensitive regex; empty = never excused).",
+    "Read by bad_translations.py (detect) and extension/src/test/i18n/localeParity.test.ts. Add a phrase only after it has been seen as an invention at least twice."
+  ],
+  "phrases": {
+    "ar": [
+      {
+        "phrase": "هيئة إدارة المعلومات",
+        "en_excuse": "information management|authority|agency"
+      },
+      {
+        "phrase": "هيئة البيانات الحيوية",
+        "en_excuse": "biometric|authority|agency"
+      },
+      {
+        "phrase": "هيئة البيانات الجسدية",
+        "en_excuse": "physical data|authority|agency"
+      }
+    ],
+    "bn": [
+      {
+        "phrase": "/নো_থিং",
+        "en_excuse": "no_think"
+      },
+      {
+        "phrase": "এইচ পি ও",
+        "en_excuse": "HPO"
+      },
+      {
+        "phrase": "প্যাকেজিংয়ের জন্য",
+        "en_excuse": "packaging"
+      }
+    ],
+    "de": [
+      {
+        "phrase": "Das ist die ________",
+        "en_excuse": "________"
+      },
+      {
+        "phrase": "ist ein Phänomen, das sich in der",
+        "en_excuse": "phenomenon"
+      }
+    ],
+    "es": [
+      {
+        "phrase": "El hombre de la ciudad",
+        "en_excuse": "man|city|town"
+      },
+      {
+        "phrase": "Es el nombre de la persona que tiene",
+        "en_excuse": "name|person"
+      },
+      {
+        "phrase": "Es el número de células que tiene la persona",
+        "en_excuse": "cell|person"
+      },
+      {
+        "phrase": "es el número de células",
+        "en_excuse": "cell"
+      }
+    ],
+    "fa": [
+      {
+        "phrase": "_فرد_منتظره",
+        "en_excuse": "person|expect"
+      }
+    ],
+    "fil": [
+      {
+        "phrase": "ang mga ito ay may _ph0__",
+        "en_excuse": "_ph0__"
+      },
+      {
+        "phrase": "Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili",
+        "en_excuse": "people|recognize"
+      },
+      {
+        "phrase": "Ang mga bagay na may kaugnayan sa pag-aalaga",
+        "en_excuse": "care"
+      },
+      {
+        "phrase": "sa loob ng isang taon na ang nakalipas",
+        "en_excuse": "year"
+      },
+      {
+        "phrase": "ang kanyang mga",
+        "en_excuse": "its|his|her|their"
+      }
+    ],
+    "fr": [
+      {
+        "phrase": "Il s'agit de la réponse à une question",
+        "en_excuse": "answer|question"
+      },
+      {
+        "phrase": "protéine",
+        "en_excuse": "protein"
+      }
+    ],
+    "he": [
+      {
+        "phrase": "זה היה חרא",
+        "en_excuse": "crap|shit"
+      },
+      {
+        "phrase": "פטריוטיביות",
+        "en_excuse": "patriot"
+      }
+    ],
+    "hi": [
+      {
+        "phrase": "/नो_थिंक",
+        "en_excuse": "no_think"
+      },
+      {
+        "phrase": "मैं तो हूँ ही",
+        "en_excuse": "I am"
+      }
+    ],
+    "id": [
+      {
+        "phrase": "adalah suatu senyawa",
+        "en_excuse": "compound"
+      },
+      {
+        "phrase": "yang bisa dibilang",
+        "en_excuse": "arguabl"
+      }
+    ],
+    "it": [
+      {
+        "phrase": "è il nome di una delle sue compagne",
+        "en_excuse": "name|partner|companion"
+      },
+      {
+        "phrase": "È il nome di un'altra versione",
+        "en_excuse": "name|version"
+      },
+      {
+        "phrase": "è il nome di una cellula",
+        "en_excuse": "name|cell"
+      },
+      {
+        "phrase": "è il numero di PH che si trova in una cellula",
+        "en_excuse": "cell|PH"
+      }
+    ],
+    "ja": [
+      {
+        "phrase": "フォローしている",
+        "en_excuse": "follow"
+      },
+      {
+        "phrase": "ヒトの体内にある",
+        "en_excuse": "human|body"
+      },
+      {
+        "phrase": "no_think",
+        "en_excuse": "no_think"
+      }
+    ],
+    "nl": [
+      {
+        "phrase": "Het is een generieke vorm van",
+        "en_excuse": "generic"
+      },
+      {
+        "phrase": "Het is een van de twee",
+        "en_excuse": "two|either|both"
+      },
+      {
+        "phrase": "_ph1__",
+        "en_excuse": "_ph1__"
+      }
+    ],
+    "pl": [
+      {
+        "phrase": "Saropa Lints: to znaczy, że jest",
+        "en_excuse": "means"
+      },
+      {
+        "phrase": "jest to grupa, która zawiera",
+        "en_excuse": "group|contain"
+      },
+      {
+        "phrase": "jest to cząstka, która łączy się z",
+        "en_excuse": "particle"
+      },
+      {
+        "phrase": "to grupa, która ma",
+        "en_excuse": "group"
+      },
+      {
+        "phrase": "to jest właśnie ten",
+        "en_excuse": "this is"
+      }
+    ],
+    "pt": [
+      {
+        "phrase": "É um termo usado para descrever",
+        "en_excuse": "term|describe"
+      },
+      {
+        "phrase": "é um tipo de células",
+        "en_excuse": "cell"
+      },
+      {
+        "phrase": "é um grupo de proteínas que se reproduzem em células",
+        "en_excuse": "protein|cell"
+      },
+      {
+        "phrase": "É um tipo de vírus que se alimenta do sangue",
+        "en_excuse": "virus|blood"
+      },
+      {
+        "phrase": "é um dos mais antigos",
+        "en_excuse": "oldest"
+      }
+    ],
+    "ru": [
+      {
+        "phrase": "Это - ПХО",
+        "en_excuse": ""
+      },
+      {
+        "phrase": "является основой для развития",
+        "en_excuse": "basis|foundation"
+      },
+      {
+        "phrase": "это число, которое соответствует числу",
+        "en_excuse": "number"
+      },
+      {
+        "phrase": "это как раз то, что я хочу сказать",
+        "en_excuse": "want to say"
+      }
+    ],
+    "sw": [
+      {
+        "phrase": ":: kwa hiyo ni sawa.",
+        "en_excuse": "so it is fine"
+      },
+      {
+        "phrase": "ilitumwa zaidi ya mwaka mmoja uliopita",
+        "en_excuse": "sent|year"
+      },
+      {
+        "phrase": "zaidi ya mwaka mmoja uliopita",
+        "en_excuse": "year"
+      }
+    ],
+    "th": [
+      {
+        "phrase": "เป็นการประกอบของ",
+        "en_excuse": "composition|consist"
+      },
+      {
+        "phrase": "เป็นการตรวจหา",
+        "en_excuse": "detect|check"
+      },
+      {
+        "phrase": "สารที่ใช้ในการรักษา",
+        "en_excuse": "treatment|substance"
+      },
+      {
+        "phrase": "_ สายการบิน",
+        "en_excuse": "airline"
+      },
+      {
+        "phrase": "การรักษาโรค",
+        "en_excuse": "disease|treatment"
+      },
+      {
+        "phrase": "ครับ",
+        "en_excuse": ""
+      }
+    ],
+    "tr": [
+      {
+        "phrase": "Hı hı",
+        "en_excuse": "hmm"
+      },
+      {
+        "phrase": "olarak tanımlanır",
+        "en_excuse": "defin|identif|describ"
+      },
+      {
+        "phrase": "Rahatlatıcı ve rahatlatıcı",
+        "en_excuse": "relax|sooth"
+      }
+    ],
+    "uk": [
+      {
+        "phrase": "_ПХО__",
+        "en_excuse": ""
+      },
+      {
+        "phrase": "ПФ2__",
+        "en_excuse": ""
+      },
+      {
+        "phrase": "це фізіотип, що містить в собі",
+        "en_excuse": "physiotype"
+      },
+      {
+        "phrase": ". . . . - відправлення",
+        "en_excuse": ""
+      }
+    ],
+    "ur": [
+      {
+        "phrase": ":۔",
+        "en_excuse": ""
+      },
+      {
+        "phrase": ".فہِھَ ہْ",
+        "en_excuse": ""
+      },
+      {
+        "phrase": "پہلے زیادہ سے سال ایک",
+        "en_excuse": "more than a year"
+      },
+      {
+        "phrase": "/نومتھنک",
+        "en_excuse": "no_think"
+      },
+      {
+        "phrase": "/نہ کریں",
+        "en_excuse": "no_think"
+      },
+      {
+        "phrase": "انحصار کرنے والے افراد",
+        "en_excuse": "people|persons|individuals"
+      }
+    ],
+    "vi": [
+      {
+        "phrase": "là Phương pháp",
+        "en_excuse": "method"
+      },
+      {
+        "phrase": "là người có thể",
+        "en_excuse": "person|who|someone"
+      },
+      {
+        "phrase": "tế bào",
+        "en_excuse": "cell"
+      },
+      {
+        "phrase": "là một dạng của",
+        "en_excuse": "form of|kind of|type of"
+      },
+      {
+        "phrase": "ph0__",
+        "en_excuse": "ph0"
+      },
+      {
+        "phrase": "Tạm dịch",
+        "en_excuse": "translat"
+      }
+    ],
+    "zh": [
+      {
+        "phrase": "没有任何问题",
+        "en_excuse": "\\bproblem|\\bissue|nothing|\\bno\\b"
+      },
+      {
+        "phrase": "没有一个人",
+        "en_excuse": "nobody|no one|person"
+      },
+      {
+        "phrase": "它们的基因",
+        "en_excuse": "\\bgene"
+      },
+      {
+        "phrase": "这是一个非常好的方法",
+        "en_excuse": "great|good way"
+      },
+      {
+        "phrase": "这是一个很好的方法",
+        "en_excuse": "great|good way"
+      },
+      {
+        "phrase": "已经成为一种",
+        "en_excuse": "become"
+      },
+      {
+        "phrase": "Saropa Lints: 已经是",
+        "en_excuse": "already"
+      }
+    ]
+  }
+}

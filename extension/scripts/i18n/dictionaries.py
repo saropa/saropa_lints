@@ -486,7 +486,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{total} transitive deps": "{total} ٹرانزیٹو ڈیپس",
         "{total} transitive deps ({shared} shared)": "{total} ٹرانزیٹو ڈیپس ({shared} مشترکہ)",
         "{label}: {size}": "{label}: {size}",
-        "Saropa Lints: Manage Rule Packs": "Saropa Lints: Open Lints Config",
+        # Manual: the old value named the retired "Open Lints Config" command.
+        "Saropa Lints: Manage Rule Packs": "Saropa Lints: رول پیکس کا نظم کریں",
         "Search": "تلاش",
         "Search packages": "تلاش",
         "Search packages…": "تلاش",
@@ -1786,7 +1787,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "CC {cc}": "CC {cc}",
         "#": "#",
         "OWASP": "OWASP",
-        "Saropa Lints: Manage Rule Packs": "Saropa Lints: লিন্ট কনফিগারেশন খুলুন",
+        # Manual: the old value named the retired "Open Lints Config" command.
+        "Saropa Lints: Manage Rule Packs": "Saropa Lints: রুল প্যাক পরিচালনা করুন",
         "TODOs": "করণীয়",
         "TODOs & HACKS": "করণীয় ও হ্যাকস",
         "TODOs & Hacks": "করণীয় ও হ্যাকস",
@@ -2085,7 +2087,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Saropa Lints: Focus Saropa Lints Sidebar": "Saropa Lints: I-focus ang Saropa Lints Sidebar",
         "Saropa Lints: Initialize / Update Analysis Options": "Saropa Lints: I-initialize / I-update ang Analysis Options",
         "Saropa Lints: Open Findings Dashboard": "Saropa Lints: Buksan ang Findings Dashboard",
-        "Saropa Lints: Manage Rule Packs": "Saropa Lints: Buksan ang Lints Config",
+        # Manual: the old value named the retired "Open Lints Config" command.
+        "Saropa Lints: Manage Rule Packs": "Saropa Lints: Pamahalaan ang mga Rule Pack",
         "Saropa Lints: Open Package Vibrancy": "Saropa Lints: Buksan ang Package Vibrancy",
         "Saropa Lints: Repair Analysis Options": "Saropa Lints: Kumpunihin ang Analysis Options",
         "Saropa Lints: Run Analysis": "Saropa Lints: Patakbuhin ang Pagsusuri",
@@ -2282,7 +2285,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Open Code Health": "פתיחת תקינות קוד",
         "Saropa Lints": "Saropa Lints",
         "Saropa Lints: Focus Package Vibrancy Tree": "Saropa Lints: מיקוד על עץ חיוניות חבילות",
-        "Saropa Lints: Manage Rule Packs": "Saropa Lints: פתיחת הגדרות Lints",
+        # Manual: the old value named the retired "Open Lints Config" command.
+        "Saropa Lints: Manage Rule Packs": "Saropa Lints: ניהול חבילות כללים",
         "Saropa Lints: Open Package Vibrancy": "Saropa Lints: פתיחת חיוניות חבילות",
         "Saropa Lints: Show Related Rule Telemetry": "Saropa Lints: הצגת טלמטריית כללים קשורים",
         "TODOs & Hacks": "לביצוע ומעקפים",
