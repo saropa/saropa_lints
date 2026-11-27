@@ -108,7 +108,7 @@
         "description": "2.350'den fazla kuralın hangilerinin çalıştığını ve hangi ciddiyet seviyesinde çalıştığını ayarlayın."
       },
       "catalog": {
-        "label": "Komut Kataloğu Komuta Katalogu",
+        "label": "Komut Kataloğu",
         "description": "Her Saropa Lints komutunu tek bir arama yapılabilir listede."
       }
     }
@@ -135,21 +135,21 @@
       "subtitle": "{count} bulguları · {timestamp}",
       "baselineSubtitle": "Temel ile kıyaslandığında {date}",
       "searchPlaceholder": "Filtreleyin kural, dosya veya mesaj...",
-      "filterTier": "Düzeyleme Seviyesi",
+      "filterTier": "Seviye",
       "filterSeverity": "Ciddilik Ağırlık",
-      "filterImpact": "Etki etkisi etki etkisi",
+      "filterImpact": "Etki",
       "filterBaselineStatus": "Temel Seviye",
       "baselineNew": "Yeni",
       "baselineUnchanged": "Değiştirilmemiş",
-      "saveBaseline": "Kaydet ve temel olarak kaydet",
+      "saveBaseline": "Temel çizgi olarak kaydet",
       "copyJson": "JSON'u kopyalayın.",
       "toggleGroup": "Gruplama aç / kapat",
-      "colFile": "Dosya dosyası dosya dosya.",
-      "colLine": "Hattı çizgi çizgi.",
-      "colRule": "Kural Kanun kural",
+      "colFile": "Dosya",
+      "colLine": "Satır",
+      "colRule": "Kural",
       "colSeverity": "Ciddilik Ağırlık",
-      "colTier": "Düzeyleme Seviyesi",
-      "colMessage": "Mesaj mesajı mesajı",
+      "colTier": "Seviye",
+      "colMessage": "Mesaj",
       "empty": "Bulunamadı — proje temiz.",
       "filteredEmpty": "Geçerli filtrelerle eşleşen sonuç bulunamadı.",
       "loadMore": "Daha fazla göster",
@@ -173,22 +173,22 @@
   },
   "scanOnSave": {
     "statusBar": {
-      "name": "Saropa Lints: Kaydedildiğinde Tarayın",
+      "name": "Saropa Lints: Kaydederken Tara",
       "scanning": "Saropa: {count} dosya(ya) taranıyor…",
       "done": "Saropa: {count} sorun(lar), {elapsed}",
       "failed": "Saropa: taranamadı",
-      "warming": "Saropa: analizleyiciyi ısınlatıyor... açıldıktan sonra ilk tarayıcı bir dakika sürebilir",
+      "warming": "Saropa: analizör ısınıyor… açıldıktan sonraki ilk tarama bir dakika sürebilir",
       "ready": "Saropa: hazır",
       "disabled": "Saropa: devre dışı",
       "noProject": "Saropa: Dart projesi yok",
       "doneTooltip": "{total} bulguları, {shown} filtreden sonra gösterilir",
       "dropped": "Saropa: taranmadı ({count} dosya)",
-      "droppedTooltip": "Saropa Lints başka bir araçla açılmış olan {count} dosyayı atladı. Dosyayı tarayabilmek için kaydedin.",
+      "droppedTooltip": "Saropa Lints, sizin tarafınızdan değil başka bir araç tarafından açılan {count} dosyayı atladı. Bir dosyayı taramak için kaydedin.",
       "droppedSuffix": "(+{count} atlanmıştır)",
       "droppedSuffixTooltip": "Ayrıca başka bir araçla açılmış olan {count} dosyaları atlandı. Dosyayı taramak için kaydedin."
     },
     "baseline": {
-      "progressTitle": "Saropa Lints: projeyi tarıyor",
+      "progressTitle": "Saropa Lints: tüm proje taranıyor",
       "progressMessage": "{scanned}/{total} dosyaları taraştırıldı, {issues} sorun bulundu"
     },
     "legacyKeyWarning": "saropaLints.scanOnSave.enabled etkisizdir — scan-on-save, saropaLints.enabled tarafından tamamen kontrol edilir. Ayarlarınızdan kullanılmayan anahtarı kaldırın."
@@ -218,22 +218,22 @@
       "usedOnly": "Sadece kullanılır",
       "deprecatedOnly": "İptal edildi sadece",
       "expandAll": "Tümünü genişlet.",
-      "collapseAll": "Hepsi çöküyor, hepsi yıkılıyor.",
+      "collapseAll": "Tümünü daralt",
       "indexLabel": "Paket index"
     },
     "summary": {
       "title": "Paket özeti",
       "sortHint": "Bu sütuna göre sırala seç",
       "colPackage": "Paket",
-      "colVersion": "Versiyon Sürüm Sürüm",
+      "colVersion": "Sürüm",
       "colFeatures": "Özellikler",
       "colAdopted": "Kabul Edildi",
       "colUnadopted": "Kabul edilmemiş",
       "colUsages": "Kullanımalar",
-      "colScore": "Skor puanı, skor sayısı."
+      "colScore": "Puan"
     },
     "packages": {
-      "title": "Paket paketler, paketler."
+      "title": "Paketler"
     },
     "empty": {
       "body": "Tarayıcıda paket bulunamadığı için özellikler listelenemedi."
@@ -263,8 +263,8 @@
       "usagesOne": "{count} kullanımı",
       "usagesUnknown": "kullanımölçülemez",
       "apiHeading": "{symbol} ({count})",
-      "viewCode": "View code Kod görüntüle",
-      "viewDocs": "View docs (dokümanları görüntüle)",
+      "viewCode": "Kodu görüntüle",
+      "viewDocs": "Belgeleri görüntüle",
       "noUsages": "Proje kaynaklarında kullanım bulunamadı.",
       "moreUsages": "{count} daha fazla kullanım",
       "moreUsagesOne": "{count} daha fazla kullanım"
@@ -278,11 +278,11 @@
   },
   "stylistic": {
     "title": "Stil ve görüşler.",
-    "intro": "Opinionated style rules, varsayılan olarak kapalı. Sadece ekibinin kabul ettiği şeyleri aç. Çelişkili seçimler gruplandırılır, böylece birini seçersiniz.",
-    "searchPlaceholder": "Arama tarzı kuralları... arama stili kurallar.",
+    "intro": "Tercihe dayalı stil kuralları varsayılan olarak kapalıdır. Yalnızca ekibinizin üzerinde anlaştığı kuralları açın. Birbiriyle çelişen seçenekler gruplandırılır, böylece birini seçersiniz.",
+    "searchPlaceholder": "Stil kurallarında ara…",
     "pickOne": "Birini seçin.",
-    "none": "Hiçbiri yok, hiçbiri yok.",
-    "enableAll": "Enable all: Hepsini etkinleştir.",
+    "none": "Hiçbiri",
+    "enableAll": "Tümünü etkinleştir",
     "disableAll": "Tümünü devre dışı bırak.",
     "noMatch": "Hiçbir stil kuralları eşleşmez.",
     "desc": {
@@ -304,7 +304,7 @@
     "forYourProject": "Projeniz için.",
     "forYourProjectHint": "Bağımlılığı veya SDK'sı pubspektrinizle eşleşen paketler. Bu kurallar, aslında gönderdiğiniz kod için geçerlidir.",
     "noneDetected": "Henüz hiçbir paket bağımlılıklarınızla eşleşmedi. Desteklenen bir paket ekleyin veya aşağıdaki Tüm paketleri açın.",
-    "allPackages": "Tüm paketler, tüm paketler.",
+    "allPackages": "Tüm paketler",
     "allPackagesHint": "Bu projede tespit edilmeyenler de dahil olmak üzere, mevcut olan her paket. Bir sürünün kurallarını seçmesini sağlayın.",
     "versionGroup": {
       "tag": "Bir versiyon seçin.",
@@ -330,24 +330,24 @@
       "ariaLabel": "Kurallar & Seviyeler panel sekme"
     },
     "ruleFinder": {
-      "disableButton": "Disable Deaktive Etme İşlemleri",
+      "disableButton": "Devre Dışı Bırak",
       "disableTitle": "Bu kuralı proje için devre dışı bırak — analysis_options_custom.yaml yazar ve analizi tekrar çalıştırır",
       "enableButton": "Aktif",
       "enableTitle": "Bu kuralı yeniden etkinleştir — analysis_options_custom.yaml'daki geçersiz kılma kaldırılır ve tekrar analiz yapılır"
     },
     "tab": {
-      "tier": "Düzeyleme Seviyesi",
-      "packs": "Kural paketleri kurallar paketi.",
-      "overrides": "Override'lar geçersiz kılmaktadır.",
+      "tier": "Seviye",
+      "packs": "Kural paketleri",
+      "overrides": "Geçersiz Kılmalar",
       "sdk": "SDK'nın kullanıma sunulması",
       "configFile": "Yapılandırma dosyası",
       "automation": "Otomasyon",
       "extension": "Eklenti"
     },
     "common": {
-      "rule": "Kural Kanun kural",
+      "rule": "Kural",
       "add": "Ekle",
-      "remove": "Remove remove kaldırmak"
+      "remove": "Kaldır"
     },
     "sdk": {
       "summary": "{total} SDK geçiş paketleri bu proje için geçerlidir - {breaking} kırma, {deprecation} kullanımdan kaldırma.",
@@ -434,8 +434,8 @@
           "resolvedSection": "Çözüldü ({count})",
           "newSection": "Başlangıçtan bu yana yeni ({count})",
           "moreRows": "+{count} daha fazlası gösterilmemiştir.",
-          "fileCol": "Dosya dosyası dosya dosya.",
-          "lineCol": "Hattı çizgi çizgi."
+          "fileCol": "Dosya",
+          "lineCol": "Satır"
         }
       },
       "optimizer": {
@@ -488,7 +488,7 @@
   "startupNudge": {
     "message": "Saropa Lints: {count} kural paketi önerisi bu projeye uygulanıyor.",
     "review": "Gözden Geçir",
-    "dismiss": "İşten çıkarma, işten atmak.",
+    "dismiss": "Kapat",
     "reviewFailed": "Saropa Lints kural paketi incelemesini açamadım. {error}"
   },
   "opportunities": {
@@ -498,8 +498,8 @@
     "noScan": "Öncelikle yükseltme fırsatları bulmak için bir paket taraması çalıştırın.",
     "openFileFailed": "{file} açılamadı — son taranmadan sonra yerinden kaybolmuş olabilir.",
     "card": {
-      "versionUpgrade": "güncelleme {latest} için mevcuttur.",
-      "versionCurrent": "En son haberler hakkında",
+      "versionUpgrade": "{latest} sürümüne güncelleme mevcut",
+      "versionCurrent": "en son sürümde",
       "featuresTitle": "Henüz kullanılmayan özellikler.",
       "locationsTitle": "Projenizin bu paketi kullandığı yerler.",
       "noLocations": "Proje kaynaklarında içe aktarılmamış — muhtemelen bir geliştirme veya transitive bağımlılığı.",
@@ -516,34 +516,34 @@
       "failed": "İş fırsatları raporunu yazamadı: {error}"
     },
     "empty": {
-      "title": "Hiçbir şey kabul etmek için hiçbir şey.",
+      "title": "Benimsenecek bir şey yok",
       "body": "Taranan her paketin özellikleri projenizdeki zaten kullanılmış veya hiç değişiklik günlüğü bulunamadı."
     }
   },
   "packageDetail": {
     "section": {
-      "version": "VERSION Versiyonu:",
-      "changelog": "CHANGELOG GÖRÜŞLERİ: Değişiklikler",
-      "community": "Topluluk: Topluluğun bir parçasıdır.",
-      "dependencies": "DEPENDANCYES (bağımlılık)",
-      "alerts": "ALERTLER UYARILAŞTIRMA İÇİN",
-      "platforms": "Platformlar platformu.",
-      "suggestions": "Öneriler önerileri.",
+      "version": "SÜRÜM",
+      "changelog": "DEĞİŞİKLİK GÜNLÜĞÜ",
+      "community": "TOPLULUK",
+      "dependencies": "BAĞIMLILIKLAR",
+      "alerts": "UYARILAR",
+      "platforms": "PLATFORMLAR",
+      "suggestions": "ÖNERİLER",
       "readmeImages": "README IMAGES'in resimleri"
     },
     "header": {
       "logoAlt": "{name} logosu ile",
       "grade": "Sınıfı {grade}",
-      "licenseTitle": "Lisanslar, lisanslar.",
+      "licenseTitle": "Lisans",
       "published": "Yayınlanmıştır {date}"
     },
     "partialBanner": {
       "partReadme": "README ve logo",
       "partGap": "version-gap PR'ler ve sorunlar.",
-      "partReverseDeps": "ters bağımlılık sayımı",
+      "partReverseDeps": "ters bağımlılık sayısı",
       "listTwo": "{first} ve {second}",
-      "listMany": "{head} ve {last} olarak adlandırılır.",
-      "message": "Bazı bölümler yüklenemedi: {list}. . . .Hı hı hımm..",
+      "listMany": "{head} ve {last}",
+      "message": "Bazı bölümler yüklenemedi: {list}.",
       "retry": "Yeniden dene",
       "retrying": "Tekrar deniyorum...",
       "retryTitle": "Başarısız olan fetch'leri tekrar deneyin."
@@ -553,69 +553,69 @@
     },
     "version": {
       "constraint": "Sınırlama kısıtlaması.",
-      "latest": "Son En son en yeni",
-      "prerelease": "Ön Sergi (Pre-Release)",
-      "published": "Yayınlanmış yayınlanmış yayımlanmış",
+      "latest": "En Son",
+      "prerelease": "Ön Sürüm",
+      "published": "Yayınlandı",
       "update": "Güncelleme",
-      "blockedBy": "Blocked by tarafından engellendi",
+      "blockedBy": "Engelleyen",
       "blockedVia": "{blocker} kapakları {dep} {constraint} ({resolvable} çözülebilir, {latest} en son)",
       "blockedViaSdk": "{dep} ({resolvable} çözülebilir, {latest} en son) için {blocker} (Flutter SDK) tarafından sabitlendi",
       "constrained": "Sınırlı, kısıtlanmış.",
       "constrainedBy": "Sizin {constraint} kısıtlamanız bunu kapatır ({resolvable} çözülebilir, {latest} son)",
-      "pinHeld": "Held held tutuldu",
-      "pinDoNotUse": "Kullanmayın kullanmayın.",
-      "drift": "Proje çapındaki sürüklenme, proje çapında bir sürükleniştir.",
+      "pinHeld": "Bekletiliyor",
+      "pinDoNotUse": "Kullanmayın",
+      "drift": "Projeler arası sapma",
       "driftBehind": "Arkada: {siblings} ({own}'niz var)",
       "driftDiffers": "Farklılıklar: {siblings} ({own}'niz var)",
       "codeSize": "Kod Boyutu Kodu Ölçüsü",
-      "archiveSize": "Arşiv Boyutu Arşip boyutu",
+      "archiveSize": "Arşiv Boyutu",
       "bloat": "({rating}/10 şişkinlik)",
-      "onDisk": "Disk On disk On diski üzerinde",
-      "upgrade": "Yükseltme Geliştirme Güncelleme",
-      "upgrading": "Yükseltme... yükseltilmek.",
+      "onDisk": "Diskte",
+      "upgrade": "Yükselt",
+      "upgrading": "Yükseltiliyor…",
       "viewChangelog": "Değişiklik Günlüğünü Görüntüle"
     },
     "changelog": {
       "intro": "{from}'dan {to}'ye ne değişti — yükseltmeden önce gözden geçirin.",
       "versionDated": "{version} — {date}",
-      "truncated": "En son çıkanları gösteriliyor. {count} en yeni sürümleri gösterir.",
+      "truncated": "En son {count} sürüm gösteriliyor.",
       "viewFull": "pub.dev'da tam değişim günlüğünü görüntüle"
     },
     "community": {
-      "stars": "Yıldızlar yıldızlar yıldızları",
-      "likes": "Beğenilenler beğenilir.",
-      "report": "Rapor, rapor raporu",
-      "openIssues": "Açık Sorunlar, Açık Konulardır",
+      "stars": "Yıldızlar",
+      "likes": "Beğeniler",
+      "report": "Rapor",
+      "openIssues": "Açık Sorunlar",
       "openPrs": "Açık PR'ler",
       "activity": "Faaliyet (90d)",
       "activityValue": "{closed} konular kapatıldı, {merged} PR'ler birleştirildi.",
       "noActivity": "Son zamanlarda herhangi bir aktivite yok.",
-      "lastCommit": "Son taahhüt son taahhüd.",
-      "pubPoints": "Pub Points (Pub) - Barlar, bar noktaları.",
+      "lastCommit": "Son Commit",
+      "pubPoints": "Pub Puanları",
       "verified": "(verifiye edilmiş)",
       "publisher": "Yayıncı Editör Yayımcı",
       "flagged": "({count} bayrağı)",
-      "transitiveDeps": "Transitif Depolar (Transitive Deposits)",
+      "transitiveDeps": "Geçişli Bağımlılıklar",
       "footprintBreakdown": "{unique} benzersiz &middot; +{shared} paylaşılan = {total} toplam",
       "footprintTooltip": "Kendi {own} + benzersiz geçişler {unique} + paylaşılan geçişleri {shared}. Bu depayı kaldırmak {saved} (paylaşılan depaylar başkaları tarafından çekilir) tasarrufu sağlar.",
       "trueFootprint": "Gerçek Ayak İzleri",
       "packagesCount": "{count} paket",
-      "dependents": "Bağımlılar, bağımlılık yapan kişiler."
+      "dependents": "Bağımlı Paketler"
     },
     "fileUsages": {
-      "commentedOut": "Yorumlu referanslar: yorumsuz referansları",
-      "fileCount": "{count} dosyaları dosyalar.",
-      "exportNoteTitle": "En az bir kullanım ihracat yönergesi olarak kullanılır.",
-      "publicApiSurface": "API'nin genel yüzeyinin API yüzeyi.",
+      "commentedOut": "Yorum satırına alınmış referanslar:",
+      "fileCount": "{count} dosya",
+      "exportNoteTitle": "En az bir kullanım bir export yönergesidir",
+      "publicApiSurface": "genel API yüzeyi",
       "header": "Dosya Kullanımı ({label})",
       "commentedReexportTitle": "Yorumlanmış-dışarı reeksport.",
       "reexportTitle": "Re-export edildi — bu kütüphanenin public API'sının bir parçası",
-      "reexportBadge": "Yeniden ihracat yeniden ihraç"
+      "reexportBadge": "yeniden dışa aktarma"
     },
     "opportunities": {
       "header": "FERHİM ({count}) fırsatları",
-      "viewCode": "View code Kod görüntüle",
-      "viewDocs": "View docs (dokümanları görüntüle)"
+      "viewCode": "Kodu görüntüle",
+      "viewDocs": "Belgeleri görüntüle"
     },
     "alerts": {
       "archived": "ARŞİVLENMİŞ — repository okunur-yazdırılabilir",
@@ -625,27 +625,27 @@
     },
     "versionGap": {
       "versionTitle": "Gap Versiyonu Gap Sürümü",
-      "overrideTitle": "Override Gap'i geçersiz kıl",
+      "overrideTitle": "Override Farkı",
       "noDates": "Bu paket için sürüm tarihlerini belirleyemedi.",
       "noItems": "Bu sürümler arasında hiçbir PR veya sorun bulunamadı.",
-      "prsMerged": "PR'ler birleşmiş, birleştirilmiştir.",
-      "issuesClosed": "Sorunlar kapandı, kapanmış konular.",
-      "searchLabel": "Arama PR'leri ve sorunları aramak.",
+      "prsMerged": "Birleştirilen PR'ler",
+      "issuesClosed": "Kapatılan sorunlar",
+      "searchLabel": "PR ve sorunlarda ara",
       "searchPlaceholder": "Arama PR'leri ve sorunları...",
       "filterAria": "Kategoriye göre filtreleyin.",
       "filterAll": "Tümü",
       "filterUnreviewed": "Değerlendirilmemişler",
       "filterPrs": "PR'ler",
-      "filterIssues": "Konular, konular sorunları.",
+      "filterIssues": "Sorunlar",
       "typePr": "PR",
-      "typeIssue": "Konuya ilişkin sorunlar.",
+      "typeIssue": "Sorun",
       "reviewReviewed": "Tekrar gözden geçirilmiş.",
       "reviewApplicable": "Uygulanabilirlik Uygun",
-      "reviewNotApplicable": "N/A Hayır",
-      "notesPlaceholder": "Notlar... notlar.",
-      "colType": "Tip: Tür, tip tipi.",
-      "colTitle": "Başlık Adı başlığı Başlık",
-      "colAuthor": "Yazarın adı: Author Author",
+      "reviewNotApplicable": "N/A",
+      "notesPlaceholder": "Notlar...",
+      "colType": "Tür",
+      "colTitle": "Başlık",
+      "colAuthor": "Yazar",
       "colReview": "Gözden Geçir",
       "summaryFooter": "{total}'nin {triaged}'si tetiklendi | {applicable} uygulanabilir | {notApplicable} Yok | {unreviewed} kaldı",
       "truncated": "Sonuçlar {limit} öğelerine kısaltılmıştır."
@@ -659,10 +659,10 @@
     "links": {
       "viewOnPubDev": "pub.dev'da görünüm",
       "documentation": "Dokümantasyon Belgelendirme",
-      "changelog": "Değişim günlüğü (Change log)",
+      "changelog": "Değişiklik Günlüğü",
       "versions": "Versiyonlar Sürümler",
       "repository": "Depolama Kaynağı Repositoriy",
-      "openIssues": "Açık Sorunlar, Açık Konulardır",
+      "openIssues": "Açık Sorunlar",
       "reportIssue": "Rapor Sorunu Konuya Göre"
     },
     "a11y": {
@@ -676,13 +676,13 @@
   "toolbar": {
     "runAnalysis": "Analiz çalıştırın.",
     "copyJson": "JSON'u kopyalayın.",
-    "saveReport": "Raporu kaydetme raporunu kaydet.",
-    "moreActions": "Daha fazla eylem, daha çok eylem.",
-    "clearAll": "Her şey temiz, her yer boş."
+    "saveReport": "Raporu kaydet",
+    "moreActions": "Diğer eylemler",
+    "clearAll": "Tümünü temizle"
   },
   "loading": {
-    "runningAnalysis": "Analiz yapıyorum... analiz yapıyorum.",
-    "analysisComplete": "Analiz tamamlandı, analizler tamamlandı.",
+    "runningAnalysis": "Analiz çalıştırılıyor…",
+    "analysisComplete": "Analiz tamamlandı",
     "analysisClean": "Sorun bulunamadı.",
     "refreshingDashboard": "En son bulgularla yenilenmiş bir pano.",
     "analysisStartedDetail": "Analiz başladı. Teşhis kayıtlarını toplamak...",
@@ -690,12 +690,12 @@
   },
   "filter": {
     "activeLabel": "Aktif filtreler:",
-    "chipRemove": "Remove remove kaldırmak"
+    "chipRemove": "Kaldır"
   },
   "a11y": {
     "toggleFullWidth": "Toggle full-width layout düzenini değiştirin.",
     "expandRow": "Ekran satırını genişletin.",
-    "comparisonDimension": "Metrik metrik olarak kullanılır."
+    "comparisonDimension": "Metrik"
   },
   "uiLanguage": {
     "pick": {
@@ -717,16 +717,16 @@
       "openViolations": "İhlaller Raporunu Aç",
       "openPackageDashboard": "Paket Tablosunu Açın",
       "openProcessHealth": "İşlem Sağlığını Aç",
-      "commandCatalog": "Komut Kataloğu Komuta Katalogu",
+      "commandCatalog": "Komut Kataloğu",
       "about": "Hakkında"
     },
     "tooltip": {
       "section": {
-        "status": "Status Durum Statüs Durumu",
+        "status": "Durum",
         "project": "Proje",
         "problems": "Sorunlar",
         "memory": "Hafıza",
-        "actions": "Eylemler eylemleri eylemler."
+        "actions": "Eylemler"
       },
       "cause": {
         "on": "Analiz çalışıyor: ayar ve analizör eklentisi hem ikisi de açıktır.",
@@ -746,14 +746,14 @@
         "vibrancy": "Paket Dashboard'ını açın."
       },
       "project": {
-        "version": "Versiyon Sürüm Sürüm",
-        "tier": "Düzeyleme Seviyesi",
+        "version": "Sürüm",
+        "tier": "Seviye",
         "vibrancy": "Canlılık",
         "packages": "Paketler taraştırılıyor",
         "packagesSuppressed": "{count} ({suppressed} bastırıldı)",
         "score": "Lint puanı",
         "scorePending": "tam analiz (kısmi tarama) yap",
-        "findings": "Bulgular Bulguları",
+        "findings": "Bulgular",
         "updates": "Güncellemeler mevcut",
         "actionItems": "Eylem noktaları",
         "route": "Yol"
@@ -780,7 +780,7 @@
         "extHost": "Eklenti ana bilgisayarı",
         "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
         "ram": "Bilgisayar RAM",
-        "ramValue": "{free} {total}'dan özgürdür",
+        "ramValue": "{total} içinde {free} boş",
         "trend": "RSS trend (son ~30 dk)"
       },
       "action": {
@@ -823,7 +823,7 @@
     "notification": {
       "critical": "Dart süreçleri {size} ile {orphaned} izole edilmiş daemon'ları kullanıyor. Temizle?",
       "possibleLeak": "Saropa RSS artmaya devam ediyor ({size} ve artıyor). Olası bellek sızıntısı — sağlık panelini kontrol edin.",
-      "result": "{count} ölü daemon öldürdüm, ~{size} serbest bırakıldı",
+      "result": "{count} sahipsiz daemon sonlandırıldı, yaklaşık {size} boşaltıldı",
       "systemLowMemory": "Makinanızda sadece {free} kadar {total} RAM boş. Kullanılmayan pencereleri veya uygulamaları kapatmayı düşünün.",
       "analysisServerLarge": "Dart analiz sunucusu {size} kullanıyor. Belleği boşaltmak için yeniden başlatın?",
       "sessionStartLow": "Makinanızda {free} kadar {total} RAM serbest. Çalışmaya başlamadan önce kullanılmayan VS Code pencerelerini veya Ollama modellerini kapatmayı düşünün."
@@ -831,17 +831,17 @@
     "action": {
       "cleanUp": "Temizle",
       "openPanel": "Sağlık Paneli",
-      "dismiss": "İşten çıkarma, işten atmak.",
+      "dismiss": "Kapat",
       "optimizeAnalysis": "Analiz Optimizasyonu",
       "dontShowAgain": "Yine Gösterme",
       "openMachineDashboard": "Makine Sağlığı Açık",
-      "restartAnalysisServer": "Yeniden başlatma, yeniden başlatmak."
+      "restartAnalysisServer": "Yeniden Başlat"
     },
     "cleanup": {
       "noOrphans": "Hiçbir ölü daemon bulunamadı.",
       "confirm": "{count} adet {size} kullanarak izole edilmiş daemon süreci bulundu. Onları sonlandırırsınız mı?",
       "killButton": "Ölçülen Çocuklar",
-      "cancelButton": "İptal Et iptal et"
+      "cancelButton": "İptal"
     },
     "orphanPreflight": {
       "found": "{count} önceki bir oturumdan kalma model ana bilgisayar işlem(ler)i, {size} boyutunda tahsis edilmiş belleği tutuyor.",
@@ -852,7 +852,7 @@
       "confirmDetail": "Bu süreçler anında sona erecek ve geri alınamayacak:",
       "confirmKill": "İşlemi Bitir",
       "listEntry": "{name} (PID {pid}) — {size}",
-      "reclaimed": "Bitirildi {count} izole edilmiş süreç(ler), {size} yaklaşık olarak geri kazanıldı.",
+      "reclaimed": "{count} sahipsiz süreç sonlandırıldı, yaklaşık {size} geri kazanıldı.",
       "reclaimFailed": "{count} işlem(ler)i sona erdirilemedi. Yükseltici izinler gerekebilir.",
       "bannerTitle": "{count} atılmış model host süreci(ler) {size} tutuyor",
       "bannerReclaim": "Geri Kazanım"
@@ -863,11 +863,11 @@
       "processes": "işlemler",
       "totalRss": "toplam RSS",
       "orphaned": "yetim",
-      "refresh": "Rahatlatıcı ve rahatlatıcı olsun.",
+      "refresh": "Yenile",
       "colPid": "PID",
       "colParent": "Ebeveyn",
       "colRss": "RSS",
-      "colType": "Tip: Tür, tip tipi.",
+      "colType": "Tür",
       "colCommand": "Komut",
       "colAction": "Eylem",
       "typeOrphan": "Yetim",
@@ -881,13 +881,13 @@
     "watcherExclude": {
       "prompt": "{count} önerilen dosya izleme hariç tutmaları bu çalışma alanından eksik: {patterns}. Bunları eklemek, VS Code tarafından belleği boşa harcayan büyük derleme artefaktlarını ve heap dump'ları izlenmesini engeller.",
       "addAll": "Tümünü Ekle",
-      "dismiss": "İşten çıkarma, işten atmak.",
+      "dismiss": "Kapat",
       "added": "{count} dosya izlemeçi hariç tutmaları işlevselliğe eklendi."
     },
     "nestedRoots": {
       "prompt": "{folders}, {count} iç içe Dart paket kök(sü) içeriyor ve bu git tarafından atlanıyor. Her biri ayrı bir bağlam olarak analiz ediliyor ve analiz sunucusunun belleğini şişebilir.",
       "fix": "Analizden Dışarı Al",
-      "dismiss": "İşten çıkarma, işten atmak.",
+      "dismiss": "Kapat",
       "fixed": "{folders}'ı analiz ve dosya izleme dışarı bırakıldı."
     },
     "hazardScan": {
@@ -895,7 +895,7 @@
       "andMore": "ve {count} daha fazla",
       "unnamedFolder": "(adi verilmemiş klasör)",
       "addExclusions": "Watcher'dan Dışarıya Al",
-      "dismiss": "İşten çıkarma, işten atmak.",
+      "dismiss": "Kapat",
       "added": "{count} izlemeçi hariç tutma deseni(e) işlevsel ayarlara eklendi."
     }
   },
@@ -918,7 +918,7 @@
   },
   "machineDashboard": {
     "title": "Makine Sağlığı",
-    "refresh": "Rahatlatıcı ve rahatlatıcı olsun.",
+    "refresh": "Yenile",
     "systemUnknown": "Bu platformda sistem belleği okunamadı.",
     "platformUnsupported": "Makine Sağlığı bu platformda mevcut değil — işlem sorguları Windows, macOS ve Linux platformlarını destekler.",
     "freeOf": "ücretsiz",
@@ -948,7 +948,7 @@
     },
     "action": {
       "reclaim": "Geri Kazanım",
-      "restartAnalysisServer": "Yeniden başlatma, yeniden başlatmak.",
+      "restartAnalysisServer": "Yeniden Başlat",
       "setHeapCap": "Kapağı Ayarla",
       "unloadModel": "Çıkart"
     },
@@ -985,7 +985,7 @@
     "notification": {
       "shedDisabled": "Analizör bellek baskısı algılandı (RSS {rssMb} MB, yumuşak sınır {softLimitMb} MB). Basınç altında maliyetli kuraları otomatik olarak devre dışı bırakmak için kural atamasını etkinleştirin.",
       "enableButton": "Olanak vermek",
-      "learnMoreButton": "Daha Fazlasını Öğrenin Daha fazlasını öğrenin",
+      "learnMoreButton": "Daha Fazla Bilgi",
       "runInit": "'dart run saropa_lints:init' komutunu çalıştırarak analysis_options_custom.yaml oluşturun, ardından shed_rules: true olarak ayarlayın.",
       "enabledConfirmation": "Kural atılımı analysis_options_custom.yaml'da etkinleştirildi. Analizleyici, bir sonraki yeniden yüklemede değişikliği alacaktır."
     },
@@ -1013,13 +1013,13 @@
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "Az önce şimdi, az önce.",
+      "justNow": "az önce",
       "minutesAgo": "{min} dk önce",
       "hoursAgo": "{hr} sa önce",
       "daysAgo": "{day} g önce"
     },
     "status": {
-      "updatedPrefix": "Güncellenmiş güncellendi.",
+      "updatedPrefix": "Güncellendi",
       "refreshHint": "Analizörden yenileme yapmak için tıklayın.",
       "lastRunUnknown": "Son çalıştırma bilinmiyor.",
       "noTimestampTitle": "violations.json'da zaman damgası yok.",
@@ -1041,35 +1041,35 @@
       "trendTitle": "Önceki çalıştırmalardan bu yana sağlık puanı/ihlal eğilimi",
       "hotspotsTitle": "{open} açık, {safe} güvenli olarak işaretlendi, {fixed} düzeltildi — incelemek için tıklayın",
       "hotspotsPill": "{open} açık · %{percent} değerlendirildi",
-      "qualityGatePassingTitle": "Code Health kalite geçidi geçişi — Code Health'i açmak için tıklayın",
+      "qualityGatePassingTitle": "Kod Sağlığı kalite kapısı geçiliyor — Kod Sağlığını açmak için tıklayın",
       "qualityGatePassingPill": "Kapı geçişi",
       "qualityGateFailingTitle": "Kod Sağlığı kalite kapısı başarısız ({count} ihlal(ler)) — Kod Sağlığı'nı açmak için tıklayın",
       "qualityGateFailingPill": "Kapı başarısız"
     },
     "groupBy": {
       "severity": "Ciddilik Ağırlık",
-      "file": "Dosya dosyası dosya dosya.",
-      "impact": "Etki etkisi etki etkisi",
-      "rule": "Kural Kanun kural",
+      "file": "Dosya",
+      "impact": "Etki",
+      "rule": "Kural",
       "owasp": "OWASP",
-      "ruleType": "Kural tipi kural türü",
+      "ruleType": "Kural türü",
       "ruleStatus": "Rule statüsü, kuralın durumudur.",
-      "tier": "Düzeyleme Seviyesi",
+      "tier": "Seviye",
       "pack": "Paketleme (ler)"
     },
     "seg": {
       "toggleSeverityTitle": "Toggle {v} şiddetini değiştirmek."
     },
     "kpi": {
-      "visibleLabel": "Görünür bulgular görünür bulgulardır.",
-      "allMatched": "Hepsi eşleşti, hepsi birbiriyle uyuştu.",
+      "visibleLabel": "Görünür bulgular",
+      "allMatched": "tümü eşleşti",
       "ofTotal": "toplam {total}'ın %1'i.",
       "clearFiltersTitle": "Tüm filtreyi temizlemek için tıklayın.",
-      "errorsLabel": "Hatalar hatalar hatası",
-      "errorsSubFix": "Fix fix olmalı, düzeltmeliyiz.",
+      "errorsLabel": "Hatalar",
+      "errorsSubFix": "düzeltilmeli",
       "errorsSubClear": "hiçbiri - temiz",
       "errorsTitle": "Bulguları hatalara göre filtreleyin (düzeltilmesi gerekir - bozuk / çökecek / istismar edilebilir)",
-      "warningsLabel": "Uyarı Sözcükleri: Warnings",
+      "warningsLabel": "Uyarılar",
       "warningsSubBad": "başarısız olabilir veya kötü görünebilir.",
       "warningsSubClear": "hiçbiri - temiz",
       "warningsTitle": "Bulguları uyarılara filtrele (başarısız olabilir veya kötü görünebilir)",
@@ -1077,28 +1077,28 @@
       "infoSub": "Bilginize - stil / öneriler",
       "infoSubNone": "hiçbiri",
       "infoTitle": "Bulguları bilgiye göre filtreleyin (Bilginize — stil ve öneriler)",
-      "filesLabel": "Etkilenen dosyalar etkilenmiş dosyalardır.",
+      "filesLabel": "Etkilenen dosyalar",
       "filesSubAcross": "tüm ihracatı boyunca.",
       "filesSubNone": "hiçbir dosya etkilenmedi.",
       "filesTitle": "En az bir bulguya katkıda bulunan farklı dosyalar.",
-      "topRuleLabel": "En üst düzey kural, en yüksek kuraldır.",
-      "topRuleTitle": "{name} kuralına filtre bulguları.",
+      "topRuleLabel": "En sık kural",
+      "topRuleTitle": "Bulguları {name} kuralına göre filtrele",
       "sectionHeading": "Genel Bakış",
       "sectionAria": "Genel istatistikler"
     },
     "toolbar": {
       "ariaFiltersActions": "Filtreler ve eylemler.",
       "groupByFieldTitle": "Grup bulguları seçilen boyutlara göre gruplandırıldı.",
-      "groupByLabel": "Gruplara göre gruplar",
+      "groupByLabel": "Gruplandırma ölçütü",
       "textFilterTitle": "Bulguları dosya yolu, kural veya mesaj metni ile filtreleyin.",
-      "textFilterPlaceholder": "Dosya, kural veya mesaj... ile filtreleyin.",
-      "textFilterAria": "Metin filtresi metin filtre.",
-      "clearTextFilterTitle": "Açık metin filtreleme filtresi.",
-      "clearTextFilterAria": "Açık metin filtreleme filtresi.",
-      "recentFiltersTitle": "Son filtreler son filtreler",
+      "textFilterPlaceholder": "Dosya, kural veya mesaja göre filtrele…",
+      "textFilterAria": "Metin filtresi",
+      "clearTextFilterTitle": "Metin filtresini temizle",
+      "clearTextFilterAria": "Metin filtresini temizle",
+      "recentFiltersTitle": "Son filtreler",
       "clearRecentTitle": "Son filtreleri temizleyin.",
       "clearRecentButton": "Temizle",
-      "recentFiltersListAria": "Son filtreler son filtreler",
+      "recentFiltersListAria": "Son filtreler",
       "runAnalysisTitle": "Saropa Lints analizi çalıştırın.",
       "severityGroupAria": "Ciddilik filtrecisi.",
       "severityLabel": "Ciddilik Ağırlık",
@@ -1130,10 +1130,10 @@
       "includeSuppressedTitle": "Ayrıca // ignore:, // ignore_for_file: veya bir temel girişle gizlenen bulguları da ekleyin — her biri nasıl bastırıldığını belirtir. Projenizin yapılandırması değiştirilmez.",
       "runButton": "Audit çalıştır",
       "runButtonTitle": "Tam proje denetimi CLI'sini çalıştırın ve sonuçlarını buraya yükleyin",
-      "cancelButton": "İptal Et iptal et",
+      "cancelButton": "İptal",
       "runningLabel": "Denetleniyor…",
       "runningMeta": "Audit CLI'sini başlatıyor...",
-      "statusFull": "Tam proje denetimini {time}'tan gösteriyor",
+      "statusFull": "{time} tarihli tam proje denetimi gösteriliyor",
       "statusChangedRef": "Dosyaları {ref} ile karşılaştırarak değişiklik gösteriliyor, audited {time}",
       "notRunYet": "Yukarıdaki bir kapsam seçin, ardından Audit çalıştırın"
     },
@@ -1144,52 +1144,52 @@
     },
     "menuPalette": {
       "help": "Yardım",
-      "groupBy": "Gruplar... gruplar...",
-      "textFilter": "Metin filtresi... metin filtre.",
+      "groupBy": "Gruplandır…",
+      "textFilter": "Metin filtresi…",
       "severityImpact": "Ciddilik filtresi...",
-      "hideRules": "Gizli kurallar... gizleme kuralları.",
-      "ruleMetadata": "Metadata kuralları metadatlar.",
+      "hideRules": "Kuralları gizle…",
+      "ruleMetadata": "Kural meta verileri",
       "clearFilters": "Filtreleri temizleyin.",
       "clearSuppressions": "Açık baskılar açıkça bastırılır.",
       "clearFileFocus": "Dosya odakını temizleyin.",
       "matchActiveEditor": "Active editör ile eşleştirme etkin düzenleyicisi.",
-      "copyTreeJson": "Kopya ağacı JSON'u kopyalayın.",
-      "refreshExtension": "Refresh eklentisi ile refresh yapın.",
-      "openPackageDashboard": "Açın Paket gösterge panosu paket aç.",
+      "copyTreeJson": "Ağaç JSON'unu kopyala",
+      "refreshExtension": "Uzantıyı yenile",
+      "openPackageDashboard": "Paket panosunu aç",
       "openCodeHealth": "Açık Kod Sağlık Open Code Health",
-      "openLintsConfig": "Yönetme Kural Paketlerini Yönetin",
+      "openLintsConfig": "Kural Paketlerini Yönet",
       "reloadFromDisk": "Diskten yeniden yükle.",
       "reloadFromDiskTitle": "Analizatörü yeniden çalıştırmadan, son violations.json'dan panoyu tekrar görüntüleyin.",
-      "reEnableDisabledRules": "Etkinleştirilmiş kuralları yeniden etkinleştir...",
+      "reEnableDisabledRules": "Devre dışı kuralları yeniden etkinleştir…",
       "reEnableDisabledRulesTitle": "analysis_options_custom.yaml'de şu anda devre dışı bırakılmış kuralların hızlı bir seçimini açın ve seçilenleri yeniden etkinleştirin.",
       "reEnableNoneMessage": "analysis_options_custom.yaml üzerinden şu anda hiçbir kural devre dışı bırakılmamıştır.",
-      "reEnableQuickPickTitle": "Re-enable disabled rules: Etkinleştirilmiş kuralları yeniden etkinleştir.",
+      "reEnableQuickPickTitle": "Devre dışı kuralları yeniden etkinleştir",
       "reEnableQuickPickPlaceholder": "Yeniden etkinleştirmek için bir veya daha fazla kural seçin.",
-      "menuGroupExport": "İhracat Export Dışarıya ihracat",
+      "menuGroupExport": "Dışa Aktar",
       "menuGroupBulk": "Toplu eylemler",
       "menuGroupFilter": "Filtre & odaklama",
       "menuGroupOpen": "Açmak için gösterge panelini açın.",
-      "menuGroupSystem": "Sistem sistemi sistem sistemi."
+      "menuGroupSystem": "Sistem"
     },
     "progress": {
-      "runningLabel": "Analiz yapıyorum... analiz yapıyorum.",
+      "runningLabel": "Analiz çalıştırılıyor…",
       "runningMeta": "Bu, büyük projelerde bir an sürebilir."
     },
     "topRules": {
       "sectionAria": "Sayıya göre en iyi kurallar.",
       "hideTitle": "Yalnızca benim için gizle — çalışma alanı düzeyinde, Clear Bastırmalar aracılığıyla geri döndürülebilir",
-      "hideButton": "Saklanmak, saklanmak.",
+      "hideButton": "Gizle",
       "disableTitle": "Tüm projeye devre dışı bırak — analysis_options_custom.yaml yazar ve analizi tekrar çalıştırır",
-      "disableButton": "Disable Deaktive Etme İşlemleri",
+      "disableButton": "Devre Dışı Bırak",
       "workspaceOnlyShort": "Sadece çalışma alanı.",
       "projectConfigShort": "project config (analysis_options_custom.yaml yazıyor)",
       "topRulesOne": "En üst {count} kuralı.",
       "topRulesOther": "En üst {count} kuralları.",
       "colRank": "#",
-      "colRule": "Kural Kanun kural",
+      "colRule": "Kural",
       "colCount": "Sayı",
       "colSeverity": "Ciddilik Ağırlık",
-      "colActionsAria": "Sıra eylemleri Sıralı eylemler",
+      "colActionsAria": "Satır eylemleri",
       "filesAffected": "Etkilenen dosyalar ({count})",
       "howToFixHeading": "Nasıl düzeltilir",
       "owaspMobileLabel": "Mobil",
@@ -1200,19 +1200,19 @@
       "supersedesLabel": "İkame eder:"
     },
     "findings": {
-      "sectionAria": "Bulgular Bulguları",
-      "heading": "Bulgular Bulguları",
+      "sectionAria": "Bulgular",
+      "heading": "Bulgular",
       "expandAll": "Tümünü genişlet.",
-      "collapseAll": "Hepsi çöküyor, hepsi yıkılıyor.",
+      "collapseAll": "Tümünü daralt",
       "bulkSelected": "{count} seçildi",
       "bulkCopy": "Seçili JSON olarak kopyala.",
       "selectAllTitle": "Tüm görünür bulguları seçin.",
       "selectAllAria": "Tüm görünür bulguları seçin.",
       "colSeverity": "Ciddilik Ağırlık",
-      "colRule": "Kural Kanun kural",
-      "colMessage": "Mesaj mesajı mesajı",
-      "colLine": "Hattı çizgi çizgi.",
-      "colActionsAria": "Sıra eylemleri Sıralı eylemler",
+      "colRule": "Kural",
+      "colMessage": "Mesaj",
+      "colLine": "Satır",
+      "colActionsAria": "Satır eylemleri",
       "selectRowAria": "Bu bulma satırını seçin.",
       "copyRowTitle": "Bu bulguyu JSON olarak kopyalayın.",
       "suppressedBadge": "İptal edildi",
@@ -1227,24 +1227,24 @@
       "emptyNoMatch": "Mevcut filtrelerle hiçbir ihlal eşleşmiyor.",
       "emptyHintNoData": "Analiz çalıştırarak `reports/.saropa_lints/violations.json`'ı doldurun, ardından yenile.",
       "emptyHintFilters": "Bulguları görmek için filtreyi ayarlayın veya analizi tekrar çalıştırın.",
-      "reRunAnalysis": "Yeniden çalıştırma analizi, yeniden çalışma analizidir.",
+      "reRunAnalysis": "Analizi yeniden çalıştır",
       "resetFilters": "Filtreyi sıfırla ve filtreyi yeniden ayarlayın.",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "Karıştırma çizelgeleri karıştırın.",
+      "sectionAria": "Dağılım grafikleri",
       "heading": "Karışım",
       "metaClickSlice": "Filtrelemek için bir dilim tıklayın.",
       "severityMix": "Ciddiyet karışımı.",
       "filterBarTitle": "Sadece {key}'e filtre yapın.",
-      "donutTotal": "Toplam toplam toplamı."
+      "donutTotal": "toplam"
     },
     "todoHack": {
       "sectionAria": "TODO ve HACKS'ler",
       "headingDisabled": "TODO'lar ve HACKSler",
-      "metaDisabled": "scan disabled engellendi tarama",
+      "metaDisabled": "tarama devre dışı",
       "scanOff": "Çalışma alanı taraması kapalı; proje dosyalarındaki işaretçilerin yüzeye çıkmasını etkinleştirin.",
-      "enableScan": "Scan scan'ı etkinleştirin.",
+      "enableScan": "Taramayı etkinleştir",
       "heading": "TODO'lar ve HACKSler",
       "subsectionNone": "{title}: tarama aralığında hiç yok.",
       "capNote": "Tarama dosya limitine ulaştı, bu yüzden bazı dosyalar atlandı.",
@@ -1256,7 +1256,7 @@
     "drift": {
       "sectionAria": "Drift Advisor",
       "headingOff": "Drift Advisor",
-      "metaOff": "entegrasyon dışı entegrasyonu kapalı",
+      "metaOff": "entegrasyon kapalı",
       "enableBlurb": "Yüzey veritabanı önerilerine Drift Advisor entegrasyonunu etkinleştirin.",
       "enable": "Olanak vermek",
       "headingNoServer": "Drift Advisor",
@@ -1264,9 +1264,9 @@
       "noServerBlurb": "Ayarlanmış portlarda Drift Advisor sunucusu bulunamadı.",
       "retry": "Yeniden dene",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "Bağlantılı bağlantılı bağlanmış bağlı",
+      "metaConnected": "bağlı",
       "noIssues": "{label}'ye bağlanıldı — güncel sorun yok.",
-      "refresh": "Rahatlatıcı ve rahatlatıcı olsun.",
+      "refresh": "Yenile",
       "openBrowser": "Tarayıcıda açılır.",
       "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor'ı devre dışı bırak"
@@ -1281,17 +1281,17 @@
       "unsuppressButton": "Kapat",
       "unsuppressTitle": "Kontrolü kaldırın böylece bu bulgu normal taramalarda görünür",
       "unsuppressHint": "{rule}'ı {file}:{line}'de tekrar bastırmak için, satırın üstündeki // ignore: yorumunu kaldırın.",
-      "columnFile": "Dosya dosyası dosya dosya.",
-      "columnLine": "Hattı çizgi çizgi.",
-      "columnRule": "Kural Kanun kural",
+      "columnFile": "Dosya",
+      "columnLine": "Satır",
+      "columnRule": "Kural",
       "columnKind": "Türkçe",
       "columnAction": "Eylem"
     },
     "suppressions": {
       "sectionAria": "Baskıların bastırılması.",
       "headingExport": "Süpürgeler (ihracat)",
-      "viewHidesHeading": "Issues View hides issues view hides saklıyor sorunları görüntüle",
-      "viewHidesMetaActive": "Aktif aktif olan aktiviteler.",
+      "viewHidesHeading": "Sorunlar görünümünün gizledikleri",
+      "viewHidesMetaActive": "etkin",
       "viewHidesMetaNone": "hiçbiri",
       "noneInExport": "Mevcut `violations.json` dışa aktarımında analizör engellemesi yok. Yok sayılanları veya doldurulacak temel çizgileri düzenledikten sonra analizi çalıştırın.",
       "totalRow": "Toplam — filtreleri temizleyin ve Bulgular'ı açın",
@@ -1306,8 +1306,8 @@
       "severityHides": "{count} önem derecesi gizleme",
       "impactHides": "{count} etki gizleme",
       "activeHides": "Aktif deriler: {counts}. .",
-      "viewHidesFooter": "Bu örtüler sadece Sorunlar / pano listesini küçültür; `violations.json`. adresine yazılmamışlardır.",
-      "clearViewHides": "Clear All View hides (Tüm Görüntüler Gizlenir)",
+      "viewHidesFooter": "Bu gizlemeler yalnızca Sorunlar / pano listesini daraltır; `violations.json` dosyasına yazılmaz.",
+      "clearViewHides": "Tüm görünüm gizlemelerini temizle",
       "foldersSample": "Dizinler (örnek)",
       "filesSample": "Dosyalar / küre (örnek)",
       "rulesSample": "Kurallar (Örnek)",
@@ -1316,11 +1316,11 @@
     "script": {
       "announceCleared": "Tüm filtreler temizlendi.",
       "announceFiltersPrefix": "Filtreler: Süzgeçler:",
-      "announceStarted": "Analiz başladı, analizler başlatıldı.",
-      "announceComplete": "Analiz tamamlandı, analizler tamamlandı.",
+      "announceStarted": "Analiz başladı",
+      "announceComplete": "Analiz tamamlandı",
       "announceFailed": "Analiz başarısız oldu.",
-      "removeRecentAria": "Remove remove kaldırmak",
-      "removeRecentTitle": "Remove remove kaldırmak",
+      "removeRecentAria": "Kaldır",
+      "removeRecentTitle": "Kaldır",
       "bulkSelectedTpl": "{n} seçildi",
       "announceSearchVerb": "Araştırılıyor",
       "severitiesNoun": "ciddiyetler",
@@ -1341,7 +1341,7 @@
     "supplementary": {
       "scannerPromo": "TODO/HACK tarayıcısını etkinleştirin.",
       "tooltipScanner": "Saropa dosya sistemi tarayıcısı — kaynaktaki açık TODO/HACK işaretçilerini sayar.",
-      "tooltipPromoClickToOn": "Etkinleştirmek için etkinleştirmeyi tıklayın."
+      "tooltipPromoClickToOn": "Etkinleştirmek için tıklayın"
     }
   },
   "ruleExplain": {
@@ -1362,18 +1362,18 @@
   },
   "triageDash": {
     "showInIssues": "Sorunları Gösterin.",
-    "disableRules": "Disable rules: Kuralları devre dışı bırak.",
-    "enableRules": "Eklenti kuralları, etkinleştirme kurallarını oluşturur.",
-    "issues": "Konular, konular sorunları.",
+    "disableRules": "Kuralları devre dışı bırak",
+    "enableRules": "Kuralları etkinleştir",
+    "issues": "Sorunlar",
     "off": "Kapalı",
-    "on": "Daha da daha, daha da.",
-    "colRule": "Kural Kanun kural",
-    "colIssues": "Konular, konular sorunları.",
+    "on": "Açık",
+    "colRule": "Kural",
+    "colIssues": "Sorunlar",
     "zeroIssueRules": "sıfır sorunu olan {count} kural — katmanda otomatik olarak etkinleştirildi.",
     "disabledOverrides": "`analysis_options_custom.yaml` içindeki geçersiz kılma nedeniyle {count} kural devre dışı bırakıldı.",
-    "summaryRuleTriage": "Rule triage, kural ayrıştırma.",
+    "summaryRuleTriage": "Kural önceliklendirme",
     "hintNoViolations": "Henüz `reports/.saropa_lints/violations.json` yok. Analiz çalıştırın, ardından bu sekmesi yeniden yükleyin.",
-    "hintUnreadable": "Okunabilir ihlaller yok. ihracat. Önce Saropa Lints analizini çalıştırın.",
+    "hintUnreadable": "Okunabilir ihlal dışa aktarımı yok. Önce Saropa Lints analizini çalıştırın.",
     "hintStale": "Triaj verileri eski olabilir (ihracat {age} yaş). Mevcut gruplar için tekrar çalışma analizi.",
     "hintNoPerRule": "Bu ihracatın kural gereği bir sayı sayısı yoktur. Mevcut bir Saropa Lints eklentisi ile yeniden analiz edin.",
     "hintBuildFailed": "Bu ihracattan bir triaj oluşturamadı. Yeni bir analiz yapın.",
@@ -1417,7 +1417,7 @@
       "knownIssuesDesc": "Bilinen açıklar ve uyarılar hakkında tarayın.",
       "compare": "Karşılaştırma Yapın",
       "compareDesc": "İki veya daha fazla paketi puan, boyut ve etkinlik açısından yan yana karşılaştırın.",
-      "settings": "Ayarlar ayarları ayarlar.",
+      "settings": "Ayarlar",
       "openButton": "{tab}'yi açın"
     },
     "settingsTab": {
@@ -1428,7 +1428,7 @@
         "scan": "Tara",
         "display": "Görüntülemek",
         "weights": "Puan Ağırlıkları",
-        "upgrade": "Yükseltme Geliştirme Güncelleme",
+        "upgrade": "Yükselt",
         "watch": "Kol saati",
         "budget": "Bütçe",
         "vuln": "Güvenlik açıkları"
@@ -1437,7 +1437,7 @@
     "detailPane": {
       "aria": "Paket detayı",
       "title": "Paket detayı",
-      "close": "Yakın detaylar, yakın ayrıntılar.",
+      "close": "Ayrıntıyı kapat",
       "copyForAi": "AI için yükseltme çağrısını kopyalayın."
     },
     "status": {
@@ -1452,37 +1452,37 @@
       "lastScanUnknownTitle": "Bu tarama, pano zaman damgalarını takip etmeden önce çalıştırıldı. Yeniden taramak ve paket güncellemelerini kontrol etmek için tıklayın."
     },
     "time": {
-      "justNow": "Az önce şimdi, az önce.",
+      "justNow": "az önce",
       "minutesAgo": "{min} dk önce",
       "hoursAgo": "{hr} sa önce",
       "daysAgo": "{day} g önce"
     },
     "scanning": {
-      "heading": "Tarama paketleri tarama paketi.",
+      "heading": "Paketler taranıyor",
       "body1": "Saropa bu projedeki her doğrudan bağımlılık için pub.dev meta verileri, GitHub etkinliği ve bağımlılıklar grafiklerini alıyor.",
       "body2": "Tarama tamamlandığında bu sayfa otomatik olarak yenilenir. Sağ altta bulunan ilerleme bildiriminden iptal edebilirsiniz.",
       "versionStamp": "Saropa Paket Kontrol Panosu v{version}"
     },
     "progress": {
       "aria": "Paket taraması ilerleme kaydı",
-      "starting": "Tarama başlatılıyor... tarayıcı."
+      "starting": "Tarama başlatılıyor…"
     },
     "gaugeTitle": "Proje Paketi Derecesi: {grade}",
     "summary": {
-      "packages": "Paket paketler, paketler.",
-      "projectGrade": "Proje Paketi Derecesi Projenin paketi derecesidir.",
+      "packages": "Paketler",
+      "projectGrade": "Proje Paket Notu",
       "totalSize": "Toplam Boyut*",
       "gradeTooltip": "Proje sınıfı {avgGrade}\nOrtalama puan: {avgScore}/100\nPaketler: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "Canlı",
       "stableTitle": "Stabil, istikrarlı.",
       "outdatedTitle": "Eskişmiş, modası geçmiş.",
       "abandonedTitle": "Terk Edilmiştir.",
-      "eolTitle": "Hayatın Sonu: Yaşamın sonu.",
-      "updates": "Güncelleme güncellemeleri.",
-      "unused": "Kullanılmamış, kullanılmayan.",
-      "singleUse": "Tek kullanımlık tek kullanma.",
+      "eolTitle": "Kullanım Ömrü Sonu",
+      "updates": "Güncellemeler",
+      "unused": "Kullanılmayan",
+      "singleUse": "Tek kullanımlı",
       "vulnerable": "Zayıf, savunmasız.",
-      "overrides": "Override'lar geçersiz kılmaktadır.",
+      "overrides": "Geçersiz Kılmalar",
       "caveatLine1": "*Gösterilen kod boyutları (lib + bildirilen varlıklar), kod boyutu kullanılamazsa pub.dev arşiv boyutuna geri döner. dev_dependencies (build_runner, lints, saropa_lints, vb.) hariç tutulur — bunlar APK / IPA / web paketine asla dağıtılmaz. Ağacın sarsılması sonucunda gerçek uygulama boyutu daha küçük olacak.",
       "caveatLine2": "Etkinlik eşikleri: 90d = durgun, 180d = uyku halinde (taahhüt + serbest bırakma zaman çizelgeleri).",
       "upgradeTitle": "Güncelleme Gerekiyor"
@@ -1490,7 +1490,7 @@
     "breakdown": {
       "title": "Neden {grade} notu veriliyor? — {pkgCount} paketlerinde {avgScore}/100 ortalama",
       "hint": "Genişletmek için tıklayın.",
-      "distributionHeading": "Dağıtım dağıtımı.",
+      "distributionHeading": "Dağılım",
       "signalsHeading": "Risk sinyalleri, puanı aşağı doğru sürükler.",
       "signalFlagged": "{count} bayraklı (terk edilmiş / ömrünün sonuna)",
       "signalVulnerable": "{count} bilinen güvenlik açıklarına sahip.",
@@ -1506,13 +1506,13 @@
       "jumpTooltip": "Paket tablosunda {name}'a atlayın."
     },
     "network": {
-      "summary": "Bağımlılık Ağı (Dependency Network)"
+      "summary": "Bağımlılık Ağı"
     },
     "sections": {
       "sizeDistribution": "Boyut Dağıtımı Ölçü Yayınlaması",
       "sizeDistributionCaption": "dev_dependencies'leri dışarı bırakır — APK / IPA / web paketine asla göndermezler.",
-      "filters": "Filtre filtre yaparlar.",
-      "packages": "Paket paketler, paketler."
+      "filters": "Filtreler",
+      "packages": "Paketler"
     },
     "toolbar": {
       "openPubspecTitle": "pubspec.yaml'u açın.",
@@ -1524,40 +1524,40 @@
       "saveAllTitle": "Rapor JSON'unu raporlara kaydet/YYY YMMDD/...",
       "saveAllLabel": "Kaydetmek",
       "saveUpgradeTitle": "Raporlara mevcut bir güncelleme ile sadece paketlerin raporunu kaydedin/YYY YMMDD/...",
-      "saveUpgradeLabel": "Save Upgrade Report'ı Kaydet",
+      "saveUpgradeLabel": "Yükseltme Raporunu Kaydet",
       "resetViewTitle": "Filtreleri sıfırla, sırala ve görüntü durumunu kaydet.",
       "resetViewLabel": "Görünümü sıfırla",
       "rescanTitle": "Paketleri yeniden tara — pub.dev önbelleğini temizler ve sürümleri yeniden getirir",
       "rescanLabel": "Yeniden tara",
       "openOtherTitle": "Vibrancy taraması için yeni bir pencerede başka bir pubspec.yaml projesini açın.",
-      "openOtherLabel": "Açık Proje... açık proje.",
+      "openOtherLabel": "Proje Aç…",
       "footprintGroupAria": "Boyut sütunu ayak izi modu",
       "footprintGroupTitle": "Boyut sütununda ne gösteriliyor: Sadece kendi kod boyutu, artı benzersiz geçişler (altındaysanız maliyet) veya artı tüm geçişleri (teorik maksimum). Kod boyutu kullanılamadığında arşiv boyutuna geri döner.",
-      "footprintLabel": "Ayak izi: ayak izleri.",
+      "footprintLabel": "Kapladığı alan:",
       "footprintOwnTitle": "Sadece kendi kod boyutu (lib + açıklanan varlıklar); kullanılamadığında pub.dev arşiv boyutuna geri döner.",
       "footprintOwn": "Sahip olmak",
       "footprintUniqueTitle": "Kendi boyutu + sadece bu bölüm tarafından kullanılan geçişler (onu kaldırırsanız tasarruf)",
       "footprintUnique": "+ Unik, benzersiz.",
       "footprintTotalTitle": "Kendi boyutu + diğer bölümlerle paylaşılanlar dahil olmak üzere tüm geçişler.",
       "footprintTotal": "+ Tüm + Hepsi",
-      "searchLabel": "Arama paketleri arama paketi.",
+      "searchLabel": "Paket ara",
       "searchPlaceholder": "Paketleri arayın...",
-      "clearSearchTitle": "Aramayı temizle, aramanın açık olması.",
-      "clearSearchAria": "Aramayı temizle, aramanın açık olması.",
+      "clearSearchTitle": "Aramayı temizle",
+      "clearSearchAria": "Aramayı temizle",
       "ageFilterTitle": "Yayınlama yaşına göre filtrele.",
-      "publishedAgeLabel": "Yayınlanan yaş yayınlanmıştır.",
+      "publishedAgeLabel": "Yayın yaşı",
       "ageMaxAll": "Tümü",
       "presetFilterTitle": "Hızlı filtre ön ayarlarını uygulayın.",
       "presetLabel": "Ön ayar",
-      "presetNone": "Hiçbiri yok, hiçbiri yok.",
-      "presetModernization": "Modernleşme Modernizasyon",
-      "presetRiskHotspots": "Risk sıcak noktaları riskli noktalardır.",
+      "presetNone": "Hiçbiri",
+      "presetModernization": "Modernizasyon",
+      "presetRiskHotspots": "Risk odak noktaları",
       "presetCleanup": "Temizlik adayları.",
-      "presetDirectOnly": "Sadece doğrudan sadece Direkt",
+      "presetDirectOnly": "Yalnızca doğrudan",
       "devToggleTitle": "Tablo ve toplamlara dev bağımlılıklarını dahil edin.",
       "includeDev": "Dev dahil edin.",
       "activeFiltersLabel": "Aktif filtreler:",
-      "clearAllFilters": "Her şey temiz, her yer boş."
+      "clearAllFilters": "Tümünü temizle"
     },
     "columns": {
       "name": {
@@ -1565,7 +1565,7 @@
         "tooltip": "Paket adı — pubspec.yaml girişini açmak için tıklayın"
       },
       "version": {
-        "label": "Versiyon Sürüm Sürüm",
+        "label": "Sürüm",
         "tooltip": "pubspec.lock'dan yüklü sürüm."
       },
       "score": {
@@ -1573,15 +1573,15 @@
         "tooltip": "Canlılık sınıflandırması ve sağlık puanı (0-10)"
       },
       "published": {
-        "label": "Yayınlanmış yayınlanmış yayımlanmış",
+        "label": "Yayınlandı",
         "tooltip": "Kurulu sürümün pub.dev'da yayımlandığı tarih."
       },
       "activity": {
-        "label": "Aktivite Faaliyet Etkinliği",
+        "label": "Etkinlik",
         "tooltip": "Kod ve serbest bırakma etkinliği derecesi, commit + publish yakınlıktan itibaren verilir."
       },
       "likes": {
-        "label": "Beğenilenler beğenilir.",
+        "label": "Beğeniler",
         "tooltip": "pub.dev beğenileri — paket puanı sayfasını açmak için tıklayın"
       },
       "downloads": {
@@ -1589,7 +1589,7 @@
         "tooltip": "pub.dev son 30 günde indirildi — paket puanı sayfasını açmak için tıklayın"
       },
       "issues": {
-        "label": "Konular, konular sorunları.",
+        "label": "Sorunlar",
         "tooltip": "Açık GitHub sorunları (bulunduğunda çekme isteklerini hariç tutar)"
       },
       "prs": {
@@ -1605,7 +1605,7 @@
         "tooltip": "Doğrudan geçişli bağımlılıklar - vurgulanan paylaşılan depolar"
       },
       "files": {
-        "label": "Referanslar referanslar",
+        "label": "Referanslar",
         "tooltip": "Bu paketi içe aktaran kaynak dosyaların sayısı — aramak için tıklayın"
       },
       "transitives": {
@@ -1613,11 +1613,11 @@
         "tooltip": "Bu paketin içine çektiği geçici (dolayı) bağımlılıkların sayısı."
       },
       "vulns": {
-        "label": "Vulns Vulns'un adı",
+        "label": "Güvenlik Açıkları",
         "tooltip": "OSV ve GitHub Danışma veritabanlarından bilinen güvenlik açıkları."
       },
       "license": {
-        "label": "Lisanslar, lisanslar.",
+        "label": "Lisans",
         "tooltip": "pub.dev'dan SPDX lisans tanımlayıcısı."
       },
       "update": {
@@ -1625,15 +1625,15 @@
         "tooltip": "Mevcut sürüm güncellemesi: büyük, küçük veya yama."
       },
       "opportunities": {
-        "label": "Fırsatlar, fırsatlar.",
+        "label": "Fırsatlar",
         "tooltip": "Bu paketin changelog'da yer alan ancak henüz kodunuzda kullanılmamış özellikleri — sıralayarak en az kullanılmış paketleri bulun"
       },
       "status": {
-        "label": "Status Durum Statüs Durumu",
+        "label": "Durum",
         "tooltip": "Kullanım durumu: Kullanımı Durumu: Paketin kullanılmamış olarak kodunuzda görünmesi."
       },
       "description": {
-        "label": "Description Description Tanımlama Açıklaması",
+        "label": "Açıklama",
         "tooltip": "Paket açıklaması pub.dev'dan."
       }
     },
@@ -1652,11 +1652,11 @@
       "sizeUnavailable": "Boyut pub.dev'den mevcut değil.",
       "noVulnerabilities": "Bilinen güvenlik açıkları yok.",
       "licenseUnspecified": "pub.dev'da belirtilmemiş lisans",
-      "unusedBadge": "Kullanılmamış, kullanılmayan.",
+      "unusedBadge": "Kullanılmayan",
       "packageInUse": "Paket kullanımda."
     },
     "row": {
-      "expandDetails": "Ayrıntıları genişletmek için ayrıntılar.",
+      "expandDetails": "Ayrıntıları genişlet",
       "copyRowJson": "Satırları JSON olarak kopyalayın."
     },
     "shortcuts": {
@@ -1671,7 +1671,7 @@
     },
     "versionTooltip": {
       "installed": "Kurulu: {version} ({date})",
-      "latest": "Son haberler: {version}",
+      "latest": "En son: {version}",
       "created": "Oluşturan: {date}",
       "constraint": "Kısıtlama: {constraint}"
     },
@@ -1696,13 +1696,13 @@
     "references": {
       "noImports": "Kaynak dosyası olmayan ithalatlar tespit edilmedi.",
       "reExportLine": "{location} (Yeniden Dışarıya Aktarma)",
-      "publicApiSurface": "Genel API yüzeyi — en az bir kullanım tekrar aktarma olarak kullanılır.",
-      "reExportedBadge": "Yeniden ihraç edilen, yeniden ihracat edilen.",
+      "publicApiSurface": "Genel API yüzeyi — en az bir kullanım yeniden dışa aktarmadır.",
+      "reExportedBadge": "Yeniden dışa aktarıldı",
       "openFileReferences": "Açık dosya referansları açın."
     },
     "deps": {
-      "noTransitives": "Geçici bağımlılıklar yok.",
-      "showTransitives": "Geçici bağımlılıkları göster.",
+      "noTransitives": "Geçişli bağımlılık yok",
+      "showTransitives": "Geçişli bağımlılıkları göster",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (paylaşılan)",
       "tooltipHeader": "{total} geçişli deps",
@@ -1721,27 +1721,27 @@
     },
     "detail": {
       "codeCommitActivity": "Kod Taahhüt Etme Faaliyeti Code Commit Activity",
-      "releaseActivity": "Release Activity (Release Aktivitesi) Serbest bırakma etkinliği.",
-      "dormancySignal": "Uyuyan Sinyal Uyku İşareti",
+      "releaseActivity": "Sürüm Etkinliği",
+      "dormancySignal": "Durağanlık Sinyali",
       "ago": "{age} önce oldu.",
       "qualityExample": "+Örnek örneği",
       "qualityExampleTitle": "Bir çalıştırılabilir demo gönderir.",
-      "qualityTests": "+testler testleri",
+      "qualityTests": "+testler",
       "qualityTestsTitle": "Bir test paketi gönderir.",
-      "qualityTools": "+ araçlar aracı",
+      "qualityTools": "+araçlar",
       "qualityToolsTitle": "Gemi bakımcısı araç gereçleri",
-      "qualityDocs": "+docs dosyaları",
+      "qualityDocs": "+docs",
       "qualityDocsTitle": "Gemiler genişletilmiş dokümantasyon belgelerini gönderir.",
       "healthScore": "Sağlık puanı (Health Score)",
-      "resolutionVelocity": "Çözünürlük Hızı Karar Hızlılığı",
+      "resolutionVelocity": "Çözüm Hızı",
       "engagementLevel": "Katılım Düzeyi (Engagement Level)",
-      "popularity": "Popülerlik Popülarite Popülerliğin popülerliği",
+      "popularity": "Popülerlik",
       "publisherTrust": "Yayıncı Güven Derneği"
     }
   },
   "commandCatalog": {
     "documentTitle": "Saropa Komut Kataloğu,",
-    "skipLink": "Skip to command katalogunu atlayın.",
+    "skipLink": "Komut kataloğuna atla",
     "heroTitle": "Saropa Komut Kataloğu,",
     "status": {
       "internalHidden": "yalnızca {count} bağlam menüsü (gizli)",
@@ -1751,30 +1751,30 @@
     },
     "search": {
       "placeholder": "Arama başlığı, açıklaması veya komut kimliği...",
-      "ariaLabel": "Arama komutları arama emridir.",
-      "clearAria": "Aramayı temizle, aramanın açık olması.",
+      "ariaLabel": "Komutlarda ara",
+      "clearAria": "Aramayı temizle",
       "hintLine1": "Her komutanınkiyle eşleşir.",
-      "hintStrongTitle": "Başlık başlığı title title",
-      "hintStrongDesc": "Description description açıklama tanımlaması",
+      "hintStrongTitle": "başlık",
+      "hintStrongDesc": "açıklama",
       "hintStrongId": "id",
       "hintLine2": "(kimlik belirteçleri de aralıklıdır - yazın",
-      "hintLine2kbd": "Run Analysis Analiz Çalıştırma Analisi",
+      "hintLine2kbd": "analiz çalıştır",
       "hintLine2End": "noktasız)."
     },
     "toolbar": {
       "showInternal": "Çeviri menüsü komutlarını göster.",
-      "collapseAll": "Hepsi çöküyor, hepsi yıkılıyor."
+      "collapseAll": "Tümünü daralt"
     },
     "recentPopover": {
-      "title": "Son Aramalar son zamanlarda yapılan aramalar",
+      "title": "Son aramalar",
       "clearTitle": "Son zamanlarda yapılan tüm aramaları temizleyin.",
       "clearButton": "Temizle",
-      "listAria": "Son Aramalar son zamanlarda yapılan aramalar"
+      "listAria": "Son aramalar"
     },
     "filterChips": {
-      "ariaRegion": "Aktif filtreler aktif filtre.",
+      "ariaRegion": "Etkin filtreler",
       "activeLabel": "Aktif filtreler:",
-      "clearAll": "Her şey temiz, her yer boş."
+      "clearAll": "Tümünü temizle"
     },
     "bands": {
       "frequentTitle": "Sık kullanılan",
@@ -1789,11 +1789,11 @@
     },
     "entry": {
       "internalBadgeTitle": "Sadece bağlam menülerinden tetiklenir.",
-      "internalBadge": "menu menümenyu menü,",
+      "internalBadge": "menü",
       "copyTitle": "Komut kimliğini kopyalayın ({id})",
       "copyAria": "Komut kimliğini kopyalayın."
     },
-    "categoryJumpTitle": "{category}'a atlayın.",
+    "categoryJumpTitle": "{category} kategorisine git",
     "shortcuts": {
       "focusSearch": "Arama alanına odaklanın.",
       "navRows": "Görünür komut satırlarında gezinin.",
@@ -1804,15 +1804,15 @@
     },
     "script": {
       "moreSuffix": "+{count} daha fazla",
-      "showLess": "Show less daha az göster",
-      "runSingular": "Koş, koş, koşu.",
+      "showLess": "Daha az göster",
+      "runSingular": " çalıştır",
       "runPlural": " çalıştırma",
       "recentWord": "son",
       "expandAll": "Tümünü genişlet.",
-      "collapseAll": "Hepsi çöküyor, hepsi yıkılıyor.",
-      "searchChip": "Arama: Arama yapın \"{query}\" diye bağırıyorum.",
+      "collapseAll": "Tümünü daralt",
+      "searchChip": "Arama: \"{query}\"",
       "internalChip": "Çeviri menüsü komutlarını göstermek.",
-      "removeFilterPrefix": "Filtreyi çıkarın filtreyi kaldırın.",
+      "removeFilterPrefix": "Filtreyi kaldır ",
       "matchOne": "{count} eşleşme",
       "matchOther": "{count} eşleşme"
     }
@@ -1822,38 +1822,38 @@
     "skipToTable": "Tablo fonksiyonlarına atlayın.",
     "openWorkspaceFirst": "Önce bir Dart/Flutter çalışma alanı açın.",
     "scan": {
-      "title": "Tarama projesi sağlık taraması",
+      "title": "Proje sağlığı taranıyor",
       "subtitle": "Kodunuzu okuyorum. Tarama daha fazla bilgi edindiği için kontrol panosu doldurulur.",
-      "waiting": "Tarama başlatılıyor... tarayıcı.",
+      "waiting": "Tarama başlatılıyor…",
       "launching": "İndirilme tarayıcı...",
-      "collect": "Dosyaları keşfetmek... dosyalar bulmak.",
+      "collect": "Dosyalar keşfediliyor…",
       "firstRunHint": "İlk çalıştırma tarayıcının derlemesini sağlar; büyük projeler dosyaların görünmesi için bir süre alır.",
-      "paused": "Duraklatılmış duraklanmıştır",
-      "stopped": "Tarama durdu, tarayıcı durduruldu.",
-      "elapsed": "Geçmişte geçmiştir.",
+      "paused": "Duraklatıldı",
+      "stopped": "Tarama durduruldu",
+      "elapsed": "Geçen süre",
       "phase": {
         "parse": "Parsing dosyaları analiz ediliyor.",
-        "history": "Git tarihi okumak git tarihinin tarihçesi.",
+        "history": "Git geçmişi okunuyor",
         "blame": "Bilgisayar kodları yaşını hesaplar.",
-        "usage": "Referansları saymak için referanslar.",
-        "score": "Puanlama fonksiyonları puanlama işlevleri."
+        "usage": "Referanslar sayılıyor",
+        "score": "Fonksiyonlar puanlanıyor"
       },
       "counter": {
-        "files": "Dosyalar dosyaları.",
-        "functions": "İşlevler Fonksiyonlar fonksiyonları",
+        "files": "Dosyalar",
+        "functions": "Fonksiyonlar",
         "problems": "Bulunan problemler, sorunlar."
       },
       "counters": {
-        "aria": "Canlı tarama sayaçları, canlı tarama sayıcılarını kullanır."
+        "aria": "Canlı tarama sayaçları"
       },
       "controls": {
         "aria": "Tarama kontrollerini tarayın."
       },
       "btn": {
-        "pause": "Duraklama, duraklama.",
-        "resume": "CV'yi devam ettirin.",
-        "restart": "Yeniden başlatma, yeniden başlatmak.",
-        "cancel": "İptal Et iptal et"
+        "pause": "Duraklat",
+        "resume": "Devam Et",
+        "restart": "Yeniden Başlat",
+        "cancel": "İptal"
       },
       "preview": {
         "heading": "Şimdiye kadar bulunan problemler",
@@ -1861,7 +1861,7 @@
       },
       "version": {
         "engine": "Motor",
-        "detecting": "tespit etmek... saptamak.",
+        "detecting": "algılanıyor…",
         "legacy": "eski - canlı ilerleme yok (bu projenin saropa_lints'i ondan öncedir)"
       }
     },
@@ -1874,9 +1874,9 @@
       "generated": "üretilmiştir.",
       "functionOne": "{count} işlev",
       "functionOther": "{count} işlev",
-      "avgFormat": "AVG {score} ({grade}) olarak tanımlanır.",
+      "avgFormat": "ort. {score} ({grade})",
       "gatesFailing": "Kapılar başarısız oluyor.",
-      "gatesPassing": "Geçiş kapıları geçişi engeller."
+      "gatesPassing": "kapı geçiliyor"
     },
     "gate": {
       "fallback": "Kalite kapıları başarısız oldu; Kod Durumu ayarlarındaki eşikleri inceleyin.",
@@ -1886,98 +1886,98 @@
       "openSettingsButton": "Açık Kod Sağlık ayarları Open Code Health settings"
     },
     "kpi": {
-      "ariaLabel": "Kod sağlık özet kod sağlığı",
+      "ariaLabel": "Kod sağlığı özeti",
       "allClear": "Hiçbir kategoride işaretlenmiş işlev yok; hepsi açık.",
-      "clickToFilter": "Tabloyu {flag}. bayrağı ile işaretlenen fonksiyonlara filtrelemek için tıklayın.",
-      "noFlagged": "{flag}. işaretlenmiş hiçbir fonksiyon yok",
-      "unused": "Kullanılmamış, kullanılmayan.",
+      "clickToFilter": "Tabloyu {flag} olarak işaretlenen fonksiyonlara göre filtrelemek için tıklayın.",
+      "noFlagged": "{flag} olarak işaretlenen fonksiyon yok.",
+      "unused": "Kullanılmayan",
       "unusedSub": "hiçbir yerde referans verilmeyen fonksiyonlar.",
-      "uncovered": "Açıklanan örtü açığa çıkarıldı.",
+      "uncovered": "Kapsanmayan",
       "uncoveredSub": "LCOV kapsamı yok.",
-      "stubTested": "Dökme testi yapılmış, testler yapılmıştır.",
+      "stubTested": "Stub ile test edilmiş",
       "stubTestedSub": "Testler var ama çok az şey iddia ediyorlar.",
-      "suspiciousCoverage": "Şüpheli haberler, şüpheli bir şekilde yayınlanıyor.",
+      "suspiciousCoverage": "Şüpheli kapsam",
       "suspiciousCoverageSub": "kapsama alanı, uydurma görünümlü bir şekilde gözüküyor.",
-      "testDrift": "Test sürüklenmesi test drift.",
+      "testDrift": "Test sapması",
       "testDriftSub": "testler fonksiyonun gerisinde kalır."
     },
     "toolbar": {
-      "ariaLabel": "Kod Sağlık eylemleri Sağlık faaliyetleri",
+      "ariaLabel": "Kod Sağlığı eylemleri",
       "rescanTitle": "Kod Sağlığı taramasını tekrar çalıştırın ve bu panoyu yenileyin.",
       "rescan": "Yeniden tara",
       "copyJsonTitle": "Çiğ Kod Sağlık JSON'u Klavyeye kopyalayın.",
       "copyJson": "JSON'u kopyalayın.",
       "settingsTitle": "Kod Sağlık ayarlarını açın.",
-      "settingsButton": "Kod Sağlık ayarları Sağlık ortamı.",
+      "settingsButton": "Kod Sağlığı ayarları",
       "filterTitle": "Satırları isim, dosya veya bayrak ile filtreleyin.",
-      "filterLabel": "Filtre satırları filtre sıraları.",
-      "filterPlaceholder": "Filtre satırları... filtre sıraları."
+      "filterLabel": "Satırları filtrele",
+      "filterPlaceholder": "Satırları filtrele…"
     },
     "table": {
       "ariaLabel": "Puanlar açısından en kötü fonksiyonları.",
-      "heading": "En kötü fonksiyonlar en kötü işlevlerdir.",
-      "colScore": "Skor puanı, skor sayısı.",
-      "colFunction": "Fonksiyon fonksiyon işlevi",
-      "colFile": "Dosya dosyası dosya dosya.",
-      "colLine": "Hattı çizgi çizgi.",
-      "colUsage": "Kullanım Tarzı Usage Usage",
-      "colCoverage": "Kapsam kapsama alanı Coverage Coverage",
-      "colComplexity": "Karmaşıklık karmaşıklık.",
-      "colFlags": "Bayraklar bayraklar.",
+      "heading": "En kötü fonksiyonlar",
+      "colScore": "Puan",
+      "colFunction": "Fonksiyon",
+      "colFile": "Dosya",
+      "colLine": "Satır",
+      "colUsage": "Kullanım",
+      "colCoverage": "Kapsam",
+      "colComplexity": "Karmaşıklık",
+      "colFlags": "İşaretler",
       "noMatch": "Mevcut filtrelerle eşleşen hiçbir işlev yok.",
       "resetFiltersTitle": "Aramayı ve aktif bayrak filtrelerini temizleyin.",
       "resetFilters": "Filtreyi sıfırla ve filtreyi yeniden ayarlayın.",
-      "expanderAriaCollapsed": "Sorun detaylarını gösterme sorunu ayrıntıları göster",
-      "expanderAriaExpanded": "Hide issue details hide issue detaylarını gizle",
-      "detailHeading": "Bu fonksiyonun neden {score} puan aldığını açıklayın.",
+      "expanderAriaCollapsed": "Sorun ayrıntılarını göster",
+      "expanderAriaExpanded": "Sorun ayrıntılarını gizle",
+      "detailHeading": "Bu fonksiyon neden {score} puan aldı",
       "detailNoIssues": "Bu satırda bayrak yok; puan, yukarıdaki sütun değerlerine göre belirlenir (kullanım, kapsam, karmaşıklık, yaş, belgeler).",
       "suppressLabel": "Dosya içinde baskı yapın.",
       "suppressTooltip": "Bu dosyaya `// ignore_for_file: code_health:<flag>` yazın, böylece gelecekteki taramalar bu bayrağı bu dosyanın tamamı için atlayacaktır."
     },
     "flag": {
       "unused": {
-        "label": "Kullanılmamış, kullanılmayan.",
+        "label": "kullanılmayan",
         "evidence": "0 arayanlar var.",
         "rule": "Başka bir dosya bu işlev adı referansı yapmadığında işaretli."
       },
       "uncovered": {
-        "label": "örtülmemiş, açığa çıkarılmış.",
-        "evidence": "{pct}% testleri testler",
+        "label": "kapsanmayan",
+        "evidence": "%{pct} test",
         "rule": "LCOV'nin %0 hattı kapsamını bildirdiği zaman işaretlenir."
       },
       "complex": {
-        "label": "karmaşık karmaşık kompleks karmaşık",
+        "label": "karmaşık",
         "evidence": "CC {cc}",
         "rule": "Siklomatik karmaşıklık 10'u geçince işaretlenir."
       },
       "undocumented": {
-        "label": "Belgesiz göçmenler, belgelendirilmemiş göçmenlerdir.",
+        "label": "belgelenmemiş",
         "evidence": "CC {cc}, doküman yok.",
         "rule": "Karmaşık bir fonksiyon (CC > 10) doküman yorumu bulunmadığında işaretlenir."
       },
       "test_drift": {
-        "label": "Test sürüklenmesi test drift",
+        "label": "test sapması",
         "evidence": "testler fonksiyonun gerisinde kalır.",
         "rule": "En yeni bağlantılı test dosyası fonksiyonun kaynak dosyasından anlamlı bir şekilde daha eski olduğunda işaretlenir."
       },
       "stub_tested": {
-        "label": "Stab testli, incelik testi yapılmış.",
+        "label": "stub ile test edilmiş",
         "evidence": "ince iddialar asserts.",
         "rule": "Bağlı bir testin varlığı ancak hiçbir şeyi doğrulayamadığı zaman işaretlenir."
       },
       "suspicious_coverage": {
-        "label": "Şüpheli bir haberin kapsamı hakkında şüphe duyulur.",
+        "label": "şüpheli kapsam",
         "evidence": "{pct}% test edilmemiş bir şekilde.",
         "rule": "LCOV yüksek kapsama rapor ederken, ancak testin işlevi referansları olmadığı zaman işaretlenir."
       },
       "fresh_code": {
-        "label": "Fresh Code Yeni Kod",
+        "label": "yeni kod",
         "evidence": "CC {cc}, son zamanlarda yeniden yazılmış.",
         "rule": "Siklomatik karmaşıklık 10'u geçtiğinde ve fonksiyon gövdesinin son 90 gün içinde yazıldığı veya yeniden yazıldığında işaretlenir. Son zamanlarda yeniden yazılmış karmaşık kod, doğrulama sırasında eski koddan çok daha sık olaylara neden oldu."
       }
     },
     "shortcuts": {
-      "focusFilter": "Satır filtre odaklı çizgi filtre.",
+      "focusFilter": "Satır filtresine odaklan",
       "clearFilter": "Odaklanmış satır filtresini temizleyin.",
       "activateKpi": "Odaklanmış KPI kartını etkinleştirin.",
       "activateKpiSpace": "Odaklanmış KPI kartını etkinleştirin.",
@@ -1985,11 +1985,11 @@
     },
     "script": {
       "activeFiltersLabel": "Aktif filtreler:",
-      "clearAll": "Her şey temiz, her yer boş.",
-      "neverRun": "Asla koşma, asla koşma."
+      "clearAll": "Tümünü temizle",
+      "neverRun": "hiç çalıştırılmadı"
     },
     "freshness": {
-      "justNow": "Az önce şimdi, az önce.",
+      "justNow": "az önce",
       "minutesAgo": "{min} dk önce",
       "hoursAgo": "{hr} sa önce",
       "daysAgo": "{day} g önce",
@@ -2005,11 +2005,11 @@
     },
     "scan": {
       "subtitle": "Proje boyutu, karmaşıklığı ve sıcak noktaları taranıyor…",
-      "elapsed": "Geçmişte geçmiştir.",
-      "cancel": "İptal Et iptal et",
-      "restart": "Yeniden başlatma, yeniden başlatmak.",
+      "elapsed": "Geçen süre",
+      "cancel": "İptal",
+      "restart": "Yeniden Başlat",
       "stopped": "Durduruldu",
-      "logHeading": "Aktivite Faaliyet Etkinliği",
+      "logHeading": "Etkinlik",
       "logEmpty": "Henüz çıkış yok — bu günlük sadece tarayıcı bir tanımlama mesajı yazarsa doldurulur.",
       "progress": "{percent}% — {done}/{total} dosyaları"
     },
@@ -2057,11 +2057,11 @@
         "saved": "Kaydedildi",
         "saveError": "Kaydedilemedi"
       },
-      "colFile": "Dosya dosyası dosya dosya.",
-      "colLineNum": "Hattı çizgi çizgi.",
-      "colRule": "Kural Kanun kural",
+      "colFile": "Dosya",
+      "colLineNum": "Satır",
+      "colRule": "Kural",
       "colSeverity": "Ciddilik Ağırlık",
-      "colMessage": "Mesaj mesajı mesajı",
+      "colMessage": "Mesaj",
       "colKey": "Anahtar"
     },
     "shortcuts": {
@@ -2069,7 +2069,7 @@
       "showOverlay": "Bu kısayol örtüsünü göster."
     },
     "hero": {
-      "files": "Dosyalar dosyaları.",
+      "files": "Dosyalar",
       "lines": "Satırlar",
       "size": "Boyut"
     }
@@ -2101,7 +2101,7 @@
     "noCountersTitle": "Yeniden ayarlanacak sayaç yok.",
     "resetTitle": "Tüm sayaçları sıfırlayın.",
     "refreshTitle": "Telemetri sayaçlarını diskten yeniden yükleyin.",
-    "refresh": "Rahatlatıcı ve rahatlatıcı olsun.",
+    "refresh": "Yenile",
     "copyTitle": "Anlık görüntüyü JSON olarak kopyalayın.",
     "copyJson": "JSON'u kopyalayın.",
     "resetCounters": "Sayı sayaçlarını sıfırla.",
@@ -2112,7 +2112,7 @@
     "emptyMessage": "Henüz kayıtlı telemetri olayı yok; sayaçları yakalamaya başlamak için Bulgular Kontrol Panelinden bir kural açın.",
     "openFindingsTitle": "Saropa Bulgular Tablosunu açın.",
     "openFindings": "Açık Bulgular Tablosu (Dashboard)",
-    "lastPropsHeading": "Son olay özellikleri son olay özelliklerini gösterir.",
+    "lastPropsHeading": "Son olay özellikleri",
     "copiedJson": "Saropa Lints: ilgili kural telemetri JSON'u kopyalandı.",
     "countersReset": "Saropa Lints: İlgili kural telemetri sayaçları sıfırlandı."
   },
@@ -2124,30 +2124,30 @@
     "issueOne": "{count} sorun",
     "issueOther": "{count} sorun",
     "noIssues": "Hiçbir sorun yok.",
-    "showIssues": "Show issues sorunları göster.",
+    "showIssues": "Sorunları göster",
     "violationTooltip": "{ruleCount} kuralda {count} ihlal. Sorunlar'da göstermek için tıklayın.",
     "noViolationsTooltip": "Bu kategoriye hiçbir ihlal haritalanmamıştır."
   },
   "comparison": {
     "title": "Paket Karşılaştırması",
     "actions": {
-      "addToProject": "Projeye Ekle Projesi'ne ekleyin"
+      "addToProject": "Projeye Ekle"
     },
     "table": {
       "row": {
-        "vibrancyGrade": "Vibrancy Grade (canlılık derecesi)",
+        "vibrancyGrade": "Canlılık Notu",
         "category": "Kategori",
         "latestVersion": "Son Sürüm En Yeni Versiyon",
-        "published": "Yayınlanmış yayınlanmış yayımlanmış",
+        "published": "Yayınlandı",
         "publisher": "Yayıncı Editör Yayımcı",
-        "pubPoints": "Pub Points (Pub) - Barlar, bar noktaları.",
-        "githubStars": "GitHub Yıldızlar yıldızları",
-        "openIssues": "Açık Sorunlar, Açık Konulardır",
+        "pubPoints": "Pub Puanları",
+        "githubStars": "GitHub Yıldızları",
+        "openIssues": "Açık Sorunlar",
         "codeSize": "Kod Boyutu Kodu Ölçüsü",
-        "bloatRating": "Bloat Rating: Boşalma derecesi",
-        "license": "Lisanslar, lisanslar.",
-        "platforms": "Platformlar Platformu platformları",
-        "inThisProject": "Bu Proje İçin In This Project"
+        "bloatRating": "Şişkinlik Derecesi",
+        "license": "Lisans",
+        "platforms": "Platformlar",
+        "inThisProject": "Bu Projede"
       },
       "value": {
         "unverified": "— (doğrulanmamış)",
@@ -2156,26 +2156,26 @@
         "no": "Hayır"
       },
       "badge": {
-        "inProject": "Proje içinde, projeye bağlı olarak."
+        "inProject": "Projede"
       }
     },
     "status": {
-      "packagesSelected": "{count} seçilen paketleri pakete ekler.",
+      "packagesSelected": "{count} paket seçildi",
       "packagesCompared": "{count} paketleri karşılaştırıldı.",
-      "dimensionsRankedOne": "{count} boyutu sıralama sıralı.",
+      "dimensionsRankedOne": "{count} boyut sıralandı",
       "dimensionsRankedOther": "{count} boyutları sıralanmış.",
       "morePackages": "+{count} daha fazla"
     },
     "empty": {
-      "ariaLabel": "Paket yok paket yok.",
-      "message": "Karşılaştırma için seçilen paketler yok. Paket gösterge panelinde iki veya daha fazla pakete sağ tıklayın ve {compare}. seçin.",
+      "ariaLabel": "Paket yok",
+      "message": "Karşılaştırma için seçili paket yok. Paket panosunda iki veya daha fazla pakete sağ tıklayın ve {compare} seçeneğini belirleyin.",
       "compareWord": "Karşılaştırma Yapın",
       "openDashboard": "Paket Tablosunu Açın",
       "openDashboardTitle": "Saropa Paket Tablosunu açın."
     },
     "a11y": {
       "skipToTable": "Karşılaştırma tablosuna atlayın.",
-      "recommendation": "Tavsiye Önerisi Tavsiyeler",
+      "recommendation": "Öneri",
       "addingToProject": "Projeye {name} eklemek"
     },
     "shortcuts": {
@@ -2183,20 +2183,20 @@
       "closeOverlay": "Klavye kısayolları üst katmanını kapatın."
     },
     "kpi": {
-      "ariaLabel": "Karşılaştırma özetinin özeti.",
+      "ariaLabel": "Karşılaştırma özeti",
       "leading": "Önde gelen liderlik",
       "leadingTitle": "En çok boyut kazanan paketi lider.",
       "dimensionWinsOne": "{count} boyutu kazanır.",
       "dimensionWinsOther": "{count} boyutu kazanır.",
-      "packages": "Paket paketler, paketler.",
-      "packagesTitle": "Yan yana karşılaştırılan paket sayısı. yan-yana.",
+      "packages": "Paketler",
+      "packagesTitle": "Yan yana karşılaştırılan paket sayısı.",
       "inComparison": "karşılaştırmada, kıyaslama olarak.",
       "dimensions": "Boyutlar Ölçüler",
       "dimensionsTitle": "Bir kazananın sıralanabileceği boyutların sayısı.",
       "ranked": "sıralamada yer aldı."
     },
     "toolbar": {
-      "ariaLabel": "Karşılaştırma eylemleri karşılaştırma eylemi.",
+      "ariaLabel": "Karşılaştırma eylemleri",
       "packageDashboard": "Paket Tablosu (Dashboard)",
       "packageDashboardTitle": "Daha fazla paketi karşılaştırmak için Paket Kontrol Panosunu açın."
     }
@@ -2217,7 +2217,7 @@
       "rss": "RSS:",
       "statusLabel": "Durum:",
       "statusValue": {
-        "active": "Aktif aktif olan aktiviteler.",
+        "active": "etkin",
         "idle": "boşta",
         "running": "çalışıyor",
         "stopped": "durdu",
@@ -2254,7 +2254,7 @@
     },
     "action": {
       "killAll": "Tüm {name} süreçlerini sonlandır",
-      "restartAll": "{name} yeniden başlat",
+      "restartAll": "{name} öğesini yeniden başlat",
       "killAllDescription": "Yalnızca LSP Sunucusunu zorla durdurur. Analizör Eklentisi ve Tarama Daemon henüz bağımsız olarak sonlandırılamaz; bunun yerine her motorun kendi AÇIK/KAPALI geçişini kullanın.",
       "restartAllDescription": "LSP Sunucusunu durdurur ve yeniden başlatır (veya çalışmıyorsa başlatır). Analizör Eklentisi ve Tarama Daemon etkilenmez; bunun yerine her motorun kendi AÇIK/KAPALI geçişini kullanın."
     },
@@ -2293,7 +2293,7 @@
         "heading": "Bu değişikliği yayınla",
         "introEnable": "{path}, işleyen ağacınızda yazılmıştır. CI'da hiçbir şey çalışana kadar {base} üzerinde olmalıdır. Bu komutlar, yeni bir branch olan {branch}'e yerleştirir ve gözden geçirmek için bir pull request açar — bunları kendiniz çalıştırın veya butona basıp Saropa Lints tam olarak bunları çalıştırır.",
         "introDisable": "{path}, işlerinizi durdurmak için çalışma ağacınızda düzenlendi. CI bu durumun {base} ulaşana kadar devam eder. Bu komutlar değişikliği yeni bir dal olan {branch} adında bir dal oluşturur ve bir çekme isteği açar — bunları kendiniz çalıştırın veya düğmeyi basıp Saropa Lints tam olarak bunları çalıştırır. CI'yi hemen durdurmak isterseniz, deposunun Eylemler sekmesinden iş akışını devre dışı bırakın.",
-        "commandsLabel": "Komutlar, komutları verir.",
+        "commandsLabel": "Komutlar",
         "copy": "Kopyala",
         "copied": "Kopyalanmış komutlar.",
         "createPr": "Dallı oluştur, commit yap, itiraf ve çekme isteği aç",
@@ -2302,8 +2302,8 @@
         "running": "Şube oluşturuyor ve gönderiyor...",
         "failed": "{command} başarısız oldu, bu yüzden hiçbir şey gönderilmedi. {details}",
         "pushedNoPr": "{branch} gönderildi. Pull request otomatik olarak açılamadı — karşılaştırma sayfasından açın.",
-        "openCompare": "Karşılaştır karşılaştır sayfasını aç",
-        "created": "Pull request açıldı için {branch}.",
+        "openCompare": "Karşılaştırma sayfasını aç",
+        "created": "{branch} için pull request açıldı.",
         "openPr": "Pull request açın",
         "notARepository": "{path} yazıldı, ancak bu klasör bir git deposu değil, bu yüzden hiçbir şey yayınlanmamıştır.",
         "pubspecHasOtherEdits": "pubspec.yaml zaten sizin uncommitted düzenlerinizi içeriyor. Bir commit tam dosyaları alır, bu yüzden buradan yayın yaparsanız bu düzenler de itilecek. Commit ya da stash edin, ardından yukarıdaki komutları kendiniz çalıştırın."
@@ -2322,31 +2322,31 @@
       "selectPackage": "Detayları görmek için bir paket seçin."
     },
     "section": {
-      "version": "VERSION Versiyonu:",
-      "update": "GÜNCELLEME",
+      "version": "SÜRÜM",
+      "update": "UPDATE",
       "suggestion": "Öneriler önerme.",
-      "community": "Topluluk: Topluluğun bir parçasıdır.",
-      "dependencies": "DEPENDANCYES (bağımlılık)",
-      "alerts": "ALERTLER UYARILAŞTIRMA İÇİN",
-      "platforms": "Platformlar platformu.",
+      "community": "TOPLULUK",
+      "dependencies": "BAĞIMLILIKLAR",
+      "alerts": "UYARILAR",
+      "platforms": "PLATFORMLAR",
       "directDeps": "DIRECT DEPPS (DYİREK SAVAÇLAR)",
       "readmeImages": "README IMAGES'in resimleri"
     },
     "version": {
       "published": "Yayınlanan: {date}",
       "codeSize": "Kod Boyutu Kodu Ölçüsü",
-      "archive": "Arşiv arşivi,",
+      "archive": "Arşiv",
       "sizeLabel": "{label}: {size}",
       "source": "Kaynak: {code} kodu · {comments} yorumları · {files} dosyaları",
       "replace": "Yerine: {summary}"
     },
     "update": {
-      "upgrade": "Yükseltme Geliştirme Güncelleme",
-      "changelog": "Değişim günlüğü (Change log)",
+      "upgrade": "Yükselt",
+      "changelog": "Değişiklik Günlüğü",
       "blockedBy": "{package} tarafından engellendi."
     },
     "suggestion": {
-      "migrateTo": "{package}. için göç etmeyi düşünün.",
+      "migrateTo": "{package} paketine geçmeyi değerlendirin.",
       "consider": "Şunu düşünün: {text}. .",
       "alternatives": "Alternatifler: {names}",
       "unused": "Bu paket kullanılmıyor gibi görünüyor — kaldırmanızı düşünelim."
@@ -2356,7 +2356,7 @@
       "prs": "{count} PR'ler için",
       "activity90d": "90d: {closed} konular kapatıldı, {merged} PR'ler birleştirildi.",
       "lastCommit": "Son katılım: {time}",
-      "archived": "Depo arşivlenmiş bir depo.",
+      "archived": "Depo arşivlenmiş",
       "pubPoints": "{points}/160 pub noktası",
       "latestRelease": "Son sürüm: {age} önce",
       "dependents": "{count} bağımlılar."
@@ -2382,18 +2382,18 @@
       "viewFullDetails": "Tam Ayrıntıları Görüntüle",
       "pubDev": "pub.dev",
       "documentation": "Dokümantasyon Belgelendirme",
-      "changelog": "Değişim günlüğü (Change log)",
+      "changelog": "Değişiklik Günlüğü",
       "repository": "Depolama Kaynağı Repositoriy",
-      "issues": "Konular, konular sorunları.",
+      "issues": "Sorunlar",
       "reportIssue": "Rapor Sorunu Konuya Göre"
     },
     "logoAlt": "{packageName} logosu ile",
-    "readMore": "Daha fazla daha çok",
+    "readMore": "daha fazla",
     "readmeImageAlt": "README görüntü resmi."
   },
   "chart": {
     "toggle": {
-      "excludeShared": "Paylaşılanı hariç tutmak paylaşılanları dışlamak."
+      "excludeShared": "Paylaşılanları hariç tut"
     },
     "filter": {
       "clear": "Temizle"
@@ -2404,8 +2404,8 @@
       "sharedTransitives": "Paylaşılan geçişler ({count})"
     },
     "noun": {
-      "package": "Paket paket paketi, paket paket.",
-      "packages": "paketler paketler."
+      "package": "paket",
+      "packages": "paketler"
     }
   },
   "suite": {
@@ -2419,11 +2419,11 @@
     },
     "openFinding": {
       "noWorkspace": "Bir bulguyu açmak için bir çalışma alanı klasörünü açın.",
-      "notFound": "{file}. açılamadı"
+      "notFound": "{file} açılamadı."
     },
     "crashNudge": {
-      "message": "Log Capture, {count} zamanında bir çökme gördü (s) bu kuralın {ruleId} yakaladığı. Kural şu anda devre dışı bırakılmıştır.",
-      "enable": "Enable rule (Eklenti kuralını etkinleştir)"
+      "message": "Log Capture, {ruleId} kuralının yakalayacağı bir çökmeyi {count} kez gördü. Kural şu anda devre dışı.",
+      "enable": "Kuralı etkinleştir"
     },
     "deepLink": {
       "showDriftIssues": "Canlı yayın gösterisi Drift sorunları (Drift Advisor)"
@@ -2431,12 +2431,12 @@
     "nudge": {
       "message": "Bu proje Drift Advisor kullanıyor. Bu statik bulgular ile SQL çalışma süresini ilişkilendirmek için Saropa Log Capture uzantısını yükleyin.",
       "install": "Log Capture'ı yükle",
-      "dismiss": "İşten çıkarma, işten atmak."
+      "dismiss": "Kapat"
     },
     "driftRecommend": {
       "message": "Bir Drift Advisor sunucusu bağlanmıştır. Tam Problemler-panel deneyimi için bağımsız Saropa Drift Advisor uzantısını yükleyin.",
       "install": "Drift Advisor'ı yükleyin.",
-      "dismiss": "İşten çıkarma, işten atmak."
+      "dismiss": "Kapat"
     }
   },
   "notify": {
@@ -2448,8 +2448,8 @@
       "runScanFirst": "Önce tarama çalıştırın.",
       "noUpgradable": "Yükseltilebilir paketler bulunamadı.",
       "proceedUpgrades": "{count} yükseltme ile devam etmek için (((s)? Başarısız adımlar geriye doğru atılır ve plan devam eder.",
-      "actionExecute": "Yürütmek, yürütmek",
-      "actionCancel": "İptal Et iptal et",
+      "actionExecute": "Yürüt",
+      "actionCancel": "İptal",
       "upgradeStopped": "Güncelleme {failedAt}'da durdu — {completed}/{total} tamamlandı",
       "upgradeAllComplete": "Tüm {count} yükseltmeleri başarıyla tamamlandı.",
       "notPubspec": "Seçilen dosya bir pubspec.yaml değil.",
@@ -2466,11 +2466,11 @@
       "noPubspec": "Hiç pubspec.yaml bulunamadı.",
       "updatePrereleaseConfirm": "{version}'ın ön sürümü için güncelleme {package}? Ön yayınlar kırılma değişiklikleri içerebilir.",
       "packageNotFound": "Paket {package}, pubspec.yaml'de bulunamadı.",
-      "updatedTo": "{package}'ı {version} olarak güncelledi.",
+      "updatedTo": "{package}, {version} sürümüne güncellendi",
       "ciRunScanFirst": "Öncelikle uygun eşiğe sahip CI konfigürasyonunu oluşturmak için bir tarama çalıştırın.",
-      "noWorkspace": "İş alanı klasörü yok açılan çalışma alanı dosyası bulunamadı.",
+      "noWorkspace": "Açık çalışma alanı klasörü yok",
       "ciOverwriteConfirm": "{path} zaten var. Üzerine yazmak mı?",
-      "actionOverwrite": "Üzerine yazma üzerine yazma",
+      "actionOverwrite": "Üzerine Yaz",
       "ciGenerated": "CI işlem hattı oluşturuldu: {path}",
       "compareSelectCount": "Karşılaştırmak için 2-3 paket seçin.",
       "compareMax": "Karşılaştırma için en fazla 3 paket.",
@@ -2480,32 +2480,32 @@
       "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} hata{suffix} — görünüm",
       "regressionScoreDipped": "Puan düştü {threshold}'nin altına — sorunları görüntüle.",
-      "actionViewViolations": "View Violations İhtiyaçları ihlal edilmiştir.",
+      "actionViewViolations": "İhlalleri Görüntüle",
       "noErrors": "Saropa Lints: Hata yok!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: açık bir çalışma alanı klasörü yok. Öncelikle Dart/Flutter projesini açın.",
       "lintIntegrationOffCannotAnalyze": "Saropa Lints: Kaydetme sırasında tarayıcı devre dışı. Analiz çalıştırmadan önce etkinleştirin.",
-      "pluginAlive": "Saropa Lints yaşıyor: {rules} kuralları etkinleştirildi, {files} dosyaları analiz edildi.",
+      "pluginAlive": "Saropa Lints çalışıyor: {rules} kural etkin, {files} dosya analiz edildi.",
       "openPubspecFailed": "pubspec.yaml açılamadı: {message}",
-      "toggleSidebarSectionFailed": "Saropa Lints: yan yana menü bölümüne geçiş başarısız — {message}",
+      "toggleSidebarSectionFailed": "Saropa Lints: kenar çubuğu bölümü açılıp kapatılamadı — {message}",
       "openWorkspaceFirst": "Önce bir çalışma alanı klasörünü açın.",
       "createInstructionsDone": "Yapay zeka ajanları için .cursor/rules/saropa_lints_instructions.mdc oluşturuldu.",
       "createInstructionsFailed": "Saropa Lints talimatları oluşturmak başarısız oldu: {message}",
-      "openFileForIssues": "Saropa Lints. içinde sorunlarını göstermek için bir dosya açın.",
+      "openFileForIssues": "Sorunlarını Saropa Lints içinde göstermek için bir dosya açın.",
       "driftAdvisorNotConnected": "Drift Advisor bağlantılı değil. Sunucuyu başlattıktan sonra Refresh'i tıklatın.",
       "noViolationsRunAnalysis": "Mevcut verilerde ihlal yok. Önce analiz çalıştır.",
       "telemetryReset": "Saropa Lints: İlgili kural telemetri sayaçları sıfırlandı.",
       "noWorkspaceOpen": "Hiçbir çalışma alanı klasörü açılmadı.",
       "noAnalysisReport": "Saropa Lints: reports/ altındaki analiz raporu bulunamadı. Öncelikle \"Saropa Lints: Analiz Çalıştır\" komutunu çalıştırın.",
-      "copiedReport": "Kopya {name} yazma. tahtaya kopyalandı.",
+      "copiedReport": "{name} panoya kopyalandı.",
       "readReportFailed": "Saropa Lints: rapor okunamadı — {message}",
       "openReportFailed": "Saropa Lints: rapor açılamadı — {message}",
       "noAnalysisData": "Analiz verileri yok. Önce analiz çalıştır.",
-      "actionDisable": "Disable Deaktive Etme İşlemleri",
+      "actionDisable": "Devre Dışı Bırak",
       "actionEnable": "Olanak vermek",
       "bulkRuleToggleConfirm": "{verb} {count} kuralları? Bu, analysis_options_custom.yaml'i güncelliyor.",
       "setupPrompt": "Saropa Lints, saropa_lints yapılandırılmadığı bir Dart projesi tespit etti. 2350+ lint kuralı için şimdi ayarlayın.",
-      "actionSetUpProject": "Projeyi Kurmak Projesi Yapılandırma",
-      "actionNotNow": "Şimdi değil şimdi, şimdi değil."
+      "actionSetUpProject": "Projeyi Ayarla",
+      "actionNotNow": "Şimdi Değil"
     },
     "lsp": {
       "noWorkspaceFolder": "Saropa Lints: LSP Sunucusunu başlatamıyorum çünkü açık bir çalışma alanı klasörü yok.",
@@ -2514,35 +2514,35 @@
     },
     "setup": {
       "requiresDartProject": "Saropa Lints bir Dart veya Flutter projesi gerektirir (hiçbir pubspec.yaml bulunamadı).",
-      "actionLearnMore": "Daha Fazlasını Öğrenin Daha fazlasını öğrenin",
+      "actionLearnMore": "Daha Fazla Bilgi",
       "noWorkspaceFolder": "Hiçbir çalışma alanı klasörü açılmadı.",
       "pubGetFailed": "Saropa Lints: pub alma işlemi başarısız oldu. {details}",
       "checkOutput": "Çıktıyı kontrol edin.",
       "baselineRunning": "Mevcut ihlalleri bastırmak için bir temel çizgi oluşturma (saropa_baseline.json)...",
-      "baselineCreated": "Başlangıç çizgisi oluşturuldu: saropa_baseline.json.jsoun.jsuon.jssn Saropa Baseline.Json. Mevcut bulgular bastırılır; Yeni kod hala kontrol ediliyor.",
-      "baselineFailed": "Saropa Lints: temel oluşturamadı. {details}",
+      "baselineCreated": "Temel çizgi oluşturuldu: saropa_baseline.json. Mevcut bulgular bastırılır; yeni kod yine denetlenir.",
+      "baselineFailed": "Saropa Lints: temel çizgi oluşturulamadı. {details}",
       "pubGetNotResolved": "Saropa Lints: pub get başarılı oldu ancak saropa_lints çözülmemiştir. pubspec.yaml formatlamasını kontrol edin.",
       "configWriteFailedNs": "Saropa Lints: yapılandırma yazma başarısız. {details}",
       "disabled": "Saropa Lints devre dışı bırakıldı. Proje dosyaları değiştirilmedi.",
       "disabledAnalyzer": "Saropa Lints entegrasyonu devre dışı. Analizci tanımlar kısa sürede temizlenecek; Scan on save'ı açarak geri yükleyin.",
       "reenabledPlugin": "Saropa Lints iç süreç eklentisi yeniden etkinleştirildi. Dart analiz sunucusunu yeniden başlatarak onu yeniden yüklüyor.",
-      "reenableNothingToRestore": "Saropa Lints: geri yüklenmesi gereken şey yok. Eklenti aracılığıyla şu anda işlem içi eklenti devre dışı bırakılmamıştır.",
+      "reenableNothingToRestore": "Saropa Lints: geri yüklenecek bir şey yok. İşlem içi eklenti şu anda uzantı tarafından devre dışı bırakılmış değil.",
       "noOpenDartFiles": "Saropa Lints: açılmış Dart dosyası bulunamadı. Bir Dart dosyasını tekrar açın veya \"Yalnızca açılan düzenleyiciler\" ayarını kapatın.",
       "analysisScanning": "Çalışma alanı taranıyor… %{percent} (şu ana kadar {count} sorun)",
-      "configUpdated": "Saropa Lints konfigürasyonu güncellenmiştir (kat: {tier}).) olarak tanımlanır.",
+      "configUpdated": "Saropa Lints yapılandırması güncellendi (seviye: {tier}).",
       "configWriteFailed": "Config write başarısız oldu. {details}",
       "scaffoldGateTitle": "Kompozite analiz cihazı eklentisi iskele yapısı.",
-      "scaffoldGateDetail": "Bu, çalışma alanınızın altına yeni bir Dart paketi yazar (pubspec.yaml, lib/main.dart, README): Saropa'yi kaydeden ve kendi kurallarınız için kancayı bırakan bir custom_lint eklentisi.\n\nBunu yalnızca özel analizör kurallarını Saropa. ile birlikte gönderdiğinizde kullanın. Normal Saropa projeleri bunu atlayabilir.Analizör bağlam başına tek bir eklenti girişine izin verir.\n\nSonraki: Önceki İçerik bir çalışma alanı göreli klasör seçin. Bu klasör zaten varsa, herhangi bir şey üzerine yazılmadan önce size sorulur.",
-      "actionContinue": "devam et, devam ettir.",
+      "scaffoldGateDetail": "Bu, çalışma alanınızın altına yeni bir Dart paketi yazar (pubspec.yaml, lib/main.dart, README): Saropa'yı kaydeden ve kendi kurallarınız için kancalar bırakan tek bir custom_lint eklentisi.\n\nBunu yalnızca özel analizör kurallarını Saropa ile birlikte dağıttığınızda kullanın. Yalnızca Saropa kullanan normal projeler bunu atlayabilir; analizör bağlam başına tek bir eklenti girişine izin verir.\n\nSonraki adım: çalışma alanına göreli bir klasör seçin. Bu klasör zaten varsa, herhangi bir şeyin üzerine yazılmadan önce size sorulur.",
+      "actionContinue": "Devam Et",
       "actionOpenGuide": "Açık kılavuz rehberi açın.",
       "scaffoldPathOutsideWorkspace": "Iskele yolu çalışma alanı klasörünün içinde olmalıdır.",
-      "scaffoldFolderExists": "Dizin zaten var: {folder}. . . .Hı hı hımm.. Dosyalar eklenebilir veya üzerine yazılabilir. Devam etmek mi?",
+      "scaffoldFolderExists": "Klasör zaten var: {folder}. Dosyalar eklenebilir veya üzerine yazılabilir. Devam edilsin mi?",
       "scaffoldCreated": "Composite eklenti iskelesi oluşturuldu. Açık üretilmiş ana dartı açın.",
       "actionOpenMainDart": "Ana.dart'ı açın",
       "actionOpenReadme": "README'yi açın.",
       "scaffoldFailed": "İskele başarısız oldu. {details}",
       "scaffoldFailedHint": "saropa_lints'nin dev_dependencies'de olduğundan emin olun ve pub get'i çalıştırın.",
-      "alreadyOnTier": "Zaten {tier} katında. seviye.",
+      "alreadyOnTier": "Zaten {tier} seviyesinde.",
       "progressPubGet": "pub get çalıştırılıyor… ({elapsed}s)",
       "progressConfigWrite": "Yazılım yapılandırması… ({elapsed}s)",
       "progressAnalysis": "Analiz çalıştırılıyor… ({elapsed}s)",
@@ -2579,16 +2579,16 @@
       "crossFileReportNoIndex": "Dosya çapraz raporu tamamlandı ancak index.html bulunamadı.",
       "crossFileHtmlReportGenerated": "Çapraz dosya HTML raporu oluşturuldu.",
       "actionOpenInBrowser": "Tarayıcıda açın.",
-      "actionOpenFile": "Open File Açık Dosya dosyası",
+      "actionOpenFile": "Dosyayı Aç",
       "crossFileSnapshotFailed": "Dosyalar arası anlık görüntü başarısız: {message}",
       "crossFileSnapshotNoJson": "Dosya çapraz fotoğraf tamamlandı ancak JSON dosyası bulunamadı.",
       "crossFileSnapshotWritten": "Cross-file snapshot yazılı raporları/.saropa_lints/cross_file_snapshot.json için",
       "crossFileNoWorkspace": "Saropa Lints: Dart/Flutter çalışma alanı bulunamadı. Öncelikle pubspec.yaml ile bir proje açın.",
-      "crossFileMissingDep": "Saropa Lints: saropa_lints'i pubspec.yaml'a ekledikten sonra cross-file analizi yapın.",
+      "crossFileMissingDep": "Saropa Lints: dosyalar arası analizi çalıştırmadan önce saropa_lints'i pubspec.yaml dosyasına ekleyin.",
       "issuesNoViolationsRunAnalysis": "Mevcut verilerde ihlal yok. Önce analiz çalıştır.",
       "issuesNoAnalysisData": "Analiz verileri yok. Önce analiz çalıştır.",
       "issuesNoHotspots": "Mevcut raporlarda güvenlik sorunları bulunamadı.",
-      "issuesHotspotMarked": "{state}. olarak işaretlenmiş sıcak nokta",
+      "issuesHotspotMarked": "Sıcak nokta {state} olarak işaretlendi.",
       "copyTreeNoSelection": "Ağaç öğesi seçilmedi.",
       "copyTreeSerializeFailed": "Seçilen öğeyi serileştirme başarısız oldu.",
       "copyTreeCopied": "{count} {viewLabel} {noun} panoya JSON olarak kopyalandı",
@@ -2596,14 +2596,14 @@
       "copyTreeSerializeTreeFailed": "Serize edilemedi ağaç.",
       "copyTreeCopiedFull": "Tam {viewLabel} ağacını ({count} {branchNoun}) JSON olarak kopyaladım.",
       "projectMapNoProject": "Saropa Lints: önce bir Dart projesi açın.",
-      "projectMapMissingDep": "Saropa Lints: saropa_lints'i pubspec.yaml'a ekledikten sonra Saropa Proje Haritasını çalıştırın.",
+      "projectMapMissingDep": "Saropa Lints: Saropa Proje Haritasını çalıştırmadan önce saropa_lints'i pubspec.yaml dosyasına ekleyin.",
       "projectMapNoHtml": "Saropa Proje Haritası: HTML raporu üretilmedi.",
       "projectMapFailed": "Saropa Proje Haritası başarısız: {message}",
       "projectMapScanFailed": "Saropa Proje Haritası taraması başarısız oldu (çıkış {code}). {details}",
-      "projectMapCouldNotOpen": "Saropa Proje Haritası: {file}. açılamadı",
+      "projectMapCouldNotOpen": "Saropa Proje Haritası: {file} açılamadı.",
       "issuesNoQuickFix": "Bu ihlal için hızlı bir çözüm bulunmamaktadır.",
-      "issuesFileNotFound": "Dosya bulunamadı: dosya bulunamıyor. {file}. . . .Hı hı hımm.. Güncelleştirmek için analizi yeniden çalıştırın.",
-      "actionFixAll": "Fix All Fix Tümleri Düzelt",
+      "issuesFileNotFound": "Dosya bulunamadı: {file}. Güncellemek için analizi yeniden çalıştırın.",
+      "actionFixAll": "Tümünü Düzelt",
       "issuesConfirmFixAll": "{fileName}'deki {count} ihlalleri düzeltilsin mi?",
       "issuesBulkFixResult": "{fixed}. sabitlendi Puanı güncellemek için analiz çalıştırın.",
       "issuesBulkFixResultSkipped": "{fixed} sabitlendi, {skipped} atlandı (düzeltilemez). Puanı güncellemek için analiz çalıştırın.",
@@ -2625,12 +2625,12 @@
       "codeHealthStartFailed": "Kod Sağlık taraması başlatılamadı. Dart SDK'nın kurulduğundan emin olun.",
       "codeHealthScanFailed": "Kod Sağlık taraması başarısız oldu.",
       "codeHealthScanFailedDetails": "Kod Sağlığı taraması başarısız: {details}",
-      "codeHealthGatesFailed": "Kod Sağlık: Code Health: yapılandırılmış kalite kapıları başarısız oldu. Açın Kod Sağlık ayarları veya JSON'u kopyalayarak gates.violations.inspect için kontrol edin.",
+      "codeHealthGatesFailed": "Kod Sağlığı: yapılandırılmış kalite kapıları başarısız oldu. Kapıları incelemek için Kod Sağlığı ayarlarını açın veya JSON'u kopyalayıp gates.violations alanına bakın.",
       "codeHealthInvalidJson": "Code Health geçersiz JSON çıktısı döndürdü.",
       "sidebarSectionUpdateFailed": "Saropa Lints: aktivite çubuğu bölümü güncellenemedi — {message}"
     },
     "vibrancy": {
-      "couldNotOpenPubspec": "pubspec.yaml. açılamadı",
+      "couldNotOpenPubspec": "pubspec.yaml açılamadı.",
       "couldNotOpenFileRef": "Dosya referansı açılamadı: {filePath}",
       "savedReportJson": "Kaydedilen rapor JSON: {path}",
       "couldNotSaveReportJson": "Rapor JSON kaydedilemiyor.",
@@ -2640,11 +2640,11 @@
       "failedToAddToPubspec": "pubspec.yaml'e {name} eklemede başarısız oldu.",
       "needsPackageRow": "{actionLabel}, Paket Kontrol Panosundan (editor sekmesi) bir paket satırı gerektirir.",
       "couldNotLocateConstraint": "{name} için sürüm kısıtlaması bulunamadı.",
-      "deletedFromPubspec": "pubspec.yaml'den silinmiş {name} ( yedekleme: {backupName}) olarak tanımlanır.",
+      "deletedFromPubspec": "{name} pubspec.yaml dosyasından silindi (yedek: {backupName})",
       "runScanFirst": "Önce tarama çalıştırın.",
       "couldNotFindPubspec": "pubspec.yaml bulunamadı.",
-      "updatedPackage": "{name}'ı {constraint} olarak güncelledi.",
-      "failedToUpdate": "{name} güncelleme başarısız oldu.",
+      "updatedPackage": "{name}, {constraint} olarak güncellendi",
+      "failedToUpdate": "{name} güncellenemedi",
       "selectPackagesToCompare": "Karşılaştırmak için 2-3 paket seçin.",
       "maxPackagesToCompare": "Karşılaştırma için en fazla 3 paket.",
       "couldNotFindLocalSource": "{name} için yerel kaynak bulunamadı.",
@@ -2655,32 +2655,32 @@
       "registryRemoveFailed": "Kayıt kaldırılamadı: {message}",
       "registryTokenUpdated": "✓ Token güncellenmiş.",
       "registryTokenUpdateFailed": "Token güncellenemedi: {message}",
-      "actionRemove": "Remove remove kaldırmak",
-      "removeAuthPrompt": "{name}? için kimlik doğrulama kaldırın",
+      "actionRemove": "Kaldır",
+      "removeAuthPrompt": "{name} için kimlik doğrulama kaldırılsın mı?",
       "annotateInProgress": "Annotasyon zaten devam ediyor.",
       "noPubspecInWorkspace": "İş alanında pubspec.yaml bulunamadı.",
       "noDependenciesToAnnotate": "Yorumlamak için bağımlılık yok.",
       "failedToApplyAnnotations": "pubspec.yaml'e eklemeler uygulamakta başarısız oldu.",
-      "annotatedSummary": "{parts} ile birlikte, {basename} içinde notlanmıştır.",
+      "annotatedSummary": "{basename} dosyasında {parts} için açıklama eklendi",
       "upgradeInProgress": "Bir yükseltme halihazırda devam ediyor.",
       "couldNotReadConstraint": "{name} için kısıtlama okunamadı.",
       "upgradeSuccess": "{name} yükseltildi {constraint}'ye — tüm testler geçti",
       "upgradeRolledBack": "{name} yükseltmesi geri alındı — {phase} başarısız. Ayrıntılar için çıktıya bakın.",
       "saveTaskFailed": "Görev kaydedilirken hata oluştu: {message}",
       "openFolderBeforeCopyConfig": "Saropa Lints: Yapılandırma kopyalamadan önce bir çalışma alanı klasörünü açın.",
-      "copiedConfigSnippet": "Saropa Lints: kopyalanmış yapılandırma parçası (seviye: {tier}, {packsLine})",
+      "copiedConfigSnippet": "Saropa Lints: yapılandırma parçası kopyalandı (seviye: {tier}, {packsLine}).",
       "couldNotCopyClipboard": "Saropa Lints: panoya kopyalamak mümkün değil — {message}.",
-      "couldNotWriteRulePacks": "Saropa Lints: analysis_options.yaml (rule_packs) yazamadı",
+      "couldNotWriteRulePacks": "Saropa Lints: analysis_options.yaml (rule_packs) yazılamadı.",
       "couldNotReadPubspec": "Saropa Lints: pubspec.yaml okunamadı.",
-      "noAdditionalSdkPacks": "Saropa Lints: ek bir SDK paketi etkinleştirmeye uygun değil.",
-      "enabledApplicableSdkPacks": "Saropa Lints: etkinleştirildi {added} uygulanabilir {modeLabel} paket(ler).",
-      "openFolderBeforeEnablePacks": "Saropa Lints: paketleri etkinleştirmek önce bir çalışma alanı klasörünü açın.",
+      "noAdditionalSdkPacks": "Saropa Lints: etkinleştirilecek başka uygun SDK paketi yok.",
+      "enabledApplicableSdkPacks": "Saropa Lints: {added} uygun {modeLabel} paketi etkinleştirildi.",
+      "openFolderBeforeEnablePacks": "Saropa Lints: paketleri etkinleştirmeden önce bir çalışma alanı klasörü açın.",
       "allApplicablePacksEnabled": "Saropa Lints: uygulanabilir her kural paketi zaten etkinleştirildi.",
       "noApplicablePacksDetected": "Saropa Lints: Bu projeye uygulanabilir kural paketleri tespit edilemedi. Yapılandırma Panelinde paketleri ayrı ayrı açın.",
       "actionEnable": "Olanak vermek",
       "enableRecommendedPacksPrompt": "{count} önerilen paketleri etkinleştirmek için (((s)?",
       "enablePacksDetail": "Bu, analysis_options.yaml'daki rule_packs.enabled dosyasını günceller. {preview}",
-      "enabledRecommendedPacks": "Saropa Lints: etkinleştirildi {count} önerilen paket(ler).",
+      "enabledRecommendedPacks": "Saropa Lints: {count} önerilen paket etkinleştirildi.",
       "enableModePacksPrompt": "{count} {modeLabel} paketlerini etkinleştirmek için ((s)?"
     },
     "misc": {
@@ -2689,23 +2689,23 @@
       "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Bu büyük bir sürüm ve yapılandırma değişikliklerine ihtiyaç duyabilir — değişikliklerin logunu inceleyin.",
       "upgradeCheckerMajorUpdate": "Büyük güncelleme Major update.",
       "upgradeCheckerMinorUpdate": "Küçük güncelleme Uyarı",
-      "upgradeCheckerPatchUpdate": "Yama güncellemesi, yama güncelleştirmesi.",
+      "upgradeCheckerPatchUpdate": "Yama güncellemesi",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: pubspec.yaml güncellenemedi — saropa_lints girdisi bulunamadı.",
-      "upgradeCheckerCancelled": "Saropa Lints yükseltme iptal edildi. pubspec.yaml, ^{version}'ye güncellendi; tamamlamak için `{cmd} pub get` komutunu çalıştırın, veya değişikliği geri almak için.",
+      "upgradeCheckerCancelled": "Saropa Lints yükseltmesi iptal edildi. pubspec.yaml ^{version} olarak güncellendi; tamamlamak için `{cmd} pub get` komutunu çalıştırın veya değişikliği geri alın.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: pub alma işlemi başarısız oldu. {detail}",
       "upgradeCheckerCheckOutput": "Çıktıyı kontrol edin.",
       "upgradeCheckerUpgraded": "Saropa Lints, {version}'e yükseltildi.",
-      "actionUpgrade": "Yükseltme Geliştirme Güncelleme",
+      "actionUpgrade": "Yükselt",
       "actionViewChangelog": "Değişiklik Günlüğünü Görüntüle",
       "healthCodeLensEnabled": "Saropa Proje Haritası ısı CodeLens etkinleştirildi.",
       "healthCodeLensDisabled": "Saropa Proje Haritası ısı CodeLens devre dışı.",
       "reportViewCopiedPath": "Kopyalanmış rapor yolu: {path}",
       "reportViewCouldNotOpen": "Rapor dosyası açılamadı: {path}",
-      "reportViewCopiedRowOne": "{count} satırını kopyalandım. panoya .",
-      "reportViewCopiedRowOther": "{count} satırlarını kopyalandım. clipboard'a .",
-      "reportViewAlreadySuppressed": "'{flag}' zaten {file}.de bastırılmıştır.",
-      "reportViewSuppressed": "{file}. içinde bastırılmış '{flag}'",
+      "reportViewCopiedRowOne": "{count} satır panoya kopyalandı.",
+      "reportViewCopiedRowOther": "{count} satır panoya kopyalandı.",
+      "reportViewAlreadySuppressed": "'{flag}' {file} dosyasında zaten bastırılmış.",
+      "reportViewSuppressed": "'{flag}' {file} dosyasında bastırıldı.",
       "reportViewCouldNotSuppress": "'{flag}'ı {file}'da bastırılamadı: {error}",
       "actionRescan": "Yeniden tara",
       "bulkUpdateNoUpdates": "Güncelleme mevcut değil.",
@@ -2714,7 +2714,7 @@
       "bulkUpdateUpdatedOne": "Güncellenmiş {count} paketi.",
       "bulkUpdateUpdatedOther": "Güncellenmiş {count} paketleri.",
       "detailViewConstraintNotFound": "{package} için sürüm kısıtlaması bulunamadı.",
-      "detailViewUpdated": "{package}'ı {version} olarak güncelledi."
+      "detailViewUpdated": "{package}, {version} sürümüne güncellendi"
     }
   },
   "analysisOptimizer": {
@@ -2744,7 +2744,7 @@
     "applyAll": "Tümünü uygula",
     "applySelected": "Seçileni uygula",
     "apply": "Uygula",
-    "remove": "Remove remove kaldırmak",
+    "remove": "Kaldır",
     "selectAll": "Tümünü seç",
     "defaultLabel": "Varsayılan",
     "sortHint": "Tıkla sırala",
@@ -2752,9 +2752,9 @@
     "previewLine": "Eklenecek tam satırı ön izle",
     "previewApprox": "Yaklaşık — uygulandığında, tam girinti ve yorum konumları dosyanızla eşleşir",
     "col": {
-      "status": "Status Durum Statüs Durumu",
+      "status": "Durum",
       "pattern": "Desen",
-      "files": "Dosyalar dosyaları.",
+      "files": "Dosyalar",
       "cost": "Tahmini maliyet",
       "priority": "Öncelik"
     },
@@ -2823,7 +2823,7 @@
       "noneFound": "İgnore yorumları bulunamadı.",
       "found": "{count} eski ignore(s) {fileCount} dosya(s) içinde. Detaylar için Sorunlar paneline bakın.",
       "fixed": "İgnore yorumları kaldırıldı. Detaylar için Çıktı panosunu inceleyin.",
-      "fixedInFile": "Saropa Lints: bu dosyada eski görmezlikler düzeltilmiş",
+      "fixedInFile": "Saropa Lints: bu dosyadaki eskimiş ignore'lar düzeltildi",
       "alreadyRunning": "Bir stale-ignore taraması zaten çalışmaktadır."
     },
     "confirm": {
@@ -2919,7 +2919,7 @@
     },
     "error": {
       "noWorkspaceFolder": "Bu dosyayı taşınamaz — açık bir çalışma alanı klasöründe değildir.",
-      "targetExists": "Hareket edilemez — {targetPath} konumunda bir dosya zaten mevcut."
+      "targetExists": "Taşınamıyor — {targetPath} konumunda bir dosya zaten var."
     }
   },
   "sidebar": {
@@ -2978,7 +2978,7 @@
   },
   "blastRadius": {
     "label": {
-      "upgrade": "Yükseltme Geliştirme Güncelleme",
+      "upgrade": "Yükselt",
       "breaks": "Kırık",
       "breaksLower": "uyumsuzluklar",
       "upgradeNotRecommended": "⚠️ Yükseltme önerilmez"
@@ -3018,7 +3018,7 @@
     "noWorkspace": "Dart proje klasörünü açarak kural isimlerini geçirmek için kullanın.",
     "pickTitle": "Yeniden adlandırılmış kuralları geçiş yap",
     "pickPlaceholder": "Dosyaları seçin",
-    "fileHits": "{hits} değişiklikler",
+    "fileHits": "{hits} değişiklik",
     "diffTitle": "Kuralı yeniden adlandır: {file}",
     "confirm": "Kural isimlerini {count} dosyasına(u) uygulamak mı? Farklar inceleme için açıktır.",
     "apply": "Uygula",
@@ -3029,7 +3029,7 @@
     "skipped": "Atlanmış: {items}.",
     "failedRestored": "Kural geçişi başarısız: {detail} Tüm dosyalar önceki içeriğe geri yüklenmiştir.",
     "failedNotRestored": "Kural geçişi başarısız: {detail} Bazı dosyalar otomatik olarak geri yüklenemedi; bunları git ile kontrol edin.",
-    "offer": "{hits} adlı kuralı {count} dosyada yeniden adlandır?",
+    "offer": "{count} dosyadaki {hits} yeniden adlandırılmış kural güncellensin mi?",
     "offerPreview": "Önizleme",
     "offerNotNow": "Şimdi değil"
   },
@@ -3067,14 +3067,14 @@
     "recommend": {
       "latestOk": "saropa_lints {version} en son sürümüdür ve bu projeye uygun çalışır. ^{version} kullanın.",
       "alreadyCorrect": "Bu proje zaten önerilen saropa_lints yapılandırmasını kullanıyor. Eylem gerekmez.",
-      "needsNewerDart": "saropa_lints {newest} daha yeni bir Dart SDK'sı gerekiyor ({dart}). ^{chosen}'yi tutun veya Flutter'yi {newest} kullanmak için yükseltin.",
+      "needsNewerDart": "saropa_lints {newest}, bu projedekinden ({dart}) daha yeni bir Dart SDK gerektiriyor. ^{chosen} sürümünde kalın veya {newest} sürümünü kullanmak için Flutter'ı yükseltin.",
       "metaExcludesPin": "saropa_lints {newest} için daha yeni bir meta paketi gerekiyor, çünkü Flutter SDK pinleriniz ({pin}) daha eski. ^{chosen}’ı koruyabilirsiniz veya Flutter’yi {newest} sürümüne yükseltin.",
       "packageHoldsAnalyzer": "Paket {package} analizörü geri tutar, bu yüzden saropa_lints {newest} kurulamaz. ^{chosen} kullanın, veya {package}'ü {newest} kullanacak şekilde güncelleyin.",
       "noVersionResolves": "saropa_lints sürümü bir bağımlılık olarak yüklenemez çünkü {package} eski bir analizör gerektirir. Eklenti rotası hâlâ çalışır.",
       "noPluginResolves": "saropa_lints sürümü bir bağımlılık olarak yüklenemez ve {version} aynı zamanda bir eklentisi olarak pub çözücüsünde geçmedi ({package} eski bir analizör gerektirir). Herhangi bir şey değişmedi.",
       "blockedUsePlugin": "{package} analizleyiciyi geri tutar, bu yüzden saropa_lints bir bağımlılık olarak yüklenemez. Eklenti rotası etkilenmez: analysis_options.yaml'da eklenti sürümünü {version} olarak ayarlayın.",
       "editorVsCli": "Editör, {plugin} sürümünü kullanacak. Komut satırı (dart run saropa_lints:init, scan, baseline) hâlâ pubspec.yaml sürümü {pubspec}'yi kullanıyor.",
-      "cliNeedsPubspec": "dart run saropa_lints:init, tarama ve temel alınması için saropa_lints gereklidir pubspec.yaml'da.",
+      "cliNeedsPubspec": "dart run saropa_lints:init, scan ve baseline komutları pubspec.yaml içinde saropa_lints gerektirir.",
       "pluginUnverified": "{version} sürümü pub çözücüsüyle kontrol edilemedi. Sadece Dart SDK kısıtlamasından önerilir.",
       "pluginOnly": "analysis_options.yaml'da saropa_lints eklentisinin sürümünü {version} olarak ayarlayın.",
       "alignPlugin": "analysis_options.yaml'daki eklenti sürümü ({plugin}), kilidi olan saropa_lints sürümünden ({locked}) farklı. Eklenti sürümünü {locked} olarak ayarlayın.",
@@ -3131,7 +3131,7 @@
     }
   },
   "lintsSwitch": {
-    "statusOn": "Saropa Lints: Üzerinde",
+    "statusOn": "Saropa Lints: Açık",
     "statusOff": "Saropa Lints: Kapalı",
     "statusPartial": "Saropa Lints: Kısmen devre dışı",
     "tooltipOn": "Saropa Lints etkin (ayarlar ve analiz eklentisi). Devre dışı bırakmak için tıklayın.",
@@ -3192,7 +3192,7 @@
       "cancelScan": "Taramayı İptal Et",
       "turnOffTypeResolution": "Tip Çözünürlüğünü Kapat",
       "startAnyway": "Devam Et",
-      "notNow": "Şimdi değil şimdi, şimdi değil.",
+      "notNow": "Şimdi Değil",
       "neverAskDeep": "Tekrar Sorma",
       "applyPlugin": "Uygula",
       "noThanks": "Hayır Teşekkürler",

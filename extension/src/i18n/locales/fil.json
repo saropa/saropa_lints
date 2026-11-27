@@ -94,13 +94,13 @@
       }
     },
     "discover": {
-      "header": "Iyakan ang mga dashboard",
+      "header": "Galugarin ang mga dashboard",
       "findings": {
-        "label": "Mga Natuklasan Dashboard ng mga natuklasan.",
+        "label": "Dashboard ng mga Natuklasan",
         "description": "Ang bawat diagnostic sa iyong proyekto, mai-filter ayon sa kahimikang at panuntok."
       },
       "packages": {
-        "label": "Package Dashboard ng Pakete Ang pakete ay isang dashboard na may mga tampok.",
+        "label": "Dashboard ng Package",
         "description": "Kalusugan ng dependensya, mga oportunidad para i-upgrade, at paggamit ng mga feature."
       },
       "rules": {
@@ -108,7 +108,7 @@
         "description": "I-configure kung alin sa 2,350+ na mga rule ang magpapatakbo at sa anong antas ng kahimtan."
       },
       "catalog": {
-        "label": "Command Catalogue Katalogo ng Pag-uutos",
+        "label": "Katalogo ng mga Command",
         "description": "Bawat Saropa Lints command sa isang makapagpapalabas na listahan."
       }
     }
@@ -177,9 +177,9 @@
       "scanning": "Saropa: nag-scan ng {count} file(s)...",
       "done": "Saropa: {count} problema(s), {elapsed}s",
       "failed": "Saropa: nabigo ang pag-scan",
-      "warming": "Saropa: naglalabas ng analysta... ang unang pag-scan sa pagbukas ay maaaring mag-iskedyul ng isang minuto",
+      "warming": "Saropa: pinapainit ang analyzer… maaaring tumagal nang isang minuto ang unang scan pagkatapos magbukas",
       "ready": "Saropa: handa na",
-      "disabled": "Saropa: di nakakatulong",
+      "disabled": "Saropa: naka-disable",
       "noProject": "Saropa: walang Dart project",
       "doneTooltip": "{total} nakahanap, {shown} ipapakita pagkatapos ng filter",
       "dropped": "Saropa: nilaktawan ang pag-scan (mga {count} na file)",
@@ -207,7 +207,7 @@
     "heroTitle": "Inventory ng mga Feature ng Package",
     "meta": "Nag-generated {timestamp} · extension v{version} · {packages} packages",
     "caveats": {
-      "title": "Limits sa Pagmamana",
+      "title": "Mga limitasyon ng pagsukat",
       "intro": "Basahin ito bago magawa ang isang konklusyon mula sa anumang bilang sa ibaba.",
       "none": "Walang mga limita na narekord para sa panayam na ito."
     },
@@ -216,8 +216,8 @@
       "filterPlaceholder": "Filipino/Tagalog: Filter by feature text, symbol, or version…",
       "unusedOnly": "Hindi ginagamit lamang",
       "usedOnly": "Gamit lamang",
-      "deprecatedOnly": "Naglalaban lamang",
-      "expandAll": "Palawakin ang lahat ng mga ito.",
+      "deprecatedOnly": "Mga deprecated lamang",
+      "expandAll": "Palawakin lahat",
       "collapseAll": "Bumagsak lahat ng mga ito.",
       "indexLabel": "Index ng package"
     },
@@ -230,7 +230,7 @@
       "colAdopted": "Nakatanggap",
       "colUnadopted": "Di na inilagay",
       "colUsages": "Gamit",
-      "colScore": "Skor ng puntos na may marka."
+      "colScore": "Iskor"
     },
     "packages": {
       "title": "Mga package"
@@ -243,12 +243,12 @@
       "noChangelog": "Wala nang changelog na naitala para sa package na ito, kaya hindi maitatala ang mga kanyang mga tampok. Ito ay isang limitasyon ng source ng mga tampok na nanggaling sa changelog, hindi isang simbolo na walang mga tampok ang package.",
       "noFeatures": "Nakita ang changelog, ngunit walang mga feature ang maitutulong mula dito.",
       "linkPubDev": "pub.dev",
-      "linkDocs": "Dokumento Pagpapadala ng dokumento",
-      "linkRepository": "Repository ng mga talaan."
+      "linkDocs": "Dokumentasyon",
+      "linkRepository": "Repositoryo"
     },
     "category": {
       "heading": "{category} ({count})",
-      "added": "Nagdagdag",
+      "added": "Naidagdag",
       "changed": "Nagbago",
       "deprecated": "Nag-iisip",
       "removed": "Nakaraan",
@@ -263,15 +263,15 @@
       "usagesOne": "Paggamit ng {count}",
       "usagesUnknown": "paggamit ay hindi maaaring i-measure",
       "apiHeading": "{symbol} ({count})",
-      "viewCode": "Tingnan ang code ng view.",
-      "viewDocs": "Tingnan ang mga dokumento ng View docs.",
+      "viewCode": "Tingnan ang code",
+      "viewDocs": "Tingnan ang docs",
       "noUsages": "Walang paggamit na nakita sa source code ng proyekto.",
-      "moreUsages": "{count} pangangalap pa",
-      "moreUsagesOne": "{count} pangangalap ng mas maraming paggamit"
+      "moreUsages": "{count} pang paggamit",
+      "moreUsagesOne": "{count} pang paggamit"
     },
     "chip": {
       "adopted": "Nakatanggap",
-      "partial": "Sama-samang inilapat",
+      "partial": "Bahagyang inilapat",
       "unused": "Hindi pa ginamit",
       "unmeasurable": "Hindi maaaring sukatin"
     }
@@ -279,11 +279,11 @@
   "stylistic": {
     "title": "Style & mga opinyon",
     "intro": "Opiniated style rules, off sa pamamagitan ng default. I-on lamang kung ano ang sumang-ayon sa iyong koponan. Ang mga salungatan sa pagpili ay pinagsama-sama upang pumili ka ng isa.",
-    "searchPlaceholder": "Mga patakaran sa estilo ng paghahanap ... mga panuntunan sa istilo ng paghanap",
-    "pickOne": "Pumili ng isa sa mga ito.",
+    "searchPlaceholder": "Maghanap ng mga style rule…",
+    "pickOne": "Pumili ng isa",
     "none": "wala",
-    "enableAll": "Pagbibigay-daan sa lahat ng paganahin ang lahat.",
-    "disableAll": "I-disable ang lahat ng mga ito.",
+    "enableAll": "Paganahin lahat",
+    "disableAll": "I-disable lahat",
     "noMatch": "Walang style rules na magkasundo.",
     "desc": {
       "ordering_sorting": "Susunod ang mga miyembro, parameter, field, at map keys para sa mas mapagmukadang layout. Malaki ang epekto sa mga naiimplimentong code — pinakamahusay para sa mga bagong code o malikot na repositorio.",
@@ -295,7 +295,7 @@
       "class_record_style": "Class vs record return types, private underscore prefixes, at explicit na ito kung saan ito nagpapaliwanag.",
       "formatting": "Pag-iimpok ng puwang, mga komma sa huli, at estilo ng literal at komento. Maaaring maging nakakaloko — maraming mga file ang kailangan ng mga pagbabago.",
       "comments_documentation": "TODO at FIXME format, kaso ng pangungusap, isang yugto pagkatapos ng mga komento sa doc, /// over //, at walang commented-out na code.",
-      "testing_style": "Mas gusto ang inaasahan kaysa sa paniniwalaan sa mga pagsubok kaya't isang pagkabigo ay nagpapakita ng inaasahang vs. aktwal na pag-aalinlangan",
+      "testing_style": "Mas piliin ang expect kaysa assert sa mga test para ipakita ng failure ang inaasahan kumpara sa aktwal.",
       "debug_test_utility": "Mga test helper tulad ng prefer_fail_test_case na biglang nabigo kapag ang isang pagsubok ay tumama sa hindi inaasahang landas.",
       "opinionated_rules": "Mga iba't ibang estilo ng pagpili — maayos na pangalan, kompletong enum, mga klause ng pag-imbun, mga kondisyon na positibo, at marami pa. Maraming mga rule; maaaring magmumukhang nakakaloko."
     }
@@ -304,7 +304,7 @@
     "forYourProject": "Para sa iyong proyekto ng proyekto.",
     "forYourProjectHint": "Mga pakete na ang dependency o SDK ay tumutugma sa iyong pubspec. Ang mga alituntunin na ito ay naaangkop sa code na talagang ipinadala mo.",
     "noneDetected": "Walang mga pack na katumbas ng iyong mga dependency pa. Magdagdag ng isang suportadong pakete, o buksan ang Lahat ng mga pakete sa ibaba.",
-    "allPackages": "Lahat ng mga pakete ay naka-package.",
+    "allPackages": "Lahat ng package",
     "allPackagesHint": "Lahat ng available na pack, kasama ang mga hindi nasuri sa proyektong ito. Pagbibigay-daan sa isang pack upang magpasya sa mga patakaran nito.",
     "versionGroup": {
       "tag": "Pumili ng isang bersyon.",
@@ -337,8 +337,8 @@
     },
     "tab": {
       "tier": "Antas",
-      "packs": "Mga pakete ng patakaran ay may mga pakete.",
-      "overrides": "Nag-iwan ng pansin ang mga overrides.",
+      "packs": "Mga rule pack",
+      "overrides": "Mga override",
       "sdk": "Paglulunsad ng SDK",
       "configFile": "File ng configuration",
       "automation": "Awtomasyon",
@@ -347,7 +347,7 @@
     "common": {
       "rule": "Panuntunan",
       "add": "Magdagdag",
-      "remove": "Alisin ang alisan ng pag-alis"
+      "remove": "Alisin"
     },
     "sdk": {
       "summary": "{total} SDK migration pack(s) ay nagsisimula sa proyekto — {breaking} breaking, {deprecation} deprecation.",
@@ -432,7 +432,7 @@
           "counts": "{resolved} na napatagalan mula sa baseline · {new} bagong nagsimula mula sa baseline.",
           "empty": "Walang pag-usbong — ang set ng mga pangangailangan na nangunguna ay sumasalungat sa base line nang direkta.",
           "resolvedSection": "Nakaresolba ({count})",
-          "newSection": "Bagong nangunguna sa baseline ({count})",
+          "newSection": "Bago mula sa baseline ({count})",
           "moreRows": "+{count} pangalan ay hindi ipapakita.",
           "fileCol": "file",
           "lineCol": "Linya"
@@ -448,7 +448,7 @@
       "hint": "Mga setting ng extension na nagkontrol kung kailan magaganap ang analisis at paano ipapakita ang mga resulta. Ito ay nagmula sa parehong mga setting sa File > Preferences > Settings sa ilalim ng Saropa Lints."
     },
     "watcher": {
-      "title": "Watcher ay naglalagay ng",
+      "title": "Mga exclude ng watcher",
       "hint": "Mga file at folder na dapat i-ignored ng file watcher ng VS Code. Ang bilang ay nanggaling sa scan ng workspace hazard; gamitin ang List upang makita ang mga path, pagkatapos ay i-exclude ang mga ito mula sa warning na ipapakita ng scan.",
       "scanning": "Nag-scan ng workspace...",
       "affected": "{count} naapektuhan",
@@ -486,20 +486,20 @@
     "enableFailed": "Hindi ma-enable ang {pack} rule pack — buksan ang Rule Packs dashboard para paganahin ito"
   },
   "startupNudge": {
-    "message": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili {count} panuntunan pack mungkahi (s) nalalapat sa proyektong ito.",
+    "message": "Saropa Lints: {count} mungkahi ng rule pack ang naaangkop sa proyektong ito.",
     "review": "Balik-aral",
-    "dismiss": "Mag-dismiss na ako.",
+    "dismiss": "I-dismiss",
     "reviewFailed": "Hindi mabuksan ang pagsusuri sa pack ng panuntunan ng Saropa Lints. {error}"
   },
   "opportunities": {
-    "documentTitle": "I-upgrade ang mga pagkakataon sa pag-update ng mga oportunidad.",
-    "heroTitle": "I-upgrade ang mga pagkakataon sa pag-update ng mga oportunidad.",
+    "documentTitle": "Mga Pagkakataon sa Pag-upgrade",
+    "heroTitle": "Mga Pagkakataon sa Pag-upgrade",
     "subtitle": "Ang mga pakete ng {count} ay may mga tampok na hindi pa ginagamit ng iyong proyekto.",
     "noScan": "Magpatakbo ng isang pag-scan sa pakete muna upang mahanap ang mga pagkakataon sa pag-upgrade.",
     "openFileFailed": "Hindi maaaring i-open ang {file} — maaari itong naging naka-ayos nang maayos mula sa huling pag-scan.",
     "card": {
       "versionUpgrade": "update na magagamit sa {latest}",
-      "versionCurrent": "Sa pinakabagong balita tungkol sa mga ito.",
+      "versionCurrent": "nasa pinakabago",
       "featuresTitle": "Mga tampok na hindi pa ginagamit.",
       "locationsTitle": "Kung saan ginagamit ng iyong proyekto ang pakete na ito.",
       "noLocations": "Hindi na import sa source ng proyekto — posibleng isang dev o transitive dependency.",
@@ -523,56 +523,56 @@
   "packageDetail": {
     "section": {
       "version": "VERSION",
-      "changelog": "Ang pagbabago ay nagbago.",
-      "community": "Komunidad ng mga bansa.",
+      "changelog": "TALAAN NG PAGBABAGO",
+      "community": "KOMUNIDAD",
       "dependencies": "DEPENDENCY",
       "alerts": "MGA ALERTO",
-      "platforms": "Mga Platform ng mga platform.",
-      "suggestions": "Mga mungkahi ng mga suhestiyon.",
+      "platforms": "MGA PLATFORM",
+      "suggestions": "MGA MUNGKAHI",
       "readmeImages": "MGA LARAWAN NG README"
     },
     "header": {
-      "logoAlt": "{name} logo ng mga tao.",
-      "grade": "Grade {grade} ang grado nito.",
-      "licenseTitle": "Lisensya ng lisensya License.",
+      "logoAlt": "Logo ng {name}",
+      "grade": "Grado {grade}",
+      "licenseTitle": "Lisensya",
       "published": "Na-publish sa {date}."
     },
     "partialBanner": {
       "partReadme": "README at logo at logo.",
       "partGap": "PRs at mga isyu ng version-gap na bersyon.",
       "partReverseDeps": "bilang ng reverse dependency",
-      "listTwo": "{first} at {second} ang mga ito.",
+      "listTwo": "{first} at {second}",
       "listMany": "{head}, at ang {last}.",
       "message": "Ang ilang mga seksyon ay hindi maaaring ma-load: {list}.",
-      "retry": "Subukan muli ang Retry.",
+      "retry": "Subukang muli",
       "retrying": "Sinusubukan muli...",
       "retryTitle": "Subukan muli ang nabigo na mga pagkuha."
     },
     "description": {
-      "readMore": "Magbasa nang higit pa Basahin ang higit pa"
+      "readMore": "magbasa pa"
     },
     "version": {
-      "constraint": "Pagbabawal ng mga paghihigpit.",
+      "constraint": "Limitasyon",
       "latest": "Pinakabagong pinakabago Latest",
       "prerelease": "Prerelease",
-      "published": "Na-publish na Inilathala",
+      "published": "Na-publish",
       "update": "I-update",
-      "blockedBy": "Blokado sa pamamagitan ng Blocked by",
-      "blockedVia": "{blocker} caps {dep} {constraint} ({resolvable} resolvable, {latest} pinakabagong) ang mga ito ay maaaring i-resolve.",
+      "blockedBy": "Hinarangan ng",
+      "blockedVia": "Nililimitahan ng {blocker} ang {dep} {constraint} ({resolvable} maaaring i-resolve, {latest} pinakabago)",
       "blockedViaSdk": "na-pin ni {blocker} (Flutter SDK) para sa {dep} ({resolvable} resolvable, {latest} pinakabago)",
       "constrained": "Kinokontrol na pinigilan.",
       "constrainedBy": "Ang iyong paghihigpit na {constraint} ay sumasaklaw dito ({resolvable} malulutas, {latest} pinakabagong)",
-      "pinHeld": "Held ay gaganapin.",
+      "pinHeld": "Naka-hold",
       "pinDoNotUse": "Huwag gamitin huwag gumamit",
       "drift": "Drift sa iba't ibang proyekto",
       "driftBehind": "Sa likod: {siblings} (mayroon kang {own})",
       "driftDiffers": "Naiiba: {siblings} (mayroon kang {own})",
-      "codeSize": "Code Size Ang laki ng code",
+      "codeSize": "Laki ng Code",
       "archiveSize": "Ang laki ng archive Size",
       "bloat": "({rating}/10 bloat)",
-      "onDisk": "Sa Disk sa Disk On Disk",
-      "upgrade": "Mag-upgrade ng Upgrade na Pagpapahusay",
-      "upgrading": "Pag-upgrade... pag-update ng mga bagay.",
+      "onDisk": "Sa Disk",
+      "upgrade": "I-upgrade",
+      "upgrading": "Nag-a-upgrade…",
       "viewChangelog": "Tingnan ang Changelog"
     },
     "changelog": {
@@ -585,12 +585,12 @@
       "stars": "Mga bituin",
       "likes": "Mga gusto",
       "report": "Ulat",
-      "openIssues": "Bukas na Isyu ng Mga Isyu",
-      "openPrs": "Buksan ang mga PRs ng Open.",
+      "openIssues": "Mga Bukas na Isyu",
+      "openPrs": "Mga Bukas na PR",
       "activity": "Aktibidad (90d)",
       "activityValue": "Isinara ang mga isyu ng {closed}, pinagsama ang mga {merged} PR",
       "noActivity": "Walang kamakailang aktibidad.",
-      "lastCommit": "Huling Pag-commit sa huling Commit",
+      "lastCommit": "Huling Commit",
       "pubPoints": "Mga puntos sa Pub",
       "verified": "(napatunayan)",
       "publisher": "Publisher",
@@ -598,24 +598,24 @@
       "transitiveDeps": "Mga transitive na dep",
       "footprintBreakdown": "{unique} natatanging &middot; +{shared} ibinahagi = {total} kabuuang kabuuan.",
       "footprintTooltip": "Ang sariling {own} + natatanging mga transitibo {unique} + ibinahaging mga tranzitibong {shared}. Ang pag-alis ng dep na ito ay nagliligtas sa {saved} (mga ibinahaging dep ay nananatiling hinango ng iba).",
-      "trueFootprint": "True Footprint - Ang Tunay na Sandali ng Paa",
+      "trueFootprint": "Tunay na Footprint",
       "packagesCount": "{count} na package",
-      "dependents": "Ang mga Dependent ay nakasalalay."
+      "dependents": "Mga Dependent"
     },
     "fileUsages": {
       "commentedOut": "Mga sanggunian na walang komento:",
       "fileCount": "{count} file",
       "exportNoteTitle": "Hindi bababa sa isang paggamit ay isang direktiba ng pag-export.",
-      "publicApiSurface": "pampublikong API surface ng ibabaw ng API.",
+      "publicApiSurface": "pampublikong API surface",
       "header": "MGA PAGGAMIT NG FILE ({label})",
       "commentedReexportTitle": "Commented-out na muling pag-export ng mga produkto.",
       "reexportTitle": "Muling na-export — bahagi ng pampublikong API ng library na ito",
-      "reexportBadge": "muling pag-export ng re-eksport."
+      "reexportBadge": "muling pag-export"
     },
     "opportunities": {
       "header": "Mga Oportunidad ({count})",
-      "viewCode": "Tingnan ang code ng view.",
-      "viewDocs": "Tingnan ang mga dokumento ng View docs."
+      "viewCode": "Tingnan ang code",
+      "viewDocs": "Tingnan ang docs"
     },
     "alerts": {
       "archived": "ARCHIVED — ang repository ay read-only",
@@ -625,24 +625,24 @@
     },
     "versionGap": {
       "versionTitle": "Agwat ng bersyon",
-      "overrideTitle": "I-override ang Gap ng Gap",
+      "overrideTitle": "Agwat ng Override",
       "noDates": "Hindi matukoy ang mga petsa ng bersyon para sa pakete na ito.",
       "noItems": "Walang PR o isyu na natagpuan sa pagitan ng mga bersyon.",
-      "prsMerged": "Ang mga PRs ay nagsasama-sama.",
-      "issuesClosed": "Isyu ng mga isyu na sarado.",
+      "prsMerged": "Mga na-merge na PR",
+      "issuesClosed": "Mga saradong isyu",
       "searchLabel": "Maghanap ng PRs at mga isyu.",
       "searchPlaceholder": "Maghanap ng mga PR at isyu ...",
-      "filterAria": "I-filter ayon sa kategorya ng mga filter.",
+      "filterAria": "I-filter ayon sa kategorya",
       "filterAll": "Lahat",
-      "filterUnreviewed": "Hindi Sinuri ng Reviewer",
+      "filterUnreviewed": "Hindi pa nasusuri",
       "filterPrs": "Mga PR",
-      "filterIssues": "Isyu ng mga isyu.",
+      "filterIssues": "Mga Isyu",
       "typePr": "PR",
       "typeIssue": "Issue ng isyu.",
       "reviewReviewed": "Sinuri muli.",
-      "reviewApplicable": "Nalalapat na naaangkop.",
-      "reviewNotApplicable": "Hindi naaangkop",
-      "notesPlaceholder": "Mga tala... mga nota.",
+      "reviewApplicable": "Naaangkop",
+      "reviewNotApplicable": "N/A",
+      "notesPlaceholder": "Mga tala...",
       "colType": "Uri",
       "colTitle": "Pamagat",
       "colAuthor": "May-akda",
@@ -658,12 +658,12 @@
     },
     "links": {
       "viewOnPubDev": "Tingnan sa pub.dev",
-      "documentation": "Dokumento Pagpapadala ng dokumento",
+      "documentation": "Dokumentasyon",
       "changelog": "Changelog",
-      "versions": "Mga bersyon ng mga bersiyon.",
-      "repository": "Repository ng mga talaan.",
-      "openIssues": "Bukas na Isyu ng Mga Isyu",
-      "reportIssue": "Isyu ng Issue Report Isyu sa ulat"
+      "versions": "Mga bersyon",
+      "repository": "Repositoryo",
+      "openIssues": "Mga Bukas na Isyu",
+      "reportIssue": "Iulat ang Isyu"
     },
     "a11y": {
       "skipToDetails": "Skip sa mga detalye ng pakete."
@@ -674,15 +674,15 @@
     }
   },
   "toolbar": {
-    "runAnalysis": "Magpatakbo ng pagsusuri sa run analysis.",
+    "runAnalysis": "Patakbuhin ang pagsusuri",
     "copyJson": "Kopyahin ang JSON.",
-    "saveReport": "I-save ang ulat sa report",
-    "moreActions": "Higit pang mga pagkilos ng mas maraming aksyon.",
+    "saveReport": "I-save ang ulat",
+    "moreActions": "Higit pang aksyon",
     "clearAll": "Malinaw ang lahat, malinis."
   },
   "loading": {
-    "runningAnalysis": "Nagpapatakbo ng pagsusuri ... pag-aaral...",
-    "analysisComplete": "Pagsusuri kumpleto kumpletong pagsusuri.",
+    "runningAnalysis": "Nagpapatakbo ng pagsusuri…",
+    "analysisComplete": "Kumpleto ang pagsusuri",
     "analysisClean": "Walang mga isyu.",
     "refreshingDashboard": "Refreshing dashboard na may pinakabagong mga natuklasan.",
     "analysisStartedDetail": "Nagsimula ang pagsusuri. Pagkolekta ng mga diagnostic...",
@@ -690,7 +690,7 @@
   },
   "filter": {
     "activeLabel": "Aktibong mga filter:",
-    "chipRemove": "Alisin ang alisan ng pag-alis"
+    "chipRemove": "Alisin"
   },
   "a11y": {
     "toggleFullWidth": "Toggle buong lapad layout ng layout.",
@@ -699,7 +699,7 @@
   },
   "uiLanguage": {
     "pick": {
-      "title": "Saropa Lints UI wika ng wika",
+      "title": "Wika ng UI ng Saropa Lints",
       "placeholder": "Piliin ang wika para sa sidebar at dashboard.",
       "auto": "Auto (sundan ang VS Code display language)",
       "coverage": "{pct}% isinalin — rest show sa English"
@@ -715,9 +715,9 @@
     },
     "menu": {
       "openViolations": "I-Open Violations Report",
-      "openPackageDashboard": "Buksan ang Dashboard ng Package na Packet.",
+      "openPackageDashboard": "Buksan ang Dashboard ng Package",
       "openProcessHealth": "I-Open Process Health",
-      "commandCatalog": "Command Catalogue Katalogo ng Pag-uutos",
+      "commandCatalog": "Katalogo ng mga Command",
       "about": "Tungkol sa"
     },
     "tooltip": {
@@ -726,7 +726,7 @@
         "project": "Proyekto",
         "problems": "Mga Problema",
         "memory": "Memorya",
-        "actions": "Mga Aktibidad mga Aksyon"
+        "actions": "Mga Aksyon"
       },
       "cause": {
         "on": "Pagsusuri ay naglalaban: ang setting at ang analyzer plugin ay pareho ang nasa on.",
@@ -753,8 +753,8 @@
         "packagesSuppressed": "{count} ({suppressed} sinuppresyon)",
         "score": "Lint score",
         "scorePending": "punan ang isang buong analisis (partial scan)",
-        "findings": "Mga Natuklasan sa Paghahanap",
-        "updates": "Nagagawa ang mga update",
+        "findings": "Mga Natuklasan",
+        "updates": "May mga update",
         "actionItems": "Mga aksyon na ginagawa",
         "route": "Ruta"
       },
@@ -831,7 +831,7 @@
     "action": {
       "cleanUp": "Maglinis",
       "openPanel": "I-Open Health Panel",
-      "dismiss": "Mag-dismiss na ako.",
+      "dismiss": "I-dismiss",
       "optimizeAnalysis": "I-optimize ang Pagsusuri",
       "dontShowAgain": "Hindi Mo Iwanan Nang Magkakaroon Nang Paliwanag",
       "openMachineDashboard": "I-Open Machine Health",
@@ -840,8 +840,8 @@
     "cleanup": {
       "noOrphans": "Walang nakakalat na daemon.",
       "confirm": "Nakita ang {count} na proseso ng daemon na walang magagamit na mga anak na proseso (processes) gamit ang {size}. I-kill ba ang mga ito?",
-      "killButton": "Iwanan ang mga Orphan",
-      "cancelButton": "Kanselahin I-cancel ang pagkansela"
+      "killButton": "Patayin ang mga Orphan",
+      "cancelButton": "Kanselahin"
     },
     "orphanPreflight": {
       "found": "{count} na host process (processes) ng modelo na nawala mula sa isang mas mababang sesyon ay nagtatapon ng {size} ng komitido memory.",
@@ -863,7 +863,7 @@
       "processes": "proseso",
       "totalRss": "kabuuang RSS",
       "orphaned": "ulila",
-      "refresh": "Magpahinga at mag-refresh.",
+      "refresh": "I-refresh",
       "colPid": "PID",
       "colParent": "Magulang",
       "colRss": "RSS",
@@ -881,13 +881,13 @@
     "watcherExclude": {
       "prompt": "Naglalagay ang {count} ng mga exclusion sa file-watcher na nawala sa workspace na ito: {patterns}. Ang pagdaragdag nito ay nagpapahinto sa VS Code mula mag-keep ng malalaking build artifacts at heap dumps na nagpapalagay ng memory.",
       "addAll": "Isumulat Lahat",
-      "dismiss": "Mag-dismiss na ako.",
+      "dismiss": "I-dismiss",
       "added": "Nagdagdag ng mga {count} file-watcher exclusion sa mga setting ng workspace."
     },
     "nestedRoots": {
       "prompt": "{folders} ay naglalaman ng {count} na nakakasalungat na Dart package root(s) na git ignore. Bawat isa ay isinasagawa bilang mag-isa na konteksto at maaaring magbanta sa memory ng analysis server.",
-      "fix": "I-exclude mula sa Pagbabase",
-      "dismiss": "Mag-dismiss na ako.",
+      "fix": "I-exclude sa Pagsusuri",
+      "dismiss": "I-dismiss",
       "fixed": "Nakalalabas ang {folders} sa pagbabase at pagmamonitor ng mga file."
     },
     "hazardScan": {
@@ -895,20 +895,20 @@
       "andMore": "at {count} pang iba pang",
       "unnamedFolder": "(folder na walang pangalan)",
       "addExclusions": "I-exclude sa Watcher",
-      "dismiss": "Mag-dismiss na ako.",
+      "dismiss": "I-dismiss",
       "added": "Nagdagdag ng pattern ng {count} watcher para sa pag-exclude sa mga setting ng workspace."
     }
   },
   "workspaceReadiness": {
     "allClear": "Kabug-osang pagkabukas ng workspace: lahat ay malayong-ayos — walang mga isyu na nakita.",
-    "quickPickTitle": "Mga Problema sa Pagpapareto ng Workspace",
+    "quickPickTitle": "Mga Isyu sa Kahandaan ng Workspace",
     "quickPickPlaceholder": "Piliin ang isang isyu para sa detalye o para i-apply ang solusyon",
     "statusBar": {
       "red": "🔴 {count} problema sa workspace",
       "yellow": "⚠ {count} problema sa workspace"
     },
     "issue": {
-      "hazardFiles": "$(warning) {count} malaking file(s) na walang pag-iisip",
+      "hazardFiles": "$(warning) {count} malaking file na hindi naka-exclude",
       "hazardFilesDetail": "Mga malalaking file na in-monitor ng file watcher ay maaaring mag-imbak ng memorya at mag-iba ang VS Code. I-run ang hazard scan upang i-exclude ang mga ito.",
       "missingExcludes": "$(info) {count} nawawalang watcher exclusion(s)",
       "missingExcludesDetail": "Hindi nakakonekta ang mga pattern ng pag-ibig sa file na inirerekumenda. Ang pagdaragdag nito ay nagpapahintulot sa hindi kinakailangang paggamit ng memorya.",
@@ -918,7 +918,7 @@
   },
   "machineDashboard": {
     "title": "Mga Kondisyon ng Sistemang Makina",
-    "refresh": "Magpahinga at mag-refresh.",
+    "refresh": "I-refresh",
     "systemUnknown": "Hindi mabasa ang sistema memory sa platform na ito.",
     "platformUnsupported": "Ang Machine Health ay hindi available sa platform na ito — ang suporta sa mga query ay para sa Windows, macOS at Linux.",
     "freeOf": "walang",
@@ -971,8 +971,8 @@
     "statusBar": {
       "hardTripped": "🔴 Nakatigil ang mga batas ({rssMb} MB)",
       "shedCritical": "🔴 {count} rules shed (kritikal)",
-      "shedWarning": "⚠ {count} mga rule na nagsisilbing shed",
-      "shedInfo": "⚡ {count} mahal na mga rule na naglilinis",
+      "shedWarning": "⚠ {count} rule ang inalis",
+      "shedInfo": "⚡ {count} mabigat na rule ang inalis",
       "pressureNoShed": "⚠ Presyon ng memorya ({rssMb} MB)"
     },
     "tooltip": {
@@ -985,20 +985,20 @@
     "notification": {
       "shedDisabled": "Nabatay ang memorya ng analyzer (RSS {rssMb} MB, soft limit {softLimitMb} MB). Mag-enable ng rule shedding upang mag-automate ng pag-off ng mahalagang mga rule sa presyon.",
       "enableButton": "Paganahin",
-      "learnMoreButton": "Matuto ng Higit pang Alamin ang Higit Pang Aralin",
+      "learnMoreButton": "Alamin Pa",
       "runInit": "Punan ang 'dart run saropa_lints:init' upang makagawa ng analysis_options_custom.yaml, pagkatapos ay itakda ang shed_rules: true.",
       "enabledConfirmation": "Nag-activate ang mga rule shedding sa analysis_options_custom.yaml. Ang analyzer ay magpapalabas ng pagbabago sa susunod na pag reload."
     },
     "dashboard": {
       "shedSectionTitle": "Nagbibigay ng mga tala (presyon ng memorya)",
       "shedHint": "Ang mga panuntok na ito ay nangunguna na naka-disable sa pamamagitan ng memory pressure handler upang mapababa ang analyzer RSS. Ito ay bumabalik nang automatic kapag bumaba ang memory pressure.",
-      "shedBadge": "malaglag",
+      "shedBadge": "inalis",
       "shedBadgeTooltip": "Ang rule na ito ay nangunguna sa sandaling ang memorya ay nangangailangan ng presyon.",
       "categoryTypeResolving": "Type-resolving (mahal)",
       "categoryHighCost": "Mataas ang halaga",
       "categoryInfoSeverity": "INFO kalubhaan",
       "categoryWarningSeverity": "BABALA kalubhaan",
-      "moreRules": "hindi na nakalista",
+      "moreRules": "pa ang hindi nakalista",
       "restartButton": "I-reset ang analisador",
       "restartTooltip": "I-reset ang server ng analisis ng Dart upang malibog ang presyon sa memorya at i-backup muli ang mga patakaran."
     }
@@ -1007,19 +1007,19 @@
     "pageTitle": "Dashboard ng mga Natuklasan ng Saropa",
     "documentTitle": "Dashboard ng mga Natuklasan ng Saropa",
     "skipToFindings": "Skip sa mga natuklasan.",
-    "secondaryAsideLabel": "Mga pangalawang diagnostics ng pang-agham.",
+    "secondaryAsideLabel": "Mga pangalawang diagnostic",
     "hero": {
-      "gaugeTitle": "Health score {score} (grade {grade}). sa pamamagitan ng pag-click dito. Ang mga pagkakamali ang pinakamabigat.",
+      "gaugeTitle": "Iskor ng kalusugan {score} (grado {grade}). Pinakamabigat ang mga error.",
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "Ngayon lang, ngayon lamang.",
+      "justNow": "ngayon lang",
       "minutesAgo": "{min}m nakalipas",
       "hoursAgo": "{hr}o nakalipas",
       "daysAgo": "{day}a nakalipas"
     },
     "status": {
-      "updatedPrefix": "Na-update na Nai-update",
+      "updatedPrefix": "Na-update",
       "refreshHint": "Mag-click upang mag-refresh mula sa analyzer.",
       "lastRunUnknown": "Huling pagtakbo hindi kilala di-kilala",
       "noTimestampTitle": "Walang timestamp sa violations.json.",
@@ -1042,7 +1042,7 @@
       "hotspotsTitle": "{open} nakabukas, {safe} nakatakdang ligtas, {fixed} tinukoy — klik para magtanong",
       "hotspotsPill": "{open} buksan · {percent}% tinanaw",
       "qualityGatePassingTitle": "Quality gate ng Code Health na ipasok — klik para buksan ang Code Health",
-      "qualityGatePassingPill": "Paghahatag ng pinto",
+      "qualityGatePassingPill": "Pumapasa ang gate",
       "qualityGateFailingTitle": "Mga batayan ng kalidad ng Code Health na nagkakasira ({count} pagkakasala(s)) — klik para buksain ang Code Health",
       "qualityGateFailingPill": "Nabigo ang gate"
     },
@@ -1052,24 +1052,24 @@
       "impact": "Epekto",
       "rule": "Panuntunan",
       "owasp": "OWASP",
-      "ruleType": "Uri ng panuntunan uri ng patakaran",
-      "ruleStatus": "Rule status ng katayuan sa pag-uutos.",
+      "ruleType": "Uri ng panuntunan",
+      "ruleStatus": "Katayuan ng panuntunan",
       "tier": "Antas",
-      "pack": "Pack (mga) pakete ng mga produkto"
+      "pack": "(Mga) pack"
     },
     "seg": {
-      "toggleSeverityTitle": "I-toggle ang {v} na kasiguruhan ng kalubhaan."
+      "toggleSeverityTitle": "I-toggle ang kalubhaang {v}"
     },
     "kpi": {
-      "visibleLabel": "Nakikita ang mga nakikitang natuklasan.",
-      "allMatched": "Lahat ay magkasundo sa lahat ng mga tugma.",
+      "visibleLabel": "Mga nakikitang natuklasan",
+      "allMatched": "lahat ay tumugma",
       "ofTotal": "ng {total} kabuuang bilang.",
       "clearFiltersTitle": "Mag-click upang linisin ang lahat ng mga filter.",
-      "errorsLabel": "Mga pagkakamali Pagkakamali",
-      "errorsSubFix": "dapat ay mag-ayos ng fix",
+      "errorsLabel": "Mga Error",
+      "errorsSubFix": "dapat ayusin",
       "errorsSubClear": "wala — malinaw",
       "errorsTitle": "I-filter ang mga natuklasan sa mga error (dapat ayusin — sira / mag-crash / mapagsamantalahan)",
-      "warningsLabel": "Mga Babala ng mga babala",
+      "warningsLabel": "Mga Babala",
       "warningsSubBad": "maaaring mabigo o tumingin masama.",
       "warningsSubClear": "wala — malinaw",
       "warningsTitle": "I-filter ang mga natuklasan sa mga babala (maaaring mabigo o magmukhang masama)",
@@ -1077,8 +1077,8 @@
       "infoSub": "FYI — istilo / mungkahi",
       "infoSubNone": "wala",
       "infoTitle": "I-filter ang mga natuklasan sa impormasyon (FYI — istilo at mga mungkahi)",
-      "filesLabel": "Ang mga file na apektado ay naapektuhan.",
-      "filesSubAcross": "sa buong export export na linya.",
+      "filesLabel": "Mga apektadong file",
+      "filesSubAcross": "sa buong export",
       "filesSubNone": "walang mga file na apektado.",
       "filesTitle": "Mga natatanging file na nag-aambag ng hindi bababa sa isang paghahanap.",
       "topRuleLabel": "Nangungunang panuntunan",
@@ -1092,17 +1092,17 @@
       "groupByLabel": "Mga grupo ayon sa pangkat",
       "textFilterTitle": "I-filter ang mga natuklasan sa pamamagitan ng file path, rule o text message.",
       "textFilterPlaceholder": "I-filter sa pamamagitan ng file, patakaran o mensahe ...",
-      "textFilterAria": "Ang filter ng teksto ay isang text filter.",
-      "clearTextFilterTitle": "I-clear ang filter ng teksto sa filter.",
-      "clearTextFilterAria": "I-clear ang filter ng teksto sa filter.",
+      "textFilterAria": "Filter ng teksto",
+      "clearTextFilterTitle": "I-clear ang filter ng teksto",
+      "clearTextFilterAria": "I-clear ang filter ng teksto",
       "recentFiltersTitle": "Kamakailan filter mga filter",
       "clearRecentTitle": "I-clear ang lahat ng mga kamakailang filter.",
       "clearRecentButton": "Maaliwalas",
       "recentFiltersListAria": "Kamakailan filter mga filter",
       "runAnalysisTitle": "Magpatakbo ng Saropa Lints analysis.",
-      "severityGroupAria": "Ang filter ng Severity ay nag-aayos.",
+      "severityGroupAria": "Filter ng kalubhaan",
       "severityLabel": "Kalubhaan",
-      "moreSummary": "Mas marami pa More More",
+      "moreSummary": "Higit pa",
       "moreChevron": "▾",
       "copyJsonTitle": "Kopyahin ang mga na-filter na paglabag bilang JSON ({count})",
       "saveReportTitle": "I-save ang mga na-filter na paglabag bilang JSON sa mga ulat / YYYYMMDD /.",
@@ -1110,7 +1110,7 @@
       "copyEverythingJsonTitle": "Kopyahin LAHAT ng mga resulta ng audit bilang JSON — walang filter, kasama ang mga naisulat",
       "saveEverythingReport": "I-save ang lahat ng ulat",
       "saveEverythingReportTitle": "I-save lahat ng mga resulta ng audit bilang JSON sa reports/ — walang pag-filter, kasama ang mga naka-ignored",
-      "suppressAll": "I-block lahat ng nakikita",
+      "suppressAll": "I-suppress lahat ng nakikita",
       "suppressAllTitle": "Ilagay // ignore: komento sa itaas ng bawat nakakakita na resulta",
       "suppressAllConfirm": "Ito ay magpapalagay ng {count} // ignore: komento sa iyong mga source files. Ito ay hindi maaaring i-undo mula sa dashboard — gamitin ang undo ng iyong editor o version control upang i-revert. Magpatuloy?",
       "suppressAllProceed": "I-block lahat ng",
@@ -1126,11 +1126,11 @@
       "scopeChangedBranch": "Nagbago ang vs branch…",
       "branchPlaceholder": "pangalan ng sangay",
       "branchAria": "Branch para i-compare",
-      "includeSuppressedLabel": "Mag-include ng pinagbabawal",
+      "includeSuppressedLabel": "Isama ang mga na-suppress",
       "includeSuppressedTitle": "Magbigay din ng mga resulta na karaniwang naka-ignored ng // ignore:, // ignore_for_file:, o entry sa baseline — bawat isang nangangahulugan kung paano ito tinanggal. Ang iyong proyekto config ay hindi binago.",
-      "runButton": "Pagsusulit audit",
+      "runButton": "Patakbuhin ang audit",
       "runButtonTitle": "Punan ang resulta ng CLI ng full-project audit dito",
-      "cancelButton": "Kanselahin I-cancel ang pagkansela",
+      "cancelButton": "Kanselahin",
       "runningLabel": "Pag-aaral…",
       "runningMeta": "Pagsimula ng audit CLI...",
       "statusFull": "Pangkabug-osang pag-aaral ng proyekto mula sa {time}",
@@ -1144,20 +1144,20 @@
     },
     "menuPalette": {
       "help": "Tulong",
-      "groupBy": "Mag-group sa pamamagitan ng...",
-      "textFilter": "Ang text filter... ang filter ng teksto.",
-      "severityImpact": "Filter ng kalubhaan ... filter ng kalubhahan...",
+      "groupBy": "Ipangkat ayon sa…",
+      "textFilter": "Filter ng teksto…",
+      "severityImpact": "Filter ng kalubhaan…",
       "hideRules": "Itago ang mga panuntunan...",
       "ruleMetadata": "Panuntunan ng panuntunan sa metadata.",
-      "clearFilters": "Malinis na mga filter ng filter.",
-      "clearSuppressions": "Malinaw na suppression ng mga pag-aalis.",
-      "clearFileFocus": "I-clear ang focus ng file sa pag-focus.",
-      "matchActiveEditor": "I-match ang aktibong editor ng active na may kasamang tagubilin.",
+      "clearFilters": "I-clear ang mga filter",
+      "clearSuppressions": "I-clear ang mga suppression",
+      "clearFileFocus": "I-clear ang focus sa file",
+      "matchActiveEditor": "Itugma sa aktibong editor",
       "copyTreeJson": "Kopyahin ang puno ng JSON na kahoy.",
-      "refreshExtension": "Refresh extension ay isang pag-update ng extension.",
-      "openPackageDashboard": "Buksan ang Dashboard ng Package na dashboard.",
+      "refreshExtension": "I-refresh ang extension",
+      "openPackageDashboard": "Buksan ang dashboard ng Package",
       "openCodeHealth": "Open Code Health Ang kalusugan.",
-      "openLintsConfig": "Pamamahala ng mga patakaran Pack",
+      "openLintsConfig": "Pamahalaan ang mga Rule Pack",
       "reloadFromDisk": "I-reload mula sa disk ng disk.",
       "reloadFromDiskTitle": "I-render muli ang dashboard mula sa huling violations.json nang hindi muling pagpapatakbo ng analyzer.",
       "reEnableDisabledRules": "I-reenable ang mga itinanggi na patakaran...",
@@ -1165,23 +1165,23 @@
       "reEnableNoneMessage": "Walang mga patakaran ay kasalukuyang hindi pinagana sa pamamagitan ng analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Re-enable disabled rules muling paganahin ang mga ito.",
       "reEnableQuickPickPlaceholder": "Piliin ang isa o higit pang mga patakaran upang muling paganahin.",
-      "menuGroupExport": "Export export na ang mga ito.",
+      "menuGroupExport": "I-export",
       "menuGroupBulk": "Maramihang pagkilos",
       "menuGroupFilter": "Filter & focus ang mga ito.",
-      "menuGroupOpen": "Buksan ang dashboard ng mga sasakyan.",
+      "menuGroupOpen": "Buksan ang dashboard",
       "menuGroupSystem": "Sistema"
     },
     "progress": {
-      "runningLabel": "Nagpapatakbo ng pagsusuri ... pag-aaral...",
+      "runningLabel": "Nagpapatakbo ng pagsusuri…",
       "runningMeta": "Ito ay maaaring tumagal ng isang sandali sa mga malalaking proyekto."
     },
     "topRules": {
       "sectionAria": "Ang mga nangungunang panuntunan sa pamamagitan ng bilang ay binabilang.",
       "hideTitle": "Itago para sa akin lang — workspace-level, nababaligtad sa pamamagitan ng Clear Suppressions",
-      "hideButton": "Magtago mag-iwan sa amin.",
+      "hideButton": "Itago",
       "disableTitle": "Huwag paganahin para sa buong proyekto — nagsusulat ng analysis_options_custom.yaml at muling nagpapatakbo ng pagsusuri",
       "disableButton": "Huwag paganahin",
-      "workspaceOnlyShort": "workspace lamang ang ginagamit.",
+      "workspaceOnlyShort": "workspace lamang",
       "projectConfigShort": "config ng proyekto (nagsusulat analysis_options_custom.yaml)",
       "topRulesOne": "Ang pinakamataas na {count} rule.",
       "topRulesOther": "Nangungunang {count} tuntunin",
@@ -1189,20 +1189,20 @@
       "colRule": "Panuntunan",
       "colCount": "Bilangin",
       "colSeverity": "Kalubhaan",
-      "colActionsAria": "Mga aksyon sa hilera ng mga aksyong hilera.",
+      "colActionsAria": "Mga aksyon sa hilera",
       "filesAffected": "Ang mga file na apektado ({count})",
       "howToFixHeading": "Paano mafix",
       "owaspMobileLabel": "Mobile",
       "owaspWebLabel": "Web",
       "relatedRulesHeading": "Mga nauugnay na pautang",
-      "sameTagHeading": "Pangangalap ng parehong tag",
+      "sameTagHeading": "Pagtuklas ayon sa parehong tag",
       "migrationHeading": "Migration",
       "supersedesLabel": "Nagmula:"
     },
     "findings": {
-      "sectionAria": "Mga Natuklasan sa Paghahanap",
-      "heading": "Mga Natuklasan sa Paghahanap",
-      "expandAll": "Palawakin ang lahat ng mga ito.",
+      "sectionAria": "Mga Natuklasan",
+      "heading": "Mga Natuklasan",
+      "expandAll": "Palawakin lahat",
       "collapseAll": "Bumagsak lahat ng mga ito.",
       "bulkSelected": "{count} ang pinili",
       "bulkCopy": "Kopyahin ang napili bilang JSON.",
@@ -1212,7 +1212,7 @@
       "colRule": "Panuntunan",
       "colMessage": "Mensahe",
       "colLine": "Linya",
-      "colActionsAria": "Mga aksyon sa hilera ng mga aksyong hilera.",
+      "colActionsAria": "Mga aksyon sa hilera",
       "selectRowAria": "Piliin ang hilera ng paghahanap na ito.",
       "copyRowTitle": "Kopyahin ang paghahanap na ito bilang JSON.",
       "suppressedBadge": "Nag-iiwan",
@@ -1220,53 +1220,53 @@
       "metaShown": "{filtered} ang ipinakita",
       "metaAfterDisable": "{total} pagkatapos ng disabled-rule filter",
       "metaSourceCap": "source na may cap sa {max} para sa pagganap ng performance.",
-      "metaGroupedBy": "na pinagsama sa pamamagitan ng {mode}.",
+      "metaGroupedBy": "nakapangkat ayon sa {mode}",
       "overflowNote": "Ang listahan ng mga mapagkukunan ay pinutol sa {max} para sa pagganap ng render.",
-      "runAgain": "Patakbuhin muli ang pagsusuri.",
+      "runAgain": "Patakbuhin muli ang pagsusuri",
       "emptyNoViolations": "Walang mga paglabag sa huling pag-aaral na tumakbo.",
       "emptyNoMatch": "Walang mga paglabag na tumutugma sa kasalukuyang mga filter.",
       "emptyHintNoData": "Patakbuhin ang pagsusuri upang i-populate ang `reports/.saropa_lints/violations.json`, pagkatapos ay i-refresh.",
       "emptyHintFilters": "I-adjust ang mga filter o patakbuhin muli ang pagsusuri upang makita ang mga natuklasan.",
-      "reRunAnalysis": "Re-run analysis ay isang pagsusuri sa pagrere-run.",
-      "resetFilters": "I-reset ang mga filter ng pag-set.",
+      "reRunAnalysis": "Patakbuhin muli ang pagsusuri",
+      "resetFilters": "I-reset ang mga filter",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "Paghihiwalayin ang mga tsart ng pagsasama.",
+      "sectionAria": "Mga chart ng komposisyon",
       "heading": "Haluin",
       "metaClickSlice": "Mag-click sa isang slice upang i-filter.",
-      "severityMix": "Pagsasama ng pag-aalinlangan sa kalubhaan.",
+      "severityMix": "Komposisyon ng kalubhaan",
       "filterBarTitle": "I-filter sa {key} lamang.",
       "donutTotal": "kabuuan"
     },
     "todoHack": {
-      "sectionAria": "Ang mga TODO at HACKS ay may kasamang pag-aari.",
-      "headingDisabled": "TODOs & HACKS ang lahat ng bagay.",
-      "metaDisabled": "scan disabled hindi na magagamit",
+      "sectionAria": "Mga TODO at HACK",
+      "headingDisabled": "Mga TODO & HACK",
+      "metaDisabled": "naka-disable ang scan",
       "scanOff": "Naka-off ang pag-scan sa workspace — paganahin ang paglabas ng mga marker mula sa mga file ng proyekto.",
-      "enableScan": "Pag-enable ng scan scan ay maaaring gawin.",
-      "heading": "TODOs & HACKS ang lahat ng bagay.",
+      "enableScan": "Paganahin ang scan",
+      "heading": "Mga TODO & HACK",
       "subsectionNone": "{title}: wala sa saklaw ng scan.",
       "capNote": "Ang pag-scan ay umabot sa limitasyon ng file nito, kaya ang ilang mga file ay pinalampas.",
       "raiseCap": "Itaas ang limitasyon ng limitasyon.",
       "notePill": "tala",
       "todosLabel": "Mga TODO",
-      "hacksLabel": "HACKS ang mga hacks."
+      "hacksLabel": "MGA HACK"
     },
     "drift": {
       "sectionAria": "Drift Advisor",
       "headingOff": "Drift Advisor",
-      "metaOff": "integrasyon off integration off ang mga ito ay",
+      "metaOff": "naka-off ang integration",
       "enableBlurb": "Pag-enable ng pagsasama sa Drift Advisor upang magpakita ng mga mungkahi sa database dito.",
       "enable": "Paganahin",
       "headingNoServer": "Drift Advisor",
       "metaNoServer": "Walang server walang server.",
       "noServerBlurb": "Walang Drift Advisor server na natagpuan sa naka-configure na mga port.",
-      "retry": "Subukan muli ang Retry.",
+      "retry": "Subukang muli",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "Nakaka-connect na connected.",
+      "metaConnected": "nakakonekta",
       "noIssues": "Nakakonekta sa {label} — walang kasalukuyang isyu.",
-      "refresh": "Magpahinga at mag-refresh.",
+      "refresh": "I-refresh",
       "openBrowser": "Buksan sa browser ng browser.",
       "headingIssues": "Drift Advisor",
       "disable": "I-disable ang Drift Advisor ng Drift"
@@ -1288,16 +1288,16 @@
       "columnAction": "Aksyon"
     },
     "suppressions": {
-      "sectionAria": "Mga suppression ng mga pang-aapi.",
-      "headingExport": "Suppression (pag-export) ng mga bagay na hindi dapat i-edit.",
-      "viewHidesHeading": "Issues view hides nagtatago ng mga isyu",
+      "sectionAria": "Mga suppression",
+      "headingExport": "Mga suppression (export)",
+      "viewHidesHeading": "Itinatago ng view ng Issues",
       "viewHidesMetaActive": "aktibo",
       "viewHidesMetaNone": "wala",
       "noneInExport": "Walang mga pagsugpo sa analyzer sa kasalukuyang pag-export ng `violations.json`. Patakbuhin ang pagsusuri pagkatapos ng pag-edit ng mga hindi pinapansin o mga baseline upang i-populate.",
       "totalRow": "Kabuuan — i-clear ang mga filter at buksan ang Findings",
       "byRule": "Sa pamamagitan ng panuntunan ({count})",
       "byFile": "Sa pamamagitan ng file ({count})",
-      "noEntries": "Walang entry. walang entries.",
+      "noEntries": "Walang entry.",
       "nothingHidden": "Walang nakatagong mula sa listahan ng mga Isyu sa workspace na ito. Gamitin ang mga aksyon ng konteksto ng puno upang itago ang mga folder, file, o patakaran; nagpapatuloy sila sa estado ng workspace.",
       "folderPattern": "{count} na folder",
       "filePattern": "{count} na file pattern",
@@ -1308,7 +1308,7 @@
       "activeHides": "Aktibong mga balat: {counts}. .",
       "viewHidesFooter": "Ang mga hides na ito ay nagpapakaunti lamang sa listahan ng Issues / dashboard; hindi sila nakasulat sa `violations.json`.",
       "clearViewHides": "I-clear ang lahat ng view hides nagtatago",
-      "foldersSample": "Mga folder (sample) ng mga folder.",
+      "foldersSample": "Mga folder (sample)",
       "filesSample": "Mga file / globs (tulad)",
       "rulesSample": "Mga Panuntunan (sample)",
       "perFileRulesSample": "Mga patakaran sa bawat file (sample)"
@@ -1317,12 +1317,12 @@
       "announceCleared": "Ang lahat ng mga filter ay pinawi.",
       "announceFiltersPrefix": "Mga filter: Filter ng mga filters:",
       "announceStarted": "Sinimulan ang pagsusuri.",
-      "announceComplete": "Pagsusuri kumpleto kumpletong pagsusuri.",
+      "announceComplete": "Kumpleto ang pagsusuri",
       "announceFailed": "Ang pagsusuri ay nabigo.",
-      "removeRecentAria": "Alisin ang alisan ng pag-alis",
-      "removeRecentTitle": "Alisin ang alisan ng pag-alis",
+      "removeRecentAria": "Alisin",
+      "removeRecentTitle": "Alisin",
       "bulkSelectedTpl": "{n} ang pinili",
-      "announceSearchVerb": "Naglalakad",
+      "announceSearchVerb": "Naghahanap",
       "severitiesNoun": "severitys",
       "impactsNoun": "nag-apekto"
     },
@@ -1332,7 +1332,7 @@
     },
     "shortcuts": {
       "focusTextFilter": "I-focus ang text filter sa iyong mga mata.",
-      "clearTextFilter": "I-clear ang naka-focus na text filter sa pamamagitan ng pag-click.",
+      "clearTextFilter": "I-clear ang naka-focus na text filter",
       "activateKpi": "I-activate ang nakatuon na KPI card o chart bar ng tsart.",
       "activateKpiSpace": "I-activate ang nakatuon na KPI card o chart bar ng tsart.",
       "showOverlay": "Ipakita ang shortcut na ito overlay."
@@ -1341,7 +1341,7 @@
     "supplementary": {
       "scannerPromo": "Pag-enable ng TODO / HACK scanner sa pag-scanning.",
       "tooltipScanner": "Saropa file-system scanner — binibilang ang mga bukas na TODO/HACK marker sa pinagmulan.",
-      "tooltipPromoClickToOn": "Mag-click upang paganahin ang pagana ng mga ito."
+      "tooltipPromoClickToOn": "I-click para paganahin"
     }
   },
   "ruleExplain": {
@@ -1362,18 +1362,18 @@
   },
   "triageDash": {
     "showInIssues": "Ipakita sa mga Isyu",
-    "disableRules": "I-disable ang mga patakaran sa pag-aalis ng panuntunan.",
+    "disableRules": "I-disable ang mga panuntunan",
     "enableRules": "Paganahin ang mga panuntunan",
-    "issues": "Isyu ng mga isyu.",
+    "issues": "Mga Isyu",
     "off": "Naka-off",
-    "on": "Sa pamamagitan ng pag-click sa itaas, maaari mong i-download ang mga ito.",
+    "on": "Naka-on",
     "colRule": "Panuntunan",
-    "colIssues": "Isyu ng mga isyu.",
+    "colIssues": "Mga Isyu",
     "zeroIssueRules": "{count} na rule na walang isyu — awtomatikong pinagana sa tier.",
     "disabledOverrides": "{count} na rule ang naka-disable dahil sa override sa `analysis_options_custom.yaml`.",
-    "summaryRuleTriage": "Panuntunan sa pag-triage ng triage.",
+    "summaryRuleTriage": "Triage ng panuntunan",
     "hintNoViolations": "Wala pang `reports/.saropa_lints/violations.json`. Patakbuhin ang pagsusuri, pagkatapos ay i-refresh ang tab na ito.",
-    "hintUnreadable": "Walang mababasa na mga paglabag export.export. Magpatakbo ng Saropa Lints analysis muna.",
+    "hintUnreadable": "Walang nababasang export ng mga paglabag. Patakbuhin muna ang pagsusuri ng Saropa Lints.",
     "hintStale": "Maaaring hindi na nauugnay ang data ng triage (ang pag-export ay {age} lumang). Re-run analysis para sa mga kasalukuyang grupo.",
     "hintNoPerRule": "Ang pag-export na ito ay walang per-rule issue counts. Re-analyze gamit ang isang kasalukuyang Saropa Lints plugin.",
     "hintBuildFailed": "Hindi maaaring bumuo ng triage mula sa pag-export na ito. Magpatakbo ng isang bagong pagsusuri.",
@@ -1383,7 +1383,7 @@
   "kbdOverlay": {
     "toggleTitle": "Ipakita ang mga shortcut ng keyboard (?)",
     "toggleAria": "Ipakita ang mga keyboard shortcut.",
-    "dialogTitle": "Mga shortcut sa keyboard ng keyboard",
+    "dialogTitle": "Mga keyboard shortcut",
     "closeAria": "Isara ang mga shortcut ng keyboard.",
     "footer": "I-press ang Esc o i-click sa labas upang isara."
   },
@@ -1413,11 +1413,11 @@
       "fullReport": "Buong ulat",
       "fullReportDesc": "I-export ang komprehensibong report ng paggamit ng feature (bawat inilalarawan na package, bawat mininung silang feature sa changelog) bilang isang HTML/Markdown/JSON file at i-open ito.",
       "fullReportGenerating": "Nag-generate ng buong report — bawat inilalarawan na package, bawat naitala na feature sa changelog. Ito ay nag-iiwan ng isang scan at nagsisimula sa cache hanggang sa i-re-scan mo ito.",
-      "knownIssues": "Nararapat na mga isyu",
+      "knownIssues": "Mga kilalang isyu",
       "knownIssuesDesc": "Surfing mga kilalang mga kahinaan at mga advisory na inilabas laban sa iyong mga dependency.",
-      "compare": "Ihambing ihambing Iparating",
+      "compare": "Ihambing",
       "compareDesc": "Sukatin ang dalawang o higit pang mga package sa iba't ibang aspeto tulad ng score, size, at activity.",
-      "settings": "Mga Pag-aayos ng Settings",
+      "settings": "Mga Setting",
       "openButton": "Ibigay ang {tab}"
     },
     "settingsTab": {
@@ -1428,74 +1428,74 @@
         "scan": "I-scan",
         "display": "Ipakita",
         "weights": "Mga Timbang ng Iskor",
-        "upgrade": "Mag-upgrade ng Upgrade na Pagpapahusay",
+        "upgrade": "I-upgrade",
         "watch": "Suriin",
         "budget": "Budjet",
         "vuln": "Mga Susosyal"
       }
     },
     "detailPane": {
-      "aria": "Mga detalye ng pakete sa pakete",
-      "title": "Mga detalye ng pakete sa pakete",
-      "close": "Malapit na detalye ng detalyadong detalye.",
+      "aria": "Detalye ng package",
+      "title": "Detalye ng package",
+      "close": "Isara ang detalye",
       "copyForAi": "Kopyahin ang pag-upgrade ng prompt para sa AI."
     },
     "status": {
       "packagesCount": "{count} na package",
       "packagesBreakdown": "{direct} direkta, {transitive} transitive",
-      "gradeLine": "Grade {grade} · {avg}/100 Ang antas ng pag-aaral ay",
+      "gradeLine": "Grado {grade} · {avg}/100",
       "flaggedCount": "{count} na na-flag",
       "flaggedTitle": "Iniwan o nasa dulo ng buhay.",
-      "lastScanLabel": "Sincan ang {when} ng scanner.",
+      "lastScanLabel": "Na-scan {when}",
       "lastScanTitle": "Kapag kinuha ang data ng dashboard na ito — {timestamp}. I-click upang muling i-scan at tingnan kung may mga update sa package.",
       "lastScanUnknown": "Nascan (hindi alam ang oras)",
       "lastScanUnknownTitle": "Ang pag-scan na ito ay tumakbo bago ang dashboard track timestamps. Mag-click upang muling i-scan at suriin ang mga update ng package."
     },
     "time": {
-      "justNow": "Ngayon lang, ngayon lamang.",
+      "justNow": "ngayon lang",
       "minutesAgo": "{min}m nakalipas",
       "hoursAgo": "{hr}o nakalipas",
       "daysAgo": "{day}a nakalipas"
     },
     "scanning": {
-      "heading": "Mga pakete ng pag-scan ng mga scanning packages.",
+      "heading": "Sini-scan ang mga package",
       "body1": "Kinukuha ng Saropa ang metadata ng pub.dev, aktibidad ng GitHub, at mga graph ng dependency para sa bawat direktang dependency sa proyektong ito.",
       "body2": "Ang pahinang ito ay awtomatikong mag-refresh kapag natapos ang pag-scan. Maaari kang mag-cancel mula sa notification ng progreso sa ibaba kanan.",
       "versionStamp": "Dashboard ng Package ng Saropa v{version}"
     },
     "progress": {
-      "aria": "Pakete pag-scan progreso ng pagsisimula",
-      "starting": "Simulan ang pag-scan ..."
+      "aria": "Progreso ng pag-scan ng package",
+      "starting": "Sinisimulan ang scan…"
     },
-    "gaugeTitle": "Project Package Grade: {grade} Ang antas ng pakete ay ...",
+    "gaugeTitle": "Grado ng mga Package ng Proyekto: {grade}",
     "summary": {
       "packages": "Mga package",
       "projectGrade": "Project Package Grade ng Pagpaplano",
       "totalSize": "Total na laki*",
       "gradeTooltip": "Grade ng proyekto {avgGrade}\nAverage na marka: {avgScore}/100\nMga Package: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "Mabilis na buhay.",
-      "stableTitle": "Ang Stable ay matatag.",
+      "stableTitle": "Matatag",
       "outdatedTitle": "Luma na",
       "abandonedTitle": "Iniwan at iniwan.",
       "eolTitle": "Ang dulo ng buhay.",
-      "updates": "Mga Update ng Pag-update",
-      "unused": "Hindi ginagamit na hindi ginamit.",
-      "singleUse": "Isang beses lamang gamitin na mga produkto.",
-      "vulnerable": "Mapagmahal na mahina ang mga mahihirap.",
-      "overrides": "Nag-iwan ng pansin ang mga overrides.",
+      "updates": "Mga Update",
+      "unused": "Hindi ginagamit",
+      "singleUse": "Isang beses gamitin",
+      "vulnerable": "Bulnerable",
+      "overrides": "Mga override",
       "caveatLine1": "*Mga ipinapakitang laki ng code (lib + idineklarang asset), bumabalik sa laki ng archive ng pub.dev kapag hindi available ang laki ng code. Hindi kasama ang dev_dependencies (build_runner, lints, saropa_lints, atbp.) — hinding-hindi sila nagpapadala sa APK / IPA / web bundle. Ang aktwal na laki ng app ay magiging mas maliit pagkatapos ng pagyanig ng puno.",
       "caveatLine2": "Mga threshold ng aktibidad: 90d = stale, 180d = dormant (pagkakatiwalaan + mga timeline sa pagpapalaya).",
       "upgradeTitle": "Pangangailangan ng Pag-Upgrade"
     },
     "breakdown": {
       "title": "Bakit grade {grade}? — {avgScore}/100 average sa {pkgCount} na mga pakete",
-      "hint": "Mag-click upang palawakin ang pagbubukas.",
-      "distributionHeading": "Ang pamamahagi ng distribusyon ay naka-set up.",
+      "hint": "I-click para palawakin",
+      "distributionHeading": "Distribusyon",
       "signalsHeading": "Mga signal ng panganib na nag-aalis sa score down.",
       "signalFlagged": "{count} na may bandila (tinataya / end-of-life)",
       "signalVulnerable": "{count} na may mga kilalang kahinaan.",
       "signalUpdates": "{count} may mga update na magagamit.",
-      "bottomHeading": "Ang mga pakete na may pinakamababang marka ay ang mga pakket na may pinakamataas na puntos.",
+      "bottomHeading": "Mga package na may pinakamababang iskor",
       "thresholdsHeading": "Paano ang mga marka ay mapa sa mga grado.",
       "thresholdA": "70+ — Vibrant: aktibong pinananatili, kamakailang na-publish",
       "thresholdB": "40–69 — Matatag: pinananatili pa rin ngunit bumabagal",
@@ -1509,26 +1509,26 @@
       "summary": "Network ng mga Dependency"
     },
     "sections": {
-      "sizeDistribution": "Pagpapalaganap ng laki Distribusyon sa sukat",
+      "sizeDistribution": "Distribusyon ng Laki",
       "sizeDistributionCaption": "Hindi kasama ang dev_dependencies — hindi sila kailanman nagpapadala sa APK / IPA / web bundle.",
-      "filters": "Mga filter ng mga Filter",
+      "filters": "Mga Filter",
       "packages": "Mga package"
     },
     "toolbar": {
       "openPubspecTitle": "Buksan ang pubspec.yaml.",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Kopyahin ang ulat JSON (lahat ng mga hilera + detalye)",
-      "copyAllLabel": "Kopya kopya kopyas kopyas",
+      "copyAllLabel": "Kopyahin",
       "copyOpportunitiesTitle": "Kopyahin ang mga pag-upgrade ng AI na prompt para sa nangungunang under-adopted packages sa isang paste.",
       "copyOpportunitiesLabel": "Kopyahin ang mga pagkakataon para sa AI.",
       "saveAllTitle": "I-save ang JSON ng ulat sa mga ulat/YYY YMMDD/...",
       "saveAllLabel": "I-save",
       "saveUpgradeTitle": "I-save ang isang ulat ng mga pakete lamang na may magagamit na pag-update sa mga ulat / YYYYMMDD/...",
-      "saveUpgradeLabel": "I-save ang Pagpapahusay ng Report sa Upgrade.",
+      "saveUpgradeLabel": "I-save ang Ulat ng Upgrade",
       "resetViewTitle": "I-reset ang mga filter, i-sort at maiimbak ang estado ng view.",
-      "resetViewLabel": "Ang reset view ay ang pag-reset ng mga setting.",
+      "resetViewLabel": "I-reset ang view",
       "rescanTitle": "I-scan muli ang mga pakete — ki-clear ang cache ng pub.dev at muling kinukuha ang mga bersyon",
-      "rescanLabel": "Rescan muli ang iyong mga mata.",
+      "rescanLabel": "I-scan muli",
       "openOtherTitle": "Buksan ang isa pang proyekto ng pubspec.yaml sa isang bagong window para sa Vibrancy scan.",
       "openOtherLabel": "Buksan ang Proyekto ...",
       "footprintGroupAria": "Size column footprint mode Mode Ang laki ng haligi sa ilalim ng mga paa",
@@ -1537,23 +1537,23 @@
       "footprintOwnTitle": "Ang sariling laki ng code lamang (lib + ipinahayag na mga asset); bumabalik sa pub.dev archival size kapag hindi magagamit.",
       "footprintOwn": "Pag-aari",
       "footprintUniqueTitle": "Ang sariling laki + mga transitives na ginagamit lamang ng dep (pag-iingat kung alisin mo ito)",
-      "footprintUnique": "+ Unikong natatangi.",
+      "footprintUnique": "+ Natatangi",
       "footprintTotalTitle": "sariling laki + lahat ng mga transitives, kabilang ang iba pang ibinabahagi sa ibang dept.",
-      "footprintTotal": "+ Lahat ng mga + Lahat.",
-      "searchLabel": "Paghahanap ng mga pakete sa paghahanap.",
+      "footprintTotal": "+ Lahat",
+      "searchLabel": "Maghanap ng package",
       "searchPlaceholder": "Maghanap ng mga pakete...",
-      "clearSearchTitle": "I-clear ang paghahanap sa paghahanap.",
-      "clearSearchAria": "I-clear ang paghahanap sa paghahanap.",
+      "clearSearchTitle": "I-clear ang paghahanap",
+      "clearSearchAria": "I-clear ang paghahanap",
       "ageFilterTitle": "I-filter ayon sa edad ng paglalathala.",
-      "publishedAgeLabel": "Na-publish na edad ng edad.",
+      "publishedAgeLabel": "Edad mula nang i-publish",
       "ageMaxAll": "Lahat",
       "presetFilterTitle": "Mag-apply ng mabilis na filter presets.",
       "presetLabel": "Preset",
       "presetNone": "wala",
-      "presetModernization": "Pag-modernize ng Modernizasyon",
+      "presetModernization": "Modernisasyon",
       "presetRiskHotspots": "Panganib na mga hotspot",
-      "presetCleanup": "Mga kandidato sa paglilinis ng mga kandidato.",
-      "presetDirectOnly": "Direkta lamang ang direktang.",
+      "presetCleanup": "Mga kandidato sa paglilinis",
+      "presetDirectOnly": "Direkta lamang",
       "devToggleTitle": "Isama ang mga dependency ng dev sa talahanayan at kabuuan.",
       "includeDev": "Isama ang dev dev.",
       "activeFiltersLabel": "Aktibong mga filter:",
@@ -1569,11 +1569,11 @@
         "tooltip": "In-install na bersyon mula sa pubspec.lock."
       },
       "score": {
-        "label": "Mga kategorya ng Kategoryang Kategoriya",
+        "label": "Kategorya",
         "tooltip": "Pag-uuri ng vibrancy at marka ng kalusugan (0–10)"
       },
       "published": {
-        "label": "Na-publish na Inilathala",
+        "label": "Na-publish",
         "tooltip": "Ang petsa ng naka-install na bersyon ay nai-publish sa pub.dev."
       },
       "activity": {
@@ -1585,11 +1585,11 @@
         "tooltip": "pub.dev likes — i-click para buksan ang page ng score ng package"
       },
       "downloads": {
-        "label": "Downloads Pag-download ng mga file",
+        "label": "Mga download",
         "tooltip": "pub.dev download sa nakalipas na 30 araw — i-click para buksan ang page ng marka ng package"
       },
       "issues": {
-        "label": "Isyu ng mga isyu.",
+        "label": "Mga Isyu",
         "tooltip": "Buksan ang mga isyu ng GitHub (hindi kasama ang mga kahilingan sa pag-drag kapag magagamit)"
       },
       "prs": {
@@ -1605,19 +1605,19 @@
         "tooltip": "Direktang transitive dependencies — naka-highlight ang mga shared deps"
       },
       "files": {
-        "label": "Mga sanggunian ng mga sanggutan",
+        "label": "Mga sanggunian",
         "tooltip": "Bilang ng mga source file na nag-import ng package na ito — i-click upang maghanap"
       },
       "transitives": {
-        "label": "Ang mga transitives ay ang mga transitive.",
+        "label": "Mga transitive",
         "tooltip": "Bilang ng mga transitive (indirect) na dependencies ang package na ito ay nakukuha sa."
       },
       "vulns": {
-        "label": "Ang mga Vulns ay mga Vuln.",
+        "label": "Mga kahinaan",
         "tooltip": "Kilalang mga kahinaan sa seguridad mula sa OSV at GitHub Advisory database."
       },
       "license": {
-        "label": "Lisensya ng lisensya License.",
+        "label": "Lisensya",
         "tooltip": "SPDX lisensiya identifier mula sa pub.dev"
       },
       "update": {
@@ -1625,7 +1625,7 @@
         "tooltip": "Available na pag-update ng bersyon: pangunahing, menor de edad o patch."
       },
       "opportunities": {
-        "label": "Mga pagkakataon ng mga oportunidad.",
+        "label": "Mga pagkakataon",
         "tooltip": "Mga tampok sa package na ito sa changelog na hindi pa ginamit sa iyong code — sort upang mahanap ang pinakamalawak na hindi pa inilalagay na mga package"
       },
       "status": {
@@ -1633,14 +1633,14 @@
         "tooltip": "Usage status: kung ang package ay lilitaw na hindi ginagamit sa iyong code."
       },
       "description": {
-        "label": "Paglalarawan Description Deskripsyon",
+        "label": "Paglalarawan",
         "tooltip": "Paglalarawan ng pakete mula sa pub.dev."
       }
     },
     "cells": {
       "noGithub": "Walang GitHub na imbakan ang natagpuan.",
       "devBadge": "dev",
-      "transitiveBadge": "transitive na may kaugalian.",
+      "transitiveBadge": "di-tuwiran",
       "opportunitiesTooltip": "Mga hindi ginagamit na mga tampok: {features}",
       "publishDateUnavailable": "Hindi available ang petsa ng pag-publish mula sa pub.dev.",
       "activityGradeUnavailable": "Hindi magagamit ang antas ng aktibidad (na nawawala ang data sa pag-commit o release)",
@@ -1650,13 +1650,13 @@
       "downloadsUnavailable": "pub.dev 30-araw na pag-download ay hindi magagamit.",
       "downloadsCount": "{count} mga pag-download sa huling 30 araw.",
       "sizeUnavailable": "Ang laki ay hindi magagamit mula sa pub.dev.",
-      "noVulnerabilities": "Walang mga kilalang kahinaan na kilala.",
+      "noVulnerabilities": "Walang kilalang kahinaan",
       "licenseUnspecified": "Lisensya hindi tinukoy sa pub.dev.",
-      "unusedBadge": "Hindi ginagamit na hindi ginamit.",
+      "unusedBadge": "Hindi ginagamit",
       "packageInUse": "Pakete ay ginagamit na pakete."
     },
     "row": {
-      "expandDetails": "Palawakin ang mga detalye ng detalye.",
+      "expandDetails": "Palawakin ang mga detalye",
       "copyRowJson": "Kopyahin ang hilera bilang JSON."
     },
     "shortcuts": {
@@ -1670,23 +1670,23 @@
       "jumpToTab": "Pumunta sa tab 1-6 (Overview, Upgrades, Full report, Known issues, Compare, Settings)"
     },
     "versionTooltip": {
-      "installed": "Na-install: {version} ({date}) na may mga tampok ng pag-andar.",
+      "installed": "Naka-install: {version} ({date})",
       "latest": "Pinakabagong: {version}",
       "created": "Lumikha: {date}",
       "constraint": "Paghihigpit: {constraint}"
     },
     "healthTooltip": {
-      "grade": "Grade: {grade} Ang grado ay",
-      "resolutionVelocity": "Resolution bilis: {value} Ang bilis ng pag-resolbo ay ...",
+      "grade": "Grado: {grade}",
+      "resolutionVelocity": "Bilis ng Paglutas: {value}",
       "engagementLevel": "Ang antas ng pakikipag-ugnayan: {value}",
-      "popularity": "Popularidad: {value} Ang mga tao ay hindi nakikinig sa akin.",
-      "publisherTrust": "Publisher Trust: {value} Ang Pagtatapat ng Tagapaglathala:",
-      "codeCommits": "Code commits: {age} ago. sa loob ng isang taon na ang nakalipas",
+      "popularity": "Popularidad: {value}",
+      "publisherTrust": "Tiwala sa Publisher: {value}",
+      "codeCommits": "Mga code commit: {age} na ang nakalipas",
       "latestRelease": "Huling paglabas: {age} ago",
       "activitySignal": "Signal ng aktibidad: {signal}"
     },
     "size": {
-      "codeSize": "Code size: {size} Ang laki ng code ay:",
+      "codeSize": "Laki ng code: {size}",
       "archiveSize": "Ang laki ng archive: {size}",
       "onDisk": "Sa disk: {size}",
       "withUniqueTransitives": "Sa mga natatanging transitives: {size}.",
@@ -1697,8 +1697,8 @@
       "noImports": "Walang source file imports na natuklasan.",
       "reExportLine": "{location} (muling i-export)",
       "publicApiSurface": "Pampublikong API surface — kahit isang paggamit ay muling i-export.",
-      "reExportedBadge": "Re-exported muling nai-export na mga produkto.",
-      "openFileReferences": "Buksan ang mga sanggunian sa file ng Open File References."
+      "reExportedBadge": "Muling na-export",
+      "openFileReferences": "Buksan ang mga sanggunian sa file"
     },
     "deps": {
       "noTransitives": "Walang transitive dependency.",
@@ -1721,20 +1721,20 @@
     },
     "detail": {
       "codeCommitActivity": "Code commit Activity Paggawa ng aktibidad",
-      "releaseActivity": "Activity ng Release na Aktibidad sa Paglabas",
-      "dormancySignal": "Ang Dormancy Signal ay isang signal ng dormancy.",
+      "releaseActivity": "Aktibidad ng Release",
+      "dormancySignal": "Senyales ng Dormancy",
       "ago": "{age} nakaraan",
       "qualityExample": "+ halimbawa ng halimbawa",
       "qualityExampleTitle": "Nagpapadala ng isang runnable demo.",
       "qualityTests": "+mga pagsubok.",
       "qualityTestsTitle": "Nagpapadala ng isang test suite na suwit.",
-      "qualityTools": "+mga tool ng mga kasangkapan",
+      "qualityTools": "+mga tool",
       "qualityToolsTitle": "Mga tool ng tagapag-alaga ng barko.",
-      "qualityDocs": "+mga dokumento",
-      "qualityDocsTitle": "Ang mga barko ay pinalawak ang dokumentasyon sa dokumentasyon.",
+      "qualityDocs": "+docs",
+      "qualityDocsTitle": "May kasamang pinalawak na dokumentasyon",
       "healthScore": "Marka ng Kalusugan",
       "resolutionVelocity": "Resolution bilis ng resolusyon",
-      "engagementLevel": "Ang antas ng pakikipag-ugnayan sa Engagement Level.",
+      "engagementLevel": "Antas ng Pakikilahok",
       "popularity": "kasikatan",
       "publisherTrust": "Publisher Trust ng Tagapaglathala."
     }
@@ -1745,20 +1745,20 @@
     "heroTitle": "Saropa Katalogo ng Komando sa Catalogue",
     "status": {
       "internalHidden": "{count} context-menu lamang (nakatago)",
-      "wordCommands": "Mga utos ng mga commands.",
+      "wordCommands": "mga command",
       "wordCategories": "mga kategorya",
       "wordRecent": "kamakailan"
     },
     "search": {
       "placeholder": "Maghanap ng pamagat, paglalarawan o command id...",
-      "ariaLabel": "Maghanap ng mga utos sa paghahanap.",
-      "clearAria": "I-clear ang paghahanap sa paghahanap.",
+      "ariaLabel": "Maghanap ng mga command",
+      "clearAria": "I-clear ang paghahanap",
       "hintLine1": "Tumutugma sa bawat utos ng command.",
-      "hintStrongTitle": "titulo ng pamagat title title",
-      "hintStrongDesc": "Paglalarawan ng paglalarawan Description description.",
+      "hintStrongTitle": "pamagat",
+      "hintStrongDesc": "paglalarawan",
       "hintStrongId": "id",
       "hintLine2": "(Ang mga token ng id ay may pagitan din - uri",
-      "hintLine2kbd": "Patakbuhin ang pagsusuri ng run analysis.",
+      "hintLine2kbd": "patakbuhin ang pagsusuri",
       "hintLine2End": "walang mga tuldok)."
     },
     "toolbar": {
@@ -1766,10 +1766,10 @@
       "collapseAll": "Bumagsak lahat ng mga ito."
     },
     "recentPopover": {
-      "title": "Mga kamakailang paghahanap sa mga nakaraang paghahanap.",
+      "title": "Mga kamakailang paghahanap",
       "clearTitle": "I-clear ang lahat ng mga kamakailang paghahanap.",
       "clearButton": "Maaliwalas",
-      "listAria": "Mga kamakailang paghahanap sa mga nakaraang paghahanap."
+      "listAria": "Mga kamakailang paghahanap"
     },
     "filterChips": {
       "ariaRegion": "Aktibong mga filter ng aktibo.",
@@ -1777,15 +1777,15 @@
       "clearAll": "Malinaw ang lahat, malinis."
     },
     "bands": {
-      "frequentTitle": "Madalas madalas na madalas.",
+      "frequentTitle": "Madalas",
       "frequentHint": "Karamihan sa ginagamit sa iyong mga sesyon.",
-      "recentTitle": "Kamakailan kamakailan Bagong",
+      "recentTitle": "Kamakailan",
       "recentClear": "Maaliwalas",
       "recentHint": "Mag-click upang magpatakbo muli · Pinakamahusay na bago muna"
     },
     "noResults": {
       "message": "Walang mga utos na tumutugma sa iyong paghahanap.",
-      "reset": "I-reset ang mga filter ng pag-set."
+      "reset": "I-reset ang mga filter"
     },
     "entry": {
       "internalBadgeTitle": "Nag-trigger mula sa mga context menu lamang.",
@@ -1808,11 +1808,11 @@
       "runSingular": "tumakbo",
       "runPlural": "tumatakbo",
       "recentWord": "kamakailan",
-      "expandAll": "Palawakin ang lahat ng mga ito.",
+      "expandAll": "Palawakin lahat",
       "collapseAll": "Bumagsak lahat ng mga ito.",
       "searchChip": "Paghahanap: \"{query}\"",
       "internalChip": "Ipinapakita ang mga utos ng menu sa konteksto.",
-      "removeFilterPrefix": "Alisin ang filter ng pag-alis.",
+      "removeFilterPrefix": "Alisin ang filter ",
       "matchOne": "{count} na match",
       "matchOther": "{count} na match"
     }
@@ -1822,38 +1822,38 @@
     "skipToTable": "Skip sa mga function table na may talahanayan.",
     "openWorkspaceFirst": "Buksan muna ang isang Dart/Flutter workspace.",
     "scan": {
-      "title": "Pag-scan ng proyekto sa kalusugan ng kalusugan",
+      "title": "Sini-scan ang kalusugan ng proyekto",
       "subtitle": "Pagbabasa ng iyong code. Ang dashboard ay pumupuno habang natututo pa ang scan.",
-      "waiting": "Simulan ang pag-scan ...",
+      "waiting": "Sinisimulan ang scan…",
       "launching": "Paglulunsad ng scanner ...",
       "collect": "Pagtuklas ng mga file ...",
       "firstRunHint": "Ang unang pagtakbo ay nag-compile ng scanner; ang malalaking proyekto ay tumatagal ng ilang sandali bago lumitaw ang mga file.",
-      "paused": "Pinasara ang Paused na pinasukan",
-      "stopped": "Tumigil ang scan at tumitigil na rin ang scanning.",
+      "paused": "Naka-pause",
+      "stopped": "Huminto ang scan",
       "elapsed": "Naglabas na panahon.",
       "phase": {
-        "parse": "Pag-parse ng mga file sa pag-parsing.",
-        "history": "Pagbabasa ng git history sa pag-aaral.",
+        "parse": "Pina-parse ang mga file",
+        "history": "Binabasa ang git history",
         "blame": "Pag-aaral ng computer code edad.",
-        "usage": "Bilangin ang mga sanggunian ng pag-uuri.",
-        "score": "Mga function ng pag-scoring sa mga puntos."
+        "usage": "Binibilang ang mga sanggunian",
+        "score": "Binibigyan ng iskor ang mga function"
       },
       "counter": {
-        "files": "Mga file ng mga file.",
+        "files": "Mga file",
         "functions": "Mga pag-andar",
-        "problems": "Natagpuan ang mga problema natagpuan."
+        "problems": "Mga natagpuang problema"
       },
       "counters": {
-        "aria": "Live scan counters ng mga live na pag-scan."
+        "aria": "Mga live na counter ng scan"
       },
       "controls": {
-        "aria": "Mag-scan ng mga kontrol sa pagkontrol."
+        "aria": "Mga kontrol ng scan"
       },
       "btn": {
-        "pause": "Pag-iwan ng pahinga Pause",
+        "pause": "I-pause",
         "resume": "Magpatuloy sa resume.",
         "restart": "I-restart",
-        "cancel": "Kanselahin I-cancel ang pagkansela"
+        "cancel": "Kanselahin"
       },
       "preview": {
         "heading": "Mga problema na natagpuan hanggang ngayon.",
@@ -1861,7 +1861,7 @@
       },
       "version": {
         "engine": "makina",
-        "detecting": "pagtuklas ... pagtuklasin...",
+        "detecting": "tinutukoy…",
         "legacy": "legacy — walang live na pag-unlad (nauna na ang saropa_lints ng proyektong ito)"
       }
     },
@@ -1875,8 +1875,8 @@
       "functionOne": "{count} na function",
       "functionOther": "{count} na function",
       "avgFormat": "avg {score} ({grade})",
-      "gatesFailing": "Mga pintuan na nabigo sa pagkabigo.",
-      "gatesPassing": "Mga pintuan na dumadaan sa pagdaan."
+      "gatesFailing": "mga gate na bumabagsak",
+      "gatesPassing": "mga gate na pumapasa"
     },
     "gate": {
       "fallback": "Nabigo ang mga gate ng kalidad — suriin ang mga threshold sa mga setting ng Code Health.",
@@ -1886,49 +1886,49 @@
       "openSettingsButton": "Open Code Mga setting ng kalusugan"
     },
     "kpi": {
-      "ariaLabel": "Code health summary ng mga sumusunod na bagay:",
+      "ariaLabel": "Buod ng kalusugan ng code",
       "allClear": "Walang na-flag na function sa anumang kategorya — malinaw ang lahat.",
       "clickToFilter": "Mag-click upang i-filter ang talahanayan sa mga function na may bandila {flag}.",
       "noFlagged": "Walang mga function na may flag {flag}.",
-      "unused": "Hindi ginagamit na hindi ginamit.",
+      "unused": "Hindi ginagamit",
       "unusedSub": "mga function na hindi binabanggit kahit saan.",
-      "uncovered": "Hindi natatakpan na hindi nakasaklaw.",
+      "uncovered": "Hindi saklaw",
       "uncoveredSub": "walang LCOV coverage na may mga LCOv.",
       "stubTested": "Na-test gamit ang stub",
       "stubTestedSub": "Mayroong mga pagsubok ngunit ang ilang pag-aangkin ay hindi gaanong tumitiyak.",
-      "suspiciousCoverage": "Ang mga suspek na saklaw ng ulat ay sumuspetsa.",
-      "suspiciousCoverageSub": "ang saklaw ay mukhang gawa-gawa na ginawa.",
+      "suspiciousCoverage": "Kahina-hinalang coverage",
+      "suspiciousCoverageSub": "mukhang gawa-gawa ang coverage",
       "testDrift": "Test drift",
       "testDriftSub": "Ang mga pagsubok lag ang function function na may lag."
     },
     "toolbar": {
-      "ariaLabel": "Code Mga aksyon sa kalusugan ng mga pagkilos",
+      "ariaLabel": "Mga aksyon ng Code Health",
       "rescanTitle": "I-re-run ang Code Health scan at i-refresh ito dashboard.",
-      "rescan": "Rescan muli ang iyong mga mata.",
+      "rescan": "I-scan muli",
       "copyJsonTitle": "Kopyahin ang raw na Code Health JSON sa clipboard.",
       "copyJson": "Kopyahin ang JSON.",
       "settingsTitle": "Buksan ang mga setting ng Code Health.",
-      "settingsButton": "Code Mga setting ng kalusugan sa kalusugan",
+      "settingsButton": "Mga setting ng Code Health",
       "filterTitle": "I-filter ang mga hilera ayon sa pangalan, file o flag.",
-      "filterLabel": "Mga hilera ng filter Filter na linya",
+      "filterLabel": "I-filter ang mga hilera",
       "filterPlaceholder": "Mga hilera ng filter ..."
     },
     "table": {
       "ariaLabel": "Pinakamasama na mga function ayon sa puntos ng markahan.",
-      "heading": "Worst function ay ang mga gawaing ito.",
-      "colScore": "Skor ng puntos na may marka.",
+      "heading": "Pinakamasamang mga function",
+      "colScore": "Iskor",
       "colFunction": "Function",
       "colFile": "file",
       "colLine": "Linya",
-      "colUsage": "Paggamit ng paggamit Gamit.",
-      "colCoverage": "Pagtatanggol ng Saklaw sa Coverage",
-      "colComplexity": "Kompleksidad ng pagiging kumplikado.",
-      "colFlags": "Mga bandila mga watawat.",
+      "colUsage": "Paggamit",
+      "colCoverage": "Saklaw",
+      "colComplexity": "Pagiging kumplikado",
+      "colFlags": "Mga flag",
       "noMatch": "Walang mga function na tumutugma sa kasalukuyang filter.",
       "resetFiltersTitle": "I-clear ang paghahanap at anumang aktibong filter ng flag.",
-      "resetFilters": "I-reset ang mga filter ng pag-set.",
+      "resetFilters": "I-reset ang mga filter",
       "expanderAriaCollapsed": "Ipakita ang mga detalye ng isyu.",
-      "expanderAriaExpanded": "Itago ang mga detalye ng isyu sa Hide.",
+      "expanderAriaExpanded": "Itago ang mga detalye ng isyu",
       "detailHeading": "Bakit ang function na ito ay nakakuha ng {score}?",
       "detailNoIssues": "Walang mga flag sa row na ito — ang marka ay hinihimok ng mga value ng column sa itaas (paggamit, saklaw, pagiging kumplikado, edad, dokumentasyon).",
       "suppressLabel": "I-suppress sa file na ito.",
@@ -1941,8 +1941,8 @@
         "rule": "Flagged kapag walang ibang file na tumutukoy sa function name."
       },
       "uncovered": {
-        "label": "hindi natatakpan na walang takip.",
-        "evidence": "{pct}% mga pagsubok sa pag-aaral",
+        "label": "hindi saklaw",
+        "evidence": "{pct}% mga test",
         "rule": "Flagged kapag LCOV ulat 0% linya saklaw."
       },
       "complex": {
@@ -1951,22 +1951,22 @@
         "rule": "Flagged kapag ang cyclomatic complexity ay higit sa 10."
       },
       "undocumented": {
-        "label": "Hindi na-documented, hindi pa rin nakakatanggap ng visa.",
+        "label": "walang dokumentasyon",
         "evidence": "CC {cc}, walang doc.",
         "rule": "Flagged kapag ang isang kumplikadong function (CC > 10) ay walang doc comment."
       },
       "test_drift": {
-        "label": "Test drift pagsubok sa pag-aalis ng tubig",
+        "label": "paglihis ng test",
         "evidence": "Ang mga pagsubok lag ang function function na may lag.",
         "rule": "Flagged kapag ang pinakabagong naka-link na file ng pagsubok ay makabuluhang mas matanda kaysa sa source file ng function."
       },
       "stub_tested": {
         "label": "na-test gamit ang stub",
-        "evidence": "manipis na asserts ay nagsasabing.",
+        "evidence": "manipis na assert",
         "rule": "Flagged kapag may umiiral na naka-link na pagsubok ngunit halos hindi nagpapahayag ng anumang bagay."
       },
       "suspicious_coverage": {
-        "label": "ang mga suspek na saklaw ng ulat.",
+        "label": "kahina-hinalang coverage",
         "evidence": "{pct}% na walang pagsubok.",
         "rule": "Flagged kapag LCOV ulat mataas na saklaw ngunit walang pagsubok ay tumutukoy sa function."
       },
@@ -1989,7 +1989,7 @@
       "neverRun": "hindi na tumakbo"
     },
     "freshness": {
-      "justNow": "Ngayon lang, ngayon lamang.",
+      "justNow": "ngayon lang",
       "minutesAgo": "{min}m nakalipas",
       "hoursAgo": "{hr}o nakalipas",
       "daysAgo": "{day}a nakalipas",
@@ -2006,7 +2006,7 @@
     "scan": {
       "subtitle": "Nagsuscan ng laki ng proyekto, komplikasyon, at mga hotspots...",
       "elapsed": "Naglabas na panahon.",
-      "cancel": "Kanselahin I-cancel ang pagkansela",
+      "cancel": "Kanselahin",
       "restart": "I-restart",
       "stopped": "Napauwi",
       "logHeading": "Aktibidad ng aktibidad.",
@@ -2069,7 +2069,7 @@
       "showOverlay": "Ipakita ang shortcut na ito overlay."
     },
     "hero": {
-      "files": "Mga file ng mga file.",
+      "files": "Mga file",
       "lines": "Linya",
       "size": "Sukat"
     }
@@ -2078,16 +2078,16 @@
     "noData": "Wala pang violations.json — magpatakbo ng pagsusuri upang i-populate ang snapshot ng pagsugpo.",
     "zeroTotal": "0 analyzer suppressions sa pinakabagong pag-export.",
     "noKindBreakdown": "Walang pag-breakdown sa pamamagitan ng uri sa eksport na ito.",
-    "title": "Suppression (pag-export) ng mga bagay na hindi dapat i-edit.",
+    "title": "Mga suppression (export)",
     "readOnlyNote": "(mababasa lamang; buksan ang mga Natuklasan upang mag-browse at kumilos.)",
-    "openFindings": "Buksan ang mga Natuklasan Dashboard ng Mga Nakikita."
+    "openFindings": "Buksan ang Dashboard ng mga Natuklasan"
   },
   "configMirrors": {
     "noFileRisk": "Walang paglabag sa panganib bawat file (walang mga pagsalangsang sa saklaw).",
-    "suppressionNote": "Matches violations.json buod, hindi live sidebar suppression toggles. mga ito ay tumugma sa .",
+    "suppressionNote": "Tumutugma sa buod ng violations.json, hindi sa mga live na toggle ng suppression sa sidebar.",
     "noSuppression": "Walang suppression aggregate sa pag-export na ito (mas lumang analyzer o zero suppressions).",
     "owaspSignal": "{count} na paglabag sa export na ito ay may dalang OWASP mobile/web mapping — buksan ang Security Posture para sa buong matrix at pag-export.",
-    "summarySuppressions": "Mga pag-aalis (pagpapalabas ng mga export snapshot)",
+    "summarySuppressions": "Mga suppression (snapshot ng export)",
     "summaryOwasp": "Ang postura ng seguridad (OWASP signal)",
     "summaryFileRisk": "Ang panganib ng file (mga nangungunang file)"
   },
@@ -2101,52 +2101,52 @@
     "noCountersTitle": "Walang mga counter na i-reset.",
     "resetTitle": "I-reset ang lahat ng mga counter.",
     "refreshTitle": "I-reload ang mga telemetry counters mula sa disk ng disk.",
-    "refresh": "Magpahinga at mag-refresh.",
+    "refresh": "I-refresh",
     "copyTitle": "Kopyahin ang snapshot bilang JSON.",
     "copyJson": "Kopyahin ang JSON.",
-    "resetCounters": "I-reset ang mga counter ng counters.",
-    "countersAria": "Mga Counter ng mga counter.",
-    "countersHeading": "Mga counter ng kaganapan na may mga event counters.",
+    "resetCounters": "I-reset ang mga counter",
+    "countersAria": "Mga counter",
+    "countersHeading": "Mga counter ng event",
     "thEvent": "Kaganapan",
     "thCount": "Bilangin",
     "emptyMessage": "Wala pang naitala na mga telemetry event — magbukas ng panuntunan mula sa Findings Dashboard para simulan ang pagkuha ng mga counter.",
     "openFindingsTitle": "Buksan ang Saropa Mga Natuklasan Dashboard.",
-    "openFindings": "Buksan ang mga Natuklasan Dashboard ng Mga Nakikita.",
-    "lastPropsHeading": "Ang mga katangian ng huling kaganapan ay may kinalaman sa pag-aari.",
+    "openFindings": "Buksan ang Dashboard ng mga Natuklasan",
+    "lastPropsHeading": "Mga katangian ng huling event",
     "copiedJson": "Saropa Lints: nakopya ang kaugnay na patakaran sa telemetry JSON.",
     "countersReset": "Saropa Lints: kaugnay na patakaran telemetry counters reset."
   },
   "sidebarLayout": {
-    "summary": "Lay-out ng Activity Bar layout na may mga tampok.",
+    "summary": "Layout ng activity bar",
     "hint": "I-on o i-off ang mga seksyon ng Saropa activity bar dito (na nakaimbak sa workspace, nang hindi iniiwan ang dashboard)."
   },
   "securityPosture": {
     "issueOne": "{count} na isyu",
     "issueOther": "{count} na isyu",
     "noIssues": "Walang mga isyu, walang problema.",
-    "showIssues": "Ipakita ang mga isyu ng Show issues.",
+    "showIssues": "Ipakita ang mga isyu",
     "violationTooltip": "{count} na paglabag sa {ruleCount} na rule. I-click para makita sa Issues.",
     "noViolationsTooltip": "Walang mga paglabag na naka-map sa kategoryang ito."
   },
   "comparison": {
     "title": "Paghahambing ng Pakete",
     "actions": {
-      "addToProject": "Magdagdag sa Proyekto ng proyekto."
+      "addToProject": "Idagdag sa Proyekto"
     },
     "table": {
       "row": {
-        "vibrancyGrade": "Vibrancy Grade Ang antas ng kagandahan.",
-        "category": "Mga kategorya ng Kategoryang Kategoriya",
+        "vibrancyGrade": "Grado ng Vibrancy",
+        "category": "Kategorya",
         "latestVersion": "Pinakabagong bersyon ng pinakabagong bersyon.",
-        "published": "Na-publish na Inilathala",
+        "published": "Na-publish",
         "publisher": "Publisher",
         "pubPoints": "Mga puntos sa Pub",
-        "githubStars": "GitHub Mga Bituin ng mga bituin",
-        "openIssues": "Bukas na Isyu ng Mga Isyu",
-        "codeSize": "Code Size Ang laki ng code",
+        "githubStars": "Mga Star sa GitHub",
+        "openIssues": "Mga Bukas na Isyu",
+        "codeSize": "Laki ng Code",
         "bloatRating": "Rating ng bloat",
-        "license": "Lisensya ng lisensya License.",
-        "platforms": "Mga Platform ng mga platform",
+        "license": "Lisensya",
+        "platforms": "Mga Platform",
         "inThisProject": "Sa proyektong ito, sa proyekto na ito."
       },
       "value": {
@@ -2160,18 +2160,18 @@
       }
     },
     "status": {
-      "packagesSelected": "{count} mga pakete na pinili ng piniling pakete.",
-      "packagesCompared": "{count} pakete kumpara sa mga naka-compare na packages.",
-      "dimensionsRankedOne": "{count} dimensyon na ranggo ng mga nasa taas.",
-      "dimensionsRankedOther": "{count} sukat na ranggo ng mga dimensyon.",
+      "packagesSelected": "{count} package ang napili",
+      "packagesCompared": "{count} package ang inihambing",
+      "dimensionsRankedOne": "{count} dimensyon ang niranggo",
+      "dimensionsRankedOther": "{count} dimensyon ang niranggo",
       "morePackages": "+{count} higit pa"
     },
     "empty": {
       "ariaLabel": "Walang mga pakete.",
       "message": "Walang mga pakete na pinili para sa paghahambing. Mag-right click sa dalawa o higit pang mga pakete sa Dashboard ng Package at piliin ang {compare}.",
-      "compareWord": "Ihambing ihambing Iparating",
-      "openDashboard": "Buksan ang Dashboard ng Package na Packet.",
-      "openDashboardTitle": "Buksan ang Saropa Package Dashboard. at i-click sa ibaba upang magsimula ng pag-install."
+      "compareWord": "Ihambing",
+      "openDashboard": "Buksan ang Dashboard ng Package",
+      "openDashboardTitle": "Buksan ang Saropa Package Dashboard."
     },
     "a11y": {
       "skipToTable": "Skip sa paghahambing ng talahanayan.",
@@ -2183,21 +2183,21 @@
       "closeOverlay": "Isara ang keyboard-shortcut overlay na naka-overlay sa iyo."
     },
     "kpi": {
-      "ariaLabel": "Paghahambing buod ng pangkalahatang impormasyon.",
+      "ariaLabel": "Buod ng paghahambing",
       "leading": "Nangunguna",
       "leadingTitle": "Pakete na nangunguna sa pamamagitan ng karamihan dimension wins.",
       "dimensionWinsOne": "{count} dimensyon panalo manalo.",
-      "dimensionWinsOther": "{count} dimensyon panalo nanalo.",
+      "dimensionWinsOther": "{count} panalo sa dimensyon",
       "packages": "Mga package",
       "packagesTitle": "Bilang ng mga pakete na inihambing nang magkasama.",
-      "inComparison": "sa paghahambing,",
-      "dimensions": "Mga sukat Dimensions mga sukat",
+      "inComparison": "sa paghahambing",
+      "dimensions": "Mga dimensyon",
       "dimensionsTitle": "Bilang ng mga sukat kung saan maaaring ma-rank ang isang nagwagi.",
-      "ranked": "Na-ranggo sa ranggo."
+      "ranked": "niranggo"
     },
     "toolbar": {
-      "ariaLabel": "Paghahambing ng mga aksyon kumpara sa pagkilos.",
-      "packageDashboard": "Package Dashboard ng Pakete Ang pakete ay isang dashboard na may mga tampok.",
+      "ariaLabel": "Mga aksyon sa paghahambing",
+      "packageDashboard": "Dashboard ng Package",
       "packageDashboardTitle": "Buksan ang Package Dashboard upang ihambing ang higit pang mga pakete."
     }
   },
@@ -2219,16 +2219,16 @@
       "statusValue": {
         "active": "aktibo",
         "idle": "walang ginagawa",
-        "running": "nagsisimula",
+        "running": "tumatakbo",
         "stopped": "nag-stop",
-        "suspended": "nagsususpende",
+        "suspended": "naka-suspend",
         "starting": "nagsimula",
-        "scanning": "naglalaro",
-        "notConfigured": "walang nakakonekta"
+        "scanning": "nag-i-scan",
+        "notConfigured": "hindi naka-configure"
       },
       "rssNote": {
         "inProcess": "sa proseso, hindi nakakakita ng mas maliit na pagtatangka",
-        "notRunning": "walang pagsusulong",
+        "notRunning": "hindi tumatakbo",
         "remote": "nagsusumite sa mga hosted runners ng GitHub — hindi masusukat dito"
       },
       "masterOffHint": "I-enable muna ang master switch",
@@ -2253,7 +2253,7 @@
       "off": "NAKA-OFF"
     },
     "action": {
-      "killAll": "Iwanan Ang Lahat Ng {name}",
+      "killAll": "Patayin Lahat ng {name}",
       "restartAll": "I-restart ang {name}",
       "killAllDescription": "Magtatag ng direktang pagbubukas ng LSP Server lamang. Ang Analyzer Plugin at Scan Daemon ay hindi pa maaaring i-kill nang walang pagkakakilanlan — gamitin ang sariling switch ng ON/OFF ng bawat engine.",
       "restartAllDescription": "Nag-ugat at nagsisimula muli ang LSP Server (o nagsisimula ito kung hindi pa ito nagtatrabaho). Ang Analyzer Plugin at Scan Daemon ay hindi napekin — gamitin ang sariling ON/OFF toggle ng bawat engine."
@@ -2261,29 +2261,29 @@
     "log": {
       "empty": "Walang mga entry sa log pa.",
       "masterToggleOn": "Master switch: ino-on…",
-      "masterToggleOff": "Master switch: di-nagagawa...",
+      "masterToggleOff": "Master switch: dini-disable…",
       "killAll": "Iwanan Lahat: nagsilbi na ang lahat ng mga engine na maaaring kontrolin.",
       "restartAll": "Restart All: restarted lahat ng kontrolable nga engines.",
-      "lspToggleOn": "LSP Server: nagtatanggal...",
-      "lspToggleOff": "LSP Server: nagtatanggal...",
+      "lspToggleOn": "LSP Server: pinapagana…",
+      "lspToggleOff": "LSP Server: dini-disable…",
       "lspStarted": "LSP Server: nagsimula.",
       "lspDisabledPrompt": "Ang LSP server ay naka-disable sa mga setting (saropaLints.lspServer.enabled). I-enable it at simulan?",
       "lspEnableButton": "Paganahin",
       "lspStopped": "LSP Server: nakatiklop.",
       "lspStartFailed": "LSP Server: nabigo ang pag-start (tanungin ang mensahe ng error at ang kanal ng output ng Saropa Lints LSP).",
-      "analyzerToggleOn": "Analyzer Plugin: nagpapalagay...",
-      "analyzerToggleOff": "Analyzer Plugin: nagtatanggal...",
-      "daemonToggleOn": "I-scan Daemon: nagsisimula...",
+      "analyzerToggleOn": "Analyzer Plugin: pinapagana…",
+      "analyzerToggleOff": "Analyzer Plugin: dini-disable…",
+      "daemonToggleOn": "Scan Daemon: ipinagpapatuloy…",
       "daemonToggleOff": "I-scan Daemon: suspending…",
-      "ciToggleOn": "CI: nagpapalagay...",
-      "ciToggleOff": "CI: nagtatanggal..."
+      "ciToggleOn": "CI: pinapagana…",
+      "ciToggleOff": "CI: dini-disable…"
     },
     "master": {
       "updateFailed": "Hindi maaaring baguhin ang master switch: {error}",
       "overridden": "Isang folder-level saropaLints.enabled setting ay nagbabago sa switch na ito. Baguhin ito sa folder's settings.json."
     },
     "sidebar": {
-      "enginesLabel": "Mga Engine: {count} na nagtatrabaho"
+      "enginesLabel": "Mga Engine: {count} tumatakbo"
     },
     "ci": {
       "disableFailed": "Hindi maaaring i-off ang CI: {path} ay nawawala o may-ugnay ang estruktura Saropa Lints ay hindi makakapag-ubahin ang automatisado. Ang CI ay pa rin nagsisimula. Bumuksan ang file at i-disable ang workflow manu-manong.",
@@ -2293,8 +2293,8 @@
         "heading": "I-publish ang pagbabago",
         "introEnable": "{path} ay naisulat na sa iyong trabaho tree. Walang nagsisimula sa CI hanggang ito ay nasa {base}. Ang mga command na ito ay naglalagay nito sa isang bagong branch na tinatawag na {branch} at nagpapaloob ng isang pull request para sa pagsusuri — i-run ito mismo mo, o i-click ang button at Saropa Lints ay magpapalabas ng mga ito eksaktong ganito.",
         "introDisable": "{path} ay inedit sa iyong working tree upang suspenduhin ang bawat trabaho. Ang CI ay patuloy na nagtatrabaho hanggang makarating ito sa {base}. Ang mga command na ito ay naglalagay ng pagbabago sa isang bagong branch na tinatawag na {branch} at nagpapaloob ng pull request — i-run ito mismo, o i-click ang button at Saropa Lints ay magpapalabas ng mga ito eksaktong ganon. Upang itigil ang CI agad, i-disable ang workflow mula sa tab ng Actions ng repository.",
-        "commandsLabel": "Mga Commands ng mga utos.",
-        "copy": "Kopya kopya kopyas kopyas",
+        "commandsLabel": "Mga Command",
+        "copy": "Kopyahin",
         "copied": "Mga utos na nakopya sa clipboard.",
         "createPr": "Lumikha ng branch, commit, push at i-open ang pull request",
         "notNow": "Hindi ngayon",
@@ -2302,7 +2302,7 @@
         "running": "Nag-creta ng branch at nag-push...",
         "failed": "{command} ay naging mali, kaya walang naisip. {details}",
         "pushedNoPr": "Inihubog ang {branch}. Hindi maaaring i-open ang pull request nang automatic — i-open ito mula sa compare page.",
-        "openCompare": "Ibukod ang pahina ng pagbabago",
+        "openCompare": "Buksan ang pahina ng paghahambing",
         "created": "Pull request na nagsimula para sa {branch}.",
         "openPr": "Ibigay ang pull request",
         "notARepository": "{path} ay isinulat, ngunit ang folder na ito ay hindi isang git repository, kaya walang ano man ang maitutulong i-publish.",
@@ -2323,25 +2323,25 @@
     },
     "section": {
       "version": "VERSION",
-      "update": "Update na ang update.",
+      "update": "UPDATE",
       "suggestion": "suhestyon",
-      "community": "Komunidad ng mga bansa.",
+      "community": "KOMUNIDAD",
       "dependencies": "DEPENDENCY",
       "alerts": "MGA ALERTO",
-      "platforms": "Mga Platform ng mga platform.",
+      "platforms": "MGA PLATFORM",
       "directDeps": "MGA DIREKTANG DEP",
       "readmeImages": "MGA LARAWAN NG README"
     },
     "version": {
       "published": "Na-publish sa: {date}",
-      "codeSize": "Code Size Ang laki ng code",
+      "codeSize": "Laki ng Code",
       "archive": "Archive",
       "sizeLabel": "{label}: {size}",
       "source": "Pinagmulan: {code} code · {comments} komento · {files} file",
       "replace": "Palitan: {summary}"
     },
     "update": {
-      "upgrade": "Mag-upgrade ng Upgrade na Pagpapahusay",
+      "upgrade": "I-upgrade",
       "changelog": "Changelog",
       "blockedBy": "Blokado ng {package}"
     },
@@ -2353,13 +2353,13 @@
     },
     "community": {
       "issues": "{count} na isyu",
-      "prs": "{count} PRs ng mga tao.",
+      "prs": "{count} PR",
       "activity90d": "90d: {closed} mga isyu ay sarado, ang {merged} PRs ay pinagsama.",
-      "lastCommit": "Huling pagsasagawa: {time}",
+      "lastCommit": "Huling commit: {time}",
       "archived": "Ang Repository ay na-archive.",
       "pubPoints": "{points}/160 mga pub point ng pub.",
       "latestRelease": "Huling paglabas: {age} ago",
-      "dependents": "{count} mga nakadepende sa pag-aari."
+      "dependents": "{count} dependent"
     },
     "dormancy": {
       "noActivity6mo": "Walang mga commit at walang mga release sa 6+ buwan.",
@@ -2369,8 +2369,8 @@
     },
     "dependencies": {
       "flagged": "({count} na may bandila)",
-      "transitiveCount": "{count} transitive packages ang mga pakete ng pang-araw araw na paglilipat.",
-      "unique": "{count} natatanging natatangi.",
+      "transitiveCount": "{count} transitive na package",
+      "unique": "{count} natatangi",
       "shared": "{count} ibinahagi ({pct}%)",
       "moreOverflow": "+{count} higit pa",
       "sharedList": "Ibinahagi: {names}"
@@ -2381,31 +2381,31 @@
     "links": {
       "viewFullDetails": "Tingnan ang Buong Mga Detalye",
       "pubDev": "pub.dev",
-      "documentation": "Dokumento Pagpapadala ng dokumento",
+      "documentation": "Dokumentasyon",
       "changelog": "Changelog",
-      "repository": "Repository ng mga talaan.",
-      "issues": "Isyu ng mga isyu.",
-      "reportIssue": "Isyu ng Issue Report Isyu sa ulat"
+      "repository": "Repositoryo",
+      "issues": "Mga Isyu",
+      "reportIssue": "Iulat ang Isyu"
     },
-    "logoAlt": "{packageName} logo ng mga tao.",
+    "logoAlt": "Logo ng {packageName}",
     "readMore": "higit pa",
     "readmeImageAlt": "README imahe ng larawan"
   },
   "chart": {
     "toggle": {
-      "excludeShared": "I-exclude ang ibinahagi na naibahagi."
+      "excludeShared": "Huwag isama ang ibinahagi"
     },
     "filter": {
       "clear": "Maaliwalas"
     },
     "bucket": {
-      "other": "Ibang ({count} {noun}) na may mga sangkap ng PH.",
-      "uniqueTransitives": "Ang mga natatanging transitives ({count}) ay",
+      "other": "Iba pa ({count} {noun})",
+      "uniqueTransitives": "Mga natatanging transitive ({count})",
       "sharedTransitives": "Ibinahaging mga transitibo ({count})"
     },
     "noun": {
       "package": "pakete",
-      "packages": "pakete ng mga package na ito ay may"
+      "packages": "mga package"
     }
   },
   "suite": {
@@ -2414,7 +2414,7 @@
     },
     "enableRule": {
       "done": "Pinaandar na panuntunan {ruleId}. . Ang pag-aaral ng muling pagpapatakbo ay dapat na ilapat.",
-      "runAnalysis": "Magpatakbo ng pagsusuri sa run analysis.",
+      "runAnalysis": "Patakbuhin ang pagsusuri",
       "noWorkspace": "Buksan ang isang folder ng workspace upang paganahin ang isang panuntunan."
     },
     "openFinding": {
@@ -2430,26 +2430,26 @@
     },
     "nudge": {
       "message": "Ang proyektong ito ay gumagamit ng Drift Advisor. I-install ang Saropa Log Capture extension upang iugnay ang runtime SQL sa mga static na natuklasan.",
-      "install": "I-install ang Log Capture ng Pagkuha sa Log",
-      "dismiss": "Mag-dismiss na ako."
+      "install": "I-install ang Log Capture",
+      "dismiss": "I-dismiss"
     },
     "driftRecommend": {
       "message": "Ang isang Drift Advisor server ay konektado. I-install ang standalone Saropa Drift Advisor extension para sa buong karanasan ng Problems panel.",
       "install": "I-install ang Drift Advisor",
-      "dismiss": "Mag-dismiss na ako."
+      "dismiss": "I-dismiss"
     }
   },
   "notify": {
     "activation": {
-      "cacheCleared": "Vibrancy cache cleared. sa loob ng isang taon na ang nakalipas",
+      "cacheCleared": "Na-clear ang cache ng Vibrancy",
       "copiedInfo": "Nakopya {package} impormasyon sa clipboard.",
       "noPubspecOrLock": "Walang pubspec.yaml/pubspec.lock na natagpuan sa workspace.",
-      "backfillComplete": "Pakete Vibrancy: Ang lakas ng buhay ay may mga pakinabang. isang beses na backfill ng kasaysayan kumpleto ({count} mga snapshot ay nai-import).",
+      "backfillComplete": "Package Vibrancy: kumpleto na ang isang beses na backfill ng kasaysayan ({count} snapshot ang na-import).",
       "runScanFirst": "Magpatakbo ng isang scan muna una.",
       "noUpgradable": "Walang mga pakete na maaaring i-upgrade ang natagpuan.",
       "proceedUpgrades": "Magpatuloy sa {count} pag-upgrade ((s)? Ang mga hindi matagumpay na hakbang ay bumabalik at ang plano ay patuloy.",
-      "actionExecute": "Ipagpapatupad Patuloy na Magpatupad",
-      "actionCancel": "Kanselahin I-cancel ang pagkansela",
+      "actionExecute": "Isagawa",
+      "actionCancel": "Kanselahin",
       "upgradeStopped": "Nag-ugnay ang pag-update sa {failedAt} — {completed}/{total} nakumpleto",
       "upgradeAllComplete": "Lahat ng mga pag-upgrade sa {count} ay matagumpay na nakumpleto.",
       "notPubspec": "Ang napili ng file ay hindi isang pubspec.yaml.",
@@ -2461,7 +2461,7 @@
       "noSuppressedPackages": "Walang mga suppressed na pakete.",
       "unsuppressedCount": "Hindi pinigilan {count} pakete ((s)",
       "noPubspecWorkspace": "Walang pubspec.yaml na natagpuan sa workspace.",
-      "depsAlreadySorted": "Ang mga dependency na naka-sorted ay nasa ilalim ng dependencies.",
+      "depsAlreadySorted": "Nakaayos na ang mga dependency",
       "depsSorted": "{detail} sa {sections}",
       "noPubspec": "Walang nakitang pubspec.yaml",
       "updatePrereleaseConfirm": "I-update ang {package} para i-prerelease ang {version}? Ang mga prerelease ay maaaring maglaman ng mga nagbabagang pagbabago.",
@@ -2469,9 +2469,9 @@
       "updatedTo": "Na-update ang {package} sa {version}.",
       "ciRunScanFirst": "Magpatakbo ng isang pag-scan muna upang makabuo CI config na may naaangkop na thresholds.",
       "noWorkspace": "Walang folder ng workspace buksan ang bukas na folder.",
-      "ciOverwriteConfirm": "{path} ay umiiral na. I-overwrite? sa loob ng isang taon na ang nakalipas",
+      "ciOverwriteConfirm": "Umiiral na ang {path}. I-overwrite?",
       "actionOverwrite": "I-overwrite",
-      "ciGenerated": "CI pipeline na nabuo: {path} ang kanyang mga",
+      "ciGenerated": "Nabuo ang CI pipeline: {path}",
       "compareSelectCount": "Piliin ang 2-3 mga pakete upang ihambing.",
       "compareMax": "Higit sa 3 packages para sa paghahambing.",
       "compareFetchFailed": "Hindi maaaring kunin ang sapat na data ng pakete."
@@ -2480,72 +2480,72 @@
       "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} error{suffix} — view",
       "regressionScoreDipped": "Score ay bumaba sa {threshold} — tingnan ang mga isyu.",
-      "actionViewViolations": "Tingnan ang mga paglabag sa pagtingin.",
-      "noErrors": "Saropa Lints: ang mga ito ay may _ph0__. Walang pagkakamali!",
+      "actionViewViolations": "Tingnan ang mga Paglabag",
+      "noErrors": "Saropa Lints: Walang error!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: walang folder ng workspace na bukas. Buksan muna ang iyong proyektong Dart/Flutter.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ang scan sa pag-save ay naka-off. Mag-enable ito bago mag-async analysis.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: naka-off ang scan on save. Paganahin ito bago patakbuhin ang pagsusuri.",
       "pluginAlive": "Saropa Lints ay buhay: {rules} mga patakaran na pinagana, {files} file sinusuri.",
-      "openPubspecFailed": "Hindi nakabukas ng pubspec.yaml: {message} ang kanyang mga",
-      "toggleSidebarSectionFailed": "Saropa Lints: nakatagong ang seksyon ng sidebar — {message}",
+      "openPubspecFailed": "Hindi mabuksan ang pubspec.yaml: {message}",
+      "toggleSidebarSectionFailed": "Saropa Lints: hindi ma-toggle ang seksyon ng sidebar — {message}",
       "openWorkspaceFirst": "Buksan muna ang isang folder ng workspace.",
       "createInstructionsDone": "Lumikha ng .cursor/rules/saropa_lints_instructions.mdc para sa mga ahente ng AI.",
-      "createInstructionsFailed": "Nababagsak upang lumikha ng Saropa Lints mga tagubilin: {message} ang kanyang mga",
+      "createInstructionsFailed": "Hindi nagawa ang mga tagubilin ng Saropa Lints: {message}",
       "openFileForIssues": "Buksan ang isang file upang ipakita ang mga isyu nito sa Saropa Lints.",
       "driftAdvisorNotConnected": "Hindi konektado ang Drift Advisor. I-click ang Refresh pagkatapos simulan ang server.",
       "noViolationsRunAnalysis": "Walang mga paglabag sa kasalukuyang data. Mag-run analysis muna.",
       "telemetryReset": "Saropa Lints: kaugnay na patakaran telemetry counters reset.",
       "noWorkspaceOpen": "Walang folder ng workspace na bukas.",
-      "noAnalysisReport": "Saropa Lints: ang mga ito ay may _ph0__. walang ulat ng pagsusuri na natagpuan sa ilalim ng mga ulat /. Magpatakbo \"Saropa Lints: Run Analysis\" muna. sa pamamagitan ng",
+      "noAnalysisReport": "Saropa Lints: walang nakitang ulat ng pagsusuri sa ilalim ng reports/. Patakbuhin muna ang \"Saropa Lints: Run Analysis\".",
       "copiedReport": "Nakopya ang {name} sa clipboard.",
-      "readReportFailed": "Saropa Lints: nakatagong bumasa sa ulat — {message}",
-      "openReportFailed": "Saropa Lints: nakatagong report — {message}",
+      "readReportFailed": "Saropa Lints: hindi mabasa ang ulat — {message}",
+      "openReportFailed": "Saropa Lints: hindi mabuksan ang ulat — {message}",
       "noAnalysisData": "Walang data ng pagsusuri. Mag-run analysis muna.",
       "actionDisable": "Huwag paganahin",
       "actionEnable": "Paganahin",
       "bulkRuleToggleConfirm": "{verb} {count} mga patakaran? Ito ay nag-update ng analysis_options_custom.yaml.",
       "setupPrompt": "Saropa Lints ay nakadetektuhan ng isang Dart proyekto nang walang saropa_lints na nakakonfigure. Mag-set up ngayon para sa 2350+ lint rules.",
-      "actionSetUpProject": "I-set up ang proyekto, i-setup ang proyekto.",
+      "actionSetUpProject": "I-set up ang Proyekto",
       "actionNotNow": "Hindi ngayon, hindi pa."
     },
     "lsp": {
       "noWorkspaceFolder": "Saropa Lints: hindi maaaring mag-start ng LSP Server dahil walang workspace folder na nakabukas.",
-      "startFailed": "Saropa Lints: ang LSP Server ay nagtagumpas ng pagtatrabaho. {reason}",
+      "startFailed": "Saropa Lints: hindi nagsimula ang LSP Server. {reason}",
       "settingWriteFailed": "Saropa Lints: hindi makapag-save ng setting ng LSP Server. {reason}"
     },
     "setup": {
       "requiresDartProject": "Nangangailangan ang Saropa Lints ng proyektong Dart o Flutter (walang nakitang pubspec.yaml).",
-      "actionLearnMore": "Matuto ng Higit pang Alamin ang Higit Pang Aralin",
+      "actionLearnMore": "Alamin Pa",
       "noWorkspaceFolder": "Walang folder ng workspace na bukas.",
-      "pubGetFailed": "Saropa Lints: nabigo ang pub. {details}",
+      "pubGetFailed": "Saropa Lints: nabigo ang pub get. {details}",
       "checkOutput": "Suriin ang Output.",
       "baselineRunning": "Paglikha ng baseline (saropa_baseline.json) upang mapigilan ang mga umiiral na paglabag ...",
       "baselineCreated": "Base line na nilikha: Saropa_baseline.json.jso ay isang domain ng saropa na may mga sumusunod: Ang mga umiiral na natuklasan ay pinigilan; bagong code ay pa rin na-check.",
       "baselineFailed": "Saropa Lints: hindi magawa ang baseline. {details}",
-      "pubGetNotResolved": "Saropa Lints: Ang mga bagay na may kaugnayan sa pag-aalaga ng katawan. Nagtagumpay ang pub get ngunit hindi nasulbad ang saropa_lints. Suriin ang pubspec.yaml pag-format.",
+      "pubGetNotResolved": "Saropa Lints: nagtagumpay ang pub get pero hindi na-resolve ang saropa_lints. Suriin ang pag-format ng pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: nabigo ang pagsulat ng config. {details}",
       "disabled": "Saropa Lints ay hindi pinagana. Ang mga file ng proyekto ay hindi binago.",
-      "disabledAnalyzer": "Saropa Lints integration tinanggal. Ang mga diagnostic ng analyzer ay magpapalitaw agad; i-activate ang Scan on save para i-back up.",
+      "disabledAnalyzer": "Na-off ang integration ng Saropa Lints. Mawawala sa ilang sandali ang mga diagnostic ng analyzer; i-toggle sa On ang Scan on save para maibalik.",
       "reenabledPlugin": "Saropa Lints plugin na ginamit sa proseso ay nagsimula muli. Nagrerestart ng server ng analisis ng Dart upang i-load ito muli.",
       "reenableNothingToRestore": "Saropa Lints: walang nangangailangan i-restore. Ang plugin na nasa proseso ay hindi kasalukuyang naka-disable sa pamamagitan ng extension.",
-      "noOpenDartFiles": "Saropa Lints: ang mga ito ay may _ph0__. walang bukas na Dart file natagpuan. Buksan muli ang isang Dart file o i-off ang \"Open editors only\" setting.",
+      "noOpenDartFiles": "Saropa Lints: walang nakitang bukas na Dart file. Buksan muli ang isang Dart file o i-off ang setting na \"Open editors only\".",
       "analysisScanning": "Sina-scan ang workspace… {percent}% ({count} isyu sa ngayon)",
       "configUpdated": "Na-update ang config ng Saropa Lints (tier: {tier}).",
       "configWriteFailed": "Ang Config write ay nabigo. {details}",
       "scaffoldGateTitle": "Composite analyzer plugin scaffolding ng mga gusali.",
       "scaffoldGateDetail": "Magsusulat ito ng bagong Dart package sa ilalim ng workspace mo (pubspec.yaml, lib/main.dart, README): isang custom_lint plugin na nagrerehistro sa Saropa at nag-iiwan ng mga hook para sa sarili mong mga rule.\n\nGamitin lang ito kung nagpapadala ka ng mga custom analyzer rule kasama ng Saropa. Puwedeng laktawan ito ng mga karaniwang proyektong Saropa lang—isang plugin entry lang bawat context ang pinapayagan ng analyzer.\n\nSusunod: pumili ng folder na relatibo sa workspace. Kung umiiral na ang folder, tatanungin ka bago may ma-overwrite.",
       "actionContinue": "Magpatuloy",
-      "actionOpenGuide": "Buksan ang gabay sa paggabay ng bukás.",
+      "actionOpenGuide": "Buksan ang gabay",
       "scaffoldPathOutsideWorkspace": "Ang landas ng scaffold ay dapat na nasa loob ng folder ng workspace.",
       "scaffoldFolderExists": "Umiiral na ang folder: {folder}. Maaaring idagdag o ma-overwrite ang mga file. Magpatuloy?",
       "scaffoldCreated": "Composite plugin scaffold na nilikha. Buksan ang nakabuo ng pangunahing dart.",
-      "actionOpenMainDart": "Buksan ang pangunahing.dart dart",
+      "actionOpenMainDart": "Buksan ang main.dart",
       "actionOpenReadme": "Buksan ang README.",
       "scaffoldFailed": "Nabigo ang scaffold. {details}",
       "scaffoldFailedHint": "Tiyaking nasa dev_dependencies ang saropa_lints at magpatakbo ng pub get.",
       "alreadyOnTier": "Nasa {tier} tier na.",
       "progressPubGet": "Pumuproseso ang pub get… ({elapsed}s)",
-      "progressConfigWrite": "Paghahatag ng config... ({elapsed}s)",
-      "progressAnalysis": "Pagsusuri... ({elapsed}s)",
+      "progressConfigWrite": "Isinusulat ang config… ({elapsed}s)",
+      "progressAnalysis": "Nagpapatakbo ng pagsusuri… ({elapsed}s)",
       "progressBaseline": "Pagsusimula ng baseline scan… ({elapsed}s)"
     },
     "lane": {
@@ -2566,25 +2566,25 @@
       "enabledButPluginOff": "Saropa Lints ay naka-on, ngunit ang mga diagnostics sa loob ng editor ay naka-off: ang plugin ng analyzer ay tinanggal mula sa extension na ito at hindi pa ito ibinalik, kaya ang mga isyu lamang ay lumalabas pagkatapos ng isang scan. Ibalik ang live in-editor diagnostics, o manatiling scan-on-save lamang?",
       "actionRestorePlugin": "Pabalik ang diagnostics sa loob ng editor",
       "actionKeepScanOnly": "Panatag ang scan-on-save lamang",
-      "disabledButPluginOn": "Saropa Lints ay nagsususpend, ngunit ang plugin ng analyzer ay pa rin nakalimbag sa analysis_options.yaml, kaya ito ay mag-load at mag-imbak ng maraming GB sa susunod na pag-iinitialize ng server ng analisis ng Dart. I-off rin ang plugin, o i-keep ito?",
+      "disabledButPluginOn": "Naka-off ang Saropa Lints, pero nakadeklara pa rin ang analyzer plugin sa analysis_options.yaml, kaya maglo-load ito at hahawak ng ilang GB sa susunod na pagsisimula ng Dart analysis server. I-off din ang plugin, o panatilihin itong naka-on?",
       "actionTurnOffPlugin": "I-off ang plugin ng analizer",
       "actionKeepPluginOn": "Panatilihin ang plugin"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} na nagkabigo: {message}",
-      "crossFileGraphExportFailed": "Saropa Lints graph export failed: hindi na rin nagamit ang . {message} ang kanyang mga",
+      "crossFileGraphExportFailed": "Nabigo ang pag-export ng graph ng Saropa Lints: {message}",
       "crossFileGraphNoDotFile": "Nakumpleto ang cross-file graph ngunit walang DOT file na natagpuan.",
       "crossFileGraphExported": "Cross-file graph na nai-export sa mga ulat/.saropa_lints/cross_file/import_graph.dot",
-      "crossFileHtmlReportFailed": "Hindi nagtagumpay ang ulat ng HTML na cross-file: {message} ang kanyang mga",
+      "crossFileHtmlReportFailed": "Nabigo ang cross-file na HTML report: {message}",
       "crossFileReportNoIndex": "Nakumpleto ang ulat ng cross-file ngunit hindi natagpuan ang index.html.",
       "crossFileHtmlReportGenerated": "Cross-file HTML ulat na nabuo.",
       "actionOpenInBrowser": "Buksan sa browser.",
-      "actionOpenFile": "Buksan ang Open File na file.",
-      "crossFileSnapshotFailed": "Nagkakamali ang cross-file snapshot: {message} ang kanyang mga",
+      "actionOpenFile": "Buksan ang File",
+      "crossFileSnapshotFailed": "Nabigo ang cross-file snapshot: {message}",
       "crossFileSnapshotNoJson": "Nakumpleto ang cross-file snapshot ngunit hindi natagpuan ang JSON file.",
       "crossFileSnapshotWritten": "Cross-file snapshot na isinulat sa mga ulat/.saropa_lints/cross_file_snapshot.json",
-      "crossFileNoWorkspace": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili walang Dart/Flutter workpace na natagpuan. Buksan ang isang proyekto sa pubspec.yaml muna.",
-      "crossFileMissingDep": "Saropa Lints: Ang mga bagay na may kaugnayan sa pag-aalaga ng katawan. idagdag ang saropa_lints sa pubspec.yaml bago magpatakbo ng pag-aaral ng cross-file.",
+      "crossFileNoWorkspace": "Saropa Lints: walang nakitang Dart/Flutter workspace. Magbukas muna ng proyektong may pubspec.yaml.",
+      "crossFileMissingDep": "Saropa Lints: idagdag ang saropa_lints sa pubspec.yaml bago patakbuhin ang cross-file analysis.",
       "issuesNoViolationsRunAnalysis": "Walang mga paglabag sa kasalukuyang data. Mag-run analysis muna.",
       "issuesNoAnalysisData": "Walang data ng pagsusuri. Mag-run analysis muna.",
       "issuesNoHotspots": "Walang mga security hotspot na natagpuan sa kasalukuyang ulat.",
@@ -2595,44 +2595,44 @@
       "copyTreeNothingToExport": "Walang maipapadala.",
       "copyTreeSerializeTreeFailed": "Hindi maaaring serialize puno.",
       "copyTreeCopiedFull": "Nakopya ang buong {viewLabel} tree ({count} {branchNoun}) bilang JSON.",
-      "projectMapNoProject": "Saropa Lints: ang mga ito ay may _ph0__. buksan muna ang isang Dart na proyekto.",
+      "projectMapNoProject": "Saropa Lints: magbukas muna ng Dart na proyekto.",
       "projectMapMissingDep": "Saropa Lints: idagdag ang saropa_lints sa pubspec.yaml bago patakbuhin ang Saropa Project Map.",
       "projectMapNoHtml": "Saropa Mapa ng Proyekto: Hindi na ginawa ang HTML ng ulat.",
-      "projectMapFailed": "Saropa Project Map nabigo: hindi na rin maaaring gawin ang project map. {message} ang kanyang mga",
+      "projectMapFailed": "Nabigo ang Saropa Project Map: {message}",
       "projectMapScanFailed": "Saropa Ang pag-scan ng Project Map ay nabigo (paglabas sa {code}). {details}",
       "projectMapCouldNotOpen": "Saropa Mapa ng Proyekto: hindi maaaring buksan {file}.",
       "issuesNoQuickFix": "Walang mabilis na pag-aayos ang magagamit para sa paglabag na ito.",
       "issuesFileNotFound": "Hindi nahanap ang file: {file}. Patakbuhin muli ang pagsusuri upang ma-update.",
-      "actionFixAll": "Mag-ayos ng Lahat Pagtutuwid sa lahat",
+      "actionFixAll": "Ayusin Lahat",
       "issuesConfirmFixAll": "Ayusin ang mga paglabag sa {count} sa {fileName}?",
       "issuesBulkFixResult": "Nakapirming {fixed}. Patakbuhin ang pagsusuri upang i-update ang marka.",
       "issuesBulkFixResultSkipped": "Fixed {fixed}, lumampas sa {skipped} (walang available na pag-aayos). Magpatakbo ng pagsusuri upang i-update ang marka.",
       "scanOnSaveStartFailed": "Nag-iba ang pag-scan sa pag-save. Siguraduhin na nakainstall ang Dart SDK.",
       "scanOnSaveFailed": "Nagtagal ang pag-scan.",
-      "scanOnSaveFailedDetails": "Nag.Fail ang pag-scan sa pag-save: {details}",
+      "scanOnSaveFailedDetails": "Nabigo ang scan on save: {details}",
       "scanOnSaveInvalidJson": "Skan sa pag-save ay nag-return ng hindi wastong output ng JSON.",
       "scanOnSaveDaemonBadResponse": "Ang proseso ng pag-scan ay nagbigay ng isang response na hindi mapapahintulutan.",
       "scanOnSaveDaemonDown": "Ang proseso ng pag-scan ay hindi naglalaban. Ito ay magsisimula muli sa susunod na pag-save.",
       "scanOnSaveDaemonTimeout": "Hindi sumagot ang proseso ng pag-scan sa oras.",
       "scanOnSaveDaemonExited": "Ang proseso ng pag-scan ay nagsimula nang hindi inaasahan. Ito ay magsisimula muli sa susunod na pag-save.",
       "scanOnSaveDaemonBackoff": "Ang proseso ng pag-scan ay nagsiwalat na at nangungunan para muling simulan. I-save muli sa ilang sandali.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints ay naka-off — i-activate ang \"Scan on save\" bago mag-iba ang buong proyekto scan.",
+      "scanOnSaveBaselineDisabled": "Naka-off ang Saropa Lints — i-on ang \"Scan on save\" bago patakbuhin ang scan ng buong proyekto.",
       "scanOnSaveBaselineAlreadyRunning": "Ang isang buong proyekto scan ay nagsisimula na.",
       "scanOnSaveBaselineCanceled": "Nag-utos ng whole-project scan matapos ang {scanned}/{total} files.",
-      "scanOnSaveBaselineFailed": "Nag.Fail ang pagscan ng buong proyekto: {details}",
+      "scanOnSaveBaselineFailed": "Nabigo ang scan ng buong proyekto: {details}",
       "scanOnSaveBaselineDone": "Nag-complete ang whole-project scan: {total} file, {issues} issue(s).",
-      "codeHealthStartFailedDetails": "Code Hindi nagsimula ang health scan ({command}): {details} Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili.",
+      "codeHealthStartFailedDetails": "Hindi nagsimula ang Code Health scan ({command}): {details}",
       "codeHealthStartFailed": "Code Health scan ay nabigo upang simulan. Tiyaking naka-install ang Dart SDK.",
       "codeHealthScanFailed": "Code Health scan na nabigo.",
-      "codeHealthScanFailedDetails": "Code Health scan failed: hindi nakapag-scan ng health {details} ang kanyang mga",
-      "codeHealthGatesFailed": "Code Health: Ang Kalusugan. nabigo ang naka-configure na mga quality gate. Buksan ang mga setting ng Code Health o kopyahin ang JSON upang suriin ang gates.violations.",
+      "codeHealthScanFailedDetails": "Nabigo ang Code Health scan: {details}",
+      "codeHealthGatesFailed": "Code Health: nabigo ang mga naka-configure na quality gate. Buksan ang mga setting ng Code Health o kopyahin ang JSON para suriin ang gates.violations.",
       "codeHealthInvalidJson": "Code Health nagbalik ng hindi wastong JSON output.",
-      "sidebarSectionUpdateFailed": "Saropa Lints: hindi maitala ang seksyon ng activity bar — {message}"
+      "sidebarSectionUpdateFailed": "Saropa Lints: hindi ma-update ang seksyon ng activity bar — {message}"
     },
     "vibrancy": {
       "couldNotOpenPubspec": "Hindi maaaring buksan ang pubspec.yaml.",
-      "couldNotOpenFileRef": "Hindi ma-open ang file reference: {filePath} ang kanyang mga",
-      "savedReportJson": "Na-save na ulat JSON: {path} ang kanyang mga",
+      "couldNotOpenFileRef": "Hindi mabuksan ang file reference: {filePath}",
+      "savedReportJson": "Na-save ang ulat na JSON: {path}",
       "couldNotSaveReportJson": "Hindi mai-save ang ulat JSON.",
       "noPubspecFound": "Walang nakitang pubspec.yaml",
       "noDependenciesSection": "Hindi mahanap ang mga dependency seksyon ng seksyon",
@@ -2640,22 +2640,22 @@
       "failedToAddToPubspec": "Nabigong magdagdag ng {name} sa pubspec.yaml.",
       "needsPackageRow": "{actionLabel} ay nangangailangan ng isang linya ng pakete mula sa Dashboard ng Package (tab na editor).",
       "couldNotLocateConstraint": "Hindi mahanap ang mga paghihigpit ng bersyon para sa {name}.",
-      "deletedFromPubspec": "Na-delete ang {name} mula sa pubspec.yaml (backup: {backupName}) ay isang uri ng pag-aalaga.",
+      "deletedFromPubspec": "Na-delete ang {name} mula sa pubspec.yaml (backup: {backupName})",
       "runScanFirst": "Magpatakbo ng isang scan muna una.",
       "couldNotFindPubspec": "Hindi mahanap ang pubspec.yaml",
       "updatedPackage": "Na-update ang {name} sa {constraint}.",
-      "failedToUpdate": "Nababagsak upang i-update ang {name}",
+      "failedToUpdate": "Nabigong i-update ang {name}",
       "selectPackagesToCompare": "Piliin ang 2-3 mga pakete upang ihambing.",
       "maxPackagesToCompare": "Higit sa 3 packages para sa paghahambing.",
       "couldNotFindLocalSource": "Hindi mahanap ang lokal na pinagmulan para sa {name}.",
       "registryAuthAdded": "✓ Idinagdag na pag-authenticate para sa {name}.",
-      "registryAddFailed": "Hindi nakapagdagdag ng rehistro: {message} ang kanyang mga",
+      "registryAddFailed": "Nabigong idagdag ang registry: {message}",
       "noConfiguredRegistries": "Walang naka-configure na mga rehistro.",
       "registryAuthRemoved": "✓ Naalis na pag-authenticate para sa {name}",
-      "registryRemoveFailed": "Hindi maaaring alisin ang rehistro: {message} ang kanyang mga",
-      "registryTokenUpdated": "✓ Na-update ang token na nakalaan.",
-      "registryTokenUpdateFailed": "Nababagsak sa pag-update ng token: {message} ang kanyang mga",
-      "actionRemove": "Alisin ang alisan ng pag-alis",
+      "registryRemoveFailed": "Nabigong alisin ang registry: {message}",
+      "registryTokenUpdated": "✓ Na-update ang token",
+      "registryTokenUpdateFailed": "Nabigong i-update ang token: {message}",
+      "actionRemove": "Alisin",
       "removeAuthPrompt": "Alisin ang pag-authenticate para sa {name}?",
       "annotateInProgress": "Annotation na nasa pag-unlad.",
       "noPubspecInWorkspace": "Walang pubspec.yaml na natagpuan sa workspace.",
@@ -2666,17 +2666,17 @@
       "couldNotReadConstraint": "Hindi mabasa ang paghihigpit para sa {name}.",
       "upgradeSuccess": "{name} na nagsimula sa {constraint} — lahat ng mga pagsusulit ay nagdaan",
       "upgradeRolledBack": "{name} upgrade binibigyan ng rollback — {phase} naging mali. Tingnan ang output para sa detalye.",
-      "saveTaskFailed": "Ang save task ay nabigo: {message} ang kanyang mga",
-      "openFolderBeforeCopyConfig": "Saropa Lints: ang mga ito ay may _ph0__. Buksan ang isang folder ng workspace bago kopyahin ang config.",
-      "copiedConfigSnippet": "Saropa Lints: Ang mga bagay na may kaugnayan sa pag-aalaga ng katawan. nakopya na snippet ng config (tier: {tier}, {packsLine}). sa pamamagitan ng pag-aayos.",
+      "saveTaskFailed": "Nabigo ang gawain sa pag-save: {message}",
+      "openFolderBeforeCopyConfig": "Saropa Lints: magbukas ng workspace folder bago kopyahin ang config.",
+      "copiedConfigSnippet": "Saropa Lints: nakopya ang config snippet (tier: {tier}, {packsLine}).",
       "couldNotCopyClipboard": "Saropa Lints: hindi makopya sa clipboard — {message}.",
-      "couldNotWriteRulePacks": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili hindi maaaring isulat ang analysis_options.yaml (rule_packs).",
+      "couldNotWriteRulePacks": "Saropa Lints: hindi maisulat ang analysis_options.yaml (rule_packs).",
       "couldNotReadPubspec": "Saropa Lints: hindi mabasa ang pubspec.yaml.",
-      "noAdditionalSdkPacks": "Saropa Lints: ang mga ito ay may _ph0__. walang karagdagang naaangkop na SDK pack upang paganahin.",
-      "enabledApplicableSdkPacks": "Saropa Lints: Ang mga bagay na may kaugnayan sa pag-aalaga ng katawan. pinaandar {added} naaangkop na {modeLabel} pack.",
-      "openFolderBeforeEnablePacks": "Saropa Lints: ang mga ito ay may _ph0__. buksan ang isang folder ng workspace bago paganahin ang mga pack.",
-      "allApplicablePacksEnabled": "Saropa Lints: ang mga ito ay may _ph0__. lahat ng naaangkop na pakete ng patakaran ay pinagana.",
-      "noApplicablePacksDetected": "Saropa Lints: walang nakakapagawa na mga rule pack para sa proyekto. I-toggle ang mga pack nang isa-isa sa Config Dashboard.",
+      "noAdditionalSdkPacks": "Saropa Lints: walang karagdagang naaangkop na SDK pack na papaganahin.",
+      "enabledApplicableSdkPacks": "Saropa Lints: pinagana ang {added} naaangkop na {modeLabel} pack.",
+      "openFolderBeforeEnablePacks": "Saropa Lints: magbukas ng workspace folder bago paganahin ang mga pack.",
+      "allApplicablePacksEnabled": "Saropa Lints: naka-enable na ang lahat ng naaangkop na rule pack.",
+      "noApplicablePacksDetected": "Saropa Lints: walang nakitang naaangkop na rule pack para sa proyektong ito. I-toggle nang isa-isa ang mga pack sa Config Dashboard.",
       "actionEnable": "Paganahin",
       "enableRecommendedPacksPrompt": "Pagbibigay ng {count} inirerekomenda na pack (s)?",
       "enablePacksDetail": "Ina-update nito ang rule_packs.enabled sa analysis_options.yaml. {preview}",
@@ -2687,43 +2687,43 @@
       "actionDontAskForVersion": "Huwag mong kwestyonin ang bersyon na ito",
       "actionLater": "Mamaya",
       "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Ito ay isang pangunahing bersyon at maaaring kailangan ang mga pagbabago sa config — tingnan ang changelog.",
-      "upgradeCheckerMajorUpdate": "Malaking update ng pag-update sa pag-upgrade.",
-      "upgradeCheckerMinorUpdate": "Maliit na pag-update ng update.",
-      "upgradeCheckerPatchUpdate": "Patch update ng pag-update sa patch.",
+      "upgradeCheckerMajorUpdate": "Major na update",
+      "upgradeCheckerMinorUpdate": "Minor na update",
+      "upgradeCheckerPatchUpdate": "Patch na update",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
-      "upgradeCheckerPubspecNotFound": "Saropa Lints: Hindi maitala ang pag-update ng pubspec.yaml — walang nakita ang entry na saropa_lints.",
+      "upgradeCheckerPubspecNotFound": "Saropa Lints: Hindi ma-update ang pubspec.yaml — hindi nakita ang entry ng saropa_lints.",
       "upgradeCheckerCancelled": "Kinansela ang pag-upgrade ng Saropa Lints. Ang pubspec.yaml ay na-update sa ^{version}; patakbuhin ang `{cmd} pub get` upang matapos, o ibalik ang pagbabago.",
-      "upgradeCheckerPubGetFailed": "Saropa Lints: nabigo ang pub. {detail}",
+      "upgradeCheckerPubGetFailed": "Saropa Lints: nabigo ang pub get. {detail}",
       "upgradeCheckerCheckOutput": "Suriin ang Output.",
       "upgradeCheckerUpgraded": "Na-upgrade ang Saropa Lints sa {version}.",
-      "actionUpgrade": "Mag-upgrade ng Upgrade na Pagpapahusay",
+      "actionUpgrade": "I-upgrade",
       "actionViewChangelog": "Tingnan ang Changelog",
       "healthCodeLensEnabled": "Saropa Project Map heat CodeLens ay pinagana.",
       "healthCodeLensDisabled": "Saropa Project Map heat CodeLens ay hindi pinagana.",
-      "reportViewCopiedPath": "Nakopya path ng ulat: {path} ang kanyang mga",
-      "reportViewCouldNotOpen": "Hindi maaaring buksan ang file ng ulat: {path} ang kanyang mga",
+      "reportViewCopiedPath": "Nakopya ang path ng ulat: {path}",
+      "reportViewCouldNotOpen": "Hindi mabuksan ang file ng ulat: {path}",
       "reportViewCopiedRowOne": "Nakopya ang {count} na hilera sa clipboard.",
       "reportViewCopiedRowOther": "Nakopya ang {count} na mga hilera sa clipboard.",
       "reportViewAlreadySuppressed": "Ang '{flag}' ay pinigilan na sa {file}.",
       "reportViewSuppressed": "Pinigilan ang '{flag}' sa {file}. .",
-      "reportViewCouldNotSuppress": "Hindi mapigilan ang '{flag}' sa {file}: {error} Ang mga bagay na may kaugnayan sa pag-aalaga ng hayop.",
-      "actionRescan": "Rescan muli ang iyong mga mata.",
-      "bulkUpdateNoUpdates": "Walang mga update na magagamit.",
+      "reportViewCouldNotSuppress": "Hindi ma-suppress ang '{flag}' sa {file}: {error}",
+      "actionRescan": "I-scan muli",
+      "bulkUpdateNoUpdates": "Walang magagamit na update",
       "bulkUpdateNoUpdatesFiltered": "Walang {filter} na mga update ang magagamit.",
-      "bulkUpdateFailed": "Nagkasala ang bulk update: {error} ang kanyang mga",
-      "bulkUpdateUpdatedOne": "Na-update ang pakete ng {count} na package.",
-      "bulkUpdateUpdatedOther": "Na-update ang mga pakete ng {count}.",
+      "bulkUpdateFailed": "Nabigo ang bulk update: {error}",
+      "bulkUpdateUpdatedOne": "Na-update ang {count} package",
+      "bulkUpdateUpdatedOther": "Na-update ang {count} package",
       "detailViewConstraintNotFound": "Hindi mahanap ang mga paghihigpit ng bersyon para sa {package}.",
       "detailViewUpdated": "Na-update ang {package} sa {version}."
     }
   },
   "analysisOptimizer": {
-    "tabTitle": "Saropa Lints: Optimizer ng Paglalaro",
-    "title": "Pagsusuri Optimizer",
+    "tabTitle": "Saropa Lints: Optimizer ng Pagsusuri",
+    "title": "Optimizer ng Pagsusuri",
     "subtitle": "Pangalawang pagtatanggal ng memorya ng analizer sa pamamagitan ng pag-iwas sa mga file na hindi pangunahing kailangan sa pagtatala",
     "emptyDescription": "I-scan ang iyong workspace upang makilala ang mga file at folder na may mataas na gastos na maaaring i-exclude sa Dart analyzer upang mapabawasan ang paggamit ng memorya.",
     "scanButton": "I-scan ang Workspace",
-    "rescanButton": "Rescan muli ang iyong mga mata.",
+    "rescanButton": "I-scan muli",
     "scanning": "Nag-scan ng workspace…",
     "openConfig": "I-Open analysis_options.yaml",
     "lastScan": "Huling pag-scan: {time}",
@@ -2731,9 +2731,9 @@
       "filesInScope": "Mga file sa scope",
       "lines": "mga linya",
       "files": "mga file",
-      "estimatedCost": "Estimado gastos sa analisis",
+      "estimatedCost": "Tinatayang gastos ng pagsusuri",
       "costUnits": "unit ng gastos",
-      "potentialSavings": "Mga posibleng pagkakapareho",
+      "potentialSavings": "Posibleng matitipid",
       "recommendations": "rekomendasyon"
     },
     "costHeavy": "Mabigat",
@@ -2744,7 +2744,7 @@
     "applyAll": "Pangalawang Patakaran:",
     "applySelected": "Pangkatin ang napiling",
     "apply": "Pangkatin",
-    "remove": "Alisin ang alisan ng pag-alis",
+    "remove": "Alisin",
     "selectAll": "Piliin lahat",
     "defaultLabel": "Karaniwan",
     "sortHint": "Click para sort",
@@ -2754,7 +2754,7 @@
     "col": {
       "status": "Katayuan",
       "pattern": "Pattern",
-      "files": "Mga file ng mga file.",
+      "files": "Mga file",
       "cost": "Est. gastos",
       "priority": "Prioridad"
     },
@@ -2768,7 +2768,7 @@
       "low": "Mababa"
     },
     "activeFilesWarning": "Ito ang folder na naglalaman ng mga binago kaharapang file",
-    "folderHeatMap": "Kostong pagbabase sa folder",
+    "folderHeatMap": "Gastos ng pagsusuri ng folder",
     "hints": {
       "title": "Paano ito gumagana",
       "body": "Ang optimizer ay nag-scan sa bawat Dart file sa workspace mo at nag-estimate ng analysis cost ayon sa komplikasyon ng file (line count, classes, functions, imports). Pagkatapos nito, ito ay nagrerekomenda ng mga pattern na pag-iexclude upang mapababa ang bilang ng mga file na inilalagay ng Dart analyzer sa memorya.",
@@ -2796,7 +2796,7 @@
     "diffTitle": "Analysis Optimizer: Mga Iminungkahing Pagbubukod"
   },
   "sidebarShell": {
-    "dashboardsViewTitle": "Mga Dashboard ng dashboard."
+    "dashboardsViewTitle": "Mga Dashboard"
   },
   "status": {
     "health": {
@@ -2805,7 +2805,7 @@
     },
     "badge": {
       "criticalTooltip": "{critical} kritikal, {total} total",
-      "totalTooltip": "{total} pagkakasala(s)"
+      "totalTooltip": "{total} paglabag"
     }
   },
   "staleIgnores": {
@@ -2823,7 +2823,7 @@
       "noneFound": "Walang mga komento sa pag-ignor ng mga panukat na nangungunat.",
       "found": "{count} mga ignore na stale sa {fileCount} file(s). Tingnan ang panel ng Problems para sa detalye.",
       "fixed": "Nakaraan na ang mga komento sa ignore. Tingnan ang panel ng Output para sa detalye.",
-      "fixedInFile": "Saropa Lints: naka-ayos na ang mga ignore na nakakalimot dito",
+      "fixedInFile": "Saropa Lints: naayos ang mga lumang ignore sa file na ito",
       "alreadyRunning": "Ang isang scan ng stale-ignore ay nagsisimula na."
     },
     "confirm": {
@@ -2866,7 +2866,7 @@
     },
     "action": {
       "openList": "I-Open List",
-      "restartAnalysis": "Ibalik ang Server ng Pagsusuri"
+      "restartAnalysis": "I-restart ang Analysis Server"
     },
     "diagnostic": {
       "staleFileMissing": "Nag-iiwan na entry: {file} ay wala nang magmula, kaya ang entry na ito para sa {rule} ay walang nangangatwiran.",
@@ -2924,7 +2924,7 @@
   },
   "sidebar": {
     "actions": {
-      "runAnalysisLabel": "Magpatakbo ng pagsusuri sa run analysis.",
+      "runAnalysisLabel": "Patakbuhin ang pagsusuri",
       "runAnalysisDescription": "Ibalik ang analisys",
       "latestEngineLabel": "I-scan gamit ang pinakabagong engine",
       "latestEngineDescription": "Ang Dart SDK ng proyekto na ito ay too old para sa live analysis",
@@ -2934,7 +2934,7 @@
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% na inreview",
       "hotspotsDescription": "{open} buksan",
-      "lastRunLabel": "Nangunguna · {ago}",
+      "lastRunLabel": "Huling takbo · {ago}",
       "machineHealthLabel": "Mga Kondisyon ng Sistemang Makina",
       "machineHealthDescription": "RAM, orphans & translation engine sa buong sistema"
     },
@@ -2949,7 +2949,7 @@
       "findingsWithViolationsFresh": "{count} na pagkakasala · puntos {score} · na-update ang {ago}",
       "packagesNeverScanned": "Paghahatid ng scan upang tukuyin ang mga dependensya",
       "packagesAllAdopted": "Lahat ng mga tampok na inilapat",
-      "packagesNeedlesCount": "{count} packages na magpapalit",
+      "packagesNeedlesCount": "{count} package na gagamitin",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Hindi pumasa ang gate",
       "codeHealthNeverScanned": "Punan ang Code Health upang makita ang iyong score",
@@ -2978,9 +2978,9 @@
   },
   "blastRadius": {
     "label": {
-      "upgrade": "Mag-upgrade ng Upgrade na Pagpapahusay",
-      "breaks": "Nagbabago",
-      "breaksLower": "nagbabago",
+      "upgrade": "I-upgrade",
+      "breaks": "Sumisira",
+      "breaksLower": "sumisira",
       "upgradeNotRecommended": "⚠️ Hindi itinuturo ang pag-update"
     },
     "notRecommended": "Hindi itinuturo ang pag-update",
@@ -3018,11 +3018,11 @@
     "noWorkspace": "Ibukod ang folder ng Dart project upang i-migrate ang pangalan ng rule.",
     "pickTitle": "Ilipat ang mga pinalitang-pangalang rule",
     "pickPlaceholder": "Piliin ang mga file na i-update",
-    "fileHits": "{hits} pagbabago(s)",
+    "fileHits": "{hits} pagbabago",
     "diffTitle": "Pagpapalit ng pangalan ng rule: {file}",
     "confirm": "Mag-aplay ng mga pagbabago sa pangalan ng rule para sa mga file {count}? Ang mga pagbabago ay nasa estado ng pagsusuri.",
     "apply": "Pangkatin",
-    "progress": "Pangangalakal ng mga binago ng mga rule",
+    "progress": "Inililipat ang mga pinalitan-pangalang panuntunan",
     "applied": "Nag-update ng reference sa rule {hits} sa mga file {count}: {files}.",
     "bareNames": "Hindi binago (igore ang mga komento nang walang saropa_lints/ prefix): {items}.",
     "clashes": "Ang parehong pangalan ng nakaraang at bagong rule ay naka-set, please merge by hand: {items}",
@@ -3108,7 +3108,7 @@
       "apply": "Pangkatin",
       "applying": "Pangangalap...",
       "preview": "I-preview ang diff",
-      "refresh": "Pangalawa ang pagsusuring uli",
+      "refresh": "Suriin muli",
       "diffTitle": "{file}: proporsiyon na bersyon ng pagbabago",
       "staleReloaded": "Ang proyekto ay nagbago habang naghahati ka sa kard, kaya walang anumang aplikasyon. Tumutulungan ka sa mga nai-update na payo at i-click muli ang Apply.",
       "loadFailed": "Hindi maaaring i-check ang kompatibilidad ng bersyon: {detail}",
@@ -3131,10 +3131,10 @@
     }
   },
   "lintsSwitch": {
-    "statusOn": "Saropa Lints: Sa",
+    "statusOn": "Saropa Lints: Naka-on",
     "statusOff": "Saropa Lints: Naka-off",
-    "statusPartial": "Saropa Lints: Nakakatapos na bahagi",
-    "tooltipOn": "Saropa Lints ay naka-set (setting at analyzer plugin). I-click para i-off.",
+    "statusPartial": "Saropa Lints: Bahagyang naka-off",
+    "tooltipOn": "Naka-on ang Saropa Lints (setting at analyzer plugin). I-click para i-off.",
     "tooltipOff": "Saropa Lints ay naka-off (setting at plugin ng analyzer). I-click para i-on ito.",
     "tooltipPartialSetting": "Sakop na bahagi: ang saropaLints.enabled ay wala nang aktibo habang ang analyzer plugin ay aktibo. I-click para i-repair (nagpapalakas ng pareho).",
     "tooltipPartialPlugin": "Sukat na hindi buo: ang plugin ng analyzer ay hindi nakakaactivate sa analysis_options.yaml habang ang setting ay nakaactivate. I-click para i-repair (nagpapalakas ng pareho).",
@@ -3196,16 +3196,16 @@
       "neverAskDeep": "Hindi Mo Na Ito Aayos",
       "applyPlugin": "Pangkatin",
       "noThanks": "Wala Kang Salita",
-      "restartAnalysisServer": "Ibalik ang Server ng Pagsusuri"
+      "restartAnalysisServer": "I-restart ang Analysis Server"
     },
     "picker": {
-      "title": "Pamamaraan ng Pag-scan",
+      "title": "Performance ng Scan",
       "machine": "{cores} CPU cores · {free} libre sa {total}",
       "recommended": "nangunguna para sa computer na ito",
       "resources": "{jobs} worker · {memory} badyet sa memorya",
       "openSettings": "I-unlock ang lahat ng mga setting ng scan",
       "profile": {
-        "gentle": "Ginintuang",
+        "gentle": "Banayad",
         "balanced": "Balansado",
         "fast": "Mabilis"
       },
