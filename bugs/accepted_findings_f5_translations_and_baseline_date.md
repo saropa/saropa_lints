@@ -16,6 +16,22 @@ Completed work: `plans/history/2026.11/2026.11.26/accepted_findings_list_open_it
 | `--explain` has no VS Code surface; the project rule asks for visible UI as well as CLI | Extension work (command, strings, translation run) and an F5 check |
 | "Summary tree shows N accepted" cannot be seen: the Summary tree is not registered as a view | Owner decision: drop the item or show the count elsewhere (step 29 checks the Manage Rule Packs strip) |
 
+## Results so far (agent run, 2026-11-27)
+
+1 step passed, 0 failed, 39 need the owner. **Left for you: steps 2 to 40.**
+
+| Step | Result | Evidence |
+|---|---|---|
+| 1 | Pass | `npm run compile` ran both type checks and ended `[watch] build finished` with no errors |
+| 2 to 23 | Needs owner | VS Code window steps; `extension/package.json` has no Extension Development Host test tool (`@vscode/test-electron` or similar) |
+| 24 | Needs owner (language server part passed) | Script against `bin/lsp_server.dart`, on a copy of `main` with the plugin section commented out and the `max: 1` list: `a.dart` got `avoid_catch_all` on line 13 only (not 5), plus `avoid_print_error` on 6 and 14. The editor display was not seen |
+| 25 to 31 | Needs owner | VS Code window or live analysis server steps |
+| 32 to 35, 37, 39 | Needs owner | They run `dart analyze`, which agents may not run |
+| 36, 38 | Needs owner | `dart run saropa_lints:baseline` runs `dart analyze` itself (`bin/baseline.dart`) |
+| 40 | Needs owner | Reads the baseline file that step 36 creates |
+
+The script run left `D:\tmp\accepted_check\` unchanged, so the test projects are ready for you. Steps 35 to 40 need only PowerShell, and steps 32 to 34 too.
+
 ## Checklist to run
 
 Every step says what to do and what a pass looks like. If a step does not pass, write down the step number and what appeared. The finding text always starts with the rule name in square brackets.
