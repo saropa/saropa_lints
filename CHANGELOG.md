@@ -66,6 +66,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.10.3] — Unreleased
+
+This release changes only the project's release tooling. Nothing changes for package or extension users. [log](https://github.com/saropa/saropa_lints/blob/v17.10.3/CHANGELOG.md)
+
+### Internal
+
+- The publish script no longer reports a CI watch timeout as a failure: it watches in 60-minute windows, and its retry, abort and local-publish prompts are safer.
+- The publish script runs independent build and test steps in parallel and retries only the failed steps; set `SAROPA_SERIAL_STEPS=1` to run them one at a time.
+
+---
+
 ## [17.10.2]
 
 `require_error_widget` stops asking for an error branch that can never run, and the VS Code extension can now explain which baseline settings hide findings in a file. Accepted findings are now counted wherever suppressions are broken down by kind. [log](https://github.com/saropa/saropa_lints/blob/v17.10.2/CHANGELOG.md)

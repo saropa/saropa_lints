@@ -55,19 +55,20 @@ from scripts.modules._pubdev_lint import (
     fix_doc_angle_brackets,
     fix_doc_references,
 )
+from scripts.modules._parallel_steps import (
+    run_analysis_and_tests,
+    run_release_checks,
+)
 from scripts.modules._publish_steps import (
     update_analysis_options_plugin_version,
     check_prerequisites,
     check_remote_sync,
     check_working_tree,
-    generate_docs,
     pre_publish_validation,
-    run_analysis,
     run_analyze_to_log,
     run_format,
     run_pre_publish_audits,
     run_pub_get,
-    run_tests,
     validate_changelog,
     verify_pubdev_publication,
 )
@@ -876,13 +877,15 @@ def run_pubdev_only_mode(
                 ExitCode.VALIDATION_FAILED,
             )
 
-        # Badge sync, changelog validation, docs, dry-run
-        release_notes = run_badge_validation_docs_dryrun(
+        # Badge sync and changelog validation write / prompt, so they go first
+        release_notes = run_badge_and_changelog(
             ctx.project_dir, version, ctx.rule_count, timer,
         )
 
-        # Final CI gate
-        run_final_ci_gate(ctx.project_dir, timer)
+        # Docs, dry run and final analysis together; no extension in this mode
+        run_release_check_gate(
+            ctx.project_dir, version, timer, with_extension=False,
+        )
 
         # Commit, tag, publish to pub.dev, GitHub release — NO extension
         run_commit_tag_publish_release(
@@ -1094,29 +1097,24 @@ def run_pre_publish_pipeline(
             lambda: run_format(project_dir),
             ExitCode.VALIDATION_FAILED,
         )
-    with timer.step("Analysis"):
-        # run_analysis already has its own Ignore/Retry/Abort prompt
-        # inside run_analysis_with_prompt, so a bare gate is fine here.
-        if not run_analysis(project_dir):
+    with timer.step("Analysis and tests"):
+        # Parallel group; it has its own Retry / Abort prompt, so a bare gate
+        # is enough here.
+        if not run_analysis_and_tests(project_dir):
             exit_with_error(
-                "Analysis failed.", ExitCode.ANALYSIS_FAILED,
+                "Analysis or tests failed.", ExitCode.TEST_FAILED,
             )
-    with timer.step("Tests"):
-        # run_tests already has its own Continue/Retry/Abort prompt
-        # inside _run_test_pass, so a bare gate is fine here.
-        if not run_tests(project_dir):
-            exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
 
 
-def run_badge_validation_docs_dryrun(
+def run_badge_and_changelog(
     project_dir: Path,
     version: str,
     rule_count: int,
     timer: StepTimer,
 ) -> str:
-    """Badge sync, CHANGELOG validation, docs, pre-publish dry-run.
+    """Badge sync and CHANGELOG validation (both before the parallel checks).
 
-    Each step prompts Retry / Ignore / Abort on failure.
+    CHANGELOG validation prompts Retry / Ignore / Abort on failure.
 
     Returns:
         Release notes string for GitHub release.
@@ -1146,41 +1144,27 @@ def run_badge_validation_docs_dryrun(
             exit_with_error(
                 "CHANGELOG failed", ExitCode.CHANGELOG_FAILED,
             )
-    with timer.step("Docs"):
-        _run_step_with_retry(
-            "Docs generation",
-            lambda: generate_docs(project_dir),
-            ExitCode.VALIDATION_FAILED,
-        )
-    with timer.step("Pre-publish validation"):
-        _run_step_with_retry(
-            "Pre-publish validation",
-            lambda: pre_publish_validation(project_dir),
-            ExitCode.VALIDATION_FAILED,
-        )
     return release_notes
 
 
-def run_final_ci_gate(project_dir: Path, timer: StepTimer) -> None:
-    """Re-run analysis after version bump; prompt RIA on failure.
+def run_release_check_gate(
+    project_dir: Path,
+    version: str,
+    timer: StepTimer,
+    *,
+    with_extension: bool,
+) -> None:
+    """Docs, dry run, final analysis and .vsix build; exit unless all pass.
 
-    run_analysis already has its own inner Ignore/Retry/Abort for
-    dart analyze, so this outer gate only fires when analysis
-    returns False (user chose Abort inside). The outer prompt gives
-    one more chance to retry or ignore before hard-exiting.
+    This is the last gate before commit / tag / publish, so there is no Ignore.
     """
-    with timer.step("Final CI gate"):
-        print_header("FINAL CI GATE")
-        print_info(
-            "Re-running CI checks after version changes to "
-            "prevent burning a tag on a broken build..."
-        )
-        _run_step_with_retry(
-            "Final CI gate",
-            lambda: run_analysis(project_dir),
-            ExitCode.ANALYSIS_FAILED,
-        )
-        print_success("CI gate passed — safe to create tag")
+    with timer.step("Release checks (parallel)"):
+        if not run_release_checks(project_dir, version, with_extension):
+            exit_with_error(
+                "Release checks failed. Nothing was committed or tagged.",
+                ExitCode.VALIDATION_FAILED,
+            )
+        print_success("All release checks passed — safe to create tag")
 
 
 def run_commit_tag_publish_release(
@@ -1461,33 +1445,15 @@ def run_full_publish(
                 ExitCode.VALIDATION_FAILED,
             )
 
-        release_notes = run_badge_validation_docs_dryrun(
+        release_notes = run_badge_and_changelog(
             ctx.project_dir, version, ctx.rule_count, timer,
         )
-        run_final_ci_gate(ctx.project_dir, timer)
-        # Package the VSIX before the optional re-run+watch in commit/release, so
+        # The VSIX is built here, before the commit and the CI watch, so
         # stopping the watch (or losing the process to a tool timeout) does not
         # mean "no .vsix on disk" when the extension compiles.
-        if extension_exists(ctx.project_dir):
-            with timer.step("Extension package"):
-                # Retry loop: package_extension may fail due to transient
-                # compile errors the developer can fix in another terminal.
-                def _try_package_extension() -> bool:
-                    package_extension(ctx.project_dir, version)
-                    expected = extension_vsix_path(ctx.project_dir, version)
-                    if not expected.is_file():
-                        print_error(
-                            f"Release requires extension/{expected.name} "
-                            "after package. Fix compile/vsce errors."
-                        )
-                        return False
-                    return True
-
-                _run_step_with_retry(
-                    "Extension packaging",
-                    _try_package_extension,
-                    ExitCode.VALIDATION_FAILED,
-                )
+        run_release_check_gate(
+            ctx.project_dir, version, timer, with_extension=True,
+        )
         run_commit_tag_publish_release(
             ctx.project_dir, version, ctx.branch, release_notes, timer,
         )

@@ -92,6 +92,8 @@ _REQUIRED_MODULES = [
     "modules/_git_ops.py",
     "modules/_pubdev_lint.py",
     "modules/_publish_steps.py",
+    "modules/_parallel.py",
+    "modules/_parallel_steps.py",
     "modules/_publish_workflow.py",
     "modules/_rule_metrics.py",
     "modules/_code_comment_metrics.py",

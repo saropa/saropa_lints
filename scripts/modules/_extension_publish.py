@@ -362,28 +362,33 @@ def run_extension_compile(project_dir: Path) -> bool:
     return True
 
 
-def run_extension_package(project_dir: Path, version: str) -> Path | None:
-    """Package .vsix with vsce. Returns path to .vsix or None on failure.
+def vsce_package_cmd(project_dir: Path, version: str) -> list[str]:
+    """Delete stale .vsix files and return the vsce command for *version*.
 
-    Removes stale .vsix files first so the glob cannot return an old
-    version (root cause of 9.1.0/9.2.0 never reaching the Marketplace).
+    Shared by the sequential and parallel packaging paths. Stale files go first
+    so a later glob cannot return an old version.
     """
-    ext_dir = _extension_dir(project_dir)
-    vsix_name = f"saropa-lints-{version}.vsix"
-    out_path = project_dir / vsix_name
-
     for old_vsix in project_dir.glob("*.vsix"):
         old_vsix.unlink()
-
     package_cmd = ["npx", "--yes", "@vscode/vsce", "package", "--no-dependencies",
-                   "--out", str(out_path)]
+                   "--out", str(extension_vsix_path(project_dir, version))]
     if is_prerelease_version(version):
         # vsce rejects a prerelease-suffixed version unless --pre-release
         # is passed — without it, packaging a "1.2.3-beta.1" version fails.
         package_cmd.append("--pre-release")
+    return package_cmd
 
+
+def run_extension_package(project_dir: Path, version: str) -> Path | None:
+    """Package .vsix with vsce. Returns path to .vsix or None on failure.
+
+    vsce_package_cmd removes stale .vsix files first so the glob cannot return
+    an old version (root cause of 9.1.0/9.2.0 never reaching the Marketplace).
+    """
+    ext_dir = _extension_dir(project_dir)
+    out_path = extension_vsix_path(project_dir, version)
     r = run_command(
-        package_cmd,
+        vsce_package_cmd(project_dir, version),
         ext_dir,
         "Package .vsix",
         capture_output=True,
@@ -643,8 +648,11 @@ def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path, version: str) 
     return True
 
 
-def package_extension(project_dir: Path, version: str) -> Path | None:
-    """Sync version, copy root changelog + readme, compile, and package .vsix. Returns path to .vsix or None.
+def prepare_extension_package(project_dir: Path, version: str) -> bool:
+    """Write the files the .vsix needs and run the locale coverage gate.
+
+    Everything here rewrites files or may prompt, so it runs on its own before
+    any build step. Returns False if the developer aborts at the locale gate.
 
     *version* is the pub.dev-style version and may carry a prerelease
     suffix (e.g. "1.2.3-beta.1"). The .vsix filename keeps that full
@@ -671,10 +679,10 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
         audit = audit_extension_locales(project_dir)
         if audit is True:
             print_success("Extension locale audit clean — no missing translations.")
-            break
+            return True
         if audit is None:
             # No i18n scripts present; nothing to gate.
-            break
+            return True
         choice = _prompt_locale_coverage_failure()
         if choice == "retry":
             print_info("Re-running extension locale audit...")
@@ -684,8 +692,14 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
                 "Continuing with missing extension translations — bundle will ship "
                 "with some English passthroughs."
             )
-            break
+            return True
         print_error("Publish aborted at extension locale coverage gate.")
+        return False
+
+
+def package_extension(project_dir: Path, version: str) -> Path | None:
+    """Sync version, copy root changelog + readme, compile, and package .vsix. Returns path to .vsix or None."""
+    if not prepare_extension_package(project_dir, version):
         return None
     # Keep the bundled rule-metadata catalog current with the rule definitions
     # before compiling it into the .vsix (non-fatal — ships the committed catalog

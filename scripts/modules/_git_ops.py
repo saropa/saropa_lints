@@ -27,8 +27,12 @@ from scripts.modules._extension_publish import (
     set_extension_version,
 )
 from scripts.modules._utils import (
+    ExitCode,
+    exit_with_error,
     hardened_env,
+    is_non_interactive,
     is_windows,
+    safe_input,
     safe_run,
     start_watchdog,
     Color,
@@ -909,27 +913,44 @@ def _move_major_version_tag(project_dir: Path, version: str) -> bool:
     return True
 
 
+# One watch window for the publish workflow. Successful runs take 6 to 15
+# minutes (analyze + full test suite) and the workflow sets no job timeout, so
+# the former 10-minute ceiling expired on healthy runs. Expiry is not a
+# failure: the run state is re-queried.
+_CI_WATCH_WINDOW_S = 60 * 60
+# Pause before re-watching, so a `gh` that exits at once (network, auth) cannot
+# spin the loop.
+_CI_REWATCH_PAUSE_S = 30
+# Unattended runs have nobody to press Abort, so they stop after this long.
+_CI_UNATTENDED_LIMIT_S = 2 * _CI_WATCH_WINDOW_S
+
+
 def _find_workflow_run(
     project_dir: Path, tag_name: str,
 ) -> str | None:
-    """Poll GitHub Actions until the publish workflow run appears.
+    """Poll GitHub Actions until the publish run for *tag_name* appears.
 
-    The publish workflow is triggered by a tag push (e.g. v6.2.2). Tag-triggered
-    runs are not always associated with headBranch in the API, so we list by
-    workflow only and accept the most recent run created since we started
-    polling (within a short window). Retries every 30 seconds for up to 10 minutes.
+    A tag-triggered run reports the tag as headBranch. The run must also match
+    the tagged commit, so a run left over from before a tag was moved is not
+    picked up. Runs of any conclusion are returned: the caller reads the real
+    state, which lets a run that was re-run on GitHub be found again. There is
+    deliberately no "any recent run" fallback, which could report another tag's
+    success as this release's. Retries every 30 seconds for up to 10 minutes.
 
-    Returns the run's database ID as a string, or None.
+    Returns the newest matching run's database ID as a string, or None.
     """
-    import json
     import time
-    from datetime import datetime, timezone
 
     use_shell = get_shell_mode()
     max_wait = 600
     interval = 30
-    # Only accept runs created after we started (minus a small buffer for clock skew).
-    started_at = datetime.now(timezone.utc).timestamp() - 120
+    # `rev-list -n 1` peels an annotated tag to its commit without a caret,
+    # which cmd.exe would eat under shell=True.
+    rev = safe_run(
+        ["git", "rev-list", "-n", "1", tag_name],
+        cwd=project_dir, capture_output=True, text=True, shell=use_shell,
+    )
+    tag_sha = rev.stdout.strip() if rev.returncode == 0 else ""
 
     for elapsed in range(0, max_wait + 1, interval):
         if elapsed > 0:
@@ -945,8 +966,8 @@ def _find_workflow_run(
             [
                 "gh", "run", "list",
                 "--workflow=publish.yml",
-                "--limit=5",
-                "--json=databaseId,status,conclusion,createdAt,headBranch",
+                "--limit=20",
+                "--json=databaseId,headBranch,headSha",
             ],
             cwd=project_dir,
             capture_output=True,
@@ -961,27 +982,95 @@ def _find_workflow_run(
         except json.JSONDecodeError:
             continue
 
+        # gh lists newest first, so the first match is the current run.
         for run in runs:
-            # Skip runs that already completed with a failure — on retry
-            # we need a fresh (queued/in_progress) run, not the old one.
-            if run.get("conclusion") == "failure":
+            if run.get("headBranch") != tag_name:
                 continue
-
-            # Prefer run that matches our tag (headBranch can be tag for tag pushes).
-            if run.get("headBranch") == tag_name:
-                return str(run["databaseId"])
-            # Otherwise accept if created after we (roughly) started waiting.
-            created_at = run.get("createdAt") or ""
-            try:
-                created_ts = datetime.fromisoformat(
-                    created_at.replace("Z", "+00:00")
-                ).timestamp()
-                if created_ts >= started_at:
-                    return str(run["databaseId"])
-            except (ValueError, TypeError):
-                pass
+            if tag_sha and run.get("headSha") != tag_sha:
+                continue
+            return str(run["databaseId"])
 
     return None
+
+
+def _query_run_state(project_dir: Path, run_id: str) -> tuple[str, str]:
+    """Return the run's (status, conclusion); ("unknown", "") if unreadable.
+
+    This is the only source of truth for success or failure. The exit code of
+    `gh run watch` is not: it is non-zero on a timeout or a network drop too.
+    """
+    result = safe_run(
+        ["gh", "run", "view", run_id, "--json=status,conclusion"],
+        cwd=project_dir, capture_output=True, text=True,
+        shell=get_shell_mode(),
+    )
+    if result.returncode != 0:
+        return "unknown", ""
+    try:
+        data = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return "unknown", ""
+    return data.get("status") or "unknown", data.get("conclusion") or ""
+
+
+def _prompt_keep_watching() -> bool:
+    """Ask whether to keep watching an unfinished run. Enter keeps watching."""
+    print_colored("  [K]eep watching  [default]", Color.CYAN)
+    print_colored("  [A]bort  (the workflow keeps running on GitHub)", Color.CYAN)
+    # safe_input returns its default on Ctrl+C / EOF, so that default is abort;
+    # a plain Enter returns "" and falls back to keep watching.
+    raw = safe_input("  Choice [K/a]: ", "a").strip().lower() or "k"
+    return not raw.startswith("a")
+
+
+def _follow_publish_run(
+    project_dir: Path, run_id: str, run_url: str,
+) -> str:
+    """Watch a run until GitHub reports it completed, or watching is stopped.
+
+    Returns "success", "failed" (completed with any other conclusion), or
+    "stopped" (still unfinished; the user, or the unattended limit, gave up).
+    """
+    import time
+
+    started = time.monotonic()
+    watched = False
+    while True:
+        # Query before watching so a finished run is reported without a watch.
+        status, conclusion = _query_run_state(project_dir, run_id)
+        if status == "completed":
+            return "success" if conclusion == "success" else "failed"
+
+        if watched:
+            print_warning(
+                f"Publish workflow {run_id} has not finished "
+                f"(status: {status}). This is not a failure."
+            )
+            print_colored(f"  URL: {run_url}", Color.DIM)
+            if is_non_interactive():
+                if time.monotonic() - started >= _CI_UNATTENDED_LIMIT_S:
+                    return "stopped"
+            elif not _prompt_keep_watching():
+                return "stopped"
+
+        try:
+            if watched:
+                time.sleep(_CI_REWATCH_PAUSE_S)
+            print_info(f"Watching workflow run {run_id}...")
+            safe_run(
+                ["gh", "run", "watch", run_id, "--exit-status"],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                shell=get_shell_mode(),
+                timeout=_CI_WATCH_WINDOW_S,
+            )
+        except KeyboardInterrupt:
+            # Ctrl+C only stops the local watch; fall through to the re-query
+            # and the keep-watching / abort choice.
+            print()
+            print_warning("Watch interrupted; the workflow is still on GitHub.")
+        watched = True
 
 
 def _report_workflow_failure(
@@ -1083,12 +1172,13 @@ def _is_auth_prompt_line(line: str) -> bool:
 def _offer_local_publish(project_dir: Path) -> bool:
     """Offer to publish from the local machine when CI publish fails.
 
+    Callers must first confirm the CI run has completed without success;
+    publishing while it is still running risks a double publish.
+
     Falls back to `dart pub publish --force` using the developer's
     local pub.dev credentials (from `dart pub login`). This bypasses
     GitHub Actions OIDC entirely.
     """
-    from scripts.modules._utils import safe_input
-
     print()
     print_warning("CI publish failed. You can publish locally instead.")
     print_info(
@@ -1096,10 +1186,12 @@ def _offer_local_publish(project_dir: Path) -> bool:
         "(from `dart pub login`)."
     )
     choice = safe_input(
-        "  Publish locally with `dart pub publish --force`? [Y/n]: ",
-        "y",
+        "  Publish locally with `dart pub publish --force`? [y/N]: ",
+        "n",
     ).strip().lower()
-    if choice == "n":
+    # Opt-in only: safe_input returns the default on Ctrl+C / EOF, so a "yes"
+    # default would publish when the user was trying to get out.
+    if choice != "y":
         return False
 
     if not _ensure_pubdev_login(project_dir):
@@ -1163,74 +1255,119 @@ def _offer_local_publish(project_dir: Path) -> bool:
     return False
 
 
+def _print_manual_finish(version: str, run_url: str) -> None:
+    """Print how to finish the release by hand after leaving step 14.
+
+    The script has no resume mode: running the full publish again sees the tag
+    on the remote and bumps to the next version.
+    """
+    tag_name = f"v{version}"
+    prerelease = " --prerelease" if is_prerelease_version(version) else ""
+    notes_code = (
+        "from pathlib import Path; "
+        "from scripts.modules._version_changelog "
+        "import validate_changelog_version as v; "
+        f"Path('release_notes.tmp.md').write_text("
+        f"v(Path('.'), '{version}'), encoding='utf-8')"
+    )
+    print()
+    print_warning(
+        f"{tag_name} is already pushed. Do NOT re-run the full publish for it: "
+        f"that bumps to the next version."
+    )
+    print_info(f"  1. Wait for CI to succeed: {run_url}")
+    print_info("  2. From the project root, create the GitHub release:")
+    print_colored(f'     python -c "{notes_code}"', Color.CYAN)
+    print_colored(
+        f'     gh release create {tag_name} --title "Release {tag_name}" '
+        f"--notes-file release_notes.tmp.md{prerelease}",
+        Color.CYAN,
+    )
+    print_info(
+        "  3. Publish the extension: python scripts/publish.py, then choose "
+        "'Publish existing .vsix'."
+    )
+
+
+def _prompt_after_ci_failure(allow_local: bool) -> str:
+    """Menu after a failed or missing run. Returns "check", "local" or "abort"."""
+    print()
+    print_colored(
+        "  [C]heck again  (re-read GitHub; picks up a re-run and continues "
+        "the release)  [default]",
+        Color.CYAN,
+    )
+    if allow_local:
+        print_colored("  [L]ocal publish  (dart pub publish --force)", Color.CYAN)
+    print_colored("  [A]bort  (stop the publish)", Color.CYAN)
+    options = "C/l/a" if allow_local else "C/a"
+    # Default on Ctrl+C / EOF is abort; a plain Enter checks again.
+    raw = safe_input(f"  Choice [{options}]: ", "a").strip().lower() or "c"
+    if raw.startswith("a"):
+        return "abort"
+    if raw.startswith("l") and allow_local:
+        return "local"
+    return "check"
+
+
 def publish_to_pubdev_step(
     project_dir: Path, version: str,
 ) -> bool:
     """Step 14: Wait for GitHub Actions publish workflow.
 
-    Polls until the workflow run appears, then watches it to
-    completion. Returns True only when the workflow succeeds.
+    Returns True when the workflow (or an explicitly chosen local publish)
+    succeeds. Never re-pushes the tag. Interactive abort exits here, so the
+    caller's generic Retry / Abort menu is not stacked on top; unattended
+    runs return False and let the caller's auto-retry decide.
     """
     print_header("STEP 14: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
 
     tag_name = f"v{version}"
-    use_shell = get_shell_mode()
-    remote_url = get_remote_url(project_dir)
-    repo_path = extract_repo_path(remote_url)
+    repo_path = extract_repo_path(get_remote_url(project_dir))
+    actions_url = f"https://github.com/{repo_path}/actions"
 
     print_info(
         "Tag push triggered GitHub Actions publish workflow."
     )
-    print_colored(
-        f"  Waiting for workflow to appear...",
-        Color.CYAN,
-    )
-    print_colored(
-        f"  Monitor: https://github.com/{repo_path}/actions",
-        Color.DIM,
-    )
+    print_colored(f"  Monitor: {actions_url}", Color.DIM)
     print()
 
-    run_id = _find_workflow_run(project_dir, tag_name)
-    ci_ok = False
-    if not run_id:
-        print_warning(
-            f"No publish workflow found for tag {tag_name} "
-            f"after 10m."
-        )
-    else:
-        print_info(f"Watching workflow run {run_id}...")
-        try:
-            watch_result = safe_run(
-                ["gh", "run", "watch", run_id, "--exit-status"],
-                cwd=project_dir,
-                capture_output=True,
-                text=True,
-                shell=use_shell,
-                timeout=600,
-            )
-        except subprocess.TimeoutExpired:
-            print_warning(
-                f"Publish workflow {run_id} still running after the watch "
-                f"window. Monitor: https://github.com/{repo_path}/actions"
-            )
-        except KeyboardInterrupt:
-            print()
-            print_warning(
-                f"Stopped watching workflow {run_id} — it keeps running on "
-                f"GitHub Actions. "
-                f"Monitor: https://github.com/{repo_path}/actions/runs/{run_id}"
-            )
+    while True:
+        run_id = _find_workflow_run(project_dir, tag_name)
+        run_url = f"{actions_url}/runs/{run_id}" if run_id else actions_url
+        if not run_id:
+            outcome = "missing"
+            print_warning(f"No publish workflow found for tag {tag_name}.")
         else:
-            if watch_result.returncode == 0:
-                print_success(
-                    "GitHub Actions publish workflow succeeded!"
-                )
-                return True
+            outcome = _follow_publish_run(project_dir, run_id, run_url)
+
+        if outcome == "success":
+            print_success("GitHub Actions publish workflow succeeded!")
+            return True
+        if outcome == "failed":
             _report_workflow_failure(project_dir, run_id, repo_path)
 
-    # CI publish failed or was not found — offer local publish fallback.
-    return _offer_local_publish(project_dir)
+        # An unfinished ("stopped") run gets no menu and no local publish,
+        # which would risk a double publish.
+        if outcome != "stopped" and not is_non_interactive():
+            # Local publish needs a confirmed failure; a "missing" run may
+            # still be queued.
+            choice = _prompt_after_ci_failure(allow_local=outcome == "failed")
+            if choice == "check":
+                continue
+            if choice == "local":
+                # The run may have been re-run while the menu was waiting.
+                if _query_run_state(project_dir, run_id)[0] != "completed":
+                    print_warning("Cannot confirm the run is still finished.")
+                    continue
+                if _offer_local_publish(project_dir):
+                    return True
+                continue
+
+        _print_manual_finish(version, run_url)
+        if is_non_interactive():
+            return False
+        exit_with_error("Publish stopped at step 14.", ExitCode.PUBLISH_FAILED)
 
 
 def create_github_release(
