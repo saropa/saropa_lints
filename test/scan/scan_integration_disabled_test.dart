@@ -109,6 +109,42 @@ void main() {
     );
   }, timeout: const Timeout(Duration(minutes: 3)));
 
+  // The stale-ignore modes used to print "scan skipped" here because their
+  // scan reported live ignores as stale. Now evidence-gated, they run: the
+  // live comment is kept and only the dead one is reported.
+  test('--find-stale-ignores runs on a disabled plugin block', () async {
+    writeDisabledProject();
+    File(p.join(dir.path, 'lib', 'a.dart')).writeAsStringSync(
+      'void f() {\n'
+      '  try {\n'
+      '  } catch (e) {\n'
+      '    // ignore: avoid_print_error\n'
+      '    print(e);\n'
+      '  }\n'
+      '  // ignore: avoid_print_error\n'
+      '  int x = 1;\n'
+      '}\n',
+    );
+    final json = p.join(dir.path, 'stale.json');
+    final result = await Process.run('dart', [
+      'run',
+      'saropa_lints',
+      'scan',
+      dir.path,
+      '--find-stale-ignores',
+      '--format',
+      'json',
+      '--json-file-path',
+      json,
+    ]);
+    final log = '${result.stdout}${result.stderr}';
+    // Exit 1 = stale comments found (the dead one), not a failure.
+    expect(result.exitCode, 1, reason: log);
+    final out = File(json).readAsStringSync();
+    expect(out, matches(RegExp(r'"totalCount":\s*1')), reason: log);
+    expect(out, matches(RegExp(r'"commentLine":\s*7')), reason: log);
+  }, timeout: const Timeout(Duration(minutes: 3)));
+
   test('a plain scan of a configured, disabled project is skipped', () async {
     writeDisabledProject();
     final result = await Process.run('dart', [

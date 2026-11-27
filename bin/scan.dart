@@ -87,15 +87,21 @@ Future<void> main(List<String> args) async {
     exit(result.hasMismatch ? 1 : 0);
   }
 
+  // Stale-ignore modes judge comments from an evidence-gated scan (see
+  // runStaleIgnoreScan), never from the normal one.
+  final staleMode = parsed.findStaleIgnores || parsed.fixStaleIgnores;
+
   // Plugin block commented out by the VS Code extension and no explicit tier:
   // report "disabled" and succeed so hooks and CI do not show a failure for a
-  // switched-off project. Not for --check-accepted: the extension also
-  // comments the block out when the language server replaces the plugin, and
-  // skipping there exited 0 without the result file the caller reads. The
-  // stale-ignore modes still skip: they report live ignores as stale (see the
-  // open items in bugs/), and --fix-stale-ignores would delete them.
+  // switched-off project. Not for --check-accepted or the stale-ignore modes:
+  // the extension also comments the block out when the language server
+  // replaces the plugin, and the rule list is then read from the commented
+  // block. The stale check only removes a comment its own scan proved
+  // unneeded for a rule that ran, so a rule the server runs but this scan
+  // does not keeps its comments.
   if (tier == null &&
       !parsed.checkAccepted &&
+      !staleMode &&
       loadScanConfig(p.absolute(path), includeDisabledBlock: false) == null &&
       isScanIntegrationDisabled(p.absolute(path))) {
     print('saropa_lints is disabled in analysis_options.yaml; scan skipped.');
@@ -120,10 +126,13 @@ Future<void> main(List<String> args) async {
   // --fail-on-count thresholds and CI reports wrong. --max-issues N or the
   // SAROPA_LINTS_MAX env var (shared with the IDE plugin) opt back in. Held
   // in a local so --check-accepted can tell whether output may be trimmed.
-  final maxIssues =
-      parsed.maxIssues ??
-      int.tryParse(Platform.environment['SAROPA_LINTS_MAX'] ?? '') ??
-      0;
+  // The stale check is always uncapped: a trimmed list would make live
+  // comments look stale.
+  final maxIssues = staleMode
+      ? 0
+      : parsed.maxIssues ??
+            int.tryParse(Platform.environment['SAROPA_LINTS_MAX'] ?? '') ??
+            0;
 
   // --quiet: suppress ALL stderr progress/status from the scanner by routing
   // messages to a no-op sink. The caller gets only the exit code + stdout.
@@ -149,6 +158,31 @@ Future<void> main(List<String> args) async {
     // .dart_tool/, etc.) so the scan covers every .dart file it finds.
     noExclude: parsed.noExclude,
   );
+  // --find-stale-ignores / --fix-stale-ignores: their own scan, resolved and
+  // in-process, with every finding reported and coverage recorded. Both
+  // helpers call exit() themselves; find wins when both flags are given.
+  if (staleMode) {
+    final scan = await runStaleIgnoreScan(runner);
+    if (scan == null) exit(2);
+    final files = _staleIgnoreFiles(
+      path,
+      dartFiles,
+      excludeGlobs,
+      parsed.includeGlobs,
+    );
+    if (parsed.findStaleIgnores) {
+      _runFindStaleIgnores(
+        scan,
+        files,
+        path,
+        formatJson,
+        parsed.jsonFilePath,
+        quiet,
+      );
+    }
+    _runFixStaleIgnores(scan, files, path, quiet);
+  }
+
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default
   // path stays the fast syntactic parse.
@@ -256,43 +290,10 @@ Future<void> main(List<String> args) async {
     if (skipped >= dartFiles.length || parsed.strictFiles) exit(2);
   }
 
-  // --find-stale-ignores: detect ignore comments whose suppressed rule no
-  // longer fires. Runs AFTER the scan so we have the full diagnostic set to
-  // diff against the ignore directives in the source files.
-  if (parsed.findStaleIgnores) {
-    _runFindStaleIgnores(
-      diagnostics,
-      path,
-      dartFiles,
-      formatJson,
-      parsed.jsonFilePath,
-      quiet,
-      excludeGlobs,
-      parsed.includeGlobs,
-    );
-    // _runFindStaleIgnores calls exit() internally.
-  }
-
-  // --fix-stale-ignores: detect stale ignores AND automatically remove them
-  // from the source files. Runs the same detection as --find-stale-ignores,
-  // then writes the cleaned files back to disk.
-  if (parsed.fixStaleIgnores) {
-    _runFixStaleIgnores(
-      diagnostics,
-      path,
-      dartFiles,
-      quiet,
-      excludeGlobs,
-      parsed.includeGlobs,
-    );
-    // _runFixStaleIgnores calls exit() internally.
-  }
-
   // Honor // ignore: and // ignore_for_file: directives by filtering
-  // diagnostics that the user has explicitly suppressed. The scan itself
-  // deliberately ignores these (so stale-ignore detection can compare
-  // against the full set), but output shown to the user must respect them.
-  // Resolve the scanned file list the same way stale-ignore does.
+  // diagnostics that the user has explicitly suppressed. The reporter
+  // already drops most of them; this also covers findings its own checks do
+  // not see (e.g. offset-only reports).
   final scannedFiles = dartFiles.isNotEmpty
       ? dartFiles
             .map(
@@ -666,40 +667,68 @@ void _runFixIgnores(String targetPath) {
   }
 }
 
-/// Detects stale `// ignore:` comments by comparing ignore directives against
-/// the diagnostics the scan actually produced. An ignore is stale when its rule
-/// did not fire on the target line — the code was fixed but the ignore remains.
-///
-/// Resolves the file list the same way the scanner does: from [dartFiles] if
-/// specified, otherwise by discovering all `.dart` files under [targetPath].
-void _runFindStaleIgnores(
-  List<ScanDiagnostic> diagnostics,
+/// The `.dart` files the stale-ignore modes read comments from: [dartFiles]
+/// when given, otherwise every file discovered under [targetPath]. Same
+/// resolution as the scan itself, so no comment outside the scan is judged
+/// (and any file the scan did not walk is kept by its coverage check).
+List<String> _staleIgnoreFiles(
   String targetPath,
   List<String> dartFiles,
-  bool formatJson,
-  String? jsonFilePath,
-  bool quiet,
   List<String> excludeGlobs,
   List<String> includeGlobs,
 ) {
-  // Resolve the scanned file list so we can parse ignore comments from every
-  // file the scan covered — including files with zero diagnostics.
-  final files = dartFiles.isNotEmpty
-      ? dartFiles
-            .map(
-              (f) => p.isAbsolute(f)
-                  ? p.normalize(f)
-                  : p.normalize(p.join(p.absolute(targetPath), f)),
-            )
-            .where((f) => f.endsWith('.dart'))
-            .toList()
-      : ScanRunner.discoverDartFiles(
-          p.absolute(targetPath),
-          excludeGlobs: excludeGlobs,
-          includeGlobs: includeGlobs,
-        );
+  if (dartFiles.isEmpty) {
+    return ScanRunner.discoverDartFiles(
+      p.absolute(targetPath),
+      excludeGlobs: excludeGlobs,
+      includeGlobs: includeGlobs,
+    );
+  }
+  return dartFiles
+      .map(
+        (f) => p.isAbsolute(f)
+            ? p.normalize(f)
+            : p.normalize(p.join(p.absolute(targetPath), f)),
+      )
+      .where((f) => f.endsWith('.dart'))
+      .toList();
+}
 
-  final stale = detectStaleIgnores(diagnostics: diagnostics, files: files);
+/// Stale comments in [files], judged only where [scan] has positive evidence
+/// (rule ran, file fully walked). Tells the user, on stderr so JSON stdout
+/// stays clean, how many files were kept unjudged because the scan did not
+/// cover them.
+List<StaleIgnore> _detectStale(
+  StaleIgnoreScan scan,
+  List<String> files, {
+  required bool quiet,
+}) {
+  final uncovered = files.length - scan.coverage.walkedCount(files);
+  if (uncovered > 0 && !quiet) {
+    stderr.writeln(
+      '$uncovered file(s) could not be fully scanned; their ignore comments '
+      'were kept.',
+    );
+  }
+  return detectStaleIgnores(
+    diagnostics: scan.diagnostics,
+    files: files,
+    coverage: scan.coverage,
+  );
+}
+
+/// Detects stale `// ignore:` comments by comparing ignore directives against
+/// the diagnostics the stale scan produced. An ignore is stale when its rule
+/// ran on the file and did not fire on the target line.
+void _runFindStaleIgnores(
+  StaleIgnoreScan scan,
+  List<String> files,
+  String targetPath,
+  bool formatJson,
+  String? jsonFilePath,
+  bool quiet,
+) {
+  final stale = _detectStale(scan, files, quiet: quiet);
 
   if (formatJson) {
     _writeJson(staleIgnoresToJsonString(stale), jsonFilePath, quiet: quiet);
@@ -788,35 +817,16 @@ void _runCheckAccepted({
 }
 
 /// Detects stale `// ignore:` comments and automatically removes them from
-/// the source files. Prints a summary of what was fixed.
-///
-/// Uses the same file-resolution logic as [_runFindStaleIgnores] so the
-/// detection covers the same set of files the scan analyzed.
+/// the source files. Prints a summary of what was fixed. Uses the same
+/// evidence-gated detection as [_runFindStaleIgnores], so a comment is only
+/// removed when the scan proved it unneeded.
 void _runFixStaleIgnores(
-  List<ScanDiagnostic> diagnostics,
+  StaleIgnoreScan scan,
+  List<String> files,
   String targetPath,
-  List<String> dartFiles,
   bool quiet,
-  List<String> excludeGlobs,
-  List<String> includeGlobs,
 ) {
-  // Resolve the scanned file list identically to _runFindStaleIgnores.
-  final files = dartFiles.isNotEmpty
-      ? dartFiles
-            .map(
-              (f) => p.isAbsolute(f)
-                  ? p.normalize(f)
-                  : p.normalize(p.join(p.absolute(targetPath), f)),
-            )
-            .where((f) => f.endsWith('.dart'))
-            .toList()
-      : ScanRunner.discoverDartFiles(
-          p.absolute(targetPath),
-          excludeGlobs: excludeGlobs,
-          includeGlobs: includeGlobs,
-        );
-
-  final stale = detectStaleIgnores(diagnostics: diagnostics, files: files);
+  final stale = _detectStale(scan, files, quiet: quiet);
 
   if (stale.isEmpty) {
     print('\nNo stale ignore comments found. Nothing to fix.');

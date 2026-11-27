@@ -1,11 +1,13 @@
 /// Detects stale `// ignore:` comments that suppress diagnostics which no
 /// longer fire on the target line.
 ///
-/// The scan CLI does not honor `// ignore:` directives during rule execution
-/// — rules always report diagnostics regardless. This is deliberate: it lets
-/// stale-ignore detection compare the full diagnostic set against ignore
-/// comments. The [filterIgnoredDiagnostics] function applies suppression
-/// AFTER scanning, so the default output path respects user-placed ignores.
+/// The reporter honors `// ignore:` during a normal scan and drops the
+/// finding, so a normal scan's diagnostics cannot judge staleness: a live
+/// comment looks exactly like a dead one. The stale modes scan through
+/// `runStaleIgnoreScan`, which arms `StaleIgnoreProbe` so every finding is
+/// reported and the scan's coverage is recorded. [filterIgnoredDiagnostics]
+/// also applies suppression after scanning, for findings the reporter's own
+/// checks do not cover (e.g. `atOffset` reports).
 ///
 /// Two Dart conventions are handled:
 /// - Standalone `// ignore:` on its own line: suppresses the NEXT line.
@@ -18,6 +20,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rule_name_utils.dart' show allSaropaRuleNames;
 
 import 'scan_diagnostic.dart';
+import 'stale_ignore_probe.dart' show StaleIgnoreCoverage;
 
 /// A single stale ignore finding: an ignore directive whose suppressed rule
 /// did not produce a diagnostic on the target line.
@@ -193,9 +196,17 @@ Set<int> commentIgnoredLines(String content, String rule) => {
 /// A stale ignore is one where the scan did not produce a diagnostic for the
 /// referenced rule on the target line — meaning the diagnostic no longer fires
 /// and the ignore comment is dead weight.
+///
+/// [diagnostics] must include findings a comment would hide, which a normal
+/// scan does not (the reporter drops them), so callers get both arguments
+/// from `runStaleIgnoreScan`. With [coverage], a comment is judged only when
+/// its rule ran, its file was fully walked, and the reporter hid no finding
+/// of that rule on a line the parser cannot place; anything else is kept.
+/// Without [coverage] the caller vouches that [diagnostics] is complete.
 List<StaleIgnore> detectStaleIgnores({
   required List<ScanDiagnostic> diagnostics,
   required List<String> files,
+  StaleIgnoreCoverage? coverage,
 }) {
   // Build a lookup: (filePath, line) -> set of rule names that fired.
   // This makes per-ignore checking O(1) instead of scanning the full
@@ -217,8 +228,23 @@ List<StaleIgnore> detectStaleIgnores({
 
     final content = file.readAsStringSync();
     final entries = _parseIgnoreComments(content, filePath);
+    // Lines each rule's comments point at, for the coverage check below.
+    final targetsByRule = <String, Set<int>>{};
+    for (final e in entries) {
+      targetsByRule.putIfAbsent(e.ruleName, () => <int>{}).add(e.targetLine);
+    }
 
     for (final entry in entries) {
+      // No positive evidence the rule could have reported here: keep the
+      // comment rather than risk deleting one that is still needed.
+      if (coverage != null &&
+          !coverage.canJudge(
+            filePath,
+            entry.ruleName,
+            targetsByRule[entry.ruleName]!,
+          )) {
+        continue;
+      }
       // Normalize to match the diagnostic-side keys built above.
       final key = '${_normalizePath(entry.filePath)}:${entry.targetLine}';
       final rulesOnLine = firedRules[key];

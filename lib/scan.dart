@@ -58,3 +58,8 @@ export 'src/scan/stale_ignore_detector.dart'
         filterIgnoredDiagnostics,
         fixStaleIgnores,
         staleIgnoresToJsonString;
+// The evidence-gated scan the stale modes need: a normal scan's list lacks
+// findings an `// ignore:` hides, so it cannot judge staleness on its own.
+export 'src/scan/stale_ignore_probe.dart' show StaleIgnoreCoverage;
+export 'src/scan/stale_ignore_scan.dart'
+    show StaleIgnoreScan, runStaleIgnoreScan;

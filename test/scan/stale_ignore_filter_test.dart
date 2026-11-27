@@ -3,12 +3,13 @@
 ///
 /// WHY THIS FILE EXISTS
 /// --------------------
-/// The scan CLI deliberately does NOT honor ignore directives during rule
-/// execution — every rule reports unconditionally. Suppression is applied
-/// afterwards by [filterIgnoredDiagnostics] (see `bin/scan.dart`, which calls
-/// it on the raw diagnostic list before any output path). That split is
-/// load-bearing: [detectStaleIgnores] needs the UNFILTERED set so it can ask
-/// "did this rule actually fire on the line this ignore protects?".
+/// [filterIgnoredDiagnostics] applies suppression to a diagnostic list after
+/// scanning (see `bin/scan.dart`). [detectStaleIgnores] needs the UNFILTERED
+/// set so it can ask "did this rule actually fire on the line this ignore
+/// protects?". Note the reporter itself also drops ignored findings in a
+/// normal scan, so the stale modes scan through `runStaleIgnoreScan`
+/// (covered end to end in `stale_ignore_live_test.dart`); the tests here
+/// feed hand-built diagnostics.
 ///
 /// Until this file was written, nothing pinned that behavior in either
 /// direction. The gap was silent: a change that moved suppression upstream

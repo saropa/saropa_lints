@@ -38,6 +38,7 @@ import 'scan_pressure.dart' show PressureLimits;
 import 'scan_diagnostic.dart';
 import 'scan_rule_context.dart';
 import 'scan_rule_tracer.dart';
+import 'stale_ignore_probe.dart' show StaleIgnoreCoverage;
 import 'scan_walker.dart';
 
 /// Optional sink for progress and error messages. When null, output goes
@@ -228,6 +229,25 @@ class ScanRunner {
   /// gating). The accepted-findings stale check uses it so an entry for a
   /// rule that did not run is never reported as stale.
   Set<String> get ranRuleNames => _ruleImpactMap.keys.toSet();
+
+  /// Files whose rule walk finished in the last run (paths as scanned). A
+  /// file that failed to resolve, was outside the roots, or was never
+  /// reached (stop sentinel, memory limit) is absent. Filled by the
+  /// in-process paths only, which is what the stale-ignore scan uses.
+  Set<String> get walkedFiles => {..._walkedFiles};
+  final Set<String> _walkedFiles = {};
+
+  /// `StaleIgnoreCoverage.failureKey` pairs: a rule threw on that file and
+  /// was disabled for the rest of its walk, so its silence there is not
+  /// evidence.
+  Set<String> get ruleFileFailures => {..._ruleFileFailures};
+  final Set<String> _ruleFileFailures = {};
+
+  /// Rules that registered at least one visitor in the last run. Narrower
+  /// than [ranRuleNames]: a rule whose registration threw or added no
+  /// visitor is in the plan but never looks at a node.
+  Set<String> get registeredRuleNames => {..._registeredRuleNames};
+  final Set<String> _registeredRuleNames = {};
 
   /// Builds an [AnalysisContextCollection] rooted at [projectRoot] for a
   /// long-lived caller (the scan daemon) to hold and reuse across many
@@ -693,6 +713,12 @@ class ScanRunner {
   /// and the caller returns no diagnostics.
   ({List<SaropaLintRule> rules, List<String> files})? _prepare() {
     MemoryModeConfig.markCli();
+    // Coverage records describe one run only; a reused runner (daemon,
+    // tests) must not carry the previous run's files or failures into the
+    // stale-ignore check.
+    _walkedFiles.clear();
+    _ruleFileFailures.clear();
+    _registeredRuleNames.clear();
     // The lane system limits in-process analysis server RSS by gating
     // expensive rules (usesTypeResolution, high cost, INFO severity) to the
     // full lane. The CLI scanner exits after one run, so RSS is irrelevant —
@@ -953,6 +979,8 @@ class ScanRunner {
 
       if (visitors.isNotEmpty) {
         result.add(_RuleRegistration(rule, visitors.cast(), context));
+        // Only a rule that reached this point can have looked at a node.
+        _registeredRuleNames.add(rule.code.lowerCaseName);
       }
     }
 
@@ -1056,6 +1084,8 @@ class ScanRunner {
     }
 
     _collectDiagnostics(listener, unit, filePath, diagnostics);
+    // The walk finished: this file counts as covered for the stale check.
+    _walkedFiles.add(filePath);
   }
 
   /// Maps each registered visitor back to its rule name so a visitor that
@@ -1083,6 +1113,9 @@ class ScanRunner {
     return (visitor, error, stackTrace) {
       final rule = visitorRule[visitor] ?? 'unknown_rule';
       _err('  Rule "$rule" failed on ${p.basename(filePath)}: $error');
+      // The rule is off for the rest of this file, so its missing findings
+      // there must not make an ignore comment look stale.
+      _ruleFileFailures.add(StaleIgnoreCoverage.failureKey(filePath, rule));
     };
   }
 
@@ -1292,6 +1325,9 @@ class ScanRunner {
     }
 
     _collectDiagnostics(listener, unit, filePath, diagnostics);
+    // Resolved and walked: covered for the stale check (an unresolved file
+    // returned above and stays uncovered).
+    _walkedFiles.add(filePath);
   }
 
   /// Converts recorded analyzer diagnostics into [ScanDiagnostic]s, resolving

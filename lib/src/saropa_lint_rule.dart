@@ -30,6 +30,7 @@ import 'owasp/owasp.dart';
 import 'project_context.dart';
 import 'rule_metadata.dart';
 import 'scan/stale_ignore_detector.dart' show commentIgnoredLines;
+import 'scan/stale_ignore_probe.dart' show StaleIgnoreProbe;
 export 'package:analyzer/error/error.dart' show DiagnosticSeverity, LintCode;
 export 'analyzer_compat.dart';
 export 'rule_metadata.dart' show AccuracyTarget, RuleStatus, RuleType;
@@ -3473,6 +3474,12 @@ class SaropaDiagnosticReporter {
   /// Reports a diagnostic at the given [token].
   void atToken(Token token, [LintCode? code]) {
     if (_isDuplicateAttempt(token.offset)) return;
+    // Stale-ignore scan: report every finding and note the ones a comment
+    // would hide, instead of dropping them (see StaleIgnoreProbe).
+    if (StaleIgnoreProbe.active) {
+      _probeToken(token);
+      return;
+    }
     if (_isBaselined(token.offset)) {
       // Pass the token's own length so a captured suppression record's
       // end-of-span matches what `reportAtToken` would have highlighted.
@@ -3537,6 +3544,17 @@ class SaropaDiagnosticReporter {
   /// Reports a diagnostic at the given offset and length.
   void atOffset({required int offset, required int length}) {
     if (_isDuplicateAttempt(offset)) return;
+    // Stale-ignore scan: no suppression at all (this path never checks
+    // line-level comments, so there is nothing to record either).
+    if (StaleIgnoreProbe.active) {
+      _deliver(
+        offset,
+        () => _rule.reportAtOffset(offset, length),
+        accepted: null,
+        length: length,
+      );
+      return;
+    }
     if (_isBaselined(offset)) {
       _trackSuppression(offset, SuppressionKind.baseline, length: length);
       return;
@@ -3570,6 +3588,12 @@ class SaropaDiagnosticReporter {
     AstNode? node,
     int? length,
   }) {
+    // Stale-ignore scan: emit at once, never held or capped, so the scan's
+    // list holds every finding (see StaleIgnoreProbe).
+    if (StaleIgnoreProbe.active) {
+      emit();
+      return;
+    }
     final max = accepted?.max;
     final unit = _ruleContext.currentUnit;
     if (max != null && unit != null) {
@@ -3651,6 +3675,17 @@ class SaropaDiagnosticReporter {
   /// When a suppression is detected, records it in [SuppressionTracker]
   /// so the summary log and violations.json include suppression counts.
   bool _isSuppressed(int offset, AstNode node, AcceptedEntry? accepted) {
+    // Stale-ignore scan: suppress nothing, but note a comment that would
+    // have hidden this finding (see StaleIgnoreProbe). Without this the
+    // finding vanished and its live `// ignore:` was reported as stale.
+    if (StaleIgnoreProbe.active) {
+      _probeCommentIgnore(
+        offset,
+        node: node,
+        ignored: IgnoreUtils.hasIgnoreComment(node, _ruleName),
+      );
+      return false;
+    }
     if (_isBaselined(offset, node: node)) {
       _trackSuppression(offset, SuppressionKind.baseline, node: node);
       return true;
@@ -3669,6 +3704,40 @@ class SaropaDiagnosticReporter {
       return true;
     }
     return false;
+  }
+
+  /// [atToken] while the stale-ignore probe is armed: the same two comment
+  /// checks the normal path uses decide what is recorded, then the finding
+  /// is reported regardless.
+  void _probeToken(Token token) {
+    final lineInfo = _ruleContext.currentUnit?.unit.lineInfo;
+    _probeCommentIgnore(
+      token.offset,
+      ignored:
+          IgnoreUtils.hasLeadingIgnoreCommentBeforeToken(
+            token,
+            _ruleName,
+            lineInfo,
+          ) ||
+          IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName),
+    );
+    _deliver(
+      token.offset,
+      () => _rule.reportAtToken(token),
+      accepted: null,
+      length: token.length,
+    );
+  }
+
+  /// Records, for the stale-ignore scan, that a `// ignore:` comment would
+  /// have hidden the finding at [offset]. The line lets the detector tell a
+  /// comment it can place from one only the reporter's AST check honors.
+  void _probeCommentIgnore(int offset, {AstNode? node, required bool ignored}) {
+    if (!ignored) return;
+    final loc = _resolveLocation(offset, node);
+    // Unknown position: recorded as such, which keeps every comment for
+    // this rule rather than guessing.
+    StaleIgnoreProbe.recordCommentHidden(_ruleName, loc?.path, loc?.line ?? 0);
   }
 
   /// Resolves the (file path, line number) for a diagnostic offset.
