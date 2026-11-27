@@ -1,6 +1,6 @@
 # Accepted-findings list and baseline: remaining items
 
-**Status: Open**
+**Status: Closed** (split; see closing note)
 
 Created: 2026-11-26
 Completed work: `plans/history/2026.11/2026.11.26/accepted_findings_list_open_items.md`
@@ -213,3 +213,15 @@ Locale parity tests: 49 passing, 0 failing after the hand repairs of 2026-11-26 
 - Still open: candidates were picked by heuristics (brand prefix, extra sentence, text after a placeholder, long, repeated or full-stop labels); other values, mainly medium and long sentences, were not all read and still hold mistranslations. The long sw memory, CI, hazard-scan and settings paragraphs still read as nonsense. Product names (Package Vibrancy, Code Health) are kept in English in some values and translated in others. Sindhi-script letters in ur are not checked by any guard. The fragment "Matches each command's" was reworded per locale without seeing how it joins the bold field names after it.
 - Least confident languages: sw, fil, ur, bn (lowest-resource; MT text around the repairs is poor) and th. Uncertain terms in every locale: "analysis lane", "Mix charts", "Held", "stub-tested", "test drift", "Dormancy Signal".
 - No translation from any hand repair has a native-speaker review.
+
+## Closing note (2026-11-27)
+
+Closed by splitting. Step 1 passed; step 24 passed at the language server only. Steps 32 to 40 are not run (an agent run of them was stopped without recording results). No step failed. Nothing else was verified for this note.
+
+Open items now live in:
+
+- `bugs/human/ACCEPTED_FINDINGS_AND_BASELINE_CHECKS_OWNER_STEPS.md` (steps 2 to 40)
+- `bugs/infra_translation_hand_repairs_remaining_quality.md`
+- `bugs/proposal_infra_baseline_explain_vscode_surface.md`
+- `bugs/infra_accepted_count_summary_tree_not_registered.md`
+- `bugs/infra_accepted_max_and_date_baseline_unverified_paths.md`

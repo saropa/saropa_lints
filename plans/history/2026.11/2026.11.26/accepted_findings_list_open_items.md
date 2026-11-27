@@ -1,6 +1,6 @@
 # Accepted-findings list: open items
 
-**Status: Closed** (completed work archived here; unchecked items continue in `bugs/accepted_findings_f5_translations_and_baseline_date.md`)
+**Status: Closed** (completed work archived here; unchecked items continue in `plans/history/2026.11/2026.11.26/accepted_findings_f5_translations_and_baseline_date.md`)
 
 Created: 2026-11-26
 Source: `plans/history/2026.11/2026.11.26/proposal_infra_accepted_findings_list.md`
@@ -78,4 +78,4 @@ Not run end to end: `dart run saropa_lints:baseline` against a real project.
 
 A hardening pass added: blame answers survive a config reload; the loader reading the real `SAROPA_LINTS_SKIP_BASELINE` variable and `bin/baseline.dart` with a positional project path are tested in child processes (the CLI's `dart analyze` call is answered by a stub script, so no analysis runs); legacy `only_impacts` names are tested through the loader; the overlay navigation and handler checks were narrowed; a constant list is no longer treated as shadowed by inherited or mixin members, which Dart does not put in lexical scope. `dart run saropa_lints:baseline --explain <file>` was added.
 
-Open items: `bugs/accepted_findings_f5_translations_and_baseline_date.md`.
+Open items: `plans/history/2026.11/2026.11.26/accepted_findings_f5_translations_and_baseline_date.md`.
