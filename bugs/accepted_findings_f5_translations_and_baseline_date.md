@@ -14,7 +14,6 @@ Completed work: `plans/history/2026.11/2026.11.26/accepted_findings_list_open_it
 | Plugin with several project roots in a live analysis server (accepted list and per-project baseline) | A person running the IDE or `dart analyze` with the plugin |
 | `dart run saropa_lints:baseline` against a real project with real `dart analyze` output | A run of `dart analyze` with the plugin |
 | `--explain` has no VS Code surface; the project rule asks for visible UI as well as CLI | Extension work (command, strings, translation run) and an F5 check |
-| With the plugin block commented out (language server on), a plain `scan` without `--tier` still prints "scan skipped" and exits 0. `--find-stale-ignores` and `--fix-stale-ignores` now run there (the live-ignore-reported-as-stale defect was fixed 2026-11-27) | Owner decision for plain `scan` |
 | "Summary tree shows N accepted" cannot be seen: the Summary tree is not registered as a view | Owner decision: drop the item or show the count elsewhere (step 29 checks the Manage Rule Packs strip) |
 
 ## Checklist to run

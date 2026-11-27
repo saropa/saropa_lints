@@ -87,9 +87,21 @@ dart run saropa_lints scan /path/to/project
 | `--debug-rule <name>` | Emit per-node diagnostic trace for the named rule, showing type resolution details. Used to diagnose false positives. |
 | `--check-sdk-compat` | Standalone SDK compatibility audit: cross-reference the pubspec SDK lower bound against Dart syntax features in `lib/`. Prints a summary showing the minimum required version and which files force each version bump. Exits 1 on mismatch, 0 when compatible. |
 
+### Commented-out plugin block
+
+The VS Code extension comments out the `plugins:` block when its language server replaces the analyzer plugin, and `init` writes a new project's block the same way. A plain `scan` then runs with the commented-out rule settings.
+
+It prints a "scan skipped" line and exits 0 instead when the block is commented out and any of these is true:
+
+- `.vscode/settings.json` (in the project folder or one folder up) has `"saropaLints.enabled": false`.
+- The extension's **Turn Off Lint Integration** commented out a live block (recorded in `.dart_tool/saropa_lints/plugin_ownership.json`, local to one machine) and the settings file does not set `true`.
+- The block holds no rule settings.
+
+The setting is not read from a `.code-workspace` file or from user settings, so a project switched off only there is scanned. `--tier`, `--check-accepted`, `--find-stale-ignores` and `--fix-stale-ignores` always run.
+
 ### Exit codes
 
-- `0` — no diagnostics (or count within `--fail-on-count` threshold)
+- `0` — no diagnostics (or count within `--fail-on-count` threshold), or the scan was skipped (see above)
 - `1` — diagnostics found (or count exceeded threshold)
 - `2` — invalid arguments
 

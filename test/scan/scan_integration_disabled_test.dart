@@ -1,4 +1,5 @@
-/// Tests that the scan CLI treats an extension-disabled project as "off".
+/// Tests how the scan CLI treats a commented-out plugin block: skipped when
+/// saropa_lints is switched off, scanned when only the plugin is replaced.
 library;
 
 import 'dart:io';
@@ -19,32 +20,80 @@ void main() {
     p.join(dir.path, 'analysis_options.yaml'),
   ).writeAsStringSync(content);
 
-  test('detects the extension OFF marker', () {
-    writeOptions(
-      '# >>> saropa_lints integration turned OFF by the VS Code extension >>>\n'
-      '# plugins:\n#   saropa_lints:\n',
-    );
-    expect(isScanIntegrationDisabled(dir.path), isTrue);
+  /// Writes [content] to [relative] under [root] (default: the temp project).
+  void writeFile(String relative, String content, [String? root]) {
+    File(p.join(root ?? dir.path, relative))
+      ..parent.createSync(recursive: true)
+      ..writeAsStringSync(content);
+  }
+
+  const marker =
+      '# >>> saropa_lints integration turned OFF by the VS Code extension >>>\n';
+  final settings = p.join('.vscode', 'settings.json');
+  final claim = p.join('.dart_tool', 'saropa_lints', 'plugin_ownership.json');
+
+  test('the marker alone does not mean "off"', () {
+    writeOptions('$marker# plugins:\n#   saropa_lints:\n');
+    expect(hasCommentedOutPluginBlock(dir.path), isTrue);
+    expect(isScanIntegrationDisabled(dir.path), isFalse);
   });
 
   test('false for plain config and for a missing file', () {
+    writeFile(settings, '{"saropaLints.enabled": false}');
     expect(isScanIntegrationDisabled(dir.path), isFalse);
     writeOptions('include: package:lints/recommended.yaml\n');
     expect(isScanIntegrationDisabled(dir.path), isFalse);
   });
 
-  test('scan CLI exits 0 and prints a disabled line', () async {
-    writeOptions(
-      '# >>> saropa_lints integration turned OFF by the VS Code extension >>>\n',
+  test('off when the settings file turns the master switch off', () {
+    writeOptions(marker);
+    writeFile(
+      settings,
+      '{\n  "url": "http://x", // note\n  "saropaLints.enabled": false,\n}\n',
     );
-    final result = await Process.run('dart', [
-      'run',
-      'saropa_lints',
-      'scan',
-      dir.path,
-    ]);
+    expect(isScanIntegrationDisabled(dir.path), isTrue);
+  });
+
+  test('a commented-out setting is ignored', () {
+    writeOptions(marker);
+    writeFile(
+      settings,
+      '{\n  // "saropaLints.enabled": false\n'
+      '  /* "saropaLints.enabled": false */\n}\n',
+    );
+    expect(isScanIntegrationDisabled(dir.path), isFalse);
+  });
+
+  test('reads the settings file one folder above the project', () {
+    final app = p.join(dir.path, 'app');
+    writeFile('analysis_options.yaml', marker, app);
+    writeFile(settings, '{"saropaLints.enabled": false}');
+    expect(isScanIntegrationDisabled(app), isTrue);
+  });
+
+  test('off when the extension owns the disable, unless re-enabled', () {
+    writeOptions(marker);
+    writeFile(claim, '{"disabledByExtension": true}');
+    expect(isScanIntegrationDisabled(dir.path), isTrue);
+    writeFile(settings, '{"saropaLints.enabled": true}');
+    expect(isScanIntegrationDisabled(dir.path), isFalse);
+  });
+
+  test('a damaged ownership file is no claim', () {
+    writeOptions(marker);
+    writeFile(claim, '{');
+    expect(isScanIntegrationDisabled(dir.path), isFalse);
+  });
+
+  /// Runs the real CLI on the temp project.
+  Future<ProcessResult> scan([List<String> extra = const []]) =>
+      Process.run('dart', ['run', 'saropa_lints', 'scan', dir.path, ...extra]);
+
+  test('a block with no rule settings is skipped', () async {
+    writeOptions(marker);
+    final result = await scan();
     expect(result.exitCode, 0, reason: '${result.stdout}${result.stderr}');
-    expect(result.stdout, contains('disabled'));
+    expect(result.stdout, contains('holds no rule settings; scan skipped'));
   }, timeout: const Timeout(Duration(minutes: 3)));
 
   /// A project as the extension leaves it with the language server on: the
@@ -145,15 +194,25 @@ void main() {
     expect(out, matches(RegExp(r'"commentLine":\s*7')), reason: log);
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('a plain scan of a configured, disabled project is skipped', () async {
+  // The language server case: nothing records "off", so the scan runs with
+  // the commented-out rule list.
+  test('a plain scan uses the commented-out rule settings', () async {
     writeDisabledProject();
-    final result = await Process.run('dart', [
-      'run',
-      'saropa_lints',
-      'scan',
-      dir.path,
-    ]);
+    File(p.join(dir.path, 'saropa_accepted.yaml')).deleteSync();
+    final json = p.join(dir.path, 'plain.json');
+    final result = await scan(['--format', 'json', '--json-file-path', json]);
+    final log = '${result.stdout}${result.stderr}';
+    // Exit 1 = findings reported.
+    expect(result.exitCode, 1, reason: log);
+    expect(result.stdout, isNot(contains('scan skipped')), reason: log);
+    expect(File(json).readAsStringSync(), contains('avoid_print_error'));
+  }, timeout: const Timeout(Duration(minutes: 3)));
+
+  test('a plain scan of a switched-off project is skipped', () async {
+    writeDisabledProject();
+    writeFile(settings, '{"saropaLints.enabled": false}');
+    final result = await scan();
     expect(result.exitCode, 0, reason: '${result.stdout}${result.stderr}');
-    expect(result.stdout, contains('disabled'));
+    expect(result.stdout, contains('turned off for this project'));
   }, timeout: const Timeout(Duration(minutes: 3)));
 }

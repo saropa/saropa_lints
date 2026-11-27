@@ -274,7 +274,7 @@ The scanner works on **any Dart project** — even without saropa_lints as a dep
 
 1. **VS Code extension:** set `saropaLints.enabled` to `false`. This master switch also stops the language server, even if `saropaLints.lspServer.enabled` is `true`.
 2. **Analyzer plugin:** toggle "Lint integration" Off in the extension, or comment out the `saropa_lints:` block under `plugins:` in `analysis_options.yaml`, then restart the Dart analysis server.
-3. **Hooks and CI:** with the plugin block commented out by the extension, `dart run saropa_lints scan` prints a "disabled" line and exits 0. A CI workflow from `init --emit-ci` has no off switch of its own; delete or disable the workflow file.
+3. **Hooks and CI:** `dart run saropa_lints scan` prints a "scan skipped" line and exits 0 when the plugin block is commented out and `.vscode/settings.json` has `"saropaLints.enabled": false` (commit that file for CI). A commented-out block alone does not switch the scan off, because the language server also comments it out; the scan then uses the commented-out rule settings. A CI workflow from `init --emit-ci` has no off switch of its own; delete or disable the workflow file.
 
 ---
 

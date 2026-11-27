@@ -35,6 +35,7 @@ export 'src/scan/scan_config.dart'
         ScanConfig,
         loadScanConfig,
         loadAnalyzerExcludes,
+        hasCommentedOutPluginBlock,
         isScanIntegrationDisabled;
 export 'src/scan/scan_diagnostic.dart' show ScanDiagnostic;
 export 'src/scan/scan_runner.dart'

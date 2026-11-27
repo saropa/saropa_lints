@@ -42,7 +42,8 @@ import 'package:saropa_lints/src/accepted/accepted_findings_roots.dart';
 /// Exit codes:
 ///   0 - No issues found (or none at/above --fail-on threshold)
 ///   1 - Issues found (or at least one at/above --fail-on threshold)
-///   0 - Also returned (with a "disabled" line) when lint integration is off
+///   0 - Also returned (with a "scan skipped" line) when lint integration is
+///       off, or a commented-out plugin block holds no rule settings
 ///   2 - No configuration found / invalid tier / parse error
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
@@ -91,21 +92,12 @@ Future<void> main(List<String> args) async {
   // runStaleIgnoreScan), never from the normal one.
   final staleMode = parsed.findStaleIgnores || parsed.fixStaleIgnores;
 
-  // Plugin block commented out by the VS Code extension and no explicit tier:
-  // report "disabled" and succeed so hooks and CI do not show a failure for a
-  // switched-off project. Not for --check-accepted or the stale-ignore modes:
-  // the extension also comments the block out when the language server
-  // replaces the plugin, and the rule list is then read from the commented
-  // block. The stale check only removes a comment its own scan proved
-  // unneeded for a rule that ran, so a rule the server runs but this scan
-  // does not keeps its comments.
-  if (tier == null &&
-      !parsed.checkAccepted &&
-      !staleMode &&
-      loadScanConfig(p.absolute(path), includeDisabledBlock: false) == null &&
-      isScanIntegrationDisabled(p.absolute(path))) {
-    print('saropa_lints is disabled in analysis_options.yaml; scan skipped.');
-    exit(0);
+  // A plain scan (no tier) of a project whose plugin block is commented out.
+  // Not for --check-accepted or the stale-ignore modes, which always run; the
+  // stale check only removes a comment its own scan proved unneeded for a rule
+  // that ran.
+  if (tier == null && !parsed.checkAccepted && !staleMode) {
+    _handleCommentedOutPluginBlock(p.absolute(path), quiet: quiet);
   }
 
   // --profile: arm per-rule timing capture BEFORE any rule callback runs and
@@ -647,6 +639,39 @@ void _printSummary(List<ScanDiagnostic> diagnostics) {
     print('  ... and ${sortedRules.length - 10} more (see report)');
   }
   print('');
+}
+
+/// Decides what a plain scan does when [root]'s plugin block is commented out.
+///
+/// Exits 0 with a "scan skipped" line when the project is switched off, or when
+/// the block holds no rule settings to scan with (nothing to run, and hooks
+/// must not start failing). Otherwise returns, so the scan runs with the
+/// commented-out settings: the language server (on by default) comments the
+/// block out while saropa_lints stays in use. A live rule list, or no marker,
+/// returns without output.
+void _handleCommentedOutPluginBlock(String root, {required bool quiet}) {
+  if (!hasCommentedOutPluginBlock(root) ||
+      loadScanConfig(root, includeDisabledBlock: false) != null) {
+    return;
+  }
+  if (isScanIntegrationDisabled(root)) {
+    print('saropa_lints is turned off for this project; scan skipped.');
+    exit(0);
+  }
+  if (loadScanConfig(root) == null) {
+    print(
+      'saropa_lints plugin block is commented out and holds no rule '
+      'settings; scan skipped.',
+    );
+    exit(0);
+  }
+  // stderr so --format json stdout stays parseable.
+  if (!quiet) {
+    stderr.writeln(
+      'Plugin block is commented out; scanning with its rule settings. To '
+      'skip, set "saropaLints.enabled": false in .vscode/settings.json.',
+    );
+  }
 }
 
 void _runFixIgnores(String targetPath) {

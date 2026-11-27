@@ -5,6 +5,7 @@
 /// Also reads severity overrides from `analysis_options_custom.yaml`.
 library;
 
+import 'dart:convert' show jsonDecode;
 import 'dart:io' show File, Platform;
 
 import 'package:path/path.dart' as p;
@@ -21,14 +22,75 @@ class ScanConfig {
   final Set<String> disabledRules;
 }
 
-/// True when the project's `analysis_options.yaml` carries the marker the
-/// VS Code extension writes when it comments out the `plugins:` block ("Lint
-/// integration" off, or the language server replacing the analyzer plugin).
-/// A plain scan without `--tier` then reports "disabled" and exits 0, so hooks
-/// do not fail on a switched-off project. `--check-accepted` runs anyway.
-bool isScanIntegrationDisabled(String projectRoot) {
+/// True when the project's `analysis_options.yaml` carries the marker written
+/// around a commented-out `plugins:` block. The marker alone does NOT mean
+/// saropa_lints is off: "Lint integration" off, the language server replacing
+/// the analyzer plugin, and the `init` default for a new project all write the
+/// same text. Use [isScanIntegrationDisabled] to ask whether it is off.
+bool hasCommentedOutPluginBlock(String projectRoot) {
   final content = _readFile(projectRoot, 'analysis_options.yaml');
   return content != null && content.contains(kIntegrationOffSentinel);
+}
+
+/// True when saropa_lints was switched off for this project: the plugin block
+/// is commented out AND a file on disk records the "off" choice. A plain scan
+/// without `--tier` then reports "scan skipped" and exits 0, so hooks do not
+/// fail on a switched-off project.
+///
+/// The records, in order:
+///  1. `"saropaLints.enabled"` in `.vscode/settings.json`, at [projectRoot] or
+///     one folder up (the extension accepts a project one level below the
+///     workspace folder). An explicit `true` wins over record 2.
+///  2. `.dart_tool/saropa_lints/plugin_ownership.json`, which the extension
+///     writes only when its Disable commented out a live block.
+///
+/// Not visible from here: the setting in a `.code-workspace` file or in the
+/// user's global settings. Such a project is scanned.
+bool isScanIntegrationDisabled(String projectRoot) {
+  if (!hasCommentedOutPluginBlock(projectRoot)) return false;
+  final root = p.normalize(p.absolute(projectRoot));
+  final enabled =
+      _vscodeEnabledSetting(root) ?? _vscodeEnabledSetting(p.dirname(root));
+  if (enabled != null) return !enabled;
+  return _extensionOwnsDisable(root);
+}
+
+/// A JSON string (group 1) or a comment, so comments can be removed without
+/// touching `//` inside a string such as a URL.
+final RegExp _jsonStringOrComment = RegExp(
+  r'("(?:\\.|[^"\\])*")|//[^\n]*|/\*[\s\S]*?\*/',
+);
+
+/// The master switch as written in [folder]'s `.vscode/settings.json`.
+/// A text match, not a JSON parse: the file allows comments and trailing
+/// commas. Null when the file or the key is absent.
+bool? _vscodeEnabledSetting(String folder) {
+  final content = _readFile(p.join(folder, '.vscode'), 'settings.json');
+  if (content == null) return null;
+  final code = content.replaceAllMapped(
+    _jsonStringOrComment,
+    (m) => m.group(1) ?? '',
+  );
+  final match = RegExp(
+    r'"saropaLints\.enabled"\s*:\s*(true|false)',
+  ).firstMatch(code);
+  return match == null ? null : match.group(1) == 'true';
+}
+
+/// Reads the claim written by `writePluginOwnershipFile` in
+/// extension/src/setup.ts. A missing or damaged file is no claim.
+bool _extensionOwnsDisable(String root) {
+  final content = _readFile(
+    p.join(root, '.dart_tool', 'saropa_lints'),
+    'plugin_ownership.json',
+  );
+  if (content == null) return false;
+  try {
+    final doc = jsonDecode(content);
+    return doc is Map && doc['disabledByExtension'] == true;
+  } on FormatException {
+    return false;
+  }
 }
 
 /// Attempts to load rule config from the project at [projectRoot].
