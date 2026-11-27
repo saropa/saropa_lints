@@ -66,9 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.10.1]
+## [17.10.2]
 
-`require_error_widget` stops asking for an error branch that can never run, and the VS Code extension can now explain which baseline settings hide findings in a file. Accepted findings are now counted wherever suppressions are broken down by kind. [log](https://github.com/saropa/saropa_lints/blob/v17.10.1/CHANGELOG.md)
+`require_error_widget` stops asking for an error branch that can never run, and the VS Code extension can now explain which baseline settings hide findings in a file. Accepted findings are now counted wherever suppressions are broken down by kind. [log](https://github.com/saropa/saropa_lints/blob/v17.10.2/CHANGELOG.md)
 
 ### Fixed
 

@@ -90,7 +90,7 @@ void main() {
   });
 
   group('YAML scalar helpers', () {
-    test('stripYamlComment', () {
+    test('stripYamlComment removes comments but keeps quoted or attached # characters', () {
       expect(stripYamlComment('a # c'), 'a');
       expect(stripYamlComment('"a # b" # c'), '"a # b"');
       expect(stripYamlComment('a#b'), 'a#b');
