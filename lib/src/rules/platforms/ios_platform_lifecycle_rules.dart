@@ -2729,8 +2729,8 @@ class _DeclarationFinder extends RecursiveAstVisitor<void> {
 }
 
 /// Finds a same-file declaration that could take over a library-private
-/// member of [_owner] at run time: a method, accessor or field of the same
-/// [_name] in another class, mixin or enum (subclass override, mixin
+/// member of `_owner` at run time: a method, accessor or field of the same
+/// `_name` in another class, mixin or enum (subclass override, mixin
 /// application, interface implementation), or any `noSuchMethod`.
 ///
 /// Matches by name in any other type rather than walking the type hierarchy:

@@ -1318,7 +1318,7 @@ Expression _wholeReference(SimpleIdentifier id) {
   }
 }
 
-/// Classifies every reference to the candidate snapshot [_fields] in a unit.
+/// Classifies every reference to the candidate snapshot `_fields` in a unit.
 class _SnapshotUsageVisitor extends RecursiveAstVisitor<void> {
   _SnapshotUsageVisitor(this._fields, this._helpers);
 

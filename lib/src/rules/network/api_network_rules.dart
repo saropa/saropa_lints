@@ -365,7 +365,7 @@ class _HttpPrivateMethodCollector extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Collects every code [SimpleIdentifier] named [_name] for
+/// Collects every code [SimpleIdentifier] named `_name` for
 /// [_HttpHelperCallFinder.allRefsAreMethodCalls].
 class _HttpHelperRefCollector extends RecursiveAstVisitor<void> {
   _HttpHelperRefCollector(this._name);

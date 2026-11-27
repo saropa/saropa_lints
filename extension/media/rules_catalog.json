@@ -2126,7 +2126,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Use .toLowerCase() on both sides or path.equals() from the 'path' package for case-insensitive comparison.",
-      "problemMessage": "[avoid_case_sensitive_path_comparison] File path compared without case normalization. Windows filesystem is case-insensitive. {v3}",
+      "problemMessage": "[avoid_case_sensitive_path_comparison] File path compared without case normalization. Windows filesystem is case-insensitive. {v4}",
       "impact": "warning",
       "owasp": {
         "mobile": [],
@@ -12294,7 +12294,7 @@
         "description": "Vulnerability default target: >= 80% true positives."
       },
       "correction": "Sanitize and validate file paths to prevent traversal (e.g., remove \"../\", use path package), and restrict access to allowed directories only.",
-      "problemMessage": "[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., \"../\"), enabling access to sensitive files outside the intended directory. Validate and canonicalize paths before file access, and reject any input containing parent-directory segments. {v8}",
+      "problemMessage": "[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., \"../\"), enabling access to sensitive files outside the intended directory. Validate and canonicalize paths before file access, and reject any input containing parent-directory segments. {v9}",
       "impact": "error",
       "owasp": {
         "mobile": [
@@ -16669,7 +16669,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Implement a bounded cache with a maximum entry count and LRU (Least Recently Used) eviction policy, or use a cache library that manages size limits automatically.",
-      "problemMessage": "[avoid_unbounded_cache_growth] Map or collection used as a cache has no maximum size constraint. Without eviction logic, the cache grows indefinitely as new entries are added, consuming increasing amounts of device memory. This eventually exhausts available RAM and crashes the app with an out-of-memory error, particularly on mobile devices with limited memory resources. {v4}",
+      "problemMessage": "[avoid_unbounded_cache_growth] Map or collection used as a cache has no maximum size constraint. Without eviction logic, the cache grows indefinitely as new entries are added, consuming increasing amounts of device memory. This eventually exhausts available RAM and crashes the app with an out-of-memory error, particularly on mobile devices with limited memory resources. {v5}",
       "impact": "warning",
       "owasp": {
         "mobile": [],
@@ -22441,7 +22441,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Remove the redundant nested condition and keep only the code inside it, since the outer condition already provides the same guarantee.",
-      "problemMessage": "[no_equal_nested_conditions] Inner condition is identical to an enclosing outer condition. The nested check is always true at that point because the outer condition already guarantees it, making the inner branch redundant dead logic that adds nesting depth without any behavioral effect. {v4}",
+      "problemMessage": "[no_equal_nested_conditions] Inner condition is identical to an enclosing outer condition. The nested check is always true at that point because the outer condition already guarantees it, making the inner branch redundant dead logic that adds nesting depth without any behavioral effect. {v5}",
       "impact": "warning",
       "owasp": {
         "mobile": [],
@@ -33786,8 +33786,8 @@
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
       },
-      "correction": "Use Theme.of(context).platform or Platform.isIOS to adapt widgets.",
-      "problemMessage": "[prefer_platform_widget_adaptive] Consider platform-adaptive widgets. Material-only UI on iOS (or Cupertino-only on Android) may feel inconsistent.",
+      "correction": "Use the .adaptive constructor of this widget, or branch on Theme.of(context).platform to build a platform-specific control.",
+      "problemMessage": "[prefer_platform_widget_adaptive] Material control has an adaptive constructor that is not used. The Material look is rendered on iOS and macOS too, where it feels inconsistent with the rest of the system. {v2}",
       "impact": "info",
       "owasp": {
         "mobile": [],
@@ -37831,7 +37831,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Replace parse with tryParse when converting dynamic or user-controlled data to prevent runtime exceptions and improve app robustness. This practice aligns with Dart’s recommendations for safe type conversion. See https://dart.dev/guides/libraries/library-tour#numbers for guidance.",
-      "problemMessage": "[prefer_try_parse_for_dynamic_data] Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers. {v4}",
+      "problemMessage": "[prefer_try_parse_for_dynamic_data] Using parse methods (like int.parse or double.parse) on dynamic or user-provided data can throw exceptions and crash your app if the input is invalid. This exposes your app to stability and security risks, especially when handling external or untrusted data. Always use tryParse to safely handle potentially malformed input and provide a fallback for invalid values. See https://dart.dev/guides/libraries/library-tour#numbers. {v6}",
       "impact": "error",
       "owasp": {
         "mobile": [],
@@ -40533,7 +40533,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Add TTL/expiration to prevent serving stale data indefinitely. Use the DevTools memory profiler to verify the leak is resolved after the fix.",
-      "problemMessage": "[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v3}",
+      "problemMessage": "[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v4}",
       "impact": "warning",
       "owasp": {
         "mobile": [],
@@ -42513,7 +42513,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Add obfuscate: true to the @Envied annotation or individual @EnviedField annotations to encode secrets at compile time and prevent plain text extraction.",
-      "problemMessage": "[require_envied_obfuscation] Envied environment variable generated without obfuscation stores secrets as plain text string constants in the compiled binary. Attackers can extract API keys, database URLs, and authentication tokens using basic reverse engineering tools, enabling unauthorized access to your backend services and third-party APIs. {v2}",
+      "problemMessage": "[require_envied_obfuscation] Envied environment variable generated without obfuscation stores secrets as plain text string constants in the compiled binary. Attackers can extract API keys, database URLs, and authentication tokens using basic reverse engineering tools, enabling unauthorized access to your backend services and third-party APIs. {v3}",
       "impact": "warning",
       "owasp": {
         "mobile": [],
@@ -43180,7 +43180,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Use path.basename() to extract filename and path.isWithin() to verify.",
-      "problemMessage": "[require_file_path_sanitization] File path constructed from parameter without sanitization. Path traversal attack possible with ../ {v3}",
+      "problemMessage": "[require_file_path_sanitization] File path constructed from parameter without sanitization. Path traversal attack possible with ../ {v4}",
       "impact": "error",
       "owasp": {
         "mobile": [
@@ -43316,7 +43316,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Wrap in try-catch or add .catchError() to handle Firebase errors.",
-      "problemMessage": "[require_firebase_error_handling] Firebase operation without error handling. Firebase calls can fail. {v2}",
+      "problemMessage": "[require_firebase_error_handling] Firebase operation without error handling. Firebase calls can fail. {v3}",
       "impact": "warning",
       "owasp": {
         "mobile": [],
@@ -44801,7 +44801,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and error payloads are handled separately.",
-      "problemMessage": "[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately. {v5}",
+      "problemMessage": "[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately. {v6}",
       "impact": "warning",
       "owasp": {
         "mobile": [],
@@ -48303,7 +48303,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Show a progress notification for operations that take more than a few seconds. This keeps users informed and prevents OS termination.",
-      "problemMessage": "[require_notification_for_long_tasks] Long-running operation detected without progress notification. Silent background work may be killed by OS. {v2}",
+      "problemMessage": "[require_notification_for_long_tasks] Long-running operation detected without progress notification. Silent background work may be killed by OS. {v3}",
       "impact": "warning",
       "owasp": {
         "mobile": [],

@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.10.0] — Unreleased
+## [17.10.0]
 
 > **Upgrade note:** A plain `dart run saropa_lints scan` no longer skips when the plugin block in `analysis_options.yaml` is commented out, which the language server does by default and `init` can leave behind, so git hooks and CI that passed by skipping can now report findings and fail. To keep skipping, set `"saropaLints.enabled": false` in `.vscode/settings.json` and commit that file; a switch in user settings or a `.code-workspace` file is not seen by the scan.
 

@@ -2751,7 +2751,7 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
   }
 }
 
-/// Collects every [SimpleIdentifier] named [_name] in a compilation unit,
+/// Collects every [SimpleIdentifier] named `_name` in a compilation unit,
 /// for [RequireFirebaseErrorHandlingRule]'s caller trace.
 ///
 /// Identifiers inside doc-comment references (`[_helper]`) are skipped: they
