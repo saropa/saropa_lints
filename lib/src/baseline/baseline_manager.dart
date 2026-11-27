@@ -65,13 +65,6 @@ class BaselineManager {
   /// Per-project states loaded so far; a null value records "no baseline".
   static final Map<String, _BaselineState?> _byRoot = {};
 
-  /// Preloaded date answers (cutoff + file -> line -> isOld).
-  ///
-  /// Held here, not on a project state, so a config reload cannot discard
-  /// them: states are rebuilt from disk, blame answers stay valid. The
-  /// cutoff is part of the key, so an edited `date:` never reads old answers.
-  static final Map<(DateTime, String), Map<int, bool>> _dateCache = {};
-
   /// Initialize the baseline manager with configuration.
   ///
   /// Should be called once during plugin initialization.
@@ -97,15 +90,13 @@ class BaselineManager {
   /// Clear the baseline manager, configuration and caches (tests).
   static void reset() {
     resetConfig();
-    _dateCache.clear();
     BaselineDate.clearCache();
   }
 
   /// Forget the configuration before a reload, keeping git blame answers.
   ///
-  /// The plugin reloads lazily once the real project root is known. Using
-  /// [reset] there threw away blame data already preloaded, and the sync
-  /// date check then silently stopped matching.
+  /// Blame answers are commit dates keyed by file content, so they stay valid
+  /// under any new configuration; dropping them would only re-run git.
   static void resetConfig() {
     _single = null;
     _reader = null;
@@ -143,21 +134,22 @@ class BaselineManager {
   /// Returns true if the violation matches:
   /// - The baseline file (exact file:line:rule match)
   /// - A baselined path pattern
-  /// - Code older than the baseline date (uses cached data)
+  /// - Code older than the baseline date (runs `git blame` once per file
+  ///   content; see [BaselineDate])
   ///
   /// [filePath] is the full path to the file.
   /// [ruleName] is the lint rule name.
   /// [line] is the 1-based line number.
   /// [impact] is the rule's impact level (optional, for filtering).
+  /// [content] is the analyzed text, when it may differ from the file on disk.
   ///
-  /// **Note**: Date-based baseline requires [preloadDateBaseline] to be called first.
-  /// If not preloaded, date-based checks are skipped.
   /// Returns false if [filePath], [ruleName] are null/empty or [line] < 1.
   static bool isBaselined(
     String? filePath,
     String? ruleName,
     int line, {
     String? impact,
+    String? content,
   }) {
     if (filePath == null || filePath.isEmpty) return false;
     if (ruleName == null || ruleName.isEmpty) return false;
@@ -184,118 +176,26 @@ class BaselineManager {
       return true;
     }
 
-    // Check date-based baseline (from cache)
-    if (state.isOldCached(filePath, line)) {
-      return true;
-    }
-
-    return false;
+    // Date last: it is the only check that can start a process, so a finding
+    // already hidden above never costs a git run.
+    return state.date?.isLineOld(filePath, line, content: content) ?? false;
   }
 
-  /// Check if a violation should be suppressed (async version with full date support).
-  ///
-  /// This version runs git blame if needed. Use for CLI tools or when
-  /// async operations are acceptable.
-  /// Returns false if [filePath], [ruleName] are null/empty or [line] < 1.
+  /// Async form of [isBaselined], kept for API compatibility. Delegates, so
+  /// there is one implementation of the matching.
   static Future<bool> isBaselinedAsync(
     String? filePath,
     String? ruleName,
     int line, {
     String? impact,
-  }) async {
-    if (filePath == null || filePath.isEmpty) return false;
-    if (ruleName == null || ruleName.isEmpty) return false;
-    if (line < 1) return false;
+  }) async => isBaselined(filePath, ruleName, line, impact: impact);
 
-    final state = _stateFor(filePath);
-    if (state == null || !state.config.isEnabled) {
-      return false;
-    }
-    final config = state.config;
-
-    // Check impact filter first
-    if (impact != null && !config.shouldBaselineImpact(impact)) {
-      return false;
-    }
-
-    // Check file-based baseline
-    if (state.matchesFile(filePath, ruleName, line)) {
-      return true;
-    }
-
-    // Check path-based baseline
-    if (state.matchesPath(filePath)) {
-      return true;
-    }
-
-    // Check date-based baseline (with git blame)
-    if (await state.isOld(filePath, line)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /// Preload date-based baseline data for a file.
-  ///
-  /// Call this before analyzing a file to enable date-based baseline checks.
-  /// This runs `git blame` once for the file and caches all line dates.
+  /// Optionally warms the date baseline for [filePath] ahead of reporting.
+  /// [isBaselined] loads on demand, so nothing has to call this.
   /// No-op if [filePath] is null or empty.
   static Future<void> preloadDateBaseline(String? filePath) async {
     if (filePath == null || filePath.isEmpty) return;
-
-    final state = _stateFor(filePath);
-    final baselineDate = state?.date;
-    if (state == null || baselineDate == null) return;
-
-    try {
-      await baselineDate.preloadFile(filePath, projectRoot: state.root);
-      // Catch Object explicitly: bare `catch` swallows OutOfMemoryError /
-      // StackOverflowError silently. Object is intentional here — this is a
-      // best-effort preload and ANY failure should fall back to "no date
-      // baseline for this file" rather than tear down the analyzer plugin.
-    } on Object catch (e, st) {
-      developer.log(
-        'baseline preloadFile failed',
-        name: 'saropa_lints',
-        error: e,
-        stackTrace: st,
-      );
-      return;
-    }
-
-    // Also populate our sync cache
-    final fileCache = _dateCache.putIfAbsent((
-      baselineDate.baselineDate,
-      filePath,
-    ), () => {});
-    try {
-      // Async I/O here: this method is already async and runs from the
-      // analyzer plugin's per-file preload. Sync I/O (existsSync /
-      // readAsLinesSync) would block the analysis isolate and trip
-      // avoid_blocking_main_thread on Flutter consumers of the plugin.
-      final file = File(filePath);
-      if (!await file.exists()) return;
-
-      final lines = await file.readAsLines();
-      for (var i = 1; i <= lines.length; i++) {
-        final isOld = await baselineDate.isOlderThanBaseline(
-          filePath,
-          i,
-          projectRoot: state.root,
-        );
-        fileCache[i] = isOld;
-      }
-      // See preloadFile catch above for why this is `on Object` and not bare.
-    } on Object catch (e, st) {
-      developer.log(
-        'baseline date cache read failed',
-        name: 'saropa_lints',
-        error: e,
-        stackTrace: st,
-      );
-      // File read or blame failed; sync cache stays empty
-    }
+    await _stateFor(filePath)?.date?.preloadFile(filePath);
   }
 
   /// Which settings of [filePath]'s baseline match that file, using the same
@@ -317,7 +217,7 @@ class BaselineManager {
       ],
       fileLoaded: state.file != null,
       fileEntries: state.file?.entriesFor(filePath) ?? const {},
-      oldLines: await state.date?.oldLines(filePath, projectRoot: state.root),
+      oldLines: await state.date?.oldLines(filePath),
     );
   }
 
@@ -419,7 +319,7 @@ class BaselineExplanation {
 }
 
 /// One project's loaded baseline: its configuration, JSON entries, path
-/// patterns and date cache, all resolved against [root].
+/// patterns and date cutoff, all resolved against [root].
 class _BaselineState {
   _BaselineState(this.config, this.root)
     : paths = config.paths.isEmpty ? null : BaselinePaths(config.paths),
@@ -452,20 +352,6 @@ class _BaselineState {
     final patterns = paths;
     if (patterns == null || !patterns.hasPatterns) return false;
     return patterns.matches(_normalizePath(filePath));
-  }
-
-  /// Date check from the preloaded cache; false when not preloaded.
-  bool isOldCached(String filePath, int line) {
-    final cutoff = date?.baselineDate;
-    if (cutoff == null) return false;
-    return BaselineManager._dateCache[(cutoff, filePath)]?[line] ?? false;
-  }
-
-  /// Date check that runs git blame when needed.
-  Future<bool> isOld(String filePath, int line) async {
-    final baselineDate = date;
-    if (baselineDate == null) return false;
-    return baselineDate.isOlderThanBaseline(filePath, line, projectRoot: root);
   }
 
   /// Resolve a baseline file path relative to project root.

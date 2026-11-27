@@ -1,34 +1,43 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
+
+import 'package:path/path.dart' as p;
+import 'package:saropa_lints/src/native/plugin_logger.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Date-based baseline for ignoring violations in code older than a specified date.
 ///
-/// Uses `git blame` to determine when each line was last modified.
-/// Lines modified before the baseline date are considered "legacy" and ignored.
+/// Uses `git blame` to determine when each line was last committed. Lines
+/// committed before the baseline date are "legacy" and their findings hidden.
 ///
 /// ## Usage
 ///
 /// ```yaml
-/// plugins:
-///   saropa_lints:
-///     diagnostics:
-///       # ... rule overrides ...
-///
-///     baseline:
-///       date: "2025-01-15"  # Ignore violations in code unchanged since this date
+/// # analysis_options_custom.yaml
+/// baseline:
+///   date: "2025-01-15"  # Ignore violations in code unchanged since this date
 /// ```
 ///
-/// ## How It Works
+/// ## Why the lookup is synchronous
 ///
-/// 1. When a violation is reported at line N in file F
-/// 2. We run `git blame -L N,N --porcelain F` to get the commit date
-/// 3. If the commit date is before the baseline date, the violation is suppressed
+/// Diagnostics are reported from synchronous visitor callbacks, and the
+/// analyzer plugin API offers no awaited per-file hook before them. An async
+/// preload therefore cannot be correct on a file's first analysis (nothing in
+/// the plugin, language server or scan CLI ever called it, so `date:` hid
+/// nothing). Blame runs with [Process.runSync] the first time a finding in a
+/// file reaches the date check.
 ///
-/// ## Caching
+/// ## Cost
 ///
-/// Git blame results are cached per-file to avoid repeated git calls.
-/// Cache is invalidated when file content changes (via content hash).
+/// One `git blame` process per analyzed file that has at least one finding not
+/// already hidden by `file:` or `paths:`, repeated only when that file's
+/// content changes. Files without such findings never start git.
+/// [Process.runSync] has no timeout, so a stalled git stalls the analysis.
+///
+/// ## Anything git cannot date still reports
+///
+/// Git missing, no repository, untracked file, uncommitted line: all report.
 class BaselineDate {
   BaselineDate(this.baselineDate, {String? gitPath})
     : _gitPath = gitPath ?? 'git';
@@ -39,295 +48,216 @@ class BaselineDate {
   /// Path to git executable.
   final String _gitPath;
 
-  /// Cache of file path -> (content hash, line -> commit date)
+  /// Blame answers by file path. Commit dates, not old/new verdicts, are
+  /// stored, so an edited `date:` reuses them without a new git run.
   static final Map<String, _FileDateCache> _cache = {};
 
-  /// Check if a violation at the given line should be suppressed.
+  /// Git executables that could not be started. Without this, a machine with
+  /// no git would retry the failing spawn once for every file.
+  static final Set<String> _unstartable = {};
+
+  /// Synchronous form of [isOlderThanBaseline], used by the reporter.
   ///
-  /// Returns true if the line was last modified before [baselineDate].
+  /// [content] is the text being analyzed. Passing it keeps line numbers right
+  /// for unsaved editor buffers; when null the file on disk is read.
+  bool isLineOld(String filePath, int line, {String? content}) {
+    if (filePath.isEmpty || line < 1) return false;
+    final committed = _lineDates(filePath, content)[line];
+    return committed != null && committed.isBefore(baselineDate);
+  }
+
+  /// Whether the line was last committed before [baselineDate].
   ///
-  /// [filePath] is the full path to the file.
-  /// [line] is the 1-based line number.
-  /// [projectRoot] is the git repository root (optional, auto-detected if null).
-  /// Returns false if [filePath] is null/empty or [line] < 1.
+  /// Returns false if [filePath] is null/empty, [line] < 1, or git cannot
+  /// date the line. [projectRoot] is accepted for source compatibility; blame
+  /// runs beside the file, so nested repositories and submodules resolve.
   Future<bool> isOlderThanBaseline(
     String? filePath,
     int line, {
     String? projectRoot,
-  }) async {
-    if (filePath == null || filePath.isEmpty) return false;
-    if (line < 1) return false;
+  }) async => filePath != null && isLineOld(filePath, line);
 
-    try {
-      final lineDate = await _getLineDate(filePath, line, projectRoot);
-      if (lineDate == null) return false;
-
-      return lineDate.isBefore(baselineDate);
-    }
-    // Catch Object (not bare `catch`) so the analyzer can verify error/stack
-    // types. Git blame can fail for many reasons (not a git repo, file not
-    // tracked, process unavailable); none of those should suppress the lint.
-    on Object catch (e, st) {
-      developer.log(
-        'isOlderThanBaseline failed',
-        name: 'saropa_lints',
-        error: e,
-        stackTrace: st,
-      );
-      return false;
-    }
-  }
-
-  /// Get the commit date for a specific line in a file.
-  Future<DateTime?> _getLineDate(
-    String filePath,
-    int line,
-    String? projectRoot,
-  ) async {
-    // Check cache first
-    final cached = _cache[filePath];
-    if (cached != null) {
-      final lineDate = cached.lineDates[line];
-      if (lineDate != null) {
-        return lineDate;
-      }
-    }
-
-    // Run git blame for this line
-    final date = await _runGitBlame(filePath, line, projectRoot);
-    if (date != null) {
-      // Cache the result
-      _cache.putIfAbsent(filePath, () => _FileDateCache()).lineDates[line] =
-          date;
-    }
-
-    return date;
-  }
-
-  /// Run git blame to get the commit date for a specific line.
-  Future<DateTime?> _runGitBlame(
-    String filePath,
-    int line,
-    String? projectRoot,
-  ) async {
-    if (filePath.isEmpty || line < 1) return null;
-
-    try {
-      // Await the lookup separately — `projectRoot ?? _findGitRoot(...)` would
-      // produce an `Object` (mixing `String?` with `Future<String?>`).
-      final workDir = projectRoot ?? await _findGitRoot(filePath);
-      if (workDir == null || workDir.isEmpty) return null;
-
-      // Make path relative to git root
-      final relativePath = _makeRelative(filePath, workDir);
-      if (relativePath.isEmpty) return null;
-
-      final result = await Process.run(
-        _gitPath,
-        ['blame', '-L', '$line,$line', '--porcelain', relativePath],
-        workingDirectory: workDir,
-        runInShell: true,
-      );
-
-      if (result.exitCode != 0) {
-        return null;
-      }
-
-      // Parse the porcelain output to find committer-time
-      final output = result.stdout?.toString() ?? '';
-      return _parseCommitterTime(output);
-    }
-    // Catch Object (not bare `catch`) so the analyzer can verify error/stack
-    // types. Process.run can throw on a missing git binary or platform error;
-    // returning null lets the caller treat the line as undatable.
-    on Object catch (e, st) {
-      developer.log(
-        '_runGitBlame failed',
-        name: 'saropa_lints',
-        error: e,
-        stackTrace: st,
-      );
-      return null;
-    }
-  }
-
-  /// Parse git blame porcelain output to extract committer timestamp.
-  DateTime? _parseCommitterTime(String output) {
-    // Format:
-    // <sha> <original-line> <final-line> <line-count>
-    // author <name>
-    // author-mail <email>
-    // author-time <timestamp>
-    // author-tz <timezone>
-    // committer <name>
-    // committer-mail <email>
-    // committer-time <timestamp>
-    // committer-tz <timezone>
-    // ...
-
-    final lines = output.split('\n');
-    for (final line in lines) {
-      if (line.startsWith('committer-time ')) {
-        final timestampStr = line.afterIndex('committer-time '.length).trim();
-        final timestamp = int.tryParse(timestampStr);
-        if (timestamp != null) {
-          return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-        }
-      }
-    }
-
-    return null;
-  }
-
-  /// Find the git repository root for a file.
-  ///
-  /// Async because this runs inside the analyzer's main isolate; sync
-  /// `existsSync()` would block the analysis loop while walking ancestor
-  /// directories looking for a `.git` entry (avoid_blocking_main_thread).
-  Future<String?> _findGitRoot(String filePath) async {
-    var dir = Directory(filePath).parent;
-    while (dir.path != dir.parent.path) {
-      final gitDir = Directory('${dir.path}/.git');
-      if (await gitDir.exists()) {
-        return dir.path;
-      }
-      dir = dir.parent;
-    }
-    return null;
-  }
-
-  /// Make a file path relative to the git root.
-  String _makeRelative(String filePath, String gitRoot) {
-    final normalized = filePath.replaceAll('\\', '/');
-    final rootNorm = gitRoot.replaceAll('\\', '/');
-
-    if (normalized.startsWith(rootNorm)) {
-      var relative = normalized.afterIndex(rootNorm.length);
-      if (relative.startsWith('/')) {
-        relative = relative.afterIndex(1);
-      }
-      return relative;
-    }
-
-    return normalized;
-  }
-
-  /// Clear the cache (for testing or when files change).
-  static void clearCache() {
-    _cache.clear();
-  }
-
-  /// Preload blame data for an entire file (optimization).
-  ///
-  /// This runs git blame once for the entire file and caches all line dates,
-  /// which is faster than running blame line-by-line.
+  /// Warms the cache for [filePath]. Optional: the checks load on demand.
   /// No-op if [filePath] is null or empty.
   Future<void> preloadFile(String? filePath, {String? projectRoot}) async {
-    if (filePath == null || filePath.isEmpty) return;
-
-    try {
-      // Await the lookup separately — `projectRoot ?? _findGitRoot(...)` would
-      // produce an `Object` (mixing `String?` with `Future<String?>`).
-      final workDir = projectRoot ?? await _findGitRoot(filePath);
-      if (workDir == null || workDir.isEmpty) return;
-
-      final relativePath = _makeRelative(filePath, workDir);
-      if (relativePath.isEmpty) return;
-
-      final result = await Process.run(
-        _gitPath,
-        ['blame', '--porcelain', relativePath],
-        workingDirectory: workDir,
-        runInShell: true,
-      );
-
-      if (result.exitCode != 0) return;
-
-      final output = result.stdout?.toString() ?? '';
-      final lineDates = _parseFullBlame(output);
-
-      _cache[filePath] = _FileDateCache()..lineDates.addAll(lineDates);
-    }
-    // Catch Object (not bare `catch`) so the analyzer can verify error/stack
-    // types. Failure to preload is non-fatal — per-line blame in
-    // _runGitBlame remains available as a fallback.
-    on Object catch (e, st) {
-      developer.log(
-        'preloadFile git blame failed',
-        name: 'saropa_lints',
-        error: e,
-        stackTrace: st,
-      );
-    }
+    if (filePath != null && filePath.isNotEmpty) _lineDates(filePath, null);
   }
 
-  /// Lines of [filePath] last changed before [baselineDate], from one blame
-  /// run. Null when blame gives nothing (untracked file, no repository), so a
-  /// caller can tell "no old lines" from "could not tell".
+  /// Lines of [filePath] last committed before [baselineDate]. Null when git
+  /// dates no line (untracked file, no repository), so a caller can tell
+  /// "no old lines" from "could not tell".
   Future<List<int>?> oldLines(String filePath, {String? projectRoot}) async {
-    await preloadFile(filePath, projectRoot: projectRoot);
-    final dates = _cache[filePath]?.lineDates;
-    if (dates == null || dates.isEmpty) return null;
+    final dates = _lineDates(filePath, null);
+    if (dates.isEmpty) return null;
     return [
       for (final e in dates.entries)
         if (e.value.isBefore(baselineDate)) e.key,
     ]..sort();
   }
 
-  /// Parse full git blame output to extract all line dates.
-  Map<int, DateTime> _parseFullBlame(String output) {
-    final lineDates = <int, DateTime>{};
-    final lines = output.split('\n');
-
-    int? currentLine;
-    DateTime? currentDate;
-
-    for (final line in lines) {
-      // Line number is in the header: <sha> <orig-line> <final-line> [count]
-      if (line.isNotEmpty && !line.startsWith('\t')) {
-        final parts = line.split(' ');
-        if (parts.length >= 3) {
-          // Check if this looks like a commit hash line.
-          // Read positional fields by name to avoid
-          // avoid_accessing_collections_by_constant_index; git porcelain
-          // header has a fixed column layout so these indexes are safe.
-          final hash = parts.first;
-          final finalLineField = parts.elementAtOrNull(2);
-          if (hash.length == 40 && _isHex(hash) && finalLineField != null) {
-            currentLine = int.tryParse(finalLineField);
-          }
-        }
-      }
-
-      if (line.startsWith('committer-time ')) {
-        final timestampStr = line.afterIndex('committer-time '.length).trim();
-        final timestamp = int.tryParse(timestampStr);
-        if (timestamp != null) {
-          currentDate = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-        }
-      }
-
-      // When we see a tab (start of actual line content), save the date
-      if (line.startsWith('\t') && currentLine != null && currentDate != null) {
-        lineDates[currentLine] = currentDate;
-        currentLine = null;
-        currentDate = null;
-      }
-    }
-
-    return lineDates;
+  /// Clear the cache (tests, memory relief); answers reload on demand.
+  static void clearCache() {
+    _cache.clear();
+    _unstartable.clear();
   }
 
-  /// Check if a string is a valid hex string.
-  bool _isHex(String s) {
-    return RegExp(r'^[0-9a-fA-F]+$').hasMatch(s);
+  /// Commit date per line of [filePath], from the cache or one blame run.
+  Map<int, DateTime> _lineDates(String filePath, String? content) {
+    try {
+      final text = content ?? _readDisk(filePath);
+      if (text == null) return const {};
+      final cached = _cache[filePath];
+      // Length plus hash identifies the content without retaining it. A
+      // changed file must be blamed again: its line numbers have moved.
+      if (cached != null &&
+          cached.length == text.length &&
+          cached.hash == text.hashCode) {
+        return cached.lineDates;
+      }
+      // An empty answer is cached too, so a failing file spawns git once.
+      final dates = _blame(filePath, text);
+      _cache[filePath] = _FileDateCache(text.length, text.hashCode, dates);
+      return dates;
+    }
+    // Best effort: any failure means "not old", never a crashed analysis.
+    on Object catch (e, st) {
+      developer.log(
+        'baseline git blame failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+      return const {};
+    }
+  }
+
+  /// File text, or null when it cannot be read.
+  String? _readDisk(String filePath) {
+    try {
+      return File(filePath).readAsStringSync();
+    } on FileSystemException {
+      return null;
+    }
+  }
+
+  /// Blames [filePath]. When [text] differs from the disk copy (unsaved
+  /// buffer), git annotates [text] through `--contents` instead, so edited
+  /// lines come back uncommitted rather than inheriting the date of whatever
+  /// line used to have that number.
+  Map<int, DateTime> _blame(String filePath, String text) {
+    if (text == _readDisk(filePath)) return _runBlame(filePath, null);
+    final temp = Directory.systemTemp.createTempSync('saropa_blame_');
+    try {
+      final copy = File(p.join(temp.path, 'contents'))..writeAsStringSync(text);
+      return _runBlame(filePath, copy.path);
+    } finally {
+      temp.deleteSync(recursive: true);
+    }
+  }
+
+  /// Runs one whole-file blame; empty when git gives no answer.
+  Map<int, DateTime> _runBlame(String filePath, String? contentsPath) {
+    if (_unstartable.contains(_gitPath)) return const {};
+    try {
+      // No shell: a file name containing `&` or `%` must stay a file name.
+      final result = Process.runSync(
+        _gitPath,
+        [
+          // Neither a repository's fsmonitor hook nor a textconv driver may
+          // run from inside the analysis server.
+          '-c', 'core.fsmonitor=false',
+          'blame', '--porcelain', '--no-textconv',
+          if (contentsPath != null) ...['--contents', contentsPath],
+          '--', p.basename(filePath),
+        ],
+        // The file's own folder, so git finds the repository that holds it.
+        workingDirectory: p.dirname(filePath),
+        environment: _gitEnvironment(),
+        includeParentEnvironment: false,
+        // Source lines in the output need not be valid UTF-8.
+        stdoutEncoding: const Utf8Codec(allowMalformed: true),
+        stderrEncoding: const Utf8Codec(allowMalformed: true),
+      );
+      if (result.exitCode != 0) return const {};
+      return _parsePorcelain('${result.stdout}');
+    } on ProcessException catch (e) {
+      _unstartable.add(_gitPath);
+      PluginLogger.warning(
+        'git could not be started (${e.message}); '
+        'baseline date: hides nothing.',
+      );
+      return const {};
+    }
+  }
+
+  /// The process environment without the variables that pin git to one
+  /// repository. Git hooks export them, and they would override the lookup
+  /// from the file's folder.
+  Map<String, String> _gitEnvironment() {
+    const pinned = {
+      'GIT_DIR',
+      'GIT_WORK_TREE',
+      'GIT_INDEX_FILE',
+      'GIT_COMMON_DIR',
+    };
+    return Map.of(Platform.environment)
+      ..removeWhere((key, _) => pinned.contains(key.toUpperCase()));
+  }
+
+  /// `<sha> <original-line> <final-line> [<count>]`, SHA-1 or SHA-256.
+  static final RegExp _header = RegExp(r'^([0-9a-f]{40,64}) \d+ (\d+)');
+
+  /// The all-zero sha git gives lines that are not committed.
+  static final RegExp _uncommitted = RegExp(r'^0+$');
+
+  /// Commit date per line from `--porcelain` output. Git prints a commit's
+  /// metadata only the first time that commit appears, so dates are kept per
+  /// sha; reading them per line dated only the first line of each commit.
+  Map<int, DateTime> _parsePorcelain(String output) {
+    final bySha = <String, DateTime>{};
+    final byLine = <int, String>{};
+    var sha = '';
+    for (final line in output.split('\n')) {
+      // Source lines are tab-prefixed and can never look like a header.
+      if (line.startsWith('\t')) continue;
+      final header = _header.firstMatch(line);
+      if (header != null) {
+        sha = header.group(1) ?? '';
+        final number = int.tryParse(header.group(2) ?? '');
+        // Uncommitted lines are left undated so they always report, even
+        // when the cutoff is in the future.
+        if (number != null && !_uncommitted.hasMatch(sha)) {
+          byLine[number] = sha;
+        }
+      } else if (line.startsWith('committer-time ')) {
+        final stamp = int.tryParse(
+          line.afterIndex('committer-time '.length).trim(),
+        );
+        if (stamp != null) {
+          bySha[sha] = DateTime.fromMillisecondsSinceEpoch(stamp * 1000);
+        }
+      }
+    }
+    final dates = <int, DateTime>{};
+    byLine.forEach((number, commit) {
+      final date = bySha[commit];
+      if (date != null) dates[number] = date;
+    });
+    return dates;
   }
 
   @override
   String toString() => 'BaselineDate($baselineDate)';
 }
 
-/// Cache for a single file's line dates.
+/// Blame answers for one version of one file.
 class _FileDateCache {
-  final Map<int, DateTime> lineDates = {};
+  _FileDateCache(this.length, this.hash, this.lineDates);
+
+  /// Length and hash of the content that was blamed.
+  final int length;
+  final int hash;
+
+  /// Commit date by 1-based line; uncommitted lines are absent.
+  final Map<int, DateTime> lineDates;
 }

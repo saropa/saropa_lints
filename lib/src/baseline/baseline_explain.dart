@@ -78,7 +78,7 @@ String _fileLines(BaselineExplanation found) {
   return out.toString();
 }
 
-/// Line ages for `date:`, with the limit that analysis does not apply them.
+/// How many lines `date:` covers, from the same blame data analysis uses.
 String _dateLine(BaselineExplanation found) {
   final date = found.config.date;
   if (date == null) return 'date: not set.';
@@ -87,9 +87,6 @@ String _dateLine(BaselineExplanation found) {
   if (old == null) {
     return 'date: $day; git blame gave no line dates for this file.';
   }
-  // Stated because it is true today: nothing calls preloadDateBaseline, so
-  // reporting these lines as hidden would contradict what analysis shows.
-  return 'date: $day; ${old.length} line(s) are older.\n'
-      '  Note: analysis does not load git blame data yet, so date: does not '
-      'currently hide findings in the editor or dart analyze.';
+  return 'date: $day; findings on ${old.length} line(s) last committed before '
+      'it are hidden. Uncommitted lines still report.';
 }

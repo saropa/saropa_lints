@@ -332,7 +332,16 @@ baseline:
 
 Trailing `# comments` and both list styles are accepted. `date`, `paths` and `only_impacts` are set by hand; the CLI writes only `file`.
 
-> **Known limit:** `date` does not currently hide findings during analysis (`dart analyze` or the editor), because git blame data is not loaded there.
+### How `date` works
+
+A finding is hidden when `git blame` shows its line was last committed before the date (midnight, local time). It applies in the editor, `dart analyze`, the language server and `scan`, from the first analysis of a file.
+
+- These lines always report: uncommitted or unsaved edits, untracked files, files outside a git repository, and every line when git is not installed or refuses the repository (for example a `safe.directory` error).
+- A shallow clone dates older lines at the clone boundary, so they report. In CI, fetch the full history.
+- A rebase or reformat gives lines a new commit date. Commits listed in git's `blame.ignoreRevsFile` setting are skipped as usual.
+- `SAROPA_LINTS_SKIP_BASELINE` does not switch `date` off.
+
+**Cost:** one `git blame` process for each file that has a finding not already hidden by `file` or `paths`, cached until the file's content changes. Expect roughly 0.1 to 0.3 seconds per such file (more with long histories or on slow disks), so a first full analysis of 1,000 such files adds a few minutes. The call is synchronous with no timeout. On large projects, record old findings in the JSON `file` baseline, or cover legacy folders with `paths`, to avoid git runs.
 
 ### Why is a finding hidden?
 

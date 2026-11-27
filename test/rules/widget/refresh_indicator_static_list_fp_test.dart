@@ -23,6 +23,12 @@ void showBalanceSheet({Object? child}) {}
 void showSpreadSheet({Object? child}) {}
 void showAppBottomSheet({Object? child}) {}
 void showShareActionSheet({Object? child}) {}
+void showDatePickerSheet({Object? child}) {}
+void showSortOptionsSheet({Object? child}) {}
+void showOptionsSheet({Object? child}) {}
+void showPickerSheetScreen({Object? child}) {}
+void showOptionsSheetPage({Object? child}) {}
+void showPickerSheets({Object? child}) {}
 class AlertDialog extends Widget {
   AlertDialog({Object? content, Object? actions});
 }
@@ -173,12 +179,67 @@ void open() {
         for (final String opener in <String>[
           'showAppBottomSheet',
           'showShareActionSheet',
+          'showDatePickerSheet',
+          'showSortOptionsSheet',
+          'showOptionsSheet',
         ]) {
           expect(
             await count('$_picker void open() { $opener(child: _Picker()); }'),
             0,
             reason: opener,
           );
+        }
+      });
+
+      // The sheet word has to end the name: these open something else.
+      test('fires when more words follow a sheet qualifier', () async {
+        for (final String opener in <String>[
+          'showPickerSheetScreen',
+          'showOptionsSheetPage',
+          'showPickerSheets',
+        ]) {
+          expect(
+            await count('$_picker void open() { $opener(child: _Picker()); }'),
+            1,
+            reason: opener,
+          );
+        }
+      });
+
+      // A handler's builder runs on tap, in either spelling of the past
+      // tense. The two-l form is split so the repository spelling check does
+      // not read this test input as prose.
+      test('fires for event handler names, skips look-alikes', () async {
+        Future<int> inDialog(String argument) => count('''
+$_picker
+void open() {
+  showDialog(
+    builder: (c) =>
+        AlertDialog(content: Holder($argument: () => _Picker())),
+  );
+}
+''');
+        for (final String name in <String>[
+          'onTap',
+          'onCancel',
+          'onCanceled',
+          'onCancel'
+              'led',
+          'onUploadCancel'
+              'led',
+          'onDone',
+        ]) {
+          expect(await inDialog(name), 1, reason: name);
+        }
+        // Not handlers: no capital after `on`, or the verb is not last.
+        for (final String name in <String>[
+          'onboardingDone',
+          'onlySelected',
+          'onTapBuilder',
+          'onCancel'
+              'ledBuilder',
+        ]) {
+          expect(await inDialog(name), 0, reason: name);
         }
       });
 

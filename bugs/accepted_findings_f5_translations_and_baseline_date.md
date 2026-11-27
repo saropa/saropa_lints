@@ -14,5 +14,12 @@ Completed work: `plans/history/2026.11/2026.11.26/accepted_findings_list_open_it
 | Per-entry maximum count (`max:`) | Owner decision on changing the version 1 schema |
 | Plugin with several project roots in a live analysis server (accepted list and per-project baseline) | A person running the IDE or `dart analyze` with the plugin |
 | `dart run saropa_lints:baseline` against a real project with real `dart analyze` output | A run of `dart analyze` with the plugin |
-| `baseline: date:` hides nothing during analysis: `BaselineManager.preloadDateBaseline` has no caller (also true at commit be403f6c7), and the reporter's date check reads only preloaded data | Owner decision: running git blame from the synchronous reporter path (cost, process spawning in the analysis server) or removing the setting. Documented in `doc/guides/configuration.md` and stated by `--explain` |
 | `--explain` has no VS Code surface; the project rule asks for visible UI as well as CLI | Extension work (command, strings, translation run) and an F5 check |
+
+## Finish report: `baseline: date:` (2026-11-26)
+
+- Cause: `BaselineManager.preloadDateBaseline` had no caller, and the porcelain parser dated only the first line of each commit.
+- Fix: the reporter's date check now runs `git blame` synchronously, once per file content, only for findings that `file` and `paths` did not hide. Cost and limits are in `doc/guides/configuration.md`.
+- Tests: a temporary git repository covers the matching rules, safe failures, caching, reloads, and end-to-end `scan`, resolved `scan` and the language server.
+- Hardening: event handler names require a capital after `on` and accept both spellings of the canceled suffix; analyzer element resolution confirms the constant-list scoping assumption across files; the `dart analyze` line format was checked against dartdev source and the baseline parser.
+- Not verified: the date baseline inside a live analysis server (covered by the plugin item above), real `dart analyze` output (item above), and behavior on Linux or macOS.

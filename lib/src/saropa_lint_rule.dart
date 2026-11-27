@@ -3642,11 +3642,16 @@ class SaropaDiagnosticReporter {
     if (!BaselineManager.isEnabled) return false;
     final loc = _resolveLocation(offset, node);
     if (loc == null) return false;
+    // The date baseline maps lines with git blame, so it needs the analyzed
+    // text (an unsaved buffer differs from disk). Only when currentUnit is
+    // this file: it can point at another part of the library (issue 208).
+    final unit = _ruleContext.currentUnit;
     return BaselineManager.isBaselined(
       loc.path,
       _ruleName,
       loc.line,
       impact: impact.name,
+      content: unit != null && unit.file.path == loc.path ? unit.content : null,
     );
   }
 

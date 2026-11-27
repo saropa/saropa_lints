@@ -164,7 +164,9 @@ bool isInsideTransientOverlay(AstNode node) {
 ///
 /// A sheet must be a qualified kind (`BottomSheet`, `ActionSheet`, ...): a
 /// bare `Sheet` suffix also matched `showBalanceSheet` and `showSpreadSheet`,
-/// which name documents shown on ordinary screens.
+/// which name documents shown on ordinary screens. `PickerSheet` and
+/// `OptionsSheet` qualify because both name a chooser laid over the current
+/// screen (`showDatePickerSheet`, `showSortOptionsSheet`).
 final RegExp _overlayWrapperName = RegExp(
   r'^_?show[A-Za-z0-9]*'
   r'(?:Dialog|(?:Bottom|Action|Modal|Picker|Options)Sheet|Popup|Menu)'
@@ -226,11 +228,13 @@ const Set<String> _pageRouteNames = <String>{
 /// callbacks that return widgets (`onSuccess:`, `onGenerateRow:`,
 /// `onLoadingBuilder:`) render inside the overlay like any builder.
 ///
-/// Verbs use US spelling, as Flutter does (`onCanceled`).
+/// A capital must follow `on`, so `onboardingDone:` is not read as a handler.
+/// The past tense of cancel is matched with one or two `l`s: Flutter writes
+/// one, but the analyzed code is the user's and may write two.
 final RegExp _eventHandlerArg = RegExp(
-  r'^on[A-Za-z0-9]*(?:Press|Pressed|Tap|TapUp|TapDown|Tapped|Click|Clicked|'
-  r'Change|Changed|Select|Selected|Submit|Submitted|Confirm|Confirmed|'
-  r'Cancel|Canceled|Accept|Accepted|Done|Dismissed)$',
+  r'^on(?:[A-Z][A-Za-z0-9]*)?(?:Press|Pressed|Tap|TapUp|TapDown|Tapped|Click|'
+  r'Clicked|Change|Changed|Select|Selected|Submit|Submitted|Confirm|'
+  r'Confirmed|Cancel|Cancell?ed|Accept|Accepted|Done|Dismissed)$',
 );
 
 /// True when the walk from [child] up to [current] crosses into code that
