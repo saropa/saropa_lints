@@ -877,9 +877,12 @@ def _move_major_version_tag(project_dir: Path, version: str) -> bool:
     # -f locally and --force on push: this tag is meant to move. Target the
     # exact release tag's commit, not HEAD: they differ when the exact tag
     # already existed locally at another commit (create_git_tag only warns).
+    # `~0` peels to the commit, not `^{commit}`: with shell=True on Windows,
+    # cmd.exe eats the caret, so the tag was never created and v17 stayed
+    # behind the releases.
     result = safe_run(
         ["git", "tag", "-f", major_tag, "-m", f"Latest {major_tag}.x release",
-         f"v{version}^{{commit}}"],
+         f"v{version}~0"],
         cwd=project_dir,
         capture_output=True, text=True, shell=use_shell,
     )

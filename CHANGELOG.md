@@ -75,6 +75,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - `require_error_widget` no longer reports a `FutureBuilder` whose future comes from a same-file async method that catches every error and only logs and returns a fallback, since its error state is unreachable; futures from other files, overridable methods and handlers that can still throw are still reported. No action required.
 - The scan CLI, scan daemon and language server now apply each package's own baseline when one run covers a folder with several packages; before, only the first analyzed package's baseline was used for every file. No action required.
 - On Windows the plugin no longer starts a PowerShell process to read total RAM at startup, so each plugin isolate is ready about 0.4 s sooner and `dart analyze` on a folder holding several packages no longer drops the second package's findings in the tested two-package case. No action required.
+- The GitHub Action no longer prefixes an absolute Windows `sarif-file` path with the working directory, which broke the SARIF upload on Windows runners. No action required.
 - `scan --check-accepted` now also scans files that accepted entries name in places a normal scan skips (such as `example/` and `bin/`), so their stale entries are reported, and "Check Accepted Findings" no longer counts unchecked entries as checked. A check that passed before can now report stale entries.
 
 ### Added (Extension)
@@ -96,6 +97,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - A translation guard and the locale parity test now fail when an Urdu value contains a Sindhi-only letter.
 - New process-level tests run the scan daemon and the language server on a temporary package to check that `max:` in `saropa_accepted.yaml` hides only the first findings and that ignored findings do not count toward it.
 - A new CI job runs the date-baseline and accepted `max:` process tests on macOS.
+- Fixed the CI Python tests: the GitHub Action tests now cover the `jobs` and `max-memory-mb` inputs, and the coverage metrics now find the `prefer_generated_data_classes` tests.
+- Fixed the release script on Windows not moving the major version tag (such as `v17`) that GitHub Action users reference.
 - Diagnosed why `dart analyze` on a folder holding two packages reports plugin findings for only one: the analysis server tracks one shared "plugin analyzing" flag for all plugin isolates, so it reports idle once the first isolate finishes, before a slower second isolate starts. Upstream; the limit is documented in the configuration guide.
 
 ---

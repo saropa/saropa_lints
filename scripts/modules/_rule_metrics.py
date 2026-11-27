@@ -200,6 +200,10 @@ def _test_category_alias(category: str) -> str:
     # of the absent pubspec_constraint_rules_test.
     if category == "pubspec_constraint":
         return "pubspec_constraint_parser"
+    # The test file is named after the rule (plural), not the source file, so
+    # the category was reported as untested and the metric totals disagreed.
+    if category == "generated_data_class":
+        return "generated_data_classes"
     return category
 
 

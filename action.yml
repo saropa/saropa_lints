@@ -645,8 +645,10 @@ runs:
         if [ "$want_sarif" = true ] && [ -f "$SARIF_FILE" ]; then
           # --output is relative to the working directory, but an absolute
           # sarif-file must not be prefixed with it.
+          # Windows runners hand over drive-letter paths ('D:\a\...'), which
+          # are absolute too and broke when prefixed.
           case "$SARIF_FILE" in
-            /*) echo "sarif-file=$SARIF_FILE" >> "$GITHUB_OUTPUT" ;;
+            /*|[A-Za-z]:/*|[A-Za-z]:\\*) echo "sarif-file=$SARIF_FILE" >> "$GITHUB_OUTPUT" ;;
             *) echo "sarif-file=$WORKING_DIRECTORY/$SARIF_FILE" >> "$GITHUB_OUTPUT" ;;
           esac
           if command -v jq >/dev/null 2>&1; then

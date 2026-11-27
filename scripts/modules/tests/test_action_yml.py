@@ -73,6 +73,8 @@ INPUT_DEFAULTS = {
     "FAIL_ON_COUNT": "",
     "FAIL_ON_IMPACT_COUNT": "",
     "FAIL_ON_TIER": "",
+    "JOBS": "",
+    "MAX_MEMORY_MB": "",
     "SINCE": "",
     "BASELINE": "",
     "EXCLUDE_GLOBS": "",
@@ -170,6 +172,15 @@ class TestExtraction(unittest.TestCase):
             self.assertIn(step, scripts)
             self.assertIn("set -", scripts[step])
 
+    def test_every_step_variable_has_a_default(self) -> None:
+        # The steps run under `set -u` with only INPUT_DEFAULTS in the
+        # environment, so a new input missing from it fails every test with
+        # "unbound variable". This names the missing variable instead.
+        declared = set(
+            re.findall(r"^        ([A-Z_]+): \$\{\{ inputs\.", ACTION_YML.read_text(encoding="utf-8"), re.M)
+        )
+        self.assertEqual(declared - set(INPUT_DEFAULTS), set())
+
 
 class TestValidateInputs(ActionHarness):
     def assert_rejected(self, fragment: str, **env: str) -> None:
@@ -224,6 +235,22 @@ class TestValidateInputs(ActionHarness):
     def test_rejects_a_resolve_value_that_would_be_ignored(self) -> None:
         self.assert_rejected("resolve must be true or false", MODE="gate", RESOLVE="True")
 
+    def test_accepts_every_documented_jobs_value(self) -> None:
+        for jobs in ("auto", "off", "serial", "1", "8"):
+            result = self.run_step(STEP_VALIDATE, MODE="gate", JOBS=jobs, MAX_MEMORY_MB="128")
+            self.assertEqual(result.returncode, 0, jobs + result.stdout + result.stderr)
+
+    def test_rejects_a_bad_jobs_or_memory_value(self) -> None:
+        for jobs in ("0", "-2", "many"):
+            self.assert_rejected("jobs must be", MODE="gate", JOBS=jobs)
+        self.assert_rejected("max-memory-mb must be a whole number", MODE="gate", MAX_MEMORY_MB="2GB")
+        self.assert_rejected("max-memory-mb must be at least 128", MODE="gate", MAX_MEMORY_MB="127")
+
+    def test_rejects_parallelism_inputs_under_audit(self) -> None:
+        self.assert_rejected(
+            "only apply to command 'scan': jobs max-memory-mb", JOBS="2", MAX_MEMORY_MB="512"
+        )
+
     def test_rejects_a_directory_without_pubspec(self) -> None:
         (self.workspace / "docs").mkdir()
         self.assert_rejected("not a Dart project", WORKING_DIRECTORY="docs")
@@ -273,6 +300,13 @@ class TestRunAudit(ActionHarness):
         at = args.index("--exclude-globs")
         self.assertEqual(args[at + 1 : at + 3], ["vendor/*", "**/gen/**"])
         self.assertEqual(len(args), at + 3)
+
+    def test_scan_gets_jobs_and_memory_budget(self) -> None:
+        result = self.run_step(STEP_AUDIT, MODE="gate", JOBS="4", MAX_MEMORY_MB="2048")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        args = self.dart_args()
+        self.assertEqual(args[args.index("--jobs") + 1], "4")
+        self.assertEqual(args[args.index("--max-memory-mb") + 1], "2048")
 
     def test_audit_gets_one_comma_joined_glob_value(self) -> None:
         result = self.run_step(STEP_AUDIT, MODE="gate", COMMAND="audit", INCLUDE_GLOBS=" lib/** , test/**")
@@ -423,6 +457,7 @@ class TestFlagsMatchTheParsers(unittest.TestCase):
     SCAN_ONLY = {
         "--tier", "--resolve", "--max-severity", "--fail-on", "--fail-on-impact",
         "--fail-on-count", "--fail-on-impact-count", "--fail-on-tier",
+        "--jobs", "--max-memory-mb",
     }
 
     @classmethod
