@@ -96,7 +96,7 @@
     "discover": {
       "header": "Verken de dashboards",
       "findings": {
-        "label": "Het bevindingen dashboard.",
+        "label": "Bevindingendashboard",
         "description": "Elke diagnose in uw project, filterbaar op ernst en regel."
       },
       "packages": {
@@ -108,7 +108,7 @@
         "description": "Stel in welke van de 2.350+ regels actief zijn en op welke ernst."
       },
       "catalog": {
-        "label": "Bevelslijst Katalogus Commando Catalogus",
+        "label": "Commandocatalogus",
         "description": "Elke Saropa Lints commando in één zoekbare lijst."
       }
     }
@@ -136,7 +136,7 @@
       "baselineSubtitle": "Geverdere met baseline van {date}",
       "searchPlaceholder": "Filter op regel, bestand of bericht…",
       "filterTier": "Niveau",
-      "filterSeverity": "De ernst van de situatie",
+      "filterSeverity": "Ernst",
       "filterImpact": "Invloed",
       "filterBaselineStatus": "Basislijn",
       "baselineNew": "Nieuw",
@@ -145,9 +145,9 @@
       "copyJson": "JSON kopieren",
       "toggleGroup": "Groepen in/uit schakelen",
       "colFile": "Bestand",
-      "colLine": "Lijn Lijnlijn Lijn",
+      "colLine": "Regel",
       "colRule": "Regel",
-      "colSeverity": "De ernst van de situatie",
+      "colSeverity": "Ernst",
       "colTier": "Niveau",
       "colMessage": "Bericht",
       "empty": "Geen resultaten — het project is schoon.",
@@ -159,7 +159,7 @@
       "exportJsonTitle": "Auditresultaten exporteren als JSON",
       "exportJsonSaved": "Audit JSON geëxporteerd",
       "exportJsonFailed": "Kon de audit JSON niet exporteren: {message}",
-      "clearRuleFilter": "De helderheid is duidelijk.",
+      "clearRuleFilter": "Wissen",
       "paginationNote": "Paginelimite geldt voor gefilterde resultaten.",
       "sevBarError": "{count} fouten ({pct}%)",
       "sevBarWarning": "{count} waarschuwingen ({pct}%)",
@@ -183,7 +183,7 @@
       "noProject": "Saropa: geen Dart project",
       "doneTooltip": "{total} vinden(s), {shown} weergegeven na filter",
       "dropped": "Saropa: scan overgeslagen ({count} bestanden)",
-      "droppedTooltip": "Saropa Lints isgeslaagd {count} bestanden die door een ander hulpmiddel zijn geopend in plaats van door u. Bewaar een bestand om het te scannen.",
+      "droppedTooltip": "Saropa Lints heeft {count} bestanden overgeslagen die door een ander hulpprogramma zijn geopend in plaats van door u. Sla een bestand op om het te scannen.",
       "droppedSuffix": "(+{count} overgeslagen)",
       "droppedSuffixTooltip": "Ook overgeslagen {count} bestanden die door een ander hulpmiddel zijn geopend in plaats van door jou. Sla een bestand op om het te scannen."
     },
@@ -217,15 +217,15 @@
       "unusedOnly": "Niet gebruikt alleen",
       "usedOnly": "Alleen gebruikt",
       "deprecatedOnly": "Verouderd alleen",
-      "expandAll": "Uitbreiden van alles.",
-      "collapseAll": "Alles instort, alles stort in.",
+      "expandAll": "Alles uitklappen",
+      "collapseAll": "Alles inklappen",
       "indexLabel": "Pakketindex"
     },
     "summary": {
       "title": "Package-overzicht",
       "sortHint": "Selecteer om te sorteren op deze kolom",
-      "colPackage": "Pakketpakket pakket",
-      "colVersion": "Versie versie versia",
+      "colPackage": "Pakket",
+      "colVersion": "Versie",
       "colFeatures": "Functies",
       "colAdopted": "Geadopteerd",
       "colUnadopted": "Niet aangenomen",
@@ -233,7 +233,7 @@
       "colScore": "Scoren"
     },
     "packages": {
-      "title": "Pakkettenpakketten zijn pakketjes."
+      "title": "Pakketten"
     },
     "empty": {
       "body": "Geen pakketten zijn gescand, dus er zijn geen functies om te lijsten."
@@ -244,7 +244,7 @@
       "noFeatures": "Een changelog is gevonden, maar geen functies konden daaruit worden geëxtraheerd.",
       "linkPubDev": "pub.dev",
       "linkDocs": "Documentatie",
-      "linkRepository": "Repositorium voor gegevensbestanden."
+      "linkRepository": "Coderepository"
     },
     "category": {
       "heading": "{category} ({count})",
@@ -263,7 +263,7 @@
       "usagesOne": "{count} gebruik",
       "usagesUnknown": "gebruik niet meetbaar",
       "apiHeading": "{symbol} ({count})",
-      "viewCode": "Code bekijken Bekijk code",
+      "viewCode": "Code bekijken",
       "viewDocs": "Documents bekijken.",
       "noUsages": "Geen gebruik gevonden in projectbron.",
       "moreUsages": "{count} meer gebruiken",
@@ -279,11 +279,11 @@
   "stylistic": {
     "title": "Stijl & meningen",
     "intro": "Opinionated stijlregels, standaard uitgeschakeld. Zet alleen aan wat je team ermee instemt. Tegenstrijdige keuzes worden gegroepeerd, zodat je er een kiest.",
-    "searchPlaceholder": "Zoek stijlregels... regels voor het zoeken.",
+    "searchPlaceholder": "Stijlregels zoeken…",
     "pickOne": "Kies er een uit.",
     "none": "Geen",
-    "enableAll": "Enable all: Alle mogelijkheden activeren.",
-    "disableAll": "Disable all: alles uitschakelen.",
+    "enableAll": "Alles inschakelen",
+    "disableAll": "Alles uitschakelen",
     "noMatch": "Geen stijlregels match.",
     "desc": {
       "ordering_sorting": "Sorteert leden, parameters, velden en map-sleutels voor een voorspelbare lay-out. Zeer storend op bestaande code — ideaal voor nieuwe code of kleine repositories.",
@@ -301,7 +301,7 @@
     }
   },
   "packs": {
-    "forYourProject": "Voor uw projectproject.",
+    "forYourProject": "Voor uw project",
     "forYourProjectHint": "Packages waarvan de afhankelijkheid of SDK overeenkomt met uw pubspec. Deze regels zijn van toepassing op code die u daadwerkelijk verzendt.",
     "noneDetected": "Er zijn nog geen packs die overeenkomen met je afhankelijkheden. Voeg een ondersteund pakket toe, of open All packages hieronder.",
     "allPackages": "Alle pakketten.",
@@ -330,15 +330,15 @@
       "ariaLabel": "Regels & Tiers dashboard tabs"
     },
     "ruleFinder": {
-      "disableButton": "Disable Disable Ontschakelen",
+      "disableButton": "Uitschakelen",
       "disableTitle": "Deactiveer deze regel voor het hele project — schrijft analysis_options_custom.yaml en herstart de analyse",
       "enableButton": "Geactiveerd",
       "enableTitle": "Deze regel opnieuw activeren — verwijdert de override in analysis_options_custom.yaml en voert de analyse opnieuw uit"
     },
     "tab": {
       "tier": "Niveau",
-      "packs": "Regelpakketten zijn regelpakketjes.",
-      "overrides": "Overschrijden overrides.",
+      "packs": "Regelpakketten",
+      "overrides": "Overschrijvingen",
       "sdk": "SDK-uitrol",
       "configFile": "Config bestand",
       "automation": "Automatisering",
@@ -426,7 +426,7 @@
         "openTitle": "Open saropa_baseline.json in de editor.",
         "summary": "{files} bestand(en), {violations} overtreding(en) gemeten — gegenereerd {generated}.",
         "unknownDate": "op een onbekend tijdstip",
-        "count": "Tellen tellen telen tellen.",
+        "count": "Aantal",
         "diff": {
           "title": "Diff vs huidig",
           "counts": "{resolved} opgelost sinds baseline · {new} nieuwe sinds baseline.",
@@ -435,7 +435,7 @@
           "newSection": "Nieuw sinds baseline ({count})",
           "moreRows": "+{count} meer niet getoond.",
           "fileCol": "Bestand",
-          "lineCol": "Lijn Lijnlijn Lijn"
+          "lineCol": "Regel"
         }
       },
       "optimizer": {
@@ -486,20 +486,20 @@
     "enableFailed": "Kon het {pack} regelpak niet activeren — open de dashboard van Regelpakketten om het in te schakelen"
   },
   "startupNudge": {
-    "message": "Saropa Lints: Het is een generieke vorm van _ph1__. {count} regelpakket suggestie (s) zijn van toepassing op dit project.",
+    "message": "Saropa Lints: {count} voorstel(len) voor regelpakketten van toepassing op dit project.",
     "review": "Beoordeling",
-    "dismiss": "Ontslag ontslagen.",
+    "dismiss": "Negeren",
     "reviewFailed": "Kan de recensie van het Saropa Lints-regelpakket niet openen. {error}"
   },
   "opportunities": {
-    "documentTitle": "Upgrade kansen op het niveau van de mogelijkheden.",
-    "heroTitle": "Upgrade kansen op het niveau van de mogelijkheden.",
+    "documentTitle": "Upgrademogelijkheden",
+    "heroTitle": "Upgrademogelijkheden",
     "subtitle": "{count}-pakketten hebben functies die uw project nog niet gebruikt.",
     "noScan": "Voer eerst een pakket-scan uit om upgrades mogelijkheden te vinden.",
     "openFileFailed": "Kon {file} niet openen — het kan sinds de laatste scan zijn verplaatst.",
     "card": {
       "versionUpgrade": "update beschikbaar voor {latest}.",
-      "versionCurrent": "over de laatste nieuwsberichten.",
+      "versionCurrent": "op de nieuwste versie",
       "featuresTitle": "Functies die nog niet gebruikt zijn.",
       "locationsTitle": "Waar uw project dit pakket gebruikt.",
       "noLocations": "Niet geïmporteerd in projectbron — waarschijnlijk een dev of transitive afhankelijkheid.",
@@ -516,25 +516,25 @@
       "failed": "Mislukt om opportunities rapport te schrijven: {error}"
     },
     "empty": {
-      "title": "Niets om te aannemen.",
+      "title": "Niets over te nemen",
       "body": "De functies van elk gescand pakket worden al gebruikt in uw project, of er zijn geen changelog-mogelijkheden gevonden."
     }
   },
   "packageDetail": {
     "section": {
-      "version": "Versies Versie versie",
-      "changelog": "CHANGELOG is een verandering.",
-      "community": "Gemeenschap, de Europese Unie.",
-      "dependencies": "Afhankelijkheden zijn afhankelijk.",
+      "version": "VERSIE",
+      "changelog": "CHANGELOG-BESTAND",
+      "community": "COMMUNITY EN ONDERSTEUNING",
+      "dependencies": "AFHANKELIJKHEDEN",
       "alerts": "Waarschuwingen.",
-      "platforms": "Platforms platforms zijn platformen.",
-      "suggestions": "Suggesties: suggesties.",
-      "readmeImages": "README IMAGES Lees de afbeeldingen."
+      "platforms": "PLATFORMEN",
+      "suggestions": "SUGGESTIES",
+      "readmeImages": "README-AFBEELDINGEN"
     },
     "header": {
       "logoAlt": "Logo van {name}",
       "grade": "Graad {grade}",
-      "licenseTitle": "Licentie licenties licentie.",
+      "licenseTitle": "Licentie",
       "published": "Gepubliceerd {date}"
     },
     "partialBanner": {
@@ -545,34 +545,34 @@
       "listMany": "{head}, en {last}.",
       "message": "Sommige secties konden niet worden geladen: {list}.",
       "retry": "Opnieuw proberen",
-      "retrying": "Ik probeer het opnieuw...",
+      "retrying": "Opnieuw proberen…",
       "retryTitle": "Probeer de mislukte fetches opnieuw."
     },
     "description": {
-      "readMore": "Lees meer over Meer lezen"
+      "readMore": "lees meer"
     },
     "version": {
-      "constraint": "Beperkingen beperken.",
-      "latest": "Laatste nieuwste laatste",
-      "prerelease": "Voorverkoop van de pre-release.",
-      "published": "Gepubliceerd Uitgegeven",
+      "constraint": "Beperking",
+      "latest": "Nieuwste",
+      "prerelease": "Prerelease-versie",
+      "published": "Gepubliceerd",
       "update": "Update",
       "blockedBy": "Geblokkeerd door:",
       "blockedVia": "{blocker} caps {dep} {constraint} ({resolvable} oplosbaar, {latest} nieuwste)",
       "blockedViaSdk": "vastgemaakt door {blocker} (Flutter SDK) voor {dep} ({resolvable} oplosbaar, {latest} laatste)",
-      "constrained": "Beperkingen opgelegd.",
+      "constrained": "Beperkt",
       "constrainedBy": "Uw beperking {constraint} plafonds dit ({resolvable} oplosbaar, {latest} nieuwste)",
-      "pinHeld": "Held gehouden.",
+      "pinHeld": "Vastgehouden",
       "pinDoNotUse": "Niet gebruiken.",
-      "drift": "Cross-project drift van projecten.",
-      "driftBehind": "Achter: achterin: {siblings} (je hebt {own})",
-      "driftDiffers": "Verschilt: verschillen in de vorm van een {siblings} (je hebt {own})",
-      "codeSize": "Code Grootte Code Afmeting",
-      "archiveSize": "Archiefgrootte Archiveermaat",
+      "drift": "Drift tussen projecten",
+      "driftBehind": "Achter: {siblings} (u hebt {own})",
+      "driftDiffers": "Verschilt: {siblings} (u hebt {own})",
+      "codeSize": "Codegrootte",
+      "archiveSize": "Archiefgrootte",
       "bloat": "({rating}/10 opgeblazen gevoel)",
       "onDisk": "Op de schijf op disk",
-      "upgrade": "Upgrade upgraden is een upgrade.",
-      "upgrading": "Upgraden... upgraden.",
+      "upgrade": "Upgraden",
+      "upgrading": "Upgraden…",
       "viewChangelog": "Changelog bekijken"
     },
     "changelog": {
@@ -582,39 +582,39 @@
       "viewFull": "Bekijk het volledige changelog op pub.dev"
     },
     "community": {
-      "stars": "Sterren sterren sterre sterren",
-      "likes": "De likes zijn de likes.",
-      "report": "Verslag Rapport Verslag Verslag",
-      "openIssues": "Open kwesties zijn open vragen.",
-      "openPrs": "Open PRs zijn open relaties.",
+      "stars": "Sterren",
+      "likes": "Aantal likes",
+      "report": "Rapport",
+      "openIssues": "Open issues",
+      "openPrs": "Open PR's",
       "activity": "Activiteit (90d)",
-      "activityValue": "{closed}-uitgaven gesloten, {merged} PR's samengevoegd.",
+      "activityValue": "{closed} issues gesloten, {merged} PR's samengevoegd",
       "noActivity": "Geen recente activiteit.",
-      "lastCommit": "Laatste verbintenis.",
-      "pubPoints": "Pub Points pubs punten.",
+      "lastCommit": "Laatste commit",
+      "pubPoints": "Pub-punten",
       "verified": "(geverifieerd)",
-      "publisher": "Uitgever Verkoper Auteur",
+      "publisher": "Uitgever",
       "flagged": "({count} gemarkeerd)",
-      "transitiveDeps": "Transitieve afzettingen.",
+      "transitiveDeps": "Transitieve afhankelijkheden",
       "footprintBreakdown": "{unique} uniek &middot; +{shared} gedeeld = {total} totaal",
       "footprintTooltip": "Eigen {own} + unieke transitives {unique} + gedeelde transitiven {shared}. Het verwijderen van deze dep bespaart {saved} (gedeelde deps blijven door anderen ingehaald).",
-      "trueFootprint": "True Footprint is een echte voetafdruk.",
+      "trueFootprint": "Werkelijke voetafdruk",
       "packagesCount": "{count} pakketten",
       "dependents": "Afhankelijke pakketten"
     },
     "fileUsages": {
       "commentedOut": "Verwijzingen zonder commentaar:",
-      "fileCount": "{count} bestanden archieven.",
+      "fileCount": "{count} bestanden",
       "exportNoteTitle": "Ten minste één gebruik is een exportrichtlijn.",
-      "publicApiSurface": "openbare API-oppervlakte van de oppervlakte.",
+      "publicApiSurface": "openbaar API-oppervlak",
       "header": "FILE GEBRUIK ({label})",
-      "commentedReexportTitle": "Gecommenteerde-out wederuitvoer.",
+      "commentedReexportTitle": "Uitgecommentarieerde re-export",
       "reexportTitle": "Re-exporteerde — deel van deze bibliotheek's openbare API",
-      "reexportBadge": "wederuitvoer naar de andere landen."
+      "reexportBadge": "herexport"
     },
     "opportunities": {
       "header": "Mogelijkheden ({count})",
-      "viewCode": "Code bekijken Bekijk code",
+      "viewCode": "Code bekijken",
       "viewDocs": "Documents bekijken."
     },
     "alerts": {
@@ -624,8 +624,8 @@
       "fix": "— oplossing: {version}"
     },
     "versionGap": {
-      "versionTitle": "Gap versie gap versie",
-      "overrideTitle": "Override Gap is een overschrijving van de gap.",
+      "versionTitle": "Versieachterstand",
+      "overrideTitle": "Override-achterstand",
       "noDates": "Kon geen versie data voor dit pakket te bepalen.",
       "noItems": "Er zijn geen PR's of problemen gevonden tussen deze versies.",
       "prsMerged": "PRs samengevoegd.",
@@ -635,35 +635,35 @@
       "filterAria": "Filter per categorie.",
       "filterAll": "Alle",
       "filterUnreviewed": "Niet beoordeeld.",
-      "filterPrs": "PR's zijn pr-diensten.",
-      "filterIssues": "Issues issues zijn kwesties.",
+      "filterPrs": "Pull requests",
+      "filterIssues": "Meldingen",
       "typePr": "PR",
-      "typeIssue": "Uitgave van het probleem.",
-      "reviewReviewed": "Herzien door de review.",
-      "reviewApplicable": "Toepasselijk Van toepassing.",
-      "reviewNotApplicable": "N/A Geen of geen",
-      "notesPlaceholder": "Notities... aantekeningen.",
+      "typeIssue": "Melding",
+      "reviewReviewed": "Beoordeeld",
+      "reviewApplicable": "Van toepassing",
+      "reviewNotApplicable": "N/A",
+      "notesPlaceholder": "Notities...",
       "colType": "Soort",
       "colTitle": "Titel",
       "colAuthor": "Auteur",
       "colReview": "Beoordeling",
-      "summaryFooter": "{triaged} of {total} getrieerd | {applicable} van toepassing | {notApplicable} N.v.t. | {unreviewed} resteert",
+      "summaryFooter": "{triaged} van {total} getrieerd | {applicable} van toepassing | {notApplicable} n.v.t. | {unreviewed} resterend",
       "truncated": "Resultaten gekort tot {limit} items."
     },
     "platforms": {
-      "wasm": "WASM is een vorm van WAS."
+      "wasm": "WASM"
     },
     "images": {
-      "alt": "README afbeelding van de Readme-afbeelding."
+      "alt": "README-afbeelding"
     },
     "links": {
       "viewOnPubDev": "Uitzicht op pub.dev",
       "documentation": "Documentatie",
-      "changelog": "Changelog is een changelog.",
-      "versions": "Versies Versieversieversies",
-      "repository": "Repositorium voor gegevensbestanden.",
-      "openIssues": "Open kwesties zijn open vragen.",
-      "reportIssue": "Rapport Uitgave Verslag Issue"
+      "changelog": "Wijzigingenlogboek",
+      "versions": "Versies",
+      "repository": "Coderepository",
+      "openIssues": "Open issues",
+      "reportIssue": "Probleem melden"
     },
     "a11y": {
       "skipToDetails": "Sla de pakketdetails over."
@@ -681,8 +681,8 @@
     "clearAll": "Alles wissen"
   },
   "loading": {
-    "runningAnalysis": "Het uitvoeren van analyses...",
-    "analysisComplete": "Analyse compleet analyse afgerond.",
+    "runningAnalysis": "Analyse wordt uitgevoerd…",
+    "analysisComplete": "Analyse voltooid",
     "analysisClean": "Geen problemen gevonden.",
     "refreshingDashboard": "Verfrissend dashboard met de nieuwste bevindingen.",
     "analysisStartedDetail": "De analyse is gestart. Diagnostiek verzamelen...",
@@ -695,7 +695,7 @@
   "a11y": {
     "toggleFullWidth": "Lay-out op volledige breedte in-/uitschakelen",
     "expandRow": "Rij uitvouwen",
-    "comparisonDimension": "Metrische metrie."
+    "comparisonDimension": "Meetwaarde"
   },
   "uiLanguage": {
     "pick": {
@@ -717,7 +717,7 @@
       "openViolations": "Open Violaties Rapport",
       "openPackageDashboard": "Open het Dashboard van de pakketten.",
       "openProcessHealth": "Open processtatus",
-      "commandCatalog": "Bevelslijst Katalogus Commando Catalogus",
+      "commandCatalog": "Commandocatalogus",
       "about": "Over"
     },
     "tooltip": {
@@ -746,14 +746,14 @@
         "vibrancy": "Package Dashboard openen."
       },
       "project": {
-        "version": "Versie versie versia",
+        "version": "Versie",
         "tier": "Niveau",
         "vibrancy": "Vibrantie",
-        "packages": "Packages gescand",
+        "packages": "Gescande pakketten",
         "packagesSuppressed": "{count} ({suppressed} onderdrukt)",
         "score": "Lintscore",
         "scorePending": "volledige analyse uitvoeren (gedeelde scan)",
-        "findings": "Bevindingen bevindingen.",
+        "findings": "Bevindingen",
         "updates": "Updates beschikbaar",
         "actionItems": "Actiepunten",
         "route": "Route"
@@ -831,11 +831,11 @@
     "action": {
       "cleanUp": "Reinigen",
       "openPanel": "Open het Gezondheidspaneel",
-      "dismiss": "Ontslag ontslagen.",
+      "dismiss": "Negeren",
       "optimizeAnalysis": "Analyse optimaliseren",
       "dontShowAgain": "Niet Opnieuw Toon",
       "openMachineDashboard": "Open Machinestatus",
-      "restartAnalysisServer": "Herstart opnieuw opstarten."
+      "restartAnalysisServer": "Opnieuw starten"
     },
     "cleanup": {
       "noOrphans": "Geen orphane daemonprocessen gevonden.",
@@ -881,13 +881,13 @@
     "watcherExclude": {
       "prompt": "De aangeraden bestand-watcher uitsluitingen van {count} ontbreken in dit werkruimte: {patterns}. Het toevoegen ervan voorkomt dat VS Code het volgen van grote build-artefacten en heap-dumps die geheugen verspillen.",
       "addAll": "Alles toevoegen",
-      "dismiss": "Ontslag ontslagen.",
+      "dismiss": "Negeren",
       "added": "Gebruikte {count} bestand-watcher uitsluitingen toegevoegd aan werkruimte instellingen."
     },
     "nestedRoots": {
       "prompt": "{folders} bevat {count} genesteerd Dart package root(s) die git ignoreert. Elke wordt geanalyseerd als een aparte context en kan de geheugenbelasting van de analyse-server verhogen.",
       "fix": "Uitsluiten van analyse",
-      "dismiss": "Ontslag ontslagen.",
+      "dismiss": "Negeren",
       "fixed": "{folders} is uit de analyse en bestandswachting uitgesloten."
     },
     "hazardScan": {
@@ -895,7 +895,7 @@
       "andMore": "en {count} meer",
       "unnamedFolder": "(ongebruikte map)",
       "addExclusions": "Uitsluiten van Watcher",
-      "dismiss": "Ontslag ontslagen.",
+      "dismiss": "Negeren",
       "added": "Gebruik van de watcher uitsluitingspatronen {count} is toegevoegd aan de werkruimte instellingen."
     }
   },
@@ -929,7 +929,7 @@
     "orphanCount": "{count} orphelijn",
     "kill": "Kil",
     "group": {
-      "analysisServer": "Dart Analyseerververs",
+      "analysisServer": "Dart-analyseservers",
       "flutterDaemon": "Flutter Daemonen",
       "saropa": "Saropa Lints",
       "otherDart": "Andere Dart processen",
@@ -948,7 +948,7 @@
     },
     "action": {
       "reclaim": "Herstel",
-      "restartAnalysisServer": "Herstart opnieuw opstarten.",
+      "restartAnalysisServer": "Opnieuw starten",
       "setHeapCap": "Kap instellen",
       "unloadModel": "Uitladen"
     },
@@ -985,7 +985,7 @@
     "notification": {
       "shedDisabled": "Analyser memory pressure gedetecteerd (RSS {rssMb} MB, soft limit {softLimitMb} MB). Schakel regelverlies in om automatisch duurzame regels te deactiveren onder druk.",
       "enableButton": "Inschakelen",
-      "learnMoreButton": "Meer weten Leer meer Meer leren",
+      "learnMoreButton": "Meer informatie",
       "runInit": "Voer 'dart run saropa_lints:init' uit om analysis_options_custom.yaml te genereren, daarna shed_rules: true instellen.",
       "enabledConfirmation": "Regelverlies ingeschakeld in analysis_options_custom.yaml. De analyzer zal de wijziging opnemen bij de volgende herlaad."
     },
@@ -1004,22 +1004,22 @@
     }
   },
   "findingsDash": {
-    "pageTitle": "Saropa Het bevindingen dashboard.",
-    "documentTitle": "Saropa Het bevindingen dashboard.",
+    "pageTitle": "Saropa Bevindingendashboard",
+    "documentTitle": "Saropa Bevindingendashboard",
     "skipToFindings": "Spring naar de bevindingen.",
-    "secondaryAsideLabel": "Secundaire diagnostiek is een tweede diagnose.",
+    "secondaryAsideLabel": "Secundaire diagnostiek",
     "hero": {
       "gaugeTitle": "Gezondheidscore {score} (graad {grade}). Fouten wegen het zwaarst.",
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "Net nu, net nu.",
+      "justNow": "zojuist",
       "minutesAgo": "{min} m geleden",
       "hoursAgo": "{hr} u geleden",
       "daysAgo": "{day} d geleden"
     },
     "status": {
-      "updatedPrefix": "Geactualiseerd bijgewerkt.",
+      "updatedPrefix": "Bijgewerkt",
       "refreshHint": "Klik om te vernieuwen vanaf de analysator.",
       "lastRunUnknown": "Laatste run onbekend.",
       "noTimestampTitle": "Geen tijdstempel op violations.json",
@@ -1030,7 +1030,7 @@
       "driftOnTitle": "Drift Advisor verbonden: {label}",
       "driftOnPill": "Drift verder · {count}",
       "driftOfflineTitle": "Drift Advisor is ingeschakeld, maar er werd geen server gevonden.",
-      "driftOfflinePill": "Drift offline afdrijven.",
+      "driftOfflinePill": "Drift is offline",
       "driftAuthRequiredTitle": "Drift Advisor server gevonden maar vereist een auth token — stel saropaLints.driftAdvisor.authToken",
       "driftAuthRequiredPill": "Drift vereist token",
       "driftAuthFailedTitle": "Drift Advisor heeft de geconfigureerde auth token geweigerd — klik om het te bijwerken",
@@ -1047,29 +1047,29 @@
       "qualityGateFailingPill": "Poort mislukt"
     },
     "groupBy": {
-      "severity": "De ernst van de situatie",
+      "severity": "Ernst",
       "file": "Bestand",
       "impact": "Invloed",
       "rule": "Regel",
       "owasp": "OWASP",
       "ruleType": "Regel type Regeltypes",
-      "ruleStatus": "Rule status: de regelstatus van een artikel.",
+      "ruleStatus": "Regelstatus",
       "tier": "Niveau",
-      "pack": "Pack (en) van de pakketten"
+      "pack": "Pakket(ten)"
     },
     "seg": {
       "toggleSeverityTitle": "Schakel {v} zwaartegraad in."
     },
     "kpi": {
-      "visibleLabel": "Zichtbare bevindingen zichtbaar.",
-      "allMatched": "Alle bij elkaar passen.",
+      "visibleLabel": "Zichtbare bevindingen",
+      "allMatched": "alles komt overeen",
       "ofTotal": "van {total} totaal.",
       "clearFiltersTitle": "Klik om alle filters te wissen.",
-      "errorsLabel": "Fouten fouten foutes",
-      "errorsSubFix": "moet fix fix",
+      "errorsLabel": "Fouten",
+      "errorsSubFix": "moet opgelost",
       "errorsSubClear": "geen – duidelijk",
       "errorsTitle": "Filter bevindingen op fouten (moet worden opgelost - kapot / crasht / exploiteerbaar)",
-      "warningsLabel": "Waarschuwingen en waarschuwingssignalen.",
+      "warningsLabel": "Waarschuwingen",
       "warningsSubBad": "zou kunnen mislukken of er slecht uitzien.",
       "warningsSubClear": "geen – duidelijk",
       "warningsTitle": "Filter bevindingen naar waarschuwingen (kunnen falen of er slecht uitzien)",
@@ -1077,11 +1077,11 @@
       "infoSub": "Ter informatie: stijl / suggesties",
       "infoSubNone": "geen",
       "infoTitle": "Filter bevindingen naar info (ter informatie: stijl en suggesties)",
-      "filesLabel": "De bestanden die getroffen zijn, worden beïnvloed.",
-      "filesSubAcross": "over de hele export-export.",
+      "filesLabel": "Betrokken bestanden",
+      "filesSubAcross": "in de hele export",
       "filesSubNone": "geen bestanden beïnvloed.",
       "filesTitle": "Onderscheidende bestanden die ten minste één bevinding bijdragen.",
-      "topRuleLabel": "Topregel: de hoogste regel.",
+      "topRuleLabel": "Belangrijkste regel",
       "topRuleTitle": "Filter bevindingen naar regel {name}.",
       "sectionHeading": "Overzicht",
       "sectionAria": "Overzicht statistieken"
@@ -1089,19 +1089,19 @@
     "toolbar": {
       "ariaFiltersActions": "Filters en acties.",
       "groupByFieldTitle": "Groepsbevindingen naar geselecteerde dimensie.",
-      "groupByLabel": "Groep per groep",
+      "groupByLabel": "Groeperen op",
       "textFilterTitle": "Filter de bevindingen op bestandspad, regel of berichttekst.",
       "textFilterPlaceholder": "Filter op bestand, regel of bericht...",
-      "textFilterAria": "Tekstfilter tekstfilter.",
-      "clearTextFilterTitle": "Clear text filter is een tekstfilter dat leeg wordt gemaakt.",
-      "clearTextFilterAria": "Clear text filter is een tekstfilter dat leeg wordt gemaakt.",
-      "recentFiltersTitle": "Recente filters recente filters",
+      "textFilterAria": "Tekstfilter",
+      "clearTextFilterTitle": "Tekstfilter wissen",
+      "clearTextFilterAria": "Tekstfilter wissen",
+      "recentFiltersTitle": "Recente filters",
       "clearRecentTitle": "Verwijder alle recente filters.",
-      "clearRecentButton": "De helderheid is duidelijk.",
-      "recentFiltersListAria": "Recente filters recente filters",
+      "clearRecentButton": "Wissen",
+      "recentFiltersListAria": "Recente filters",
       "runAnalysisTitle": "Voer Saropa Lints analyse uit.",
-      "severityGroupAria": "De ernstfilter filter.",
-      "severityLabel": "De ernst van de situatie",
+      "severityGroupAria": "Ernstfilter",
+      "severityLabel": "Ernst",
       "moreSummary": "Meer",
       "moreChevron": "▾",
       "copyJsonTitle": "Kopieer gefilterde schendingen als JSON ({count})",
@@ -1144,17 +1144,17 @@
     },
     "menuPalette": {
       "help": "Help",
-      "groupBy": "Groeperen naar... groepen.",
-      "textFilter": "Tekstfilter... tekstfilter.",
-      "severityImpact": "De ernst van het probleem... filter.",
-      "hideRules": "Verberg regels... verstop je regels.",
-      "ruleMetadata": "Metadata is de regel.",
-      "clearFilters": "Filters schoonmaken.",
-      "clearSuppressions": "Duidelijke onderdrukkingen.",
+      "groupBy": "Groeperen op…",
+      "textFilter": "Tekstfilter…",
+      "severityImpact": "Ernstfilter…",
+      "hideRules": "Regels verbergen…",
+      "ruleMetadata": "Regelmetadata",
+      "clearFilters": "Filters wissen",
+      "clearSuppressions": "Onderdrukkingen wissen",
       "clearFileFocus": "Verwijder de focus van het bestand.",
       "matchActiveEditor": "Match active editor bij elkaar.",
       "copyTreeJson": "Kopieerboom JSON.",
-      "refreshExtension": "Refresh is een uitbreiding van Refresh.",
+      "refreshExtension": "Extensie vernieuwen",
       "openPackageDashboard": "Open het Dashboard van de Package.",
       "openCodeHealth": "Open Code Gezondheidszorg",
       "openLintsConfig": "Regelpakketten beheren",
@@ -1163,16 +1163,16 @@
       "reEnableDisabledRules": "Her-activeren uitgeschakelde regels...",
       "reEnableDisabledRulesTitle": "Open een snelle keuze van de regels die momenteel uitgeschakeld zijn in analysis_options_custom.yaml en activeer opnieuw de gekozen regels.",
       "reEnableNoneMessage": "Er zijn momenteel geen regels uitgeschakeld via analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Re-enable deactiveren uitgeschakelde regels.",
+      "reEnableQuickPickTitle": "Uitgeschakelde regels opnieuw inschakelen",
       "reEnableQuickPickPlaceholder": "Selecteer een of meer regels om deze opnieuw in te schakelen.",
       "menuGroupExport": "Export Uitvoer",
       "menuGroupBulk": "Bulk acties",
-      "menuGroupFilter": "Filter & focus op de foto's.",
+      "menuGroupFilter": "Filteren en focussen",
       "menuGroupOpen": "Open het dashboard.",
-      "menuGroupSystem": "Het systeem van het systeem."
+      "menuGroupSystem": "Systeem"
     },
     "progress": {
-      "runningLabel": "Het uitvoeren van analyses...",
+      "runningLabel": "Analyse wordt uitgevoerd…",
       "runningMeta": "Dit kan een tijdje duren bij grote projecten."
     },
     "topRules": {
@@ -1180,15 +1180,15 @@
       "hideTitle": "Alleen voor mij verbergen: op werkruimteniveau, omkeerbaar via Clear Suppressions",
       "hideButton": "Verbergen",
       "disableTitle": "Uitschakelen voor het hele project — schrijft analysis_options_custom.yaml en herstart de analyse",
-      "disableButton": "Disable Disable Ontschakelen",
-      "workspaceOnlyShort": "Alleen werkruimte alleen.",
+      "disableButton": "Uitschakelen",
+      "workspaceOnlyShort": "alleen werkruimte",
       "projectConfigShort": "project config (schrijft analysis_options_custom.yaml)",
       "topRulesOne": "Top {count} regel van de top.",
       "topRulesOther": "Top {count} regels",
       "colRank": "#",
       "colRule": "Regel",
-      "colCount": "Tellen tellen telen tellen.",
-      "colSeverity": "De ernst van de situatie",
+      "colCount": "Aantal",
+      "colSeverity": "Ernst",
       "colActionsAria": "Rij-acties Rijaakties",
       "filesAffected": "De bestanden die zijn aangetast ({count})",
       "howToFixHeading": "Hoe te fixen",
@@ -1200,18 +1200,18 @@
       "supersedesLabel": "Vervangt:"
     },
     "findings": {
-      "sectionAria": "Bevindingen bevindingen.",
-      "heading": "Bevindingen bevindingen.",
-      "expandAll": "Uitbreiden van alles.",
-      "collapseAll": "Alles instort, alles stort in.",
+      "sectionAria": "Bevindingen",
+      "heading": "Bevindingen",
+      "expandAll": "Alles uitklappen",
+      "collapseAll": "Alles inklappen",
       "bulkSelected": "{count} geselecteerd",
       "bulkCopy": "Kopieer de geselecteerde tekst als JSON.",
       "selectAllTitle": "Selecteer alle zichtbare bevindingen.",
       "selectAllAria": "Selecteer alle zichtbare bevindingen.",
-      "colSeverity": "De ernst van de situatie",
+      "colSeverity": "Ernst",
       "colRule": "Regel",
       "colMessage": "Bericht",
-      "colLine": "Lijn Lijnlijn Lijn",
+      "colLine": "Regel",
       "colActionsAria": "Rij-acties Rijaakties",
       "selectRowAria": "Selecteer deze zoekrij.",
       "copyRowTitle": "Kopieer deze bevinding als JSON.",
@@ -1227,7 +1227,7 @@
       "emptyNoMatch": "Geen overtredingen passen bij de huidige filters.",
       "emptyHintNoData": "Voer een analyse uit om `reports/.saropa_lints/violations.json` in te vullen en vernieuw vervolgens.",
       "emptyHintFilters": "Pas de filters aan of voer de analyse opnieuw uit om resultaten te zien.",
-      "reRunAnalysis": "Re-run analyse Analyse van herhaling.",
+      "reRunAnalysis": "Analyse opnieuw uitvoeren",
       "resetFilters": "Filters resetten",
       "linePrefix": "L{line}"
     },
@@ -1235,41 +1235,41 @@
       "sectionAria": "Mix-charts gebruiken.",
       "heading": "Mengen",
       "metaClickSlice": "Klik op een slice om te filteren.",
-      "severityMix": "De ernst van de ziekte is gemengd.",
+      "severityMix": "Verdeling naar ernst",
       "filterBarTitle": "Filter alleen naar {key}.",
       "donutTotal": "totaal"
     },
     "todoHack": {
-      "sectionAria": "TODO's en HACKS zijn er.",
-      "headingDisabled": "TODO's & HACKS zijn er voor iedereen.",
+      "sectionAria": "TODO's en HACK's",
+      "headingDisabled": "TODO's en HACK's",
       "metaDisabled": "scan uitgeschakeld.",
       "scanOff": "Werkruimtescan is uitgeschakeld: schakel markeringen uit projectbestanden in.",
-      "enableScan": "Scan scan inschakelen.",
-      "heading": "TODO's & HACKS zijn er voor iedereen.",
+      "enableScan": "Scan inschakelen",
+      "heading": "TODO's en HACK's",
       "subsectionNone": "{title}: geen in scanbereik.",
       "capNote": "De scan bereikte zijn bestandsgrens, dus sommige bestanden werden overgeslagen.",
-      "raiseCap": "Verhoog de limiet van het aantal keer dat je kunt betalen.",
-      "notePill": "Noot noot nootsnoot",
-      "todosLabel": "TODOs zijn alles.",
+      "raiseCap": "Limiet verhogen",
+      "notePill": "notitie",
+      "todosLabel": "TODO's",
       "hacksLabel": "Noodoplossingen"
     },
     "drift": {
       "sectionAria": "Drift Advisor",
       "headingOff": "Drift Advisor",
-      "metaOff": "Integratie van de integratie af.",
+      "metaOff": "integratie uit",
       "enableBlurb": "Hier activeer je de integratie van Drift Advisor met suggesties voor databaseoppervlak.",
       "enable": "Inschakelen",
       "headingNoServer": "Drift Advisor",
-      "metaNoServer": "Geen server, geen server.",
+      "metaNoServer": "geen server",
       "noServerBlurb": "Geen Drift Advisor-server gevonden op geconfigureerde poorten.",
       "retry": "Opnieuw proberen",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "verbonden verbonden aangesloten verbonden",
+      "metaConnected": "verbonden",
       "noIssues": "Verbonden met {label} — geen huidige problemen.",
       "refresh": "Vernieuwen",
       "openBrowser": "Open in de browser.",
       "headingIssues": "Drift Advisor",
-      "disable": "Disable Drift Advisor - De driftradgeur uitschakelen"
+      "disable": "Drift Advisor uitschakelen"
     },
     "suppressedFindings": {
       "heading": "Verwerkte Resultaten",
@@ -1282,16 +1282,16 @@
       "unsuppressTitle": "Verwijder de onderdrukingsindicatie zodat deze bevinding verschijnt in normale scans",
       "unsuppressHint": "Om {rule} te ontsuppressen bij {file}:{line}: verwijder de // ignore: opmerking bovenaan die regel.",
       "columnFile": "Bestand",
-      "columnLine": "Lijn Lijnlijn Lijn",
+      "columnLine": "Regel",
       "columnRule": "Regel",
       "columnKind": "Soort",
       "columnAction": "Actie"
     },
     "suppressions": {
-      "sectionAria": "Onderdrukking Verdrukkingen",
+      "sectionAria": "Onderdrukkingen",
       "headingExport": "Uitwissing (export)",
-      "viewHidesHeading": "Issues view verbergt de weergave van problemen.",
-      "viewHidesMetaActive": "Actief actief actieve actieve",
+      "viewHidesHeading": "Verborgen in de weergave Issues",
+      "viewHidesMetaActive": "actief",
       "viewHidesMetaNone": "geen",
       "noneInExport": "Geen analysatoronderdrukkingen in de huidige `violations.json`-export. Voer een analyse uit na het bewerken van negaties of basislijnen die moeten worden ingevuld.",
       "totalRow": "Totaal — verwijder filters en open Bevindingen",
@@ -1307,7 +1307,7 @@
       "impactHides": "{count} impact verborgen",
       "activeHides": "Actieve huiden: {counts}. .",
       "viewHidesFooter": "Deze hides verkleinen alleen de lijst met issues / dashboard; ze zijn niet geschreven voor `violations.json`.",
-      "clearViewHides": "Clear all view verbergt zich voor alle weergave.",
+      "clearViewHides": "Alle weergaveverbergingen wissen",
       "foldersSample": "Mappen (sample)",
       "filesSample": "Bestanden / globs (monster)",
       "rulesSample": "Regels (sample)",
@@ -1317,7 +1317,7 @@
       "announceCleared": "Alle filters zijn schoongemaakt.",
       "announceFiltersPrefix": "Filters:",
       "announceStarted": "De analyse is gestart.",
-      "announceComplete": "Analyse compleet analyse afgerond.",
+      "announceComplete": "Analyse voltooid",
       "announceFailed": "Analyse mislukt.",
       "removeRecentAria": "Verwijderen",
       "removeRecentTitle": "Verwijderen",
@@ -1337,11 +1337,11 @@
       "activateKpiSpace": "Activeer gefocuste KPI-kaart of grafiekbalk.",
       "showOverlay": "Toon deze snelkoppeling overlay."
     },
-    "unknownAnalyzerKind": "Onbekend onbekend Onbekende Onbekenden",
+    "unknownAnalyzerKind": "Onbekend",
     "supplementary": {
       "scannerPromo": "Schakel de TODO/HACK scanner in.",
       "tooltipScanner": "Saropa-bestandssysteemscanner — telt open TODO/HACK-markeringen in de bron.",
-      "tooltipPromoClickToOn": "Klik om in te schakelen en activeer."
+      "tooltipPromoClickToOn": "Klik om in te schakelen"
     }
   },
   "ruleExplain": {
@@ -1362,16 +1362,16 @@
   },
   "triageDash": {
     "showInIssues": "Toon in kwesties.",
-    "disableRules": "Regels uitschakelen van regels uitschakelt.",
-    "enableRules": "Er zijn mogelijkheidsregels.",
-    "issues": "Issues issues zijn kwesties.",
+    "disableRules": "Regels uitschakelen",
+    "enableRules": "Regels inschakelen",
+    "issues": "Meldingen",
     "off": "Uit",
-    "on": "Op de op de op.",
+    "on": "Aan",
     "colRule": "Regel",
-    "colIssues": "Issues issues zijn kwesties.",
+    "colIssues": "Meldingen",
     "zeroIssueRules": "{count} regels met nul problemen — automatisch ingeschakeld in tier.",
     "disabledOverrides": "{count} regels uitgeschakeld door overschrijving in `analysis_options_custom.yaml`.",
-    "summaryRuleTriage": "Regel triage-sorteerprocedure.",
+    "summaryRuleTriage": "Regeltriage",
     "hintNoViolations": "Nog geen `reports/.saropa_lints/violations.json`. Voer de analyse uit en vernieuw vervolgens dit tabblad.",
     "hintUnreadable": "Geen leesbare overtredingen export. Voer eerst Saropa Lints analyse uit.",
     "hintStale": "Triagemegevens kunnen verouderd zijn (export is {age} oud). Herhalingsanalyse voor de huidige groepen.",
@@ -1415,7 +1415,7 @@
       "fullReportGenerating": "Volledig rapport genereren — elke gescande package, elke uitgegraven changelog feature. Dit draait één keer per scan en blijft in cache tot u opnieuw scant.",
       "knownIssues": "Bekende problemen",
       "knownIssuesDesc": "Blader door bekende kwetsbaarheden en advisories die gerapporteerd zijn tegen uw afhankelijkheden.",
-      "compare": "Vergelijk vergelijken.",
+      "compare": "Vergelijken",
       "compareDesc": "Vergelijk twee of meer packages naast elkaar op score, grootte en activiteit.",
       "settings": "Instellingen",
       "openButton": "{tab} openen"
@@ -1428,22 +1428,22 @@
         "scan": "Scannen",
         "display": "Weergave",
         "weights": "Scoregewichten",
-        "upgrade": "Upgrade upgraden is een upgrade.",
+        "upgrade": "Upgraden",
         "watch": "Horloge",
         "budget": "Begroting",
-        "vuln": "Vulnerabiliteiten"
+        "vuln": "Kwetsbaarheden"
       }
     },
     "detailPane": {
-      "aria": "Pakket detail pakket details",
-      "title": "Pakket detail pakket details",
-      "close": "Close detail details van dichtbij.",
+      "aria": "Pakketdetails",
+      "title": "Pakketdetails",
+      "close": "Details sluiten",
       "copyForAi": "Kopieer de upgrade prompt voor AI."
     },
     "status": {
       "packagesCount": "{count} pakketten",
       "packagesBreakdown": "{direct} direct, {transitive} transitief",
-      "gradeLine": "Graad {grade} · {avg}/100 De graad is:",
+      "gradeLine": "Cijfer {grade} · {avg}/100",
       "flaggedCount": "{count} gemarkeerd",
       "flaggedTitle": "Verlaten of aan het einde van de levensduur.",
       "lastScanLabel": "Gescand {when} gescand.",
@@ -1452,37 +1452,37 @@
       "lastScanUnknownTitle": "Deze scan liep voordat het dashboard tijdstempels volgde. Klik om opnieuw te scannen en controleer op pakketupdates."
     },
     "time": {
-      "justNow": "Net nu, net nu.",
+      "justNow": "zojuist",
       "minutesAgo": "{min} m geleden",
       "hoursAgo": "{hr} u geleden",
       "daysAgo": "{day} d geleden"
     },
     "scanning": {
-      "heading": "Scanningspakketten scannen.",
+      "heading": "Pakketten scannen",
       "body1": "Saropa haalt pub.dev-metagegevens, GitHub-activiteit en afhankelijkheidsgrafieken op voor elke directe afhankelijkheid in dit project.",
       "body2": "Deze pagina zal automatisch worden vernieuwd wanneer de scan is voltooid. U kunt annuleren via de voortgangsmelding rechtsonder.",
       "versionStamp": "Saropa Dashboard van het pakket v{version}"
     },
     "progress": {
-      "aria": "Pakket scan voortgang van de pakkettechniek.",
+      "aria": "Voortgang van pakketscan",
       "starting": "Start van de scan..."
     },
     "gaugeTitle": "Projectpakket Klasse: {grade}",
     "summary": {
-      "packages": "Pakkettenpakketten zijn pakketjes.",
+      "packages": "Pakketten",
       "projectGrade": "Projectpakket Klasse Grade",
       "totalSize": "Totaal grootte*",
       "gradeTooltip": "Projectklasse {avgGrade}\nGemiddelde score: {avgScore}/100\nPakketten: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "Een levendige, dynamische man.",
-      "stableTitle": "Stabiel stabiel.",
-      "outdatedTitle": "Verouderd verouderde.",
-      "abandonedTitle": "Verlaten, verlaten.",
+      "vibrantTitle": "Levendig",
+      "stableTitle": "Stabiel",
+      "outdatedTitle": "Verouderd",
+      "abandonedTitle": "Verlaten",
       "eolTitle": "Einde van het leven.",
       "updates": "Updates",
       "unused": "Ongebruikt",
-      "singleUse": "Eénmalig gebruik, voor eenmalig gebruiken.",
-      "vulnerable": "Kwetsbaar kwetsbaar",
-      "overrides": "Overschrijden overrides.",
+      "singleUse": "Eenmalig gebruik",
+      "vulnerable": "Kwetsbaar",
+      "overrides": "Overschrijvingen",
       "caveatLine1": "*Getoonde codegroottes (lib + gedeclareerde assets), terugvallend op de archiefgrootte pub.dev wanneer de codegrootte niet beschikbaar is. Exclusief dev_dependencies (build_runner, lints, saropa_lints, enz.) — ze worden nooit verzonden naar de APK/IPA/webbundel. De werkelijke app-grootte zal kleiner zijn na het schudden van de boom.",
       "caveatLine2": "Activiteitsdrempels: 90d = verouderde, 180d = slapende (commit + release tijdlijnen).",
       "upgradeTitle": "Upgrade vereist"
@@ -1490,7 +1490,7 @@
     "breakdown": {
       "title": "Waarom een ​​cijfer {grade}? — {avgScore}/100 gemiddeld over {pkgCount}-pakketten",
       "hint": "Klik om uit te breiden.",
-      "distributionHeading": "Distributie distributie.",
+      "distributionHeading": "Verdeling",
       "signalsHeading": "Risico signalen die de score naar beneden slepen.",
       "signalFlagged": "{count} gemarkeerd (verlaten / einde-van-levensduur)",
       "signalVulnerable": "{count} met bekende kwetsbaarheden.",
@@ -1509,16 +1509,16 @@
       "summary": "Afhankelijkheidsnetwerk"
     },
     "sections": {
-      "sizeDistribution": "Grootte Distributie Afmetingen Verdeling",
+      "sizeDistribution": "Grootteverdeling",
       "sizeDistributionCaption": "Exclusief dev_dependencies: ze worden nooit verzonden naar de APK/IPA/webbundel.",
       "filters": "Filters",
-      "packages": "Pakkettenpakketten zijn pakketjes."
+      "packages": "Pakketten"
     },
     "toolbar": {
       "openPubspecTitle": "pubspec.yaml openen",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Kopieer het rapport JSON (alle rijen + details)",
-      "copyAllLabel": "Kopieer kopieer, kopieër.",
+      "copyAllLabel": "Kopiëren",
       "copyOpportunitiesTitle": "Kopieer de AI-upgrade-aanwijzingen voor de top ondergeadopteerde pakketten in één plakvorm.",
       "copyOpportunitiesLabel": "Copy kansen voor AI.",
       "saveAllTitle": "Bewaar het rapport JSON in reports/YYY YMMDD/...",
@@ -1530,16 +1530,16 @@
       "rescanTitle": "Pakketten opnieuw scannen — wist de cache van pub.dev en haalt versies opnieuw op",
       "rescanLabel": "Opnieuw scannen",
       "openOtherTitle": "Open een ander project van pubspec.yaml in een nieuw venster voor Vibrancy-scan.",
-      "openOtherLabel": "Open Project... is een project dat open staat.",
+      "openOtherLabel": "Project openen…",
       "footprintGroupAria": "Grootte kolom voetafdruk modus.",
       "footprintGroupTitle": "Wat de kolom Grootte laat zien: alleen eigen codegrootte, plus unieke transitives (kosten als deze worden verwijderd), of plus alle transitiven (theoretische max). Terug naar archiefgrootte wanneer code-maat niet beschikbaar is.",
-      "footprintLabel": "Voetafdruk: voetafbeelding.",
+      "footprintLabel": "Voetafdruk:",
       "footprintOwnTitle": "Alleen eigen code grootte (lib + gedeclareerde activa); valt terug naar pub.dev archiefgrootte wanneer niet beschikbaar.",
       "footprintOwn": "Eigen",
       "footprintUniqueTitle": "Eigen grootte + transitives die alleen door deze dep worden gebruikt (besparing als je het verwijdert)",
-      "footprintUnique": "+ Uniek, uniek.",
+      "footprintUnique": "+ Unieke",
       "footprintTotalTitle": "Eigen omvang + alle transitives, inclusief die gedeeld met andere afdelingen.",
-      "footprintTotal": "+ Alle + Allemaal",
+      "footprintTotal": "+ Alle",
       "searchLabel": "Zoeken",
       "searchPlaceholder": "Zoeken",
       "clearSearchTitle": "Zoeken wissen",
@@ -1548,12 +1548,12 @@
       "publishedAgeLabel": "Publiceerde leeftijd.",
       "ageMaxAll": "Alle",
       "presetFilterTitle": "Breng snel filterpresets toe.",
-      "presetLabel": "Preset presets zijn voorgeschikt.",
+      "presetLabel": "Voorinstelling",
       "presetNone": "Geen",
-      "presetModernization": "Modernisering van de modernisering.",
-      "presetRiskHotspots": "Risico hotspots zijn risicokaders.",
+      "presetModernization": "Modernisering",
+      "presetRiskHotspots": "Risicohotspots",
       "presetCleanup": "Schoonmaak kandidaten.",
-      "presetDirectOnly": "Alleen direct alleen Direct.",
+      "presetDirectOnly": "Alleen directe",
       "devToggleTitle": "Inclusief dev-afhankelijkheden in tabel en totalen.",
       "includeDev": "Inclusief dev.",
       "activeFiltersLabel": "Actieve filters:",
@@ -1561,27 +1561,27 @@
     },
     "columns": {
       "name": {
-        "label": "Pakketpakket pakket",
+        "label": "Pakket",
         "tooltip": "Pakketnaam: klik om het item pubspec.yaml te openen"
       },
       "version": {
-        "label": "Versie versie versia",
+        "label": "Versie",
         "tooltip": "Geïnstalleerde versie vanaf pubspec.lock."
       },
       "score": {
-        "label": "Categorie categorie categorieën.",
+        "label": "Categorie",
         "tooltip": "Levendigheidsclassificatie en gezondheidsscore (0–10)"
       },
       "published": {
-        "label": "Gepubliceerd Uitgegeven",
+        "label": "Gepubliceerd",
         "tooltip": "Datum waarop de geïnstalleerde versie werd gepubliceerd op pub.dev."
       },
       "activity": {
-        "label": "Activiteit Activiteitsactiviteit",
+        "label": "Activiteit",
         "tooltip": "Code-en-release activiteit graad van commit + publiceren recency."
       },
       "likes": {
-        "label": "De likes zijn de likes.",
+        "label": "Aantal likes",
         "tooltip": "pub.dev likes — klik om de pakketscorepagina te openen"
       },
       "downloads": {
@@ -1589,15 +1589,15 @@
         "tooltip": "downloads van pub.dev in de afgelopen 30 dagen: klik om de pakketscorepagina te openen"
       },
       "issues": {
-        "label": "Issues issues zijn kwesties.",
+        "label": "Meldingen",
         "tooltip": "Open GitHub-problemen (exclusief pullverzoeken wanneer beschikbaar)"
       },
       "prs": {
-        "label": "PR's zijn pr-diensten.",
-        "tooltip": "Open GitHub pull requests voor het ophalen van gegevens."
+        "label": "Pull requests",
+        "tooltip": "Open GitHub-pullrequests"
       },
       "size": {
-        "label": "Grootte Afmeting Maatwerk",
+        "label": "Grootte",
         "tooltip": "Code grootte (lib + gedeclareerde activa); valt terug naar pub.dev archiefgrootte wanneer code-omvang niet beschikbaar is."
       },
       "deps": {
@@ -1605,11 +1605,11 @@
         "tooltip": "Directe transitieve afhankelijkheden: gedeelde afhankelijkheden gemarkeerd"
       },
       "files": {
-        "label": "Verwijzingen verwijzingen.",
+        "label": "Verwijzingen",
         "tooltip": "Aantal bronbestanden dat dit pakket importeert: klik om te zoeken"
       },
       "transitives": {
-        "label": "Transitieve producten zijn transitives.",
+        "label": "Transitieve",
         "tooltip": "Aantal transitieve (indirecte) afhankelijkheden die dit pakket inhaalt."
       },
       "vulns": {
@@ -1617,7 +1617,7 @@
         "tooltip": "Bekende beveiligingslekken van OSV en GitHub Adviesdatabases."
       },
       "license": {
-        "label": "Licentie licenties licentie.",
+        "label": "Licentie",
         "tooltip": "SPDX licentie-identificatiecode van pub.dev"
       },
       "update": {
@@ -1625,7 +1625,7 @@
         "tooltip": "Beschikbare versie-update: grote, kleine of patch."
       },
       "opportunities": {
-        "label": "Kansen, kansen.",
+        "label": "Kansen",
         "tooltip": "Functies in deze package's changelog die nog niet gebruikt worden in uw code — sorteer om de meest onder-geadopteerde packages te vinden"
       },
       "status": {
@@ -1633,20 +1633,20 @@
         "tooltip": "Gebruiksstatus: of het pakket ongebruikt verschijnt in uw code."
       },
       "description": {
-        "label": "Beschrijving Beskrywing Beschrijvingen",
+        "label": "Beschrijving",
         "tooltip": "Verpakkingsbeschrijving van pub.dev"
       }
     },
     "cells": {
       "noGithub": "Geen GitHub repository gevonden.",
       "devBadge": "dev",
-      "transitiveBadge": "transitieve, overgangsvormige.",
+      "transitiveBadge": "transitief",
       "opportunitiesTooltip": "Ongebruikte functies: {features}",
       "publishDateUnavailable": "Publicatie datum niet beschikbaar vanaf pub.dev",
       "activityGradeUnavailable": "Activiteitsklasse niet beschikbaar (ontbrekende commit- of releasegegevens)",
       "activityFallback": "Activiteit gebaseerd op recente commits en releases.",
       "likesUnavailable": "pub.dev likes niet beschikbaar.",
-      "likesCount": "{count} pub.dev houdt van likes.",
+      "likesCount": "{count} likes op pub.dev",
       "downloadsUnavailable": "pub.dev 30-daagse downloads niet beschikbaar.",
       "downloadsCount": "{count} downloads in de afgelopen 30 dagen",
       "sizeUnavailable": "Grootte niet beschikbaar bij pub.dev",
@@ -1656,7 +1656,7 @@
       "packageInUse": "Pakket is in gebruik."
     },
     "row": {
-      "expandDetails": "Uitbreiden van details Details",
+      "expandDetails": "Details uitklappen",
       "copyRowJson": "Kopieer de rij als JSON."
     },
     "shortcuts": {
@@ -1697,7 +1697,7 @@
       "noImports": "Geen bronbestand invoer gedetecteerd.",
       "reExportLine": "{location} (heruitvoer)",
       "publicApiSurface": "Openbare API-oppervlak — ten minste één gebruik is een re-export.",
-      "reExportedBadge": "Heruitgevoerd her-geëxporteerd",
+      "reExportedBadge": "Opnieuw geëxporteerd",
       "openFileReferences": "Open bestandverwijzingen."
     },
     "deps": {
@@ -1720,59 +1720,59 @@
       "healthy": "Code en release activiteit is gezond (activiteitsgraad {grade})"
     },
     "detail": {
-      "codeCommitActivity": "Code commit Activiteit code commit activiteit",
-      "releaseActivity": "Release Activity Release activiteit",
-      "dormancySignal": "Slaapsignaal is een slapende signaal.",
+      "codeCommitActivity": "Commitactiviteit",
+      "releaseActivity": "Releaseactiviteit",
+      "dormancySignal": "Inactiviteitssignaal",
       "ago": "{age} geleden.",
-      "qualityExample": "+voorbeeld voorbeeld",
-      "qualityExampleTitle": "Verzendt een runnable demo.",
-      "qualityTests": "+tests testen.",
-      "qualityTestsTitle": "Verzendt een testsuite.",
-      "qualityTools": "+tools gereedschappen",
-      "qualityToolsTitle": "Schepen onderhouder gereedschapsvoorraad.",
-      "qualityDocs": "+docs docs",
-      "qualityDocsTitle": "Schepen uitgebreide documentatie over de scheepvaart.",
-      "healthScore": "Gezondheidscore (Health Score)",
+      "qualityExample": "+voorbeeld",
+      "qualityExampleTitle": "Bevat een uitvoerbare demo",
+      "qualityTests": "+testsuite",
+      "qualityTestsTitle": "Bevat een testsuite",
+      "qualityTools": "+hulpmiddelen",
+      "qualityToolsTitle": "Bevat tools voor onderhouders",
+      "qualityDocs": "+docs",
+      "qualityDocsTitle": "Bevat uitgebreide documentatie",
+      "healthScore": "Gezondheidsscore",
       "resolutionVelocity": "Resolutie snelheid",
       "engagementLevel": "Betrokkenheidsniveau",
-      "popularity": "Populariteit populariteit",
-      "publisherTrust": "Uitgeverij Trust Trust"
+      "popularity": "Populariteit",
+      "publisherTrust": "Vertrouwen in uitgever"
     }
   },
   "commandCatalog": {
     "documentTitle": "Saropa Bevelslijst Katalogus",
-    "skipLink": "Skip to command catalogus, gebruik de opdracht om te navigeren naar het bestur",
+    "skipLink": "Naar de commandocatalogus",
     "heroTitle": "Saropa Bevelslijst Katalogus",
     "status": {
       "internalHidden": "{count} alleen contextmenu (verborgen)",
-      "wordCommands": "Bevels geven bevelen.",
-      "wordCategories": "categorieën categorieëncategorieën categorieen",
+      "wordCommands": "commando's",
+      "wordCategories": "categorieën",
       "wordRecent": "recent"
     },
     "search": {
       "placeholder": "Zoek titel, beschrijving of commando-id...",
-      "ariaLabel": "Zoekcommando's zoeken naar commando's.",
+      "ariaLabel": "Commando's zoeken",
       "clearAria": "Zoeken wissen",
       "hintLine1": "Past bij elk commando's.",
       "hintStrongTitle": "titel",
-      "hintStrongDesc": "Beschrijving beschrijving van de omschrijving",
+      "hintStrongDesc": "beschrijving",
       "hintStrongId": "id",
       "hintLine2": "(ID-tokens staan ​​ook op afstand — type",
-      "hintLine2kbd": "Run analyse run analyse",
+      "hintLine2kbd": "analyse uitvoeren",
       "hintLine2End": "zonder stippen)."
     },
     "toolbar": {
       "showInternal": "Toon contextmenu commando's.",
-      "collapseAll": "Alles instort, alles stort in."
+      "collapseAll": "Alles inklappen"
     },
     "recentPopover": {
       "title": "Recente zoekopdrachten.",
       "clearTitle": "Verwijder alle recente zoekopdrachten.",
-      "clearButton": "De helderheid is duidelijk.",
+      "clearButton": "Wissen",
       "listAria": "Recente zoekopdrachten."
     },
     "filterChips": {
-      "ariaRegion": "Actieve filters zijn actieve filers.",
+      "ariaRegion": "Actieve filters",
       "activeLabel": "Actieve filters:",
       "clearAll": "Alles wissen"
     },
@@ -1780,7 +1780,7 @@
       "frequentTitle": "Vaak",
       "frequentHint": "Meest gebruikte in uw sessies.",
       "recentTitle": "Recent",
-      "recentClear": "De helderheid is duidelijk.",
+      "recentClear": "Wissen",
       "recentHint": "Klik om opnieuw te starten · Nieuwste eerst"
     },
     "noResults": {
@@ -1803,16 +1803,16 @@
       "showOverlay": "Toon deze snelkoppeling overlay."
     },
     "script": {
-      "moreSuffix": "+{count} meer meer",
-      "showLess": "Toon minder toont minder.",
+      "moreSuffix": "+{count} meer",
+      "showLess": "Minder tonen",
       "runSingular": " uitvoering",
-      "runPlural": "Rennen, rennen, lopen.",
+      "runPlural": " uitvoeringen",
       "recentWord": "recent",
-      "expandAll": "Uitbreiden van alles.",
-      "collapseAll": "Alles instort, alles stort in.",
+      "expandAll": "Alles uitklappen",
+      "collapseAll": "Alles inklappen",
       "searchChip": "Zoek: \"{query}\"",
       "internalChip": "Bevels van het contextmenu weergeven.",
-      "removeFilterPrefix": "Verwijder het filter met de remover.",
+      "removeFilterPrefix": "Filter verwijderen",
       "matchOne": "{count} overeenkomst",
       "matchOther": "{count} overeenkomsten"
     }
@@ -1822,7 +1822,7 @@
     "skipToTable": "Ga over naar functies van de tabel.",
     "openWorkspaceFirst": "Open eerst een Dart/Flutter werkruimte.",
     "scan": {
-      "title": "Scanning project gezondheidszorg.",
+      "title": "Projectgezondheid scannen",
       "subtitle": "Ik lees je code. Het dashboard vult zich aan als de scan meer leert.",
       "waiting": "Start van de scan...",
       "launching": "De lancering van de scanner...",
@@ -1830,29 +1830,29 @@
       "firstRunHint": "De eerste run compileert de scanner; grote projecten hebben een tijdje nodig voordat bestanden verschijnen.",
       "paused": "Pauzeerde Pauseren",
       "stopped": "De scan is gestopt.",
-      "elapsed": "Er is tijd verstreken.",
+      "elapsed": "Verstreken",
       "phase": {
         "parse": "Parsen van bestanden.",
         "history": "Lees git geschiedenis.",
-        "blame": "Computing code age computercode leeftijd",
+        "blame": "Codeleeftijd berekenen",
         "usage": "Het tellen van referenties.",
-        "score": "Scoreerfuncties scoren functies."
+        "score": "Functies beoordelen"
       },
       "counter": {
-        "files": "Bestanden bestandenbestanden.",
-        "functions": "Functies functies.",
-        "problems": "Problemen gevonden Problemen gevonden"
+        "files": "Bestanden",
+        "functions": "Functies",
+        "problems": "Gevonden problemen"
       },
       "counters": {
-        "aria": "Live scan tellers tellen de live scans."
+        "aria": "Live scantellers"
       },
       "controls": {
         "aria": "Scan de bedieningselementen."
       },
       "btn": {
-        "pause": "Pauze paus pauze",
-        "resume": "Hervat uw CV.",
-        "restart": "Herstart opnieuw opstarten.",
+        "pause": "Pauzeren",
+        "resume": "Hervatten",
+        "restart": "Opnieuw starten",
         "cancel": "Annuleren"
       },
       "preview": {
@@ -1860,8 +1860,8 @@
         "empty": "Nog geen problemen gevonden..."
       },
       "version": {
-        "engine": "De motor is een machine die werkt.",
-        "detecting": "detecteren... opsporen.",
+        "engine": "Scanengine",
+        "detecting": "detecteren…",
         "legacy": "erfenis - geen live voortgang (de saropa_lints van dit project dateert van vóór het project)"
       }
     },
@@ -1871,12 +1871,12 @@
     "panelTitle": "Saropa Code Gezondheid Dashboard",
     "hero": {
       "title": "Saropa Code Gezondheid Dashboard",
-      "generated": "Gegenereerd gegenereerde",
+      "generated": "Gegenereerd",
       "functionOne": "{count} functie",
       "functionOther": "{count} functies",
-      "avgFormat": "avg {score} ({grade}) is het gemiddelde aantal",
+      "avgFormat": "gem. {score} ({grade})",
       "gatesFailing": "poorten falen.",
-      "gatesPassing": "De poorten passeren de passanten."
+      "gatesPassing": "poorten geslaagd"
     },
     "gate": {
       "fallback": "Kwaliteitspoorten zijn mislukt: bekijk de drempelwaarden in de Code Health-instellingen.",
@@ -1886,17 +1886,17 @@
       "openSettingsButton": "Open Code Gezondheidsinstellingen"
     },
     "kpi": {
-      "ariaLabel": "Code gezondheidssamenvatting code gezondheidsoverzicht",
+      "ariaLabel": "Samenvatting codegezondheid",
       "allClear": "Geen gemarkeerde functies in welke categorie dan ook - allemaal duidelijk.",
       "clickToFilter": "Klik om de tabel te filteren naar functies met {flag}.",
       "noFlagged": "Geen functies met de vlag {flag}.",
       "unused": "Ongebruikt",
       "unusedSub": "functies waar nergens naar wordt verwezen.",
-      "uncovered": "Onbedekt onthuld.",
+      "uncovered": "Niet gedekt",
       "uncoveredSub": "geen LCOV-dekking.",
-      "stubTested": "Stub-getest met een stubtest.",
+      "stubTested": "Met stubs getest",
       "stubTestedSub": "Er bestaan tests, maar ze beweren weinig.",
-      "suspiciousCoverage": "Verdachte berichten over verdacht materiaal.",
+      "suspiciousCoverage": "Verdachte dekking",
       "suspiciousCoverageSub": "dekking ziet er verzonnen uit.",
       "testDrift": "Testdrift",
       "testDriftSub": "De tests laten de functie achter."
@@ -1910,20 +1910,20 @@
       "settingsTitle": "Open de Code Health-instellingen.",
       "settingsButton": "Code Gezondheidsinstellingen",
       "filterTitle": "Filter rijen op naam, bestand of vlag.",
-      "filterLabel": "Filter rijen filters.",
-      "filterPlaceholder": "Filterrijden..."
+      "filterLabel": "Rijen filteren",
+      "filterPlaceholder": "Rijen filteren…"
     },
     "table": {
       "ariaLabel": "Slechtste functies naar score.",
-      "heading": "De slechtste functies zijn de functies die het ergst werken.",
+      "heading": "Slechtste functies",
       "colScore": "Scoren",
-      "colFunction": "Functie functiefunctie.",
+      "colFunction": "Functie",
       "colFile": "Bestand",
-      "colLine": "Lijn Lijnlijn Lijn",
+      "colLine": "Regel",
       "colUsage": "Gebruik",
-      "colCoverage": "De dekking van de Dekkingsdekking",
-      "colComplexity": "Complexiteit complexiteit",
-      "colFlags": "Vlaggen Vlagges Vlagge",
+      "colCoverage": "Dekking",
+      "colComplexity": "Complexiteit",
+      "colFlags": "Vlaggen",
       "noMatch": "Geen functies passen bij de huidige filters.",
       "resetFiltersTitle": "Verwijder het zoekopdracht en alle actieve vlaggenfilters.",
       "resetFilters": "Filters resetten",
@@ -1931,12 +1931,12 @@
       "expanderAriaExpanded": "Verberg details van de kwestie.",
       "detailHeading": "Waarom deze functie een score van {score} behaalde",
       "detailNoIssues": "Geen vlaggen in deze rij: de score wordt bepaald door de bovenstaande kolomwaarden (gebruik, dekking, complexiteit, leeftijd, documentatie).",
-      "suppressLabel": "Suppress in file onderdrukken.",
+      "suppressLabel": "In bestand onderdrukken",
       "suppressTooltip": "Schrijft `// ignore_for_file: code_health:<flag>` in dit bestand zodat toekomstige scans deze vlag voor het hele bestand laten vallen."
     },
     "flag": {
       "unused": {
-        "label": "ongebruikt, niet gebruikt.",
+        "label": "ongebruikt",
         "evidence": "0 bellers, 0 oproepers",
         "rule": "Gekennummerd wanneer geen ander bestand verwijst naar deze functie naam."
       },
@@ -1951,27 +1951,27 @@
         "rule": "Geflagd wanneer de cyclomatische complexiteit hoger is dan 10."
       },
       "undocumented": {
-        "label": "ongedocumenteerde migranten.",
+        "label": "ongedocumenteerd",
         "evidence": "CC {cc}, geen doc.",
         "rule": "Gekennummerd wanneer een complexe functie (CC > 10) geen doccommentaar heeft."
       },
       "test_drift": {
-        "label": "Drift test drifttest drijfdrift",
+        "label": "testdrift",
         "evidence": "De tests laten de functie achter.",
         "rule": "Gekennemde wanneer het nieuwste gekoppelde testbestand significant ouder is dan de bronbestand van de functie."
       },
       "stub_tested": {
-        "label": "Stub-getest door de stub-test.",
-        "evidence": "dunne beweringen bevestigt.",
+        "label": "met stubs getest",
+        "evidence": "zwakke asserts",
         "rule": "Gekennemde wanneer een gekoppelde test bestaat, maar nauwelijks iets bevestigt."
       },
       "suspicious_coverage": {
-        "label": "verdachte dekking van de berichten.",
+        "label": "verdachte dekking",
         "evidence": "{pct}% zonder test.",
         "rule": "Gekennemde wanneer LCOV meldt hoge dekking, maar geen test verwijst naar de functie."
       },
       "fresh_code": {
-        "label": "Fresh code vers, de nieuwe code.",
+        "label": "nieuwe code",
         "evidence": "CC {cc}, onlangs herschreven.",
         "rule": "Gekennummerd wanneer de cyclomatische complexiteit meer dan 10 bedraagt en het functiekorps is geschreven of herschreven binnen de laatste 90 dagen. Recentelijk herschreven complexe code veroorzaakte veel vaker incidenten dan oude code tijdens validatie."
       }
@@ -1986,10 +1986,10 @@
     "script": {
       "activeFiltersLabel": "Actieve filters:",
       "clearAll": "Alles wissen",
-      "neverRun": "Nooit rennen, nooit lopen."
+      "neverRun": "nooit uitgevoerd"
     },
     "freshness": {
-      "justNow": "Net nu, net nu.",
+      "justNow": "zojuist",
       "minutesAgo": "{min} m geleden",
       "hoursAgo": "{hr} u geleden",
       "daysAgo": "{day} d geleden",
@@ -2005,11 +2005,11 @@
     },
     "scan": {
       "subtitle": "Projectgrootte, complexiteit en hotspots scannen…",
-      "elapsed": "Er is tijd verstreken.",
+      "elapsed": "Verstreken",
       "cancel": "Annuleren",
-      "restart": "Herstart opnieuw opstarten.",
+      "restart": "Opnieuw starten",
       "stopped": "Gestopt",
-      "logHeading": "Activiteit Activiteitsactiviteit",
+      "logHeading": "Activiteit",
       "logEmpty": "Geen uitvoer nog — deze log vult alleen als de scan een diagnostische bericht print.",
       "progress": "{percent}% — {done}/{total} bestanden"
     },
@@ -2058,9 +2058,9 @@
         "saveError": "Kon niet opslaan"
       },
       "colFile": "Bestand",
-      "colLineNum": "Lijn Lijnlijn Lijn",
+      "colLineNum": "Regel",
       "colRule": "Regel",
-      "colSeverity": "De ernst van de situatie",
+      "colSeverity": "Ernst",
       "colMessage": "Bericht",
       "colKey": "Sleutel"
     },
@@ -2069,9 +2069,9 @@
       "showOverlay": "Toon deze snelkoppeling overlay."
     },
     "hero": {
-      "files": "Bestanden bestandenbestanden.",
+      "files": "Bestanden",
       "lines": "Regels:",
-      "size": "Grootte Afmeting Maatwerk"
+      "size": "Grootte"
     }
   },
   "suppressionsStrip": {
@@ -2104,17 +2104,17 @@
     "refresh": "Vernieuwen",
     "copyTitle": "Kopieer de snapshot als JSON.",
     "copyJson": "JSON kopieren",
-    "resetCounters": "Reset tellers weer op gang brengen.",
+    "resetCounters": "Tellers resetten",
     "countersAria": "Tellers met tellen.",
-    "countersHeading": "Event tellers zijn voorzien van evenementen.",
+    "countersHeading": "Gebeurtenistellers",
     "thEvent": "Evenement",
-    "thCount": "Tellen tellen telen tellen.",
+    "thCount": "Aantal",
     "emptyMessage": "Nog geen telemetriegebeurtenissen geregistreerd: open een regel vanuit het Bevindingendashboard om te beginnen met het vastleggen van tellers.",
     "openFindingsTitle": "Open het Saropa Findings Dashboard.",
     "openFindings": "Open het Dashboard van de bevindingen.",
-    "lastPropsHeading": "Last event eigenschappen van de laatste gebeurtenis.",
-    "copiedJson": "Saropa Lints: gekopieerd gerelateerde regel telemetrie JSON.",
-    "countersReset": "Saropa Lints: gerelateerde regel telemetrie tellers resetten."
+    "lastPropsHeading": "Eigenschappen van laatste gebeurtenis",
+    "copiedJson": "Saropa Lints: telemetrie-JSON van gerelateerde regels gekopieerd.",
+    "countersReset": "Saropa Lints: telemetrietellers van gerelateerde regels gereset."
   },
   "sidebarLayout": {
     "summary": "De lay-out van de activiteitenbalk.",
@@ -2123,30 +2123,30 @@
   "securityPosture": {
     "issueOne": "{count} probleem",
     "issueOther": "{count} problemen",
-    "noIssues": "Geen issues, geen problemen.",
+    "noIssues": "Geen problemen",
     "showIssues": "Toon problemen aan.",
     "violationTooltip": "{count} overtreding(en) verdeeld over {ruleCount} regel(s). Klik om weer te geven in Problemen.",
     "noViolationsTooltip": "Er zijn geen overtredingen in deze categorie."
   },
   "comparison": {
-    "title": "Pakketvergelijking Vergeleken met pakketten",
+    "title": "Pakketvergelijking",
     "actions": {
       "addToProject": "Voeg toe aan Project"
     },
     "table": {
       "row": {
-        "vibrancyGrade": "Vibrancy Grade (Vibransiteit)",
-        "category": "Categorie categorie categorieën.",
-        "latestVersion": "Laatste versie, de laatste versie.",
-        "published": "Gepubliceerd Uitgegeven",
-        "publisher": "Uitgever Verkoper Auteur",
-        "pubPoints": "Pub Points pubs punten.",
-        "githubStars": "GitHub Sterrensterren Zwarte Piet",
-        "openIssues": "Open kwesties zijn open vragen.",
-        "codeSize": "Code Grootte Code Afmeting",
-        "bloatRating": "Bloat Rating is een rating voor bloaten.",
-        "license": "Licentie licenties licentie.",
-        "platforms": "Platforms Platformen",
+        "vibrancyGrade": "Vibrancy-cijfer",
+        "category": "Categorie",
+        "latestVersion": "Nieuwste versie",
+        "published": "Gepubliceerd",
+        "publisher": "Uitgever",
+        "pubPoints": "Pub-punten",
+        "githubStars": "GitHub-sterren",
+        "openIssues": "Open issues",
+        "codeSize": "Codegrootte",
+        "bloatRating": "Bloat-score",
+        "license": "Licentie",
+        "platforms": "Platformen",
         "inThisProject": "In dit project."
       },
       "value": {
@@ -2156,7 +2156,7 @@
         "no": "Nee"
       },
       "badge": {
-        "inProject": "In project in het project."
+        "inProject": "In project"
       }
     },
     "status": {
@@ -2164,18 +2164,18 @@
       "packagesCompared": "{count} pakketten vergeleken.",
       "dimensionsRankedOne": "{count} dimensie gerangschikt.",
       "dimensionsRankedOther": "{count} afmetingen gerangschikt.",
-      "morePackages": "+{count} meer meer"
+      "morePackages": "+{count} meer"
     },
     "empty": {
       "ariaLabel": "Geen pakketten.",
       "message": "Geen pakketten geselecteerd voor vergelijking. Klik met de rechtermuisknop op twee of meer pakketten in het Dashboard van Pakketten en kies {compare}.",
-      "compareWord": "Vergelijk vergelijken.",
+      "compareWord": "Vergelijken",
       "openDashboard": "Open het Dashboard van de pakketten.",
       "openDashboardTitle": "Open het Saropa Package Dashboard."
     },
     "a11y": {
       "skipToTable": "Skip naar vergelijkingstabel.",
-      "recommendation": "Aanbeveling Aanbevolen",
+      "recommendation": "Aanbeveling",
       "addingToProject": "Het toevoegen van {name} aan het project."
     },
     "shortcuts": {
@@ -2184,19 +2184,19 @@
     },
     "kpi": {
       "ariaLabel": "Samenvatting van de vergelijking.",
-      "leading": "Leidinggevende leidende",
+      "leading": "Aan kop",
       "leadingTitle": "Pakket dat het meest door de meeste dimensies leidt wint.",
-      "dimensionWinsOne": "{count} dimensie win winnen",
+      "dimensionWinsOne": "{count} dimensie gewonnen",
       "dimensionWinsOther": "{count} dimensie wint.",
-      "packages": "Pakkettenpakketten zijn pakketjes.",
+      "packages": "Pakketten",
       "packagesTitle": "Aantal pakketten vergeleken naast elkaar.",
-      "inComparison": "in vergelijking met elkaar.",
+      "inComparison": "in vergelijking",
       "dimensions": "Afmetingen Dimensies",
       "dimensionsTitle": "Aantal dimensies waarin een winnaar zou kunnen worden gerangschikt.",
-      "ranked": "rangorde gerangschikt."
+      "ranked": "gerangschikt"
     },
     "toolbar": {
-      "ariaLabel": "Vergelijkingsacties vergelijken acties.",
+      "ariaLabel": "Vergelijkingsacties",
       "packageDashboard": "Package Dashboard van het pakket",
       "packageDashboardTitle": "Open het pakket dashboard om meer pakketten te vergelijken."
     }
@@ -2217,7 +2217,7 @@
       "rss": "RSS:",
       "statusLabel": "Status:",
       "statusValue": {
-        "active": "Actief actief actieve actieve",
+        "active": "actief",
         "idle": "inactief",
         "running": "uitvoeren",
         "stopped": "gestopt",
@@ -2271,7 +2271,7 @@
       "lspEnableButton": "Inschakelen",
       "lspStopped": "LSP Server: gestopt.",
       "lspStartFailed": "LSP Server: het starten is mislukt (zie het foutbericht en de Saropa Lints LSP uitvoerkanal).",
-      "analyzerToggleOn": "Analyseer Plug-in: inschakelen…",
+      "analyzerToggleOn": "Analyzer-plugin: inschakelen…",
       "analyzerToggleOff": "Analyseer Plug-in: uitschakelen…",
       "daemonToggleOn": "Scan Daemon: verdergaan…",
       "daemonToggleOff": "Scan Daemon: suspenderen…",
@@ -2293,8 +2293,8 @@
         "heading": "Publiceer deze wijziging",
         "introEnable": "{path} is geschreven in je werkende boom. Niets draait in CI totdat het op {base} is. Deze commando's zetten het op een nieuwe tak genaamd {branch} en openen een pull request voor beoordeling — voer ze zelf uit, of druk op de knop en Saropa Lints zal deze precies uitvoeren.",
         "introDisable": "{path} is bewerkt in je werkboom om alle taken te onderbreken. CI blijft lopen tot dat {base} bereikt wordt. Deze opdrachten zetten de wijziging op een nieuwe tak genaamd {branch} en openen een pull request — voer ze zelf uit, of druk op de knop en Saropa Lints zal deze precies uitvoeren. Om CI direct te stoppen, deactiveer het workflow vanaf de Actions-tab van het repository.",
-        "commandsLabel": "Bevels Commandos Commando's",
-        "copy": "Kopieer kopieer, kopieër.",
+        "commandsLabel": "Commando's",
+        "copy": "Kopiëren",
         "copied": "Commando's gekopieerd naar het klembord.",
         "createPr": "Branch maken, commit, push en pull request openen",
         "notNow": "Niet nu",
@@ -2322,27 +2322,27 @@
       "selectPackage": "Selecteer een pakket om de details te bekijken."
     },
     "section": {
-      "version": "Versies Versie versie",
+      "version": "VERSIE",
       "update": "UPDATE",
-      "suggestion": "Suggestie is suggestie.",
-      "community": "Gemeenschap, de Europese Unie.",
-      "dependencies": "Afhankelijkheden zijn afhankelijk.",
+      "suggestion": "SUGGESTIE",
+      "community": "COMMUNITY EN ONDERSTEUNING",
+      "dependencies": "AFHANKELIJKHEDEN",
       "alerts": "Waarschuwingen.",
-      "platforms": "Platforms platforms zijn platformen.",
+      "platforms": "PLATFORMEN",
       "directDeps": "Direct Deposits (DDE)",
-      "readmeImages": "README IMAGES Lees de afbeeldingen."
+      "readmeImages": "README-AFBEELDINGEN"
     },
     "version": {
       "published": "Gepubliceerd door: {date}",
-      "codeSize": "Code Grootte Code Afmeting",
-      "archive": "Archief archieven archiveren",
+      "codeSize": "Codegrootte",
+      "archive": "Archief",
       "sizeLabel": "{label}: {size}",
       "source": "Bron: {code}-code · {comments}-opmerkingen · {files}-bestanden",
       "replace": "Vervangen door: {summary}"
     },
     "update": {
-      "upgrade": "Upgrade upgraden is een upgrade.",
-      "changelog": "Changelog is een changelog.",
+      "upgrade": "Upgraden",
+      "changelog": "Wijzigingenlogboek",
       "blockedBy": "Geblokkeerd door {package}"
     },
     "suggestion": {
@@ -2370,33 +2370,33 @@
     "dependencies": {
       "flagged": "({count} gemarkeerd)",
       "transitiveCount": "{count} transitieve pakketten.",
-      "unique": "{count} uniek, uniek",
+      "unique": "{count} uniek",
       "shared": "{count} gedeeld ({pct}%)",
-      "moreOverflow": "+{count} meer meer",
+      "moreOverflow": "+{count} meer",
       "sharedList": "Gedeeld: {names}"
     },
     "platforms": {
-      "wasm": "WASM is een vorm van WAS."
+      "wasm": "WASM"
     },
     "links": {
       "viewFullDetails": "Bekijk volledige details.",
       "pubDev": "pub.dev",
       "documentation": "Documentatie",
-      "changelog": "Changelog is een changelog.",
-      "repository": "Repositorium voor gegevensbestanden.",
-      "issues": "Issues issues zijn kwesties.",
-      "reportIssue": "Rapport Uitgave Verslag Issue"
+      "changelog": "Wijzigingenlogboek",
+      "repository": "Coderepository",
+      "issues": "Meldingen",
+      "reportIssue": "Probleem melden"
     },
     "logoAlt": "Logo van {packageName}",
     "readMore": "meer",
-    "readmeImageAlt": "README afbeelding van de Readme-afbeelding."
+    "readmeImageAlt": "README-afbeelding"
   },
   "chart": {
     "toggle": {
-      "excludeShared": "Exclusieve gedeelde delen."
+      "excludeShared": "Gedeelde uitsluiten"
     },
     "filter": {
-      "clear": "De helderheid is duidelijk."
+      "clear": "Wissen"
     },
     "bucket": {
       "other": "Overig ({count} {noun})",
@@ -2404,8 +2404,8 @@
       "sharedTransitives": "Gedeelde transitives ({count})"
     },
     "noun": {
-      "package": "Pakket pakket paket",
-      "packages": "pakketten verpakkingen."
+      "package": "pakket",
+      "packages": "pakketten"
     }
   },
   "suite": {
@@ -2423,7 +2423,7 @@
     },
     "crashNudge": {
       "message": "Log Capture zag een crash {count} tijd (((s) die regel {ruleId} zou hebben gepakt. De regel is momenteel uitgeschakeld.",
-      "enable": "In staat stellen regel in te schakelen."
+      "enable": "Regel inschakelen"
     },
     "deepLink": {
       "showDriftIssues": "Laat live Drift-problemen zien (Drift Advisor)"
@@ -2431,12 +2431,12 @@
     "nudge": {
       "message": "Dit project maakt gebruik van Drift Advisor. Installeer de Saropa Log Capture extensie om runtime SQL te correleren met deze statische bevindingen.",
       "install": "Installeer Log Capture.",
-      "dismiss": "Ontslag ontslagen."
+      "dismiss": "Negeren"
     },
     "driftRecommend": {
       "message": "Een Drift Advisor-server is aangesloten. Installeer de standalone Saropa Drift Advisor extensie voor een volledige Problems-panel ervaring.",
       "install": "Installeer Drift Advisor.",
-      "dismiss": "Ontslag ontslagen."
+      "dismiss": "Negeren"
     }
   },
   "notify": {
@@ -2444,11 +2444,11 @@
       "cacheCleared": "Vibrancy cache verwijderd.",
       "copiedInfo": "Gekopieerde {package} informatie naar het klembord.",
       "noPubspecOrLock": "Geen pubspec.yaml/pubspec.lock gevonden in werkruimte.",
-      "backfillComplete": "Package Vibrantie: De vibrantie van het pakket. eenmalige geschiedenis backfill voltooid ({count} snapshots geïmporteerd).",
+      "backfillComplete": "Package Vibrancy: eenmalige aanvulling van de geschiedenis voltooid ({count} momentopnamen geïmporteerd).",
       "runScanFirst": "Voer eerst een scan uit.",
       "noUpgradable": "Er zijn geen upgradebare pakketten gevonden.",
       "proceedUpgrades": "Gaat u verder met {count} upgrade? De mislukte stappen worden teruggedraaid en het plan gaat door.",
-      "actionExecute": "Uitvoeren Execute Execute",
+      "actionExecute": "Uitvoeren",
       "actionCancel": "Annuleren",
       "upgradeStopped": "Upgrade gestopt bij {failedAt} — {completed}/{total} voltooid",
       "upgradeAllComplete": "Alle {count} upgrades zijn met succes voltooid.",
@@ -2468,9 +2468,9 @@
       "packageNotFound": "Pakket {package} niet gevonden in pubspec.yaml",
       "updatedTo": "Bijgewerkt {package} naar {version}.",
       "ciRunScanFirst": "Voer eerst een scan uit om CI config te genereren met de juiste drempels.",
-      "noWorkspace": "Geen werkruimte map open geopend geen werkruimpak folder geopende",
+      "noWorkspace": "Geen werkruimtemap geopend",
       "ciOverwriteConfirm": "{path} bestaat al. Overschrijven?",
-      "actionOverwrite": "Overschrijven schrijf over.",
+      "actionOverwrite": "Overschrijven",
       "ciGenerated": "CI-pipeline gegenereerd: {path}",
       "compareSelectCount": "Selecteer 2-3 pakketten om te vergelijken.",
       "compareMax": "Maximaal 3 pakketten voor vergelijking.",
@@ -2480,7 +2480,7 @@
       "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} fout{suffix} — weergave",
       "regressionScoreDipped": "Score daalde onder {threshold} — bekijk problemen.",
-      "actionViewViolations": "View Violaties Bekijk overtredingen",
+      "actionViewViolations": "Overtredingen bekijken",
       "noErrors": "Saropa Lints: Geen fouten!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: geen werkruimte map is geopend. Open eerst uw Dart/Flutter project.",
       "lintIntegrationOffCannotAnalyze": "Saropa Lints: scan op slaan is uit. Schakel het in voordat je analyse uitvoert.",
@@ -2493,19 +2493,19 @@
       "openFileForIssues": "Open een bestand om de problemen te tonen in Saropa Lints.",
       "driftAdvisorNotConnected": "Drift Advisor is niet aangesloten. Klik op Vernieuw na het starten van de server.",
       "noViolationsRunAnalysis": "Geen schendingen in de huidige gegevens. Voer eerst de analyse uit.",
-      "telemetryReset": "Saropa Lints: gerelateerde regel telemetrie tellers resetten.",
+      "telemetryReset": "Saropa Lints: telemetrietellers van gerelateerde regels gereset.",
       "noWorkspaceOpen": "Geen werkruimte map geopend.",
       "noAnalysisReport": "Saropa Lints: geen analyseverslag gevonden onder reports/. Voer eerst \"Saropa Lints: Analyse uitvoeren\" uit.",
       "copiedReport": "Gekopieerd {name} naar het klembord.",
       "readReportFailed": "Saropa Lints: rapport lezen mislukt — {message}",
       "openReportFailed": "Saropa Lints: rapport openen mislukt — {message}",
       "noAnalysisData": "Geen analysegegevens. Voer eerst de analyse uit.",
-      "actionDisable": "Disable Disable Ontschakelen",
+      "actionDisable": "Uitschakelen",
       "actionEnable": "Inschakelen",
       "bulkRuleToggleConfirm": "{verb} {count} regels? Dit is een update van analysis_options_custom.yaml.",
       "setupPrompt": "Saropa Lints heeft een Dart project gedetecteerd zonder saropa_lints geconfigureerd. Stel nu in voor 2350+ lint regels.",
-      "actionSetUpProject": "Project opzetten project instellen",
-      "actionNotNow": "Nu niet, nu niet."
+      "actionSetUpProject": "Project instellen",
+      "actionNotNow": "Niet nu"
     },
     "lsp": {
       "noWorkspaceFolder": "Saropa Lints: de LSP-server kan niet worden gestart omdat geen werkmap is geopend.",
@@ -2514,32 +2514,32 @@
     },
     "setup": {
       "requiresDartProject": "Saropa Lints vereist een Dart of Flutter project (geen pubspec.yaml gevonden).",
-      "actionLearnMore": "Meer weten Leer meer Meer leren",
+      "actionLearnMore": "Meer informatie",
       "noWorkspaceFolder": "Geen werkruimte map geopend.",
-      "pubGetFailed": "Saropa Lints: pub mislukt. {details}",
+      "pubGetFailed": "Saropa Lints: pub get mislukt. {details}",
       "checkOutput": "Controleer de uitgang.",
       "baselineRunning": "Het creëren van een baseline (saropa_baseline.json) om bestaande overtredingen te onderdrukken...",
       "baselineCreated": "Basislijn gecreëerd: saropa_baseline.json.jso is een website van Saropa Bestaande bevindingen worden onderdrukt; nieuwe code wordt nog steeds gecontroleerd.",
-      "baselineFailed": "Saropa Lints: Het is een generieke vorm van _ph1__. kon geen baseline maken. {details}",
-      "pubGetNotResolved": "Saropa Lints: Het is een van de twee pub succesvol was, maar saropa_lints werd niet opgelost. Controleer de pubspec.yaml opmaak.",
-      "configWriteFailedNs": "Saropa Lints: Het is een generieke vorm van _ph1__. config schrijven mislukte. {details}",
+      "baselineFailed": "Saropa Lints: kon geen baseline maken. {details}",
+      "pubGetNotResolved": "Saropa Lints: pub get is gelukt, maar saropa_lints is niet opgelost. Controleer de opmaak van pubspec.yaml.",
+      "configWriteFailedNs": "Saropa Lints: configuratie schrijven mislukt. {details}",
       "disabled": "Saropa Lints is uitgeschakeld. De projectbestanden zijn niet gewijzigd.",
       "disabledAnalyzer": "Saropa Lints integratie uitgeschakeld. Analyse-diagnostiek wordt spoedig opgeruimd; schakel Scan on save aan om te herstellen.",
       "reenabledPlugin": "Saropa Lints in-process plugin is opnieuw ingeschakeld. Herstarten van de Dart analyse-server om het op te laden.",
       "reenableNothingToRestore": "Saropa Lints: niets te herstellen. Het in-proces plugin is momenteel niet gedeactiveerd via de extensie.",
       "noOpenDartFiles": "Saropa Lints: geen open Dart bestanden gevonden. Heropen een Dart bestand of de instelling \"Alleen open editors\" uitschakelen.",
       "analysisScanning": "Werkruimte scannen… {percent}% ({count} problemen tot nu toe)",
-      "configUpdated": "Saropa Lints config is bijgewerkt (tier: {tier}). het is een soort van",
+      "configUpdated": "Saropa Lints-configuratie bijgewerkt (niveau: {tier}).",
       "configWriteFailed": "Config schrijven mislukte. {details}",
-      "scaffoldGateTitle": "Composite analyzer plugin scaffold steigerwerk.",
+      "scaffoldGateTitle": "Scaffold voor composite analyzer-plugin",
       "scaffoldGateDetail": "Dit schrijft een nieuw Dart pakket onder uw werkruimte (pubspec.yaml, lib/main.dart, README): één custom_lint plug-in dat Saropa registreert en hooks laat voor uw eigen regels.\n\nGebruik alleen dit wanneer u aangepaste analyzer regels samen met Saropa uitbrengt. Normale Saropa-alleen projecten kunnen het overslaan – de analyzer stelt een enkel plug-in entry per context toe.\n\nVolgende: kies een map ten opzichte van de werkruimte. Als die map al bestaat, wordt u gevraagd voorafgaand aan het overschrijven.",
-      "actionContinue": "Doorgaan doorgaan doorzetten",
-      "actionOpenGuide": "Open gids open gids.",
+      "actionContinue": "Doorgaan",
+      "actionOpenGuide": "Gids openen",
       "scaffoldPathOutsideWorkspace": "Het pad van het steigers moet zich in de werkruimte-map bevinden.",
       "scaffoldFolderExists": "Map bestaat al: {folder}. Bestanden kunnen worden toegevoegd of overschreven. Doorgaan?",
       "scaffoldCreated": "Composite plugin scaffold gemaakt. Open gegenereerde main.dart?",
-      "actionOpenMainDart": "Open main.dart open maar eens",
-      "actionOpenReadme": "Open de README-weergave.",
+      "actionOpenMainDart": "main.dart openen",
+      "actionOpenReadme": "README openen",
       "scaffoldFailed": "Steiger mislukt. {details}",
       "scaffoldFailedHint": "Zorg ervoor dat saropa_lints in dev_dependencies is en voer pub get uit.",
       "alreadyOnTier": "Al op {tier} niveau.",
@@ -2549,7 +2549,7 @@
       "progressBaseline": "Baseline-scan uitvoeren… ({elapsed}s)"
     },
     "lane": {
-      "pickerTitle": "Saropa Lints: Analyseer Regel",
+      "pickerTitle": "Saropa Lints: Analysebaan instellen",
       "pickerPlaceholder": "Huidig: {lane}",
       "lightLabel": "Licht (standaard)",
       "lightDescription": "Alleen ~200 fout/waarschuwing regels lopen in-editor",
@@ -2579,12 +2579,12 @@
       "crossFileReportNoIndex": "Cross-file rapport voltooid maar index.html werd niet gevonden.",
       "crossFileHtmlReportGenerated": "Cross-file HTML rapport gegenereerd.",
       "actionOpenInBrowser": "Open in de browser.",
-      "actionOpenFile": "Open File Open File openen",
+      "actionOpenFile": "Bestand openen",
       "crossFileSnapshotFailed": "Snapshot over meerdere bestanden mislukt: {message}",
       "crossFileSnapshotNoJson": "Cross-file snapshot voltooid maar JSON bestand niet gevonden.",
       "crossFileSnapshotWritten": "Cross-file snapshot geschreven naar rapporten/.saropa_lints/cross_file_snapshot.json",
-      "crossFileNoWorkspace": "Saropa Lints: Het is een generieke vorm van _ph1__. geen Dart/Flutter werkruimte gevonden. Open eerst een project met pubspec.yaml.",
-      "crossFileMissingDep": "Saropa Lints: Het is een van de twee voeg saropa_lints toe aan pubspec.yaml voordat u de cross-file analyse uitvoert.",
+      "crossFileNoWorkspace": "Saropa Lints: geen Dart/Flutter-werkruimte gevonden. Open eerst een project met pubspec.yaml.",
+      "crossFileMissingDep": "Saropa Lints: voeg saropa_lints toe aan pubspec.yaml voordat u de cross-file analyse uitvoert.",
       "issuesNoViolationsRunAnalysis": "Geen schendingen in de huidige gegevens. Voer eerst de analyse uit.",
       "issuesNoAnalysisData": "Geen analysegegevens. Voer eerst de analyse uit.",
       "issuesNoHotspots": "Geen beveiligingshotspots gevonden in het huidige rapport.",
@@ -2596,14 +2596,14 @@
       "copyTreeSerializeTreeFailed": "Kon boom niet serialiseren.",
       "copyTreeCopiedFull": "Gecopieerd volledige {viewLabel} boom ({count} {branchNoun}) als JSON.",
       "projectMapNoProject": "Saropa Lints: open een Dart project eerst.",
-      "projectMapMissingDep": "Saropa Lints: Het is een van de twee voeg saropa_lints toe aan pubspec.yaml voordat je de Saropa Project Map uitvoert.",
+      "projectMapMissingDep": "Saropa Lints: voeg saropa_lints toe aan pubspec.yaml voordat u de Saropa Project Map uitvoert.",
       "projectMapNoHtml": "Saropa Projectkaart: HTML-rapport werd niet geproduceerd.",
       "projectMapFailed": "Saropa Project Map mislukt: {message}",
       "projectMapScanFailed": "Saropa Project Map scan mislukt (exit {code}). {details}",
-      "projectMapCouldNotOpen": "Saropa Projectkaart: kon niet {file}. openen",
+      "projectMapCouldNotOpen": "Saropa Projectkaart: kon {file} niet openen.",
       "issuesNoQuickFix": "Er is geen snelle oplossing beschikbaar voor deze overtreding.",
       "issuesFileNotFound": "Bestand niet gevonden: {file}. Analyse opnieuw uitvoeren om bij te werken.",
-      "actionFixAll": "Fix All Fix Alle oplossen",
+      "actionFixAll": "Alles oplossen",
       "issuesConfirmFixAll": "Fix {count} schendingen in {fileName}?",
       "issuesBulkFixResult": "Vaste {fixed}. . Voer analyse uit om de score bij te werken.",
       "issuesBulkFixResultSkipped": "Fixed {fixed}, overgeslagen {skipped} (geen fix beschikbaar). Voer analyse uit om de score bij te werken.",
@@ -2621,11 +2621,11 @@
       "scanOnSaveBaselineCanceled": "Gehele projectscan geannuleerd na {scanned}/{total} bestanden.",
       "scanOnSaveBaselineFailed": "Gehele project scan mislukt: {details}",
       "scanOnSaveBaselineDone": "Volledige projectscan voltooid: {total} bestanden, {issues} probleem(en).",
-      "codeHealthStartFailedDetails": "Code Gezondheids-scan kon niet worden gestart ({command}): {details} is een genetisch gemodificeerde stof.",
+      "codeHealthStartFailedDetails": "Code Health-scan kon niet worden gestart ({command}): {details}",
       "codeHealthStartFailed": "Code Gezondheidsonderzoek kon niet starten. Zorg ervoor dat Dart SDK is geïnstalleerd.",
       "codeHealthScanFailed": "Code Gezondheidsonderzoek mislukt.",
       "codeHealthScanFailedDetails": "Code Health scan mislukt: {details}",
-      "codeHealthGatesFailed": "Code Gezondheid: code gezondheid. geconfigureerde kwaliteitspoorten mislukten. Open Code Health-instellingen of kopieer JSON om gates.violations. te inspecteren.",
+      "codeHealthGatesFailed": "Code Health: geconfigureerde kwaliteitspoorten zijn niet gehaald. Open de Code Health-instellingen of kopieer de JSON om gates.violations te inspecteren.",
       "codeHealthInvalidJson": "Code Health heeft ongeldige JSON-uitvoer geretourneerd.",
       "sidebarSectionUpdateFailed": "Saropa Lints: kon de sectie van de activity bar niet bijwerken — {message}"
     },
@@ -2640,7 +2640,7 @@
       "failedToAddToPubspec": "Het is niet gelukt om {name} toe te voegen aan pubspec.yaml.",
       "needsPackageRow": "{actionLabel} heeft een pakketrij nodig uit het Package Dashboard (editor tabblad).",
       "couldNotLocateConstraint": "Kon geen versiebeperking vinden voor {name}.",
-      "deletedFromPubspec": "Verwijderde {name} uit pubspec.yaml (backup: {backupName}) zijn.",
+      "deletedFromPubspec": "{name} verwijderd uit pubspec.yaml (back-up: {backupName})",
       "runScanFirst": "Voer eerst een scan uit.",
       "couldNotFindPubspec": "Kon pubspec.yaml niet vinden.",
       "updatedPackage": "Bijgewerkt {name} naar {constraint}.",
@@ -2668,35 +2668,35 @@
       "upgradeRolledBack": "{name} upgrade hersteld — {phase} mislukt. Zie output voor details.",
       "saveTaskFailed": "Taak opslaan mislukt: {message}",
       "openFolderBeforeCopyConfig": "Saropa Lints: open een werkruimte map voordat u de configuratie kopieert.",
-      "copiedConfigSnippet": "Saropa Lints: Het is een van de twee gekopieerde config snippet (Tier: {tier}, {packsLine}).",
+      "copiedConfigSnippet": "Saropa Lints: configuratiefragment gekopieerd (niveau: {tier}, {packsLine}).",
       "couldNotCopyClipboard": "Saropa Lints: kon niet kopiëren naar klembord — {message}.",
-      "couldNotWriteRulePacks": "Saropa Lints: Het is een generieke vorm van _ph1__. kon niet schrijven analysis_options.yaml (rule_packs).",
-      "couldNotReadPubspec": "Saropa Lints: Het is een generieke vorm van _ph1__. kon niet pubspec.yaml. lezen",
+      "couldNotWriteRulePacks": "Saropa Lints: kon analysis_options.yaml (rule_packs) niet schrijven.",
+      "couldNotReadPubspec": "Saropa Lints: kon pubspec.yaml niet lezen.",
       "noAdditionalSdkPacks": "Saropa Lints: geen extra toepasselijke SDK-pakketten om in te schakelen.",
-      "enabledApplicableSdkPacks": "Saropa Lints: Het is een van de twee {added} is ingeschakeld toepasselijke {modeLabel} pack.",
+      "enabledApplicableSdkPacks": "Saropa Lints: {added} toepasselijke {modeLabel}-pakket(ten) ingeschakeld.",
       "openFolderBeforeEnablePacks": "Saropa Lints: open een werkruimte map voordat u packs activeert.",
       "allApplicablePacksEnabled": "Saropa Lints: elke toepasselijke regelset is al ingeschakeld.",
       "noApplicablePacksDetected": "Saropa Lints: geen toepasbare regelpakketten gedetecteerd voor dit project. Schakel pakketten individueel in de Config Dashboard in.",
       "actionEnable": "Inschakelen",
       "enableRecommendedPacksPrompt": "Enable {count} aanbevolen pakketten?",
       "enablePacksDetail": "Dit is een update van rule_packs.enabled in analysis_options.yaml. {preview}",
-      "enabledRecommendedPacks": "Saropa Lints: Het is een generieke vorm van _ph1__. {count} aanbevolen pakketten.",
+      "enabledRecommendedPacks": "Saropa Lints: {count} aanbevolen pakket(ten) ingeschakeld.",
       "enableModePacksPrompt": "Enable {count} {modeLabel} pack ((s))?"
     },
     "misc": {
       "actionDontAskForVersion": "Vraag niet naar deze versie",
       "actionLater": "Later",
       "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Dit is een belangrijke versie en kan configuratie wijzigingen vereisen — zie de changelog.",
-      "upgradeCheckerMajorUpdate": "Belangrijke update van de belangrijkste updates.",
-      "upgradeCheckerMinorUpdate": "Kleine update van de Minor Update.",
-      "upgradeCheckerPatchUpdate": "Patch update patch updates zijn een soort van patches.",
+      "upgradeCheckerMajorUpdate": "Hoofdversie-update",
+      "upgradeCheckerMinorUpdate": "Subversie-update",
+      "upgradeCheckerPatchUpdate": "Patch-update",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: Kon pubspec.yaml niet bijwerken — saropa_lints entry niet gevonden.",
       "upgradeCheckerCancelled": "Saropa Lints upgrade geannuleerd. pubspec.yaml is geüpdatet naar ^{version}; voer `{cmd} pub get` uit om te voltooien, of herstel de wijziging.",
-      "upgradeCheckerPubGetFailed": "Saropa Lints: pub mislukt. {detail}",
+      "upgradeCheckerPubGetFailed": "Saropa Lints: pub get mislukt. {detail}",
       "upgradeCheckerCheckOutput": "Controleer de uitgang.",
       "upgradeCheckerUpgraded": "Saropa Lints is geüpgraded naar {version}.",
-      "actionUpgrade": "Upgrade upgraden is een upgrade.",
+      "actionUpgrade": "Upgraden",
       "actionViewChangelog": "Changelog bekijken",
       "healthCodeLensEnabled": "Saropa Project Map heat CodeLens ingeschakeld.",
       "healthCodeLensDisabled": "Saropa Project Map heat CodeLens uitgeschakeld.",
@@ -2706,7 +2706,7 @@
       "reportViewCopiedRowOther": "Gekopieerde {count} rijen naar het klembord.",
       "reportViewAlreadySuppressed": "'{flag}' is al onderdrukt in {file}.",
       "reportViewSuppressed": "Onderdrukt '{flag}' in {file}. .",
-      "reportViewCouldNotSuppress": "Kon '{flag}' niet onderdrukken in {file}: {error} is een hormoon dat door de mens wordt geproduceerd.",
+      "reportViewCouldNotSuppress": "Kon '{flag}' niet onderdrukken in {file}: {error}",
       "actionRescan": "Opnieuw scannen",
       "bulkUpdateNoUpdates": "Geen updates beschikbaar.",
       "bulkUpdateNoUpdatesFiltered": "Geen {filter} updates beschikbaar.",
@@ -2718,7 +2718,7 @@
     }
   },
   "analysisOptimizer": {
-    "tabTitle": "Saropa Lints: Analyse Optimaliseer",
+    "tabTitle": "Saropa Lints: Analyse-optimalisatie",
     "title": "Analyse Optimaliseer",
     "subtitle": "Gebruik exclusies om niet-essentiële bestanden uit de analyse te verwijderen en de analyseramgeheugen te verminderen",
     "emptyDescription": "Scan je werkruimte om hoge kosten bestanden en mappen te identificeren die kunnen worden uitgesloten uit de Dart analyzer om de geheugenverbruik te verminderen.",
@@ -2730,7 +2730,7 @@
     "kpi": {
       "filesInScope": "Bestanden in scope",
       "lines": "lijnen",
-      "files": "De bestanden zijn archieven.",
+      "files": "bestanden",
       "estimatedCost": "Gebruikte analysekosten",
       "costUnits": "kosten eenheden",
       "potentialSavings": "Potentiële besparingen",
@@ -2754,7 +2754,7 @@
     "col": {
       "status": "Status",
       "pattern": "Patroon",
-      "files": "Bestanden bestandenbestanden.",
+      "files": "Bestanden",
       "cost": "Est. kosten",
       "priority": "Prioriteit"
     },
@@ -2823,7 +2823,7 @@
       "noneFound": "Geen verouderde ignore opmerkingen gevonden.",
       "found": "{count} verouderde negeren(s) in {fileCount} bestand(s). Zie het Problems-paneel voor meer informatie.",
       "fixed": "Verouwde ignore opmerkingen verwijderd. Zie de Output-venster voor details.",
-      "fixedInFile": "Saropa Lints: verouwde ignoreren is aangepast in deze bestand",
+      "fixedInFile": "Saropa Lints: verouderde ignores in dit bestand opgelost",
       "alreadyRunning": "Een stale-ignore scan loopt al."
     },
     "confirm": {
@@ -2978,7 +2978,7 @@
   },
   "blastRadius": {
     "label": {
-      "upgrade": "Upgrade upgraden is een upgrade.",
+      "upgrade": "Upgraden",
       "breaks": "Breuken",
       "breaksLower": "breuken",
       "upgradeNotRecommended": "⚠️ Upgrade niet aanbevolen"
@@ -3131,7 +3131,7 @@
     }
   },
   "lintsSwitch": {
-    "statusOn": "Saropa Lints: Op",
+    "statusOn": "Saropa Lints: Aan",
     "statusOff": "Saropa Lints: Uit",
     "statusPartial": "Saropa Lints: Gedeeltelijk uitgeschakeld",
     "tooltipOn": "Saropa Lints is aan (instelling en analyzer plug-in). Klik om het uit te zetten.",
@@ -3192,7 +3192,7 @@
       "cancelScan": "Scan annuleren",
       "turnOffTypeResolution": "Type Resolutie Uitzetten",
       "startAnyway": "Start toch",
-      "notNow": "Nu niet, nu niet.",
+      "notNow": "Niet nu",
       "neverAskDeep": "Niet Vraag Opnieuw",
       "applyPlugin": "Toepassen",
       "noThanks": "Niet dankjewel",

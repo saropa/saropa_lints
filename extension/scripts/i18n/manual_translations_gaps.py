@@ -13,6 +13,8 @@ from typing import Dict
 # module (this one would pass 600 lines); WIDGET_STYLE is shared so the English
 # source is spelled once.
 from manual_translations_mt_leaks import LEAK_REPAIRS, WIDGET_STYLE
+# Invented-sentence and nonsense-label repairs; JSON data, folded in below.
+from manual_translations_invented import load as _load_invented
 
 # Long English sources are spelled once here and referenced by alias below, so each
 # literal lives in one place (and a typo fails the alias lookup, not silently).
@@ -393,6 +395,15 @@ for _loc, _entries in LEAK_REPAIRS.items():
     _overlap = sorted(set(_target) & set(_entries))
     if _overlap:
         raise ValueError(f"LEAK_REPAIRS[{_loc!r}] repeats _REPAIRS sources: {_overlap}")
+    _target.update(_entries)
+
+# Fold the invented-text and nonsense-label repairs (invented_repairs/*.json) the
+# same way and with the same overlap rule: one source, one hand-written value.
+for _loc, _entries in _load_invented().items():
+    _target = _REPAIRS.setdefault(_loc, {})
+    _overlap = sorted(set(_target) & set(_entries))
+    if _overlap:
+        raise ValueError(f"invented_repairs/{_loc}.json repeats _REPAIRS sources: {_overlap}")
     _target.update(_entries)
 
 
