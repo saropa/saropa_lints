@@ -437,6 +437,8 @@
     "welcome.card.sidebar.actionWalkthrough",
     "welcome.discover.findings.label",
     "welcome.discover.packages.label",
+    "pubGuard.source.path",
+    "pubGuard.projectSource.dartToolVersion",
     "scanResources.*"
   ],
   "reviewed_ok": {

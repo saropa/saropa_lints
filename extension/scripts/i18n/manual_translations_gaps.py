@@ -96,6 +96,19 @@ GAPS: Dict[str, Dict[str, str]] = {
         _NEWEST: "saropa_lints {newest} דורש Dart SDK חדש יותר ממה שיש לפרויקט הזה ({dart}). השאירו ^{chosen}, או שדרגו את Flutter כדי להשתמש ב-{newest}.",
         "saropa_lints {version} requires a newer Dart SDK than {dart}.": "saropa_lints {version} דורש Dart SDK חדש יותר מ-{dart}.",
         "saropa_lints: plugin needs newer Dart": "saropa_lints: התוסף דורש Dart חדש יותר",
+        # Hand-written replacements for MT output that leaked Arabic/kana characters and
+        # gibberish into Hebrew. Curated entries win over the MT cache, so a later gaps or
+        # upgrade run cannot restore the corrupted text. Terms follow the rest of he.json:
+        # "ממצאים מתקבלים" (accepted findings), "רשומה" (entry), "עקיפה" (override).
+        "Check accepted findings failed: {message}": "בדיקת הממצאים המתקבלים נכשלה: {message}",
+        "This file is not inside a Dart package (no pubspec.yaml above it), so it cannot be added to saropa_accepted.yaml.": "הקובץ הזה אינו נמצא בתוך חבילת Dart (אין מעליו pubspec.yaml), ולכן לא ניתן להוסיף אותו ל-saropa_accepted.yaml.",
+        "Stale entry: {file} no longer exists, so this entry for {rule} hides nothing.": "רשומה מיושנת: {file} כבר לא קיים, ולכן הרשומה הזו עבור {rule} אינה מסתירה דבר.",
+        "Stale entry: {rule} found nothing in {file}. Remove the entry if the code was fixed.": "רשומה מיושנת: {rule} לא מצא דבר ב-{file}. הסר את הרשומה אם הקוד תוקן.",
+        "Accepted: the finding is real and the code stays as it is": "מאושר: הממצא אמיתי והקוד נשאר כפי שהוא",
+        "Suppress (override is intentional)": "השתק (העקיפה מכוונת)",
+        # Multilingual picker label: only "Language" is localized; the other languages'
+        # words stay as in the source. MT had appended a stray "השפה / הלשון" tail.
+        "Saropa Lints: Language / Langue / Sprache / 言語 / 语言": "Saropa Lints: שפה / Langue / Sprache / 言語 / 语言",
     },
     "hi": {
         _LSP_FAIL: "LSP सर्वर: शुरू नहीं हो सका (त्रुटि संदेश और Saropa Lints LSP आउटपुट चैनल देखें)।",

@@ -38,3 +38,15 @@ Remaining:
 - 90 values identical to English. 81 are four technical strings: `pubGuard.source.path` (24 locales), `pubGuard.projectSource.dartToolVersion` (24), `compat.status.both` (20), `compat.status.plugin` (13). The other 9: fil `pubGuard.source.fvm`, `pubGuard.explain.folder`, `ruleExplain.noData.packsLine`, `vibrancyOverride.incompleteData`, `vibrancyOverride.unverifiedLabel`; sw `vibrancyOverride.unverifiedLabel`, `acceptedFindings.info.clean`; th `vibrancyOverride.groupUnverifiedTooltip`; tr `vibrancy.staleOverride.suppress`.
 - 10 token mismatches: ur `scanOnSave.statusBar.droppedTooltip` (placeholders); manifest code spans in fa and ur `...preferPinnedVersions.markdownDescription` and fil `...scanOnSave.timeoutSeconds.markdownDescription`; manifest links in ru `healthScore`, sw and tr `trends`, sw `todosAndHacks`, zh `issues` and `commandCatalog` walkthrough descriptions.
 - Hebrew values with Arabic or kana characters mixed in, passing the parity test: `acceptedFindings.error.checkFailed`, `error.outsideProject`, `diagnostic.staleFileMissing`, `diagnostic.staleNoFinding`, `prompt.kindAccepted`, and `vibrancy.staleOverride.suppress`.
+
+## Hebrew repair and allowlist (2026-11-26)
+
+The six corrupted Hebrew values above, plus the manifest `command.pickUiLanguage.title` (MT had appended "השפה / הלשון"), were hand-written by an agent (not a native speaker) into `he.json` / `package.nls.he.json` and into `TRANSLATIONS["he"]` via `manual_translations_gaps.py`, so a later run keeps them. `pubGuard.source.path` (the `PATH` variable) and `pubGuard.projectSource.dartToolVersion` (a file path) are now in the `english_allowed.json` key list. Locale parity went from 31 failing tests (100 problems) to 29 failing (52 problems); no Hebrew value contains Arabic or kana except the intentional `言語 / 语言` in the picker title.
+
+Remaining:
+
+- `compat.status.both` (20 locales) and `compat.status.plugin` (13): identical to English; the owner decided not to allowlist them, so they need real translations.
+- 9 other values identical to English: fil `pubGuard.source.fvm`, `pubGuard.explain.folder`, `ruleExplain.noData.packsLine`, `vibrancyOverride.incompleteData`, `vibrancyOverride.unverifiedLabel`; sw `vibrancyOverride.unverifiedLabel`, `acceptedFindings.info.clean`; th `vibrancyOverride.groupUnverifiedTooltip`; tr `vibrancy.staleOverride.suppress`.
+- 10 damaged tokens: ur `scanOnSave.statusBar.droppedTooltip` (placeholders); code spans in fa and ur `...preferPinnedVersions.markdownDescription` and fil `...scanOnSave.timeoutSeconds.markdownDescription`; links in ru `healthScore`, sw and tr `trends`, sw `todosAndHacks`, zh `issues` and `commandCatalog` walkthrough descriptions.
+- Other locales' `command.pickUiLanguage.title` values (ar, fil, fr, id, ja, sw, th, vi, zh, ur) also carry MT tails or mistranslations; the parity test does not flag them.
+- The new Hebrew has no native-speaker review, and other Hebrew accepted-findings strings use uneven terms ("מציאויות", "painel", "אור לילך").

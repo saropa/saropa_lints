@@ -2847,12 +2847,12 @@
       "checking": "בדיקה של תוצאות מתקבלות…"
     },
     "error": {
-      "checkFailed": "הتحقق מהמצאות מתקבלות נכשל: {message}",
+      "checkFailed": "בדיקת הממצאים המתקבלים נכשלה: {message}",
       "badOutput": "התוצאה של הסריקה לא ניתנה לקרוא.",
       "noWorkspace": "לא נמצאו תחומים עבודה Dart/Flutter. פתח פרויקט עם pubspec.yaml תחילה.",
       "missingDep": "הוסף saropa_lints ל-pubspec.yaml לפני שימוש במצאים מתקבלים.",
       "noFinding": "השתמש באור לילך על ממצא Saropa Lints בקובץ Dart כדי לאשר אותו.",
-      "outsideProject": "הקובץ הזה אינו בתוך חزمة Dart (אין pubspec.yaml מעליו), ולכן לא ניתן להוסיף אותו ל-saropa_accepted.yaml.",
+      "outsideProject": "הקובץ הזה אינו נמצא בתוך חבילת Dart (אין מעליו pubspec.yaml), ולכן לא ניתן להוסיף אותו ל-saropa_accepted.yaml.",
       "writeFailed": "לא ניתן לעדכן saropa_accepted.yaml: {message}",
       "cannotAppend": "saropa_accepted.yaml יש מערך שגיאה שלא ניתן להרחיב אוטומטית. הוסף את הכניסה ידנית.",
       "entryExists": "saropa_accepted.yaml כבר מכיל רשומה עבור {rule} ב {file}. אם הרשומה מכילה גבול עליון, עלה אותו ידנית."
@@ -2869,13 +2869,13 @@
       "restartAnalysis": "הפעל מחדש את שרת האנליזה"
     },
     "diagnostic": {
-      "staleFileMissing": "הントק'ה: {file} כבר לא קיים, ולכן הכניסה ל {rule} אינה מוסתרת.",
-      "staleNoFinding": "הントראיקי: {rule} לא נמצא שום דבר ב-{file}. הסר את הントראיקי אם השיקוד נערך.",
+      "staleFileMissing": "רשומה מיושנת: {file} כבר לא קיים, ולכן הרשומה הזו עבור {rule} אינה מסתירה דבר.",
+      "staleNoFinding": "רשומה מיושנת: {rule} לא מצא דבר ב-{file}. הסר את הרשומה אם הקוד תוקן.",
       "invalid": "כניסה לא תקינה, מסתיר כלום: {message}"
     },
     "prompt": {
       "kindTitle": "למה הfinding הזה נחשב תקין?",
-      "kindAccepted": "מאושר: התמצית קיימת וקוד נשאר كما הוא",
+      "kindAccepted": "מאושר: הממצא אמיתי והקוד נשאר כפי שהוא",
       "kindFalsePositive": "טעות חיובי: הכלל לא נכון כאן",
       "reasonTitle": "סיבה לקבל {rule} ב-{file}",
       "reasonPlaceholder": "נדרש. שמור ב-saropa_accepted.yaml למשתתפים.",
@@ -2973,7 +2973,7 @@
       "suppressOldSdk": "השתלט (בוגר SDK)"
     },
     "staleOverride": {
-      "suppress": "השתלט (החלפה מقصودת)"
+      "suppress": "השתק (העקיפה מכוונת)"
     }
   },
   "blastRadius": {

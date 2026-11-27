@@ -30,7 +30,7 @@
   "command.toggleSeverityInfo.title": "Saropa Lints: שחלוף מידע דיאגנוסטיקה",
   "command.toggleSeverityHint.title": "Saropa Lints: מראה/הסרת תיאורים אבחנתיים",
   "command.toggleSeverityInline.title": "החלף",
-  "command.pickUiLanguage.title": "Saropa Lints: שפה / Langue / Sprache / 言語 / 语言 השפה / הלשון",
+  "command.pickUiLanguage.title": "Saropa Lints: שפה / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: פתיחת הגדרות Lints",
   "command.openAnalysisOptimizer.title": "Saropa Lints: אופטימיזר ניתוח",
   "command.openPackageVibrancy.title": "Saropa Lints: פתיחת חיוניות חבילות",

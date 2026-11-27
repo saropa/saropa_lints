@@ -103,6 +103,7 @@ Many lint rules report fewer false positives, covering paths, caches, async guar
 - `dart run saropa_lints:baseline --explain <file>` shows which baseline settings (`paths:`, JSON entries, `date:`, `only_impacts:`) hide findings in that file, without running analysis. No action required.
 - "Check Accepted Findings" in the VS Code extension now also checks a workspace folder whose `pubspec.yaml` sits one folder down, and a folder that uses saropa_lints without listing it in `pubspec.yaml`. A package nested inside a folder that is not checked is no longer skipped. No action required.
 - "Migrate Renamed Rules" in the VS Code extension now also renames rules in `saropa_accepted.yaml`, so renamed rules keep their reviewed entries. Entries for removed rules are kept and reported by `--check-accepted` for you to delete.
+- The Hebrew VS Code extension no longer shows Arabic or Japanese characters and garbled words in six accepted-findings and stale-override messages, and the language picker title no longer carries extra trailing words. No action required.
 
 ### Internal
 
