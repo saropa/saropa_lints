@@ -2854,7 +2854,8 @@
       "noFinding": "Use the light bulb on a Saropa Lints finding in a Dart file to accept it.",
       "outsideProject": "This file is not inside a Dart package (no pubspec.yaml above it), so it cannot be added to saropa_accepted.yaml.",
       "writeFailed": "Could not update saropa_accepted.yaml: {message}",
-      "cannotAppend": "saropa_accepted.yaml has a layout that cannot be extended automatically. Add the entry by hand."
+      "cannotAppend": "saropa_accepted.yaml has a layout that cannot be extended automatically. Add the entry by hand.",
+      "entryExists": "saropa_accepted.yaml already has an entry for {rule} in {file}. If the entry has a max count, raise it by hand."
     },
     "info": {
       "alreadyRunning": "An accepted-findings check is already running.",

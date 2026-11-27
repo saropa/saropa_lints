@@ -1,6 +1,9 @@
 /// The accepted-findings list: a committed, hand-maintained record of
 /// reviewed findings (`rule` + `file` + `reason`, no line numbers).
 ///
+/// An optional `max:` caps how many findings an entry hides: the first `max`
+/// by source position stay hidden and the rest report again.
+///
 /// Lives at `<project root>/saropa_accepted.yaml`. Its presence is the
 /// opt-in; there is no config key or env var. An entry hides every finding
 /// of its rule in its file, from the Problems panel and from exports. It
@@ -32,7 +35,7 @@ const Set<String> kAcceptedKinds = {'accepted', 'false_positive'};
 /// Keys an entry may carry. Anything else invalidates the entry, so a key
 /// from a newer schema (or a mistaken `line:`) never silently widens what
 /// the entry hides.
-const Set<String> _allowedEntryKeys = {'rule', 'file', 'kind', 'reason'};
+const Set<String> _allowedEntryKeys = {'rule', 'file', 'kind', 'reason', 'max'};
 
 /// One valid entry.
 class AcceptedEntry {
@@ -42,6 +45,7 @@ class AcceptedEntry {
     required this.reason,
     required this.line,
     this.kind,
+    this.max,
   });
 
   final String rule;
@@ -52,6 +56,9 @@ class AcceptedEntry {
 
   /// `accepted`, `false_positive`, or null when omitted.
   final String? kind;
+
+  /// Most findings the entry hides, always positive; null means unlimited.
+  final int? max;
 
   /// 1-based line of the entry in the list file, for stale/invalid reports
   /// and the Problems diagnostic the extension places on the list file.
@@ -193,7 +200,7 @@ AcceptedEntry? _parseEntry(
   final extra = node.keys.where((k) => !_allowedEntryKeys.contains(k));
   if (extra.isNotEmpty) {
     bad(
-      'Unknown key(s): ${extra.join(', ')}. Allowed: rule, file, kind, reason.',
+      'Unknown key(s): ${extra.join(', ')}. Allowed: rule, file, kind, reason, max.',
     );
     return null;
   }
@@ -202,6 +209,11 @@ AcceptedEntry? _parseEntry(
   final reason = _str(node['reason']);
   final kind = _str(node['kind']);
   final file = rawFile == null ? null : normalizeAcceptedFile(rawFile);
+  // Presence is checked, not just the value: an empty `max:` must not fall
+  // back to unlimited, which would hide more than the author asked for.
+  final hasMax = node.containsKey('max');
+  final rawMax = node['max'];
+  final max = rawMax is int && rawMax > 0 ? rawMax : null;
   // First failing check wins; one message per entry keeps the report short.
   final String? error;
   if (rule == null) {
@@ -218,6 +230,8 @@ AcceptedEntry? _parseEntry(
     error = 'Unknown rule `$rule`.';
   } else if (kind != null && !kAcceptedKinds.contains(kind)) {
     error = '`kind` must be accepted or false_positive.';
+  } else if (hasMax && max == null) {
+    error = '`max` must be a positive whole number.';
   } else if (file == null) {
     error = '`file` must be a project-relative path without globs or "..".';
   } else {
@@ -232,6 +246,7 @@ AcceptedEntry? _parseEntry(
     file: file,
     reason: reason,
     kind: kind,
+    max: max,
     line: line,
   );
 }

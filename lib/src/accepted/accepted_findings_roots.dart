@@ -16,7 +16,8 @@ import 'package:path/path.dart' as p;
 import '../project_context.dart' show ProjectContext;
 import '../scan/scan_diagnostic.dart';
 import 'accepted_findings_list.dart';
-import 'accepted_findings_report.dart' show AcceptedFilterResult;
+import 'accepted_findings_report.dart'
+    show AcceptedFilterResult, partitionAccepted;
 
 /// The package root whose list applies to [filePath]: the nearest directory
 /// at or above the file that holds a `pubspec.yaml`, in canonical form
@@ -91,8 +92,8 @@ class AcceptedSplit {
   /// Findings no entry covers, in input order.
   final List<ScanDiagnostic> kept;
 
-  /// Per root key ([rootKey]): what that root's list hid. Only roots whose
-  /// list hid something appear.
+  /// Per root key ([rootKey]): what that root's list matched. Only roots
+  /// whose list matched something appear.
   final Map<String, AcceptedFilterResult> byRoot;
 
   /// Every hidden finding with its entry, across all lists (audit output).
@@ -105,6 +106,10 @@ class AcceptedSplit {
   /// relative path (`lib/main.dart`), which share an entry key.
   Map<String, int> hiddenByEntryAt(String root) =>
       byRoot[rootKey(canonicalRoot(root))]?.hiddenByEntry ?? const {};
+
+  /// Above-`max` counts per entry key for the list at canonical [root].
+  Map<String, int> aboveMaxByEntryAt(String root) =>
+      byRoot[rootKey(canonicalRoot(root))]?.aboveMaxByEntry ?? const {};
 }
 
 /// Splits [diagnostics] by the list at each finding's package root
@@ -115,9 +120,10 @@ AcceptedSplit filterAcceptedByNearestRoot(
   AcceptedListSet? lists,
 }) {
   final set = lists ?? AcceptedListSet();
-  final kept = <ScanDiagnostic>[];
-  final hidden =
-      <String, List<({ScanDiagnostic diagnostic, AcceptedEntry entry})>>{};
+  // Matched findings per root: two packages can hold the same entry key
+  // (`lib/main.dart` and one rule), and each has its own `max`.
+  final matched = <String, List<ScanDiagnostic>>{};
+  final matchedEntries = <String, List<AcceptedEntry>>{};
   for (final d in diagnostics) {
     final root = acceptedRootFor(d.filePath);
     // A finding outside every package, or in one that accepted nothing, is
@@ -127,16 +133,23 @@ AcceptedSplit filterAcceptedByNearestRoot(
         ? null
         : relativeToProject(d.filePath, root!);
     final entry = rel == null ? null : list!.entryFor(rel, d.ruleName);
-    if (entry == null) {
-      kept.add(d);
-    } else {
-      (hidden[rootKey(root!)] ??= []).add((diagnostic: d, entry: entry));
-    }
+    if (entry == null) continue;
+    (matched[rootKey(root!)] ??= []).add(d);
+    (matchedEntries[rootKey(root)] ??= []).add(entry);
   }
-  return AcceptedSplit._(kept, {
-    for (final e in hidden.entries)
-      e.key: AcceptedFilterResult(const [], e.value),
-  });
+  final byRoot = {
+    for (final key in matched.keys)
+      key: partitionAccepted(matched[key]!, matchedEntries[key]!),
+  };
+  final removed = Set<ScanDiagnostic>.identity()
+    ..addAll([
+      for (final r in byRoot.values)
+        for (final h in r.hidden) h.diagnostic,
+    ]);
+  return AcceptedSplit._([
+    for (final d in diagnostics)
+      if (!removed.contains(d)) d,
+  ], byRoot);
 }
 
 /// Directory names never walked when looking for lists: dependency caches

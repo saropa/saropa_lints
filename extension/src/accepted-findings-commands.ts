@@ -30,6 +30,7 @@ import {
   type ListMarker,
   appendEntry,
   findPackageRoot,
+  hasEntry,
   markersFromCheck,
   mergeCheckResults,
   parseAcceptedCheckJson,
@@ -300,6 +301,15 @@ async function writeEntry(
   const listUri = vscode.Uri.file(listPath);
   try {
     const existing = fs.existsSync(listPath) ? fs.readFileSync(listPath, 'utf-8') : undefined;
+    // The finding shows although an entry exists (above its `max:`, or the
+    // file is not re-analyzed yet): point at the list, never add a duplicate.
+    if (existing !== undefined && hasEntry(existing, entry.rule, entry.file)) {
+      void vscode.window.showWarningMessage(
+        l10n('acceptedFindings.error.entryExists', { rule: entry.rule, file: entry.file }),
+      );
+      await vscode.window.showTextDocument(listUri);
+      return;
+    }
     const next = appendEntry(existing, entry);
     if (next === null) {
       // A layout the appender cannot extend without rewriting other lines.

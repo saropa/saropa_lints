@@ -16,6 +16,7 @@ import 'package:analyzer/error/error.dart'
 
 import 'analyzer_compat.dart';
 import 'baseline/baseline_manager.dart';
+import 'accepted/accepted_findings_list.dart' show AcceptedEntry;
 import 'accepted/accepted_findings_runtime.dart';
 import 'config/memory_mode.dart';
 import 'ignore_utils.dart';
@@ -28,6 +29,7 @@ import 'report/import_graph_tracker.dart';
 import 'owasp/owasp.dart';
 import 'project_context.dart';
 import 'rule_metadata.dart';
+import 'scan/stale_ignore_detector.dart' show commentIgnoredLines;
 export 'package:analyzer/error/error.dart' show DiagnosticSeverity, LintCode;
 export 'analyzer_compat.dart';
 export 'rule_metadata.dart' show AccuracyTarget, RuleStatus, RuleType;
@@ -3353,6 +3355,10 @@ abstract class SaropaLintRule extends AnalysisRule {
       ruleContext: context,
     );
     runWithReporter(reporter, saropaContext);
+    // Registered after the rule's own callbacks so their reports are included.
+    // Unconditional: the accepted-list hook is enabled by the lazy config load
+    // during the walk, after this method has already run.
+    registry.afterLibrary(this, reporter.flushAcceptedMax);
   }
 
   /// Override this method to implement your lint rule.
@@ -3369,6 +3375,30 @@ abstract class SaropaLintRule extends AnalysisRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   );
+}
+
+/// A resolved finding position (see [SaropaDiagnosticReporter]).
+typedef _ReportLocation = ({
+  String path,
+  int line,
+  int column,
+  int endLine,
+  int endColumn,
+});
+
+/// One finding held until the walk ends, for an accepted entry with a `max`.
+class _DeferredReport {
+  _DeferredReport(this.offset, this.max, this.loc, this.content, this.emit);
+
+  final int offset;
+  final int max;
+  final _ReportLocation loc;
+
+  /// Analyzed text of the finding's file, for its ignore comments.
+  final String content;
+
+  /// Reports the finding to the analyzer, in its own file.
+  final void Function() emit;
 }
 
 /// Reporter that wraps the native [AnalysisRule] reporting methods.
@@ -3400,6 +3430,12 @@ class SaropaDiagnosticReporter {
   bool? _cachedFileIgnored;
   final DiagnosticDedupTracker _dedupTracker = DiagnosticDedupTracker();
 
+  /// Findings of entries with a `max`, held until the library is walked:
+  /// which ones stay hidden depends on source position, and rules do not
+  /// report in source order. Emptied by [flushAcceptedMax]; the reporter is
+  /// created per analysis pass, so counts never carry over to the next one.
+  final List<_DeferredReport> _deferred = [];
+
   /// Reports a diagnostic at the given [node].
   ///
   /// For [AnnotatedNode]s (declarations with doc comments or metadata), the
@@ -3413,17 +3449,25 @@ class SaropaDiagnosticReporter {
       final adjustedOffset = node.firstTokenAfterCommentAndMetadata.offset;
       final length = node.end - adjustedOffset;
       if (_isDuplicateAttempt(adjustedOffset)) return;
-      if (_isSuppressed(adjustedOffset, node)) return;
-      if (!_isCappedFromProblemsTab()) {
-        _rule.reportAtOffset(adjustedOffset, length);
-      }
-      _trackViolation(adjustedOffset, node: node);
+      final accepted = _acceptedEntry(adjustedOffset, node: node);
+      if (_isSuppressed(adjustedOffset, node, accepted)) return;
+      _deliver(
+        adjustedOffset,
+        () => _rule.reportAtOffset(adjustedOffset, length),
+        accepted: accepted,
+        node: node,
+      );
       return;
     }
     if (_isDuplicateAttempt(node.offset)) return;
-    if (_isSuppressed(node.offset, node)) return;
-    if (!_isCappedFromProblemsTab()) _rule.reportAtNode(node);
-    _trackViolation(node.offset, node: node);
+    final accepted = _acceptedEntry(node.offset, node: node);
+    if (_isSuppressed(node.offset, node, accepted)) return;
+    _deliver(
+      node.offset,
+      () => _rule.reportAtNode(node),
+      accepted: accepted,
+      node: node,
+    );
   }
 
   /// Reports a diagnostic at the given [token].
@@ -3441,7 +3485,10 @@ class SaropaDiagnosticReporter {
     }
     // Accepted-findings list: checked after the baseline so a finding that
     // is both baselined and accepted keeps its existing baseline count.
-    if (_isAccepted(token.offset)) {
+    // An entry with a `max` is applied last (see _deliver): an ignored finding
+    // must not use up its count.
+    final accepted = _acceptedEntry(token.offset);
+    if (accepted != null && accepted.max == null) {
       _trackSuppression(
         token.offset,
         SuppressionKind.accepted,
@@ -3479,8 +3526,12 @@ class SaropaDiagnosticReporter {
       );
       return;
     }
-    if (!_isCappedFromProblemsTab()) _rule.reportAtToken(token);
-    _trackViolation(token.offset);
+    _deliver(
+      token.offset,
+      () => _rule.reportAtToken(token),
+      accepted: accepted,
+      length: token.length,
+    );
   }
 
   /// Reports a diagnostic at the given offset and length.
@@ -3491,7 +3542,8 @@ class SaropaDiagnosticReporter {
       return;
     }
     // Same order as atToken: baseline, then the accepted-findings list.
-    if (_isAccepted(offset)) {
+    final accepted = _acceptedEntry(offset);
+    if (accepted != null && accepted.max == null) {
       _trackSuppression(offset, SuppressionKind.accepted, length: length);
       return;
     }
@@ -3500,8 +3552,79 @@ class SaropaDiagnosticReporter {
       _trackSuppression(offset, SuppressionKind.ignoreForFile, length: length);
       return;
     }
-    if (!_isCappedFromProblemsTab()) _rule.reportAtOffset(offset, length);
-    _trackViolation(offset);
+    _deliver(
+      offset,
+      () => _rule.reportAtOffset(offset, length),
+      accepted: accepted,
+      length: length,
+    );
+  }
+
+  /// Emits a finding no other suppression silenced, or holds it when an
+  /// [accepted] entry with a `max` matches (entries without one were already
+  /// applied by the caller).
+  void _deliver(
+    int offset,
+    void Function() emit, {
+    required AcceptedEntry? accepted,
+    AstNode? node,
+    int? length,
+  }) {
+    final max = accepted?.max;
+    final unit = _ruleContext.currentUnit;
+    if (max != null && unit != null) {
+      final loc = _resolveLocation(
+        offset,
+        node,
+        length: length,
+        wantSpan: SuppressionTracker.captureDetails,
+      );
+      if (loc != null) {
+        // Each part file has its own diagnostic listener; remember this one.
+        void emitInUnit() {
+          _rule.reporter = unit.diagnosticReporter;
+          emit();
+        }
+
+        _deferred.add(
+          _DeferredReport(offset, max, loc, unit.content, emitInUnit),
+        );
+        return;
+      }
+    }
+    if (!_isCappedFromProblemsTab()) emit();
+    _trackViolation(offset, node: node);
+  }
+
+  /// Settles the findings held for `max` entries: per file, the first `max`
+  /// by source position stay hidden and the rest are reported.
+  void flushAcceptedMax() {
+    if (_deferred.isEmpty) return;
+    final pending = [..._deferred]..sort((a, b) => a.offset - b.offset);
+    _deferred.clear();
+    final hiddenPerFile = <String, int>{};
+    final ignoredPerFile = <String, Set<int>>{};
+    for (final r in pending) {
+      final path = r.loc.path;
+      // The analyzer drops comment-ignored findings after the walk, so they
+      // are excluded here too, matching what the CLI producers count.
+      final ignored = ignoredPerFile.putIfAbsent(
+        path,
+        () => commentIgnoredLines(r.content, _ruleName),
+      );
+      if (ignored.contains(r.loc.line)) {
+        _trackSuppression(r.offset, SuppressionKind.ignore, location: r.loc);
+        continue;
+      }
+      final hidden = hiddenPerFile[path] ?? 0;
+      if (hidden < r.max) {
+        hiddenPerFile[path] = hidden + 1;
+        _trackSuppression(r.offset, SuppressionKind.accepted, location: r.loc);
+        continue;
+      }
+      if (!_isCappedFromProblemsTab()) r.emit();
+      _trackViolation(r.offset, location: r.loc);
+    }
   }
 
   /// Whether [ProgressTracker.maxIssues] has been reached and this
@@ -3527,13 +3650,13 @@ class SaropaDiagnosticReporter {
   ///
   /// When a suppression is detected, records it in [SuppressionTracker]
   /// so the summary log and violations.json include suppression counts.
-  bool _isSuppressed(int offset, AstNode node) {
+  bool _isSuppressed(int offset, AstNode node, AcceptedEntry? accepted) {
     if (_isBaselined(offset, node: node)) {
       _trackSuppression(offset, SuppressionKind.baseline, node: node);
       return true;
     }
     // Same order as atToken: baseline, then the accepted-findings list.
-    if (_isAccepted(offset, node: node)) {
+    if (accepted != null && accepted.max == null) {
       _trackSuppression(offset, SuppressionKind.accepted, node: node);
       return true;
     }
@@ -3655,17 +3778,17 @@ class SaropaDiagnosticReporter {
     );
   }
 
-  /// Whether an accepted-findings entry (rule + file) hides this finding.
+  /// The accepted-findings entry (rule + file) matching this finding, if any.
   ///
   /// Only the in-server plugin enables the hook (see the config loader); CLI
   /// producers filter their output afterwards instead and pay only a static
   /// read here. The location is resolved first because the file's path picks
   /// which project's list applies.
-  bool _isAccepted(int offset, {AstNode? node}) {
-    if (!AcceptedFindingsRuntime.isEnabled) return false;
+  AcceptedEntry? _acceptedEntry(int offset, {AstNode? node}) {
+    if (!AcceptedFindingsRuntime.isEnabled) return null;
     final loc = _resolveLocation(offset, node);
-    if (loc == null) return false;
-    return AcceptedFindingsRuntime.match(loc.path, _ruleName) != null;
+    if (loc == null) return null;
+    return AcceptedFindingsRuntime.match(loc.path, _ruleName);
   }
 
   /// Check if this rule is suppressed file-wide via `// ignore_for_file:`.
@@ -3705,12 +3828,14 @@ class SaropaDiagnosticReporter {
   /// — line/path then resolve from the node's own CompilationUnit
   /// instead of the shared mutable `currentUnit` (see [_resolveLocation]
   /// for the rationale and the issue this prevents).
-  void _trackViolation(int offset, {AstNode? node}) {
+  void _trackViolation(int offset, {AstNode? node, _ReportLocation? location}) {
     // Skip accumulation when the hard RSS valve has tripped — the trackers
     // were just cleared to avoid OOM, so re-filling them defeats the purpose.
     if (MemoryPressureHandler.isOverHardLimit) return;
 
-    final loc = _resolveLocation(offset, node);
+    // [location] is passed for deferred findings: by flush time currentUnit
+    // may no longer be the file the finding is in.
+    final loc = location ?? _resolveLocation(offset, node);
     if (loc == null) return;
 
     // Revoke optimistic "passed" record so balanced mode doesn't skip this
@@ -3760,6 +3885,7 @@ class SaropaDiagnosticReporter {
     SuppressionKind kind, {
     AstNode? node,
     int? length,
+    _ReportLocation? location,
   }) {
     // Skip accumulation when the hard RSS valve has tripped — suppression
     // records are diagnostic, not worth re-filling under OOM pressure.
@@ -3769,12 +3895,15 @@ class SaropaDiagnosticReporter {
     // something will actually read it. `record` nulls every detail field
     // out when captureDetails is false, so resolving the span in that mode
     // is pure waste on a path that runs inside in-editor analysis.
-    final loc = _resolveLocation(
-      offset,
-      node,
-      length: length,
-      wantSpan: SuppressionTracker.captureDetails,
-    );
+    // [location] is passed for deferred findings (see _trackViolation).
+    final loc =
+        location ??
+        _resolveLocation(
+          offset,
+          node,
+          length: length,
+          wantSpan: SuppressionTracker.captureDetails,
+        );
     if (loc == null) return;
 
     SuppressionTracker.record(

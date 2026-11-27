@@ -179,6 +179,14 @@ List<_IgnoreEntry> _parseIgnoreComments(String content, String filePath) {
   return entries;
 }
 
+/// 1-based lines of [content] on which a `// ignore:` comment silences
+/// [rule]. Shared with the accepted-findings `max` count, which must skip
+/// ignored findings the same way [filterIgnoredDiagnostics] does.
+Set<int> commentIgnoredLines(String content, String rule) => {
+  for (final e in _parseIgnoreComments(content, ''))
+    if (e.ruleName == rule) e.targetLine,
+};
+
 /// Detects stale `// ignore:` comments across the given [files] by comparing
 /// them against [diagnostics] from a scan run.
 ///

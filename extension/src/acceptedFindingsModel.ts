@@ -28,6 +28,10 @@ export interface AcceptedCheckEntry {
   line: number;
   state: AcceptedEntryState;
   hiddenCount: number;
+  /** The entry's `max:` count; null or absent means unlimited. */
+  max?: number | null;
+  /** Findings reported again because `max` was reached. */
+  aboveMaxCount?: number;
 }
 
 /** One invalid entry or parse failure in the check JSON. */
@@ -44,6 +48,8 @@ export interface AcceptedCheckSummary {
   notChecked: number;
   problemCount: number;
   hiddenTotal: number;
+  /** Absent in JSON from a package version without `max:`. */
+  aboveMaxTotal?: number;
 }
 
 /**
@@ -113,6 +119,7 @@ export function mergeCheckResults(results: AcceptedCheckResult[]): AcceptedCheck
       notChecked: sum('notChecked'),
       problemCount: sum('problemCount'),
       hiddenTotal: sum('hiddenTotal'),
+      aboveMaxTotal: sum('aboveMaxTotal'),
     },
   };
 }
@@ -212,6 +219,42 @@ export function buildEntryYaml(
     `${pad}kind: ${entry.kind}`,
     `${pad}reason: ${JSON.stringify(entry.reason)}`,
   ].join('\n') + '\n';
+}
+
+/**
+ * Whether the list text already has an entry for [rule] in [file]. A finding
+ * above an entry's `max:` still offers "Accept in this file", and appending a
+ * second entry would only create an invalid duplicate that hides nothing.
+ * Reads block and one-line flow items; anything else is left to the Dart
+ * parser, which reports duplicates.
+ */
+export function hasEntry(existing: string, rule: string, file: string): boolean {
+  // Comments are dropped first so a commented-out entry does not count.
+  const text = existing.replace(/^\s*#.*$/gm, '');
+  return text.split(/^\s*-(?=\s)/m).slice(1).some(
+    (item) => itemValue(item, 'rule') === rule && normalizeFile(itemValue(item, 'file')) === file,
+  );
+}
+
+/** The value of [key] in one list item, unquoted, or undefined. */
+function itemValue(item: string, key: 'rule' | 'file'): string | undefined {
+  // Anchored on a line start, `{` or `,` so "file:" inside a reason is skipped.
+  const m = new RegExp(String.raw`(?:^|[{,])[ \t]*${key}[ \t]*:[ \t]*("(?:[^"\\]|\\.)*"|'[^']*'|[^,}#\r\n]+)`, 'm').exec(item);
+  if (!m) return undefined;
+  const raw = m[1].trim();
+  if (raw.startsWith("'")) return raw.slice(1, -1);
+  if (!raw.startsWith('"')) return raw;
+  try {
+    return JSON.parse(raw) as string;
+  } catch {
+    // A YAML-only escape: compare the text between the quotes.
+    return raw.slice(1, -1);
+  }
+}
+
+/** Same normalization as Dart's `normalizeAcceptedFile`, for comparison. */
+function normalizeFile(file: string | undefined): string | undefined {
+  return file?.split(path.win32.sep).join('/').replace(/^(\.\/)+/, '');
 }
 
 /** Header written when the list file does not exist yet. */

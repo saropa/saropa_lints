@@ -17,6 +17,7 @@ import {
   appendEntry,
   buildEntryYaml,
   findPackageRoot,
+  hasEntry,
   markersFromCheck,
   mergeCheckResults,
   parseAcceptedCheckJson,
@@ -134,6 +135,31 @@ describe('acceptedFindingsModel', () => {
   it('refuses layouts it cannot extend without rewriting', () => {
     assert.strictEqual(appendEntry('accepted: []\n', entry), null);
     assert.strictEqual(appendEntry('accepted:\n  - rule: a\nversion: 1\n', entry), null);
+  });
+});
+
+describe('hasEntry', () => {
+  const list = [
+    'version: 1',
+    'accepted:',
+    '  - rule: avoid_x',
+    '    file: "lib/a.dart"',
+    '    reason: "moved from file: lib/b.dart"',
+    '    max: 2',
+    "  - {rule: 'avoid_y', file: ./lib/c.dart, reason: r}",
+    '  # - rule: avoid_z',
+    '  #   file: lib/a.dart',
+  ].join('\r\n');
+
+  it('finds block and flow entries, with or without a max', () => {
+    assert.strictEqual(hasEntry(list, 'avoid_x', 'lib/a.dart'), true);
+    assert.strictEqual(hasEntry(list, 'avoid_y', 'lib/c.dart'), true);
+  });
+
+  it('ignores other files, commented entries and text inside a reason', () => {
+    assert.strictEqual(hasEntry(list, 'avoid_x', 'lib/b.dart'), false);
+    assert.strictEqual(hasEntry(list, 'avoid_z', 'lib/a.dart'), false);
+    assert.strictEqual(hasEntry('', 'avoid_x', 'lib/a.dart'), false);
   });
 });
 

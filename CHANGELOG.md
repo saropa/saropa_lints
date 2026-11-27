@@ -72,7 +72,7 @@ Many lint rules report fewer false positives, covering paths, caches, async guar
 
 ### Added
 
-- A `saropa_accepted.yaml` beside a package's `pubspec.yaml` (rule, file and reason, no line numbers) hides reviewed findings from Problems, scan, audit and violations exports; each file uses the list of its nearest `pubspec.yaml`. `scan --check-accepted` checks every list under the target and fails on stale or invalid entries. The VS Code extension adds "Accept {rule} in this file" and "Check Accepted Findings".
+- A `saropa_accepted.yaml` beside a package's `pubspec.yaml` (rule, file and reason, no line numbers) hides reviewed findings from Problems, scan, audit and violations exports; each file uses the list of its nearest `pubspec.yaml`. An optional `max:` count hides only the first findings by source position and reports the rest. `scan --check-accepted` checks every list under the target and fails on stale or invalid entries. The VS Code extension adds "Accept {rule} in this file" and "Check Accepted Findings".
 
 ### Changed
 

@@ -64,6 +64,7 @@ List<AcceptedListCheck> checkAcceptedLists({
             list: list,
             entries: own,
             hiddenByEntry: split.hiddenByEntryAt(root),
+            aboveMaxByEntry: split.aboveMaxByEntryAt(root),
             scannedFiles: scanned[rootKey(root)] ?? const {},
             rulesRun: rulesRun,
             projectRoot: root,
@@ -184,6 +185,9 @@ Map<String, Object?> _entryJson(AcceptedEntryStatus s) => <String, Object?>{
   'line': s.entry.line,
   'state': s.state.name,
   'hiddenCount': s.hiddenCount,
+  // Null when the entry is unlimited.
+  'max': s.entry.max,
+  'aboveMaxCount': s.aboveMaxCount,
 };
 
 /// Counts across [checks]; used per list and for the totals.
@@ -197,6 +201,7 @@ Map<String, Object> _summary(List<AcceptedListCheck> checks) {
     'notChecked': count(AcceptedEntryState.notChecked),
     'problemCount': checks.fold<int>(0, (a, c) => a + c.problems.length),
     'hiddenTotal': statuses.fold<int>(0, (a, s) => a + s.hiddenCount),
+    'aboveMaxTotal': statuses.fold<int>(0, (a, s) => a + s.aboveMaxCount),
   };
 }
 
@@ -236,6 +241,11 @@ String _statusLine(AcceptedEntryStatus s) {
     AcceptedEntryState.staleNoFinding => 'STALE (no finding)',
     AcceptedEntryState.notChecked => 'not checked',
   };
+  // Above-max findings are ordinary findings in a normal scan; the check
+  // names them so growth is visible. They do not fail the run.
+  final over = s.aboveMaxCount == 0
+      ? ''
+      : ' (max ${s.entry.max}; ${s.aboveMaxCount} above max reported)';
   return '  line ${s.entry.line.toString().padLeft(4)}  '
-      '${s.entry.rule}  ${s.entry.file}  — $label';
+      '${s.entry.rule}  ${s.entry.file}  — $label$over';
 }

@@ -7,31 +7,140 @@
 /// stale check can see what each entry hid.
 library;
 
-import 'dart:io' show FileSystemEntity;
+import 'dart:io' show File, FileSystemEntity;
 
 import '../scan/scan_diagnostic.dart';
 import '../scan/scan_json.dart'
     show kScanJsonDiagnostics, scanDiagnosticsToJson;
+import '../scan/stale_ignore_detector.dart' show commentIgnoredLines;
 import 'accepted_findings_list.dart';
 
 /// Result of splitting findings into shown and hidden.
 class AcceptedFilterResult {
-  const AcceptedFilterResult(this.kept, this.hidden);
+  const AcceptedFilterResult(
+    this.kept,
+    this.hidden, [
+    this.aboveMax = const [],
+  ]);
 
-  /// Findings no entry covers.
+  /// Findings that stay reported: not covered, or above an entry's `max`.
   final List<ScanDiagnostic> kept;
 
   /// Findings an entry covers, paired with that entry.
   final List<({ScanDiagnostic diagnostic, AcceptedEntry entry})> hidden;
 
+  /// Findings an entry matches but does not hide because its `max` was
+  /// already used up. Each is also in [kept].
+  final List<({ScanDiagnostic diagnostic, AcceptedEntry entry})> aboveMax;
+
+  /// Above-`max` finding count per entry key.
+  Map<String, int> get aboveMaxByEntry => _countByEntry(aboveMax);
+
   /// Hidden finding count per entry key ([AcceptedEntry.key]).
-  Map<String, int> get hiddenByEntry {
+  Map<String, int> get hiddenByEntry => _countByEntry(hidden);
+
+  static Map<String, int> _countByEntry(
+    List<({ScanDiagnostic diagnostic, AcceptedEntry entry})> matches,
+  ) {
     final counts = <String, int>{};
-    for (final h in hidden) {
-      counts[h.entry.key] = (counts[h.entry.key] ?? 0) + 1;
+    for (final m in matches) {
+      counts[m.entry.key] = (counts[m.entry.key] ?? 0) + 1;
     }
     return counts;
   }
+}
+
+/// The findings among [matches] (all matched by one list) that must stay
+/// reported although an entry covers them.
+///
+/// Within each entry that has a `max`, the first `max` distinct source
+/// positions (offset, then line and column) are hidden, so the result does not
+/// depend on the order rules or files were visited. Repeats of one position
+/// (the same file listed twice in a run) share a verdict and count once. A
+/// finding silenced by an `// ignore:` comment does not use up the count: some
+/// producers filter those before this point and some do not, and all of them
+/// must hide the same set. State lives only in this call, so analyzing a file
+/// again starts from zero.
+Set<ScanDiagnostic> findingsAboveMax(
+  List<({ScanDiagnostic diagnostic, AcceptedEntry entry})> matches,
+) {
+  final byEntry = <String, List<ScanDiagnostic>>{};
+  final maxByEntry = <String, int>{};
+  for (final m in matches) {
+    final max = m.entry.max;
+    if (max == null) continue;
+    maxByEntry[m.entry.key] = max;
+    (byEntry[m.entry.key] ??= []).add(m.diagnostic);
+  }
+  final above = Set<ScanDiagnostic>.identity();
+  for (final group in byEntry.entries) {
+    above.addAll(_aboveInEntry(group.value, maxByEntry[group.key]!));
+  }
+  return above;
+}
+
+/// [findingsAboveMax] for one entry (one rule in one file).
+Iterable<ScanDiagnostic> _aboveInEntry(
+  List<ScanDiagnostic> group,
+  int max,
+) sync* {
+  group.sort(_bySource);
+  final ignored = _ignoredLines(group.first.filePath, group.first.ruleName);
+  final hiddenPositions = <(int, int, int)>{};
+  for (final d in group) {
+    // Left reported, as the producer had it, and not counted.
+    if (ignored.contains(d.line)) {
+      yield d;
+      continue;
+    }
+    final at = (d.offset, d.line, d.column);
+    if (hiddenPositions.length < max) hiddenPositions.add(at);
+    if (!hiddenPositions.contains(at)) yield d;
+  }
+}
+
+int _bySource(ScanDiagnostic a, ScanDiagnostic b) {
+  var c = a.offset.compareTo(b.offset);
+  if (c == 0) c = a.line.compareTo(b.line);
+  return c != 0 ? c : a.column.compareTo(b.column);
+}
+
+/// Lines of [path] where a comment ignores [rule]; empty when unreadable.
+Set<int> _ignoredLines(String path, String rule) {
+  try {
+    return commentIgnoredLines(File(path).readAsStringSync(), rule);
+  } on Object {
+    return const {};
+  }
+}
+
+/// Splits [diagnostics] given the entry matching each one (or null), keeping
+/// input order. The single place the CLI producers decide hide or report.
+AcceptedFilterResult partitionAccepted(
+  List<ScanDiagnostic> diagnostics,
+  List<AcceptedEntry?> entries,
+) {
+  final above = findingsAboveMax([
+    for (var i = 0; i < diagnostics.length; i++)
+      if (entries[i] case final entry?)
+        (diagnostic: diagnostics[i], entry: entry),
+  ]);
+  final kept = <ScanDiagnostic>[];
+  final hidden = <({ScanDiagnostic diagnostic, AcceptedEntry entry})>[];
+  final aboveMax = <({ScanDiagnostic diagnostic, AcceptedEntry entry})>[];
+  for (var i = 0; i < diagnostics.length; i++) {
+    final d = diagnostics[i];
+    final entry = entries[i];
+    if (entry == null) {
+      kept.add(d);
+    } else if (above.contains(d)) {
+      kept.add(d);
+      aboveMax.add((diagnostic: d, entry: entry));
+    } else {
+      hidden.add((diagnostic: d, entry: entry));
+    }
+  }
+  return AcceptedFilterResult(kept, hidden, aboveMax);
 }
 
 /// Splits [diagnostics] into kept and hidden. A no-op (everything kept) when
@@ -44,18 +153,19 @@ AcceptedFilterResult filterAcceptedDiagnostics({
   if (list.isEmpty || diagnostics.isEmpty) {
     return AcceptedFilterResult(diagnostics, const []);
   }
-  final kept = <ScanDiagnostic>[];
-  final hidden = <({ScanDiagnostic diagnostic, AcceptedEntry entry})>[];
-  for (final d in diagnostics) {
-    final rel = relativeToProject(d.filePath, projectRoot);
-    final entry = rel == null ? null : list.entryFor(rel, d.ruleName);
-    if (entry == null) {
-      kept.add(d);
-    } else {
-      hidden.add((diagnostic: d, entry: entry));
-    }
-  }
-  return AcceptedFilterResult(kept, hidden);
+  return partitionAccepted(diagnostics, [
+    for (final d in diagnostics) _entryFor(d, list, projectRoot),
+  ]);
+}
+
+/// The entry of [list] matching [d], or null.
+AcceptedEntry? _entryFor(
+  ScanDiagnostic d,
+  AcceptedFindingsList list,
+  String projectRoot,
+) {
+  final rel = relativeToProject(d.filePath, projectRoot);
+  return rel == null ? null : list.entryFor(rel, d.ruleName);
 }
 
 // Check-run verdicts and their JSON/text reports (one block per list) live in
@@ -79,11 +189,19 @@ enum AcceptedEntryState {
 
 /// Verdict for one entry.
 class AcceptedEntryStatus {
-  const AcceptedEntryStatus(this.entry, this.state, this.hiddenCount);
+  const AcceptedEntryStatus(
+    this.entry,
+    this.state,
+    this.hiddenCount, [
+    this.aboveMaxCount = 0,
+  ]);
 
   final AcceptedEntry entry;
   final AcceptedEntryState state;
   final int hiddenCount;
+
+  /// Matching findings reported again because the entry's `max` was reached.
+  final int aboveMaxCount;
 
   bool get isStale =>
       state == AcceptedEntryState.staleFileMissing ||
@@ -105,6 +223,7 @@ List<AcceptedEntryStatus> evaluateAcceptedEntries({
   bool complete = true,
   bool Function(String absPath)? fileExists,
   Iterable<AcceptedEntry>? entries,
+  Map<String, int> aboveMaxByEntry = const {},
 }) {
   final exists = fileExists ?? FileSystemEntity.isFileSync;
   return [
@@ -123,6 +242,7 @@ List<AcceptedEntryStatus> evaluateAcceptedEntries({
           exists('$projectRoot/${e.file}'),
         ),
         hiddenByEntry[e.key] ?? 0,
+        aboveMaxByEntry[e.key] ?? 0,
       ),
   ];
 }
