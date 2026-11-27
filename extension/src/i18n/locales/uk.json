@@ -89,14 +89,14 @@
         "header": "Змінено: Панель боксу спростована",
         "body": "Панель боксу зменшена до 13 рядків по 4 панелі. Перемикачі важливості, керування двигуном та налаштування переміщені у свої дашборди. Панель Дебагу об'єднана у панель Здоров'я, а панель Домашня видалена у користування статусною лінією та дашбордом Знайдено.",
         "why": "Якщо щось, на що ви звикли клікати в боковому панелі, зникло, воно перемістилося на панель управління — воно не було видалено.",
-        "actionCatalog": "Перегляньте всі команди.",
+        "actionCatalog": "Переглянути всі команди",
         "actionWalkthrough": "Відкрити поетапний огляд"
       }
     },
     "discover": {
       "header": "Досліджуйте дашборди",
       "findings": {
-        "label": "Наслідки панелі даних Dashboard.",
+        "label": "Панель знахідок",
         "description": "Кожна діагностика у вашому проекті, фільтрування за серйозністю та правилом."
       },
       "packages": {
@@ -136,18 +136,18 @@
       "baselineSubtitle": "Порівняно з базовим варіантом з {date}",
       "searchPlaceholder": "Фільтрувати за правилом, файлом або повідомленням…",
       "filterTier": "Рівень",
-      "filterSeverity": "Важкість тяжкості.",
+      "filterSeverity": "Серйозність",
       "filterImpact": "Вплив",
       "filterBaselineStatus": "Бейслайн",
       "baselineNew": "Новий",
       "baselineUnchanged": "Незмінений",
       "saveBaseline": "Зберігати як базову лінію",
-      "copyJson": "Копіюйте JSON.",
+      "copyJson": "Копіювати JSON",
       "toggleGroup": "Приховання групування",
       "colFile": "Файл",
       "colLine": "Рядок",
       "colRule": "Статут Регуляція",
-      "colSeverity": "Важкість тяжкості.",
+      "colSeverity": "Серйозність",
       "colTier": "Рівень",
       "colMessage": "повідомлення",
       "empty": "Немає виявлення — проект чистий.",
@@ -217,7 +217,7 @@
       "unusedOnly": "Не використовується лише",
       "usedOnly": "Використовується лише",
       "deprecatedOnly": "Вилучено лише",
-      "expandAll": "Розширюйте все.",
+      "expandAll": "Розгорнути все",
       "collapseAll": "Згорнути все",
       "indexLabel": "Індекс пакетів"
     },
@@ -244,7 +244,7 @@
       "noFeatures": "Був знайдений changelog, але з нього не вдалося витягнути жодної функції.",
       "linkPubDev": "pub.dev",
       "linkDocs": "Документація",
-      "linkRepository": "Репозиторій даних Repository."
+      "linkRepository": "Репозиторій"
     },
     "category": {
       "heading": "{category} ({count})",
@@ -263,8 +263,8 @@
       "usagesOne": "Використання {count}",
       "usagesUnknown": "використання не вимірюється",
       "apiHeading": "{symbol} ({count})",
-      "viewCode": "Переглянути код.",
-      "viewDocs": "Переглянути документи.",
+      "viewCode": "Переглянути код",
+      "viewDocs": "Переглянути документацію",
       "noUsages": "У проекті немає використання.",
       "moreUsages": "{count} більше використань",
       "moreUsagesOne": "{count} більше використання"
@@ -277,13 +277,13 @@
     }
   },
   "stylistic": {
-    "title": "Стиль і думки.",
+    "title": "Стиль і вподобання",
     "intro": "Правила стилю для висловлювання думок, відключені за замовчуванням. Включайте тільки те, з чим ваша команда погоджується. Конфліктні варіанти згруповані, так що ви можете обрати один.",
     "searchPlaceholder": "Пошук правил стилю…",
-    "pickOne": "Виберіть один з них.",
+    "pickOne": "Виберіть один варіант",
     "none": "Немає",
     "enableAll": "Включити все ввімкніть усе",
-    "disableAll": "Виключити всі відключення.",
+    "disableAll": "Вимкнути все",
     "noMatch": "Не стиль правила матч.",
     "desc": {
       "ordering_sorting": "Сортує члени, параметри, поля та ключі map для передбачуваного вигляду. Дуже шумний на існуючому коді — найкраще на новому коді або малих репозиторіях.",
@@ -301,13 +301,13 @@
     }
   },
   "packs": {
-    "forYourProject": "Для вашого проекту.",
+    "forYourProject": "Для вашого проєкту",
     "forYourProjectHint": "Пакети, залежність або SDK яких відповідає вашій pubspec. Ці правила застосовуються до коду, який ви фактично відправляєте.",
     "noneDetected": "Ще немає пачок, які б відповіли вашим залежностям. Додайте підтримуваний пакет або відкрийте Все пакети нижче.",
-    "allPackages": "Всі пакети.",
+    "allPackages": "Усі пакети",
     "allPackagesHint": "Кожна наявна упаковка, включаючи ті, які не виявлені в цьому проекті. Дозволити зграї прийняти її правила.",
     "versionGroup": {
-      "tag": "Виберіть одну версію.",
+      "tag": "Виберіть одну версію",
       "tooltip": "Ці пакети вказують на різні основні версії однієї залежності. Використовується лише один — увімкнення одного вимикає інші."
     },
     "domainDesc": {
@@ -327,7 +327,7 @@
   },
   "rulesTiers": {
     "tabBar": {
-      "ariaLabel": "Вкладки інформаційної панелі «Правила та рівні»."
+      "ariaLabel": "Вкладки панелі «Правила та рівні»"
     },
     "ruleFinder": {
       "disableButton": "Виключити відключати",
@@ -338,7 +338,7 @@
     "tab": {
       "tier": "Рівень",
       "packs": "Пакети правил",
-      "overrides": "Прийомні дії переоцінюють.",
+      "overrides": "Перевизначення",
       "sdk": "Розгортання SDK",
       "configFile": "Файл конфігурації",
       "automation": "автоматизація",
@@ -462,7 +462,7 @@
     "shortcuts": {
       "jumpToTab": "Перейти до вкладки 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
       "prevNextTab": "Попередня / наступна вкладка",
-      "showOverlay": "Показати цей короткий шлях перегортання."
+      "showOverlay": "Показати цю підказку клавіш"
     }
   },
   "dashboards": {
@@ -488,7 +488,7 @@
   "startupNudge": {
     "message": "Saropa Lints: до цього проекту застосовні пропозиції щодо пакетів правил: {count}.",
     "review": "Переглянути",
-    "dismiss": "Відпустка від роботи.",
+    "dismiss": "Закрити",
     "reviewFailed": "Не вдалося відкрити перегляд пакету правил Saropa Lints. {error}"
   },
   "opportunities": {
@@ -498,12 +498,12 @@
     "noScan": "Спочатку запустите сканування пакетів, щоб знайти можливості для оновлення.",
     "openFileFailed": "Не вдалося відкрити {file} — можливо, його переміщено після останнього сканування.",
     "card": {
-      "versionUpgrade": "оновлення, доступне для {latest}.",
-      "versionCurrent": "про останні новини.",
-      "featuresTitle": "Функції, які ще не використовуються.",
+      "versionUpgrade": "доступне оновлення до {latest}",
+      "versionCurrent": "остання версія",
+      "featuresTitle": "Ще не використані функції",
       "locationsTitle": "Де ваш проект використовує цей пакет?",
       "noLocations": "Не імпортовано в джерело проекту — ймовірно, розробнича або транзитивна залежність.",
-      "moreFiles": "і {count} більше файлів.",
+      "moreFiles": "і ще {count} файлів",
       "openInDashboard": "Відкрити на панелі пакетів",
       "writeReport": "Написати звіт"
     },
@@ -524,27 +524,27 @@
     "section": {
       "version": "ВЕРСІЯ",
       "changelog": "CHANGELOGEGO зміни",
-      "community": "Співтовариство ЄС.",
+      "community": "СПІЛЬНОТА",
       "dependencies": "ЗАЛЕЖНОСТІ",
-      "alerts": "ОЗВІДНЕНИЯ ВЕДУКОВ.",
+      "alerts": "СПОВІЩЕННЯ",
       "platforms": "ПЛАТФОРМИ",
-      "suggestions": "Надання пропозицій.",
+      "suggestions": "ПРОПОЗИЦІЇ",
       "readmeImages": "README ІМЕЖИ ЗНАЧЕНІ В РОЛЬЗУ"
     },
     "header": {
-      "logoAlt": "{name} логотип.",
+      "logoAlt": "Логотип {name}",
       "grade": "Рівень {grade}",
       "licenseTitle": "Ліцензія",
-      "published": "Опубліковано {date}."
+      "published": "Опубліковано {date}"
     },
     "partialBanner": {
-      "partReadme": "README та логотип.",
+      "partReadme": "README та логотип",
       "partGap": "PR-проекти з прогалотою версій та проблеми, пов'язані із ними.",
       "partReverseDeps": "кількість зворотних залежностей",
-      "listTwo": "{first} і {second}.",
-      "listMany": "{head}, і {last}.",
+      "listTwo": "{first} і {second}",
+      "listMany": "{head} і {last}",
       "message": "Не вдалося завантажити деякі розділи: {list}.",
-      "retry": "Перепробуйте повторно.",
+      "retry": "Повторити",
       "retrying": "Повторна спроба...",
       "retryTitle": "Перепробуйте невдалі поглинання."
     },
@@ -560,20 +560,20 @@
       "blockedBy": "Блокується за допомогою",
       "blockedVia": "{blocker} капи {dep} {constraint} ({resolvable} розв'язуватися, {latest} останнє)",
       "blockedViaSdk": "закріплено {blocker} (Flutter SDK) для {dep} ({resolvable} вирішується, {latest} останній)",
-      "constrained": "Зв'язнені, обмежені.",
+      "constrained": "Обмежена",
       "constrainedBy": "Ваш обмеження {constraint} обмежує це ({resolvable} вирішуваний, {latest} останній)",
       "pinHeld": "Утримується",
-      "pinDoNotUse": "Не використовувати.",
+      "pinDoNotUse": "Не використовувати",
       "drift": "Міжпроектний дрейф",
       "driftBehind": "Позаду: {siblings} (у вас {own})",
       "driftDiffers": "Відрізняється: {siblings} (у вас {own})",
       "codeSize": "Розмір коду",
-      "archiveSize": "Розмір архіву.",
+      "archiveSize": "Розмір архіву",
       "bloat": "({rating}/10 набряк)",
       "onDisk": "На диску",
       "upgrade": "Оновити",
       "upgrading": "Оновлення…",
-      "viewChangelog": "Переглянути реєстр змін."
+      "viewChangelog": "Переглянути журнал змін"
     },
     "changelog": {
       "intro": "Що змінилося від {from} до {to} — перегляньте перед оновленням.",
@@ -585,37 +585,37 @@
       "stars": "Зірки",
       "likes": "Вподобання",
       "report": "Звіт, доповідь",
-      "openIssues": "Відкриті питання.",
-      "openPrs": "Відкриті PR-служби.",
+      "openIssues": "Відкриті питання",
+      "openPrs": "Відкриті PR",
       "activity": "Діяльність (90d)",
       "activityValue": "Випуски {closed} закриті, {merged} PR об’єднані",
-      "noActivity": "Недавніх дій немає.",
-      "lastCommit": "Останній зобов'язання.",
+      "noActivity": "Немає недавньої активності",
+      "lastCommit": "Останній коміт",
       "pubPoints": "Pub Points - Пуб-поїнти",
       "verified": "(перевірений)",
       "publisher": "Видавець",
       "flagged": "({count} зафіксовано)",
-      "transitiveDeps": "Перехідні депони.",
+      "transitiveDeps": "Транзитивні залежності",
       "footprintBreakdown": "{unique} унікальний &middot; +{shared} спільний = {total} загальна кількість",
       "footprintTooltip": "Власні {own} + унікальні транзитиви {unique} + спільні транзитивні {shared}. Видалення цього депу заощаджує {saved} (спільні депо залишаються в інших).",
-      "trueFootprint": "Істинний відбиток ноги.",
+      "trueFootprint": "Реальний обсяг",
       "packagesCount": "{count} пакетів",
-      "dependents": "Залежні особи."
+      "dependents": "Залежні пакети"
     },
     "fileUsages": {
       "commentedOut": "Відношення з коментарями:",
       "fileCount": "Файлів: {count}",
       "exportNoteTitle": "Принаймні одне використання є експортною директивою.",
-      "publicApiSurface": "API поверхня публічної API.",
+      "publicApiSurface": "поверхня публічного API",
       "header": "ФІЛЬ ОБНОВИЩЕНЯ ({label})",
-      "commentedReexportTitle": "Реекспорт з коментарією на відключення.",
+      "commentedReexportTitle": "Закоментований реекспорт",
       "reexportTitle": "Повернений — частина публічного інтерфейсу цієї бібліотеки",
       "reexportBadge": "реекспорт"
     },
     "opportunities": {
       "header": "Можливості ({count})",
-      "viewCode": "Переглянути код.",
-      "viewDocs": "Переглянути документи."
+      "viewCode": "Переглянути код",
+      "viewDocs": "Переглянути документацію"
     },
     "alerts": {
       "archived": "АРХІВОВАНО — репозиторій є тільки для читання",
@@ -625,14 +625,14 @@
     },
     "versionGap": {
       "versionTitle": "Версія Gap Version Гіпа",
-      "overrideTitle": "Override Gap перезаписує прогалини.",
+      "overrideTitle": "Розрив через перевизначення",
       "noDates": "Не вдалося визначити дати версії для цього пакета.",
       "noItems": "Між цими версіями не було виявлено жодних проблем або PR.",
       "prsMerged": "Об’єднані PR",
       "issuesClosed": "Закриті проблеми",
-      "searchLabel": "Пошук PR і проблем.",
+      "searchLabel": "Пошук PR і проблем",
       "searchPlaceholder": "Пошук PR і проблем...",
-      "filterAria": "Фільтр за категоріями.",
+      "filterAria": "Фільтр за категоріями",
       "filterAll": "всі",
       "filterUnreviewed": "Непереглянуті",
       "filterPrs": "PR",
@@ -654,31 +654,31 @@
       "wasm": "WASM"
     },
     "images": {
-      "alt": "README зображення образу."
+      "alt": "Зображення з README"
     },
     "links": {
       "viewOnPubDev": "Вид на pub.dev",
       "documentation": "Документація",
       "changelog": "Журнал змін",
       "versions": "Версії",
-      "repository": "Репозиторій даних Repository.",
-      "openIssues": "Відкриті питання.",
+      "repository": "Репозиторій",
+      "openIssues": "Відкриті питання",
       "reportIssue": "Повідомити про проблему"
     },
     "a11y": {
-      "skipToDetails": "Перейти до деталей упаковки."
+      "skipToDetails": "Перейти до відомостей про пакет"
     },
     "shortcuts": {
-      "showOverlay": "Показати цей короткий шлях перегортання.",
+      "showOverlay": "Показати цю підказку клавіш",
       "closeOverlay": "Закрийте накладку короткостворки клавіатури."
     }
   },
   "toolbar": {
     "runAnalysis": "Запустити аналіз",
-    "copyJson": "Копіюйте JSON.",
+    "copyJson": "Копіювати JSON",
     "saveReport": "Зберегти звіт",
     "moreActions": "Інші дії",
-    "clearAll": "Все чисто, все вільне."
+    "clearAll": "Очистити все"
   },
   "loading": {
     "runningAnalysis": "Проведення аналізу...",
@@ -693,7 +693,7 @@
     "chipRemove": "Видалити"
   },
   "a11y": {
-    "toggleFullWidth": "Перемикайте розклад повної ширини.",
+    "toggleFullWidth": "Перемкнути макет на всю ширину",
     "expandRow": "Розгорнути рядок",
     "comparisonDimension": "Метрика"
   },
@@ -705,7 +705,7 @@
       "coverage": "{pct}% перекладено — решта показується на англійській"
     },
     "reloadPrompt": "Мова встановлена на {locale}. Перезавантажуйте вікно, щоб оновити бокову панель та етикети команд.",
-    "reloadNow": "Перезаряджуйте зараз.",
+    "reloadNow": "Перезавантажити зараз",
     "reloadLater": "Пізніше"
   },
   "statusBar": {
@@ -715,7 +715,7 @@
     },
     "menu": {
       "openViolations": "Відкрийте звіт про порушення",
-      "openPackageDashboard": "Відкрийте панель управління пакетом.",
+      "openPackageDashboard": "Відкрити панель пакетів",
       "openProcessHealth": "Відкрити стан процесу",
       "commandCatalog": "Каталог команд",
       "about": "про"
@@ -831,11 +831,11 @@
     "action": {
       "cleanUp": "Очистити",
       "openPanel": "Відкрити панель здоров'я",
-      "dismiss": "Відпустка від роботи.",
+      "dismiss": "Закрити",
       "optimizeAnalysis": "Оптимізувати аналіз",
       "dontShowAgain": "Не Показувати Опять",
       "openMachineDashboard": "Відкрити Машинний Здоров'я",
-      "restartAnalysisServer": "Перезавантажити Рестартуйте."
+      "restartAnalysisServer": "Перезапустити"
     },
     "cleanup": {
       "noOrphans": "Немає вільних демонів.",
@@ -863,7 +863,7 @@
       "processes": "процеси",
       "totalRss": "загальна RSS",
       "orphaned": "орфанізовані",
-      "refresh": "Відсвіжіть, освіждайте.",
+      "refresh": "Оновити",
       "colPid": "PID",
       "colParent": "Батьківство",
       "colRss": "RSS",
@@ -881,13 +881,13 @@
     "watcherExclude": {
       "prompt": "{count} порекомендовані виключення для файлового спостерігача відсутні в цьому робочому просторі: {patterns}. Додавання їх запобігає VS Code від слідкування великими побудовними артефактами та дампами стеку, які витрачають пам'ять.",
       "addAll": "Додати всі",
-      "dismiss": "Відпустка від роботи.",
+      "dismiss": "Закрити",
       "added": "Додано {count} виключення(я) файлового оглядач до налаштувань робочого простору"
     },
     "nestedRoots": {
       "prompt": "{folders} містить {count} вкладених Dart коренів пакету, які git ігнорує. Кожен аналізується як окремий контекст і може призводити до зростання об'єму пам'яті аналізового сервера.",
       "fix": "Виключити з аналізу",
-      "dismiss": "Відпустка від роботи.",
+      "dismiss": "Закрити",
       "fixed": "Виключено {folders} з аналізу та моніторингу файлів"
     },
     "hazardScan": {
@@ -895,7 +895,7 @@
       "andMore": "і {count} більше",
       "unnamedFolder": "(незвичайна папка)",
       "addExclusions": "Виключити з Watcher",
-      "dismiss": "Відпустка від роботи.",
+      "dismiss": "Закрити",
       "added": "Додано шаблон(и) виключення {count} нагляду до налаштувань робочого простору."
     }
   },
@@ -918,7 +918,7 @@
   },
   "machineDashboard": {
     "title": "Машинна працездатність",
-    "refresh": "Відсвіжіть, освіждайте.",
+    "refresh": "Оновити",
     "systemUnknown": "Системна пам'ять не може бути прочитана на цій платформі.",
     "platformUnsupported": "Машінне здоров'я недоступне на цій платформі — підтримуються запити процесу Windows, macOS та Linux.",
     "freeOf": "безкоштовний",
@@ -948,7 +948,7 @@
     },
     "action": {
       "reclaim": "Відновити",
-      "restartAnalysisServer": "Перезавантажити Рестартуйте.",
+      "restartAnalysisServer": "Перезапустити",
       "setHeapCap": "Встановити ліміт",
       "unloadModel": "Відмовитися"
     },
@@ -1004,9 +1004,9 @@
     }
   },
   "findingsDash": {
-    "pageTitle": "Saropa Dashboard результатів.",
-    "documentTitle": "Saropa Dashboard результатів.",
-    "skipToFindings": "Перейдіть до висновків.",
+    "pageTitle": "Панель знахідок Saropa",
+    "documentTitle": "Панель знахідок Saropa",
+    "skipToFindings": "Перейти до знахідок",
     "secondaryAsideLabel": "Вторинна діагностика",
     "hero": {
       "gaugeTitle": "Степень здоров'я {score} (клас {grade}). Помилки важать найбільше.",
@@ -1021,7 +1021,7 @@
     "status": {
       "updatedPrefix": "Оновлено",
       "refreshHint": "Натисніть, щоб оновити від аналізатора.",
-      "lastRunUnknown": "Останній пробіг невідомий.",
+      "lastRunUnknown": "Час останнього запуску невідомий",
       "noTimestampTitle": "Немає часової марки на violations.json.",
       "findingsAfterFilterTitle": "Загальні результати після фільтрування правила відключення.",
       "findingOne": "{count} знахідка",
@@ -1047,7 +1047,7 @@
       "qualityGateFailingPill": "Несправність воріт"
     },
     "groupBy": {
-      "severity": "Важкість тяжкості.",
+      "severity": "Серйозність",
       "file": "Файл",
       "impact": "Вплив",
       "rule": "Статут Регуляція",
@@ -1062,7 +1062,7 @@
     },
     "kpi": {
       "visibleLabel": "Видимі знахідки",
-      "allMatched": "Всі вони збігалися.",
+      "allMatched": "усі збігаються",
       "ofTotal": "загального {total}",
       "clearFiltersTitle": "Натисніть, щоб очистити всі фільтри.",
       "errorsLabel": "Помилки",
@@ -1077,31 +1077,31 @@
       "infoSub": "FYI — стиль / пропозиції",
       "infoSubNone": "немає",
       "infoTitle": "Фільтрування знахідок до інформації (для вашої інформації — стиль і пропозиції)",
-      "filesLabel": "Зачеплені файли зачіпаються.",
+      "filesLabel": "Зачеплені файли",
       "filesSubAcross": "у всьому експорті",
-      "filesSubNone": "Ніяких файлів не зачіпали.",
+      "filesSubNone": "немає зачеплених файлів",
       "filesTitle": "Відрізні файли, що сприяють принаймні одному знахідці.",
       "topRuleLabel": "Головне правило",
-      "topRuleTitle": "Фільтруйте результати дослідження за правилом {name}.",
+      "topRuleTitle": "Фільтрувати знахідки за правилом {name}",
       "sectionHeading": "Огляд",
       "sectionAria": "Огляд статистики"
     },
     "toolbar": {
-      "ariaFiltersActions": "Фільтри та дії.",
+      "ariaFiltersActions": "Фільтри та дії",
       "groupByFieldTitle": "Групові висновки за вибраним виміром.",
       "groupByLabel": "Групувати за",
       "textFilterTitle": "Фільтруйте результати пошуку за путі до файлу, правилом або текстом повідомлення.",
       "textFilterPlaceholder": "Фільтруйте за файлом, правилом або повідомленням...",
       "textFilterAria": "Фільтр за текстом",
-      "clearTextFilterTitle": "Чистий текстовий фільтр.",
-      "clearTextFilterAria": "Чистий текстовий фільтр.",
+      "clearTextFilterTitle": "Очистити текстовий фільтр",
+      "clearTextFilterAria": "Очистити текстовий фільтр",
       "recentFiltersTitle": "Нещодавні фільтри",
-      "clearRecentTitle": "Очистіть всі останні фільтри.",
+      "clearRecentTitle": "Очистити всі недавні фільтри",
       "clearRecentButton": "Очистити",
       "recentFiltersListAria": "Нещодавні фільтри",
-      "runAnalysisTitle": "Запустити Saropa Lints аналіз.",
-      "severityGroupAria": "Фільтр за ступенем тяжкості.",
-      "severityLabel": "Важкість тяжкості.",
+      "runAnalysisTitle": "Запустити аналіз Saropa Lints",
+      "severityGroupAria": "Фільтр за серйозністю",
+      "severityLabel": "Серйозність",
       "moreSummary": "Більше",
       "moreChevron": "▾",
       "copyJsonTitle": "Копіюйте фільтрувані порушення як JSON ({count})",
@@ -1140,7 +1140,7 @@
     "chip": {
       "contains": "містить \"{q}\"",
       "severityOff": "тяжкість ≠ {v}",
-      "resetAllTitle": "Перезавантажити всі фільтри."
+      "resetAllTitle": "Скинути всі фільтри"
     },
     "menuPalette": {
       "help": "Довідка",
@@ -1148,27 +1148,27 @@
       "textFilter": "Текстовий фільтр...",
       "severityImpact": "Фільтр за серйозністю…",
       "hideRules": "Приховати правила…",
-      "ruleMetadata": "Правило метаданих.",
-      "clearFilters": "Зберігайте фільтри від чистого кольору.",
-      "clearSuppressions": "Яскраве придушення.",
-      "clearFileFocus": "Зберіть фокус файлу з чистого поля зору.",
-      "matchActiveEditor": "Збірайте активний редактор матчів.",
-      "copyTreeJson": "Копіюйте дерево JSON.",
-      "refreshExtension": "Додаток Refresh розширюється.",
-      "openPackageDashboard": "Відкрийте панель управління пакетом.",
+      "ruleMetadata": "Метадані правила",
+      "clearFilters": "Очистити фільтри",
+      "clearSuppressions": "Очистити придушення",
+      "clearFileFocus": "Скинути фокус на файлі",
+      "matchActiveEditor": "Відповідно до активного редактора",
+      "copyTreeJson": "Копіювати JSON дерева",
+      "refreshExtension": "Оновити розширення",
+      "openPackageDashboard": "Відкрити панель пакетів",
       "openCodeHealth": "Відкрити Code Health",
-      "openLintsConfig": "Управління пакетами правил.",
-      "reloadFromDisk": "Перезавантажуйте з диска.",
+      "openLintsConfig": "Керувати пакетами правил",
+      "reloadFromDisk": "Перезавантажити з диска",
       "reloadFromDiskTitle": "Перепроектуйте панель приладів з останнього violations.json, не запускаючи аналізатора.",
       "reEnableDisabledRules": "Повторно ввімкнути вимкнені правила…",
       "reEnableDisabledRulesTitle": "Відкрийте швидкий вибір правил, які в даний час відключені у analysis_options_custom.yaml і знову включіть вибрані правила.",
       "reEnableNoneMessage": "В даний час жодні правила не відключені через analysis_options_custom.yaml.",
-      "reEnableQuickPickTitle": "Повторна активність відключених правил.",
+      "reEnableQuickPickTitle": "Знову увімкнути вимкнені правила",
       "reEnableQuickPickPlaceholder": "Виберіть одну або кілька правил, щоб знову включити.",
       "menuGroupExport": "Експорт",
       "menuGroupBulk": "Операції масового виконання",
-      "menuGroupFilter": "Фільтр і фокус.",
-      "menuGroupOpen": "Відкрийте приладову панель.",
+      "menuGroupFilter": "Фільтр і фокус",
+      "menuGroupOpen": "Відкрити панель",
       "menuGroupSystem": "Система"
     },
     "progress": {
@@ -1176,19 +1176,19 @@
       "runningMeta": "Це може зайняти деякий час на великих проектах."
     },
     "topRules": {
-      "sectionAria": "Найважливіші правила за кількістю.",
+      "sectionAria": "Найчастіші правила за кількістю",
       "hideTitle": "Приховати лише для мене — на рівні робочої області, оборотне за допомогою Clear Suppressions",
       "hideButton": "Приховати",
       "disableTitle": "Вимкнути для всього проекту — записує analysis_options_custom.yaml і повторно запускає аналіз",
       "disableButton": "Виключити відключати",
       "workspaceOnlyShort": "Тільки робоча зона",
       "projectConfigShort": "config проекту (записує analysis_options_custom.yaml)",
-      "topRulesOne": "Найвищою є правило {count}.",
+      "topRulesOne": "Топ-{count} правило",
       "topRulesOther": "Топ- {count} правила",
       "colRank": "#",
       "colRule": "Статут Регуляція",
       "colCount": "Кількість",
-      "colSeverity": "Важкість тяжкості.",
+      "colSeverity": "Серйозність",
       "colActionsAria": "Діяльність по ряду Роль ролі",
       "filesAffected": "Впливові файли ({count})",
       "howToFixHeading": "Як виправити",
@@ -1202,53 +1202,53 @@
     "findings": {
       "sectionAria": "Знахідки",
       "heading": "Знахідки",
-      "expandAll": "Розширюйте все.",
+      "expandAll": "Розгорнути все",
       "collapseAll": "Згорнути все",
       "bulkSelected": "{count} вибрано",
-      "bulkCopy": "Копіюйте вибраний файл як JSON.",
-      "selectAllTitle": "Виберіть всі видимі знахідки.",
-      "selectAllAria": "Виберіть всі видимі знахідки.",
-      "colSeverity": "Важкість тяжкості.",
+      "bulkCopy": "Копіювати вибране як JSON",
+      "selectAllTitle": "Вибрати всі видимі знахідки",
+      "selectAllAria": "Вибрати всі видимі знахідки",
+      "colSeverity": "Серйозність",
       "colRule": "Статут Регуляція",
       "colMessage": "повідомлення",
       "colLine": "Рядок",
       "colActionsAria": "Діяльність по ряду Роль ролі",
-      "selectRowAria": "Виберіть цей ряд пошуку.",
+      "selectRowAria": "Вибрати цей рядок знахідки",
       "copyRowTitle": "Копіюйте цей висновок в JSON.",
       "suppressedBadge": "Відмінений",
       "suppressedByTitle": "Приховано від вашого звичайного перегляду за допомогою {kind} — видно лише тут, бо увімкнено \"Включити приховане\"",
       "metaShown": "показано {filtered}",
       "metaAfterDisable": "{total} після фільтра вимкнених правил",
       "metaSourceCap": "джерело, обмежене {max} для продуктивності.",
-      "metaGroupedBy": "групуються за {mode}.",
+      "metaGroupedBy": "згруповано за: {mode}",
       "overflowNote": "Список джерел скорочений на {max} для покращення рендерингових характеристик.",
-      "runAgain": "Поново виконайте аналіз.",
+      "runAgain": "Запустити аналіз знову",
       "emptyNoViolations": "Немає порушень в останньому аналізі.",
       "emptyNoMatch": "Жоден з порушень не відповідає поточним фільтрам.",
       "emptyHintNoData": "Запустити аналіз для заповнення `reports/.saropa_lints/violations.json`, а потім оновлення.",
       "emptyHintFilters": "Налагодьте фільтри або запустить аналіз знову, щоб побачити результати.",
       "reRunAnalysis": "Повторити аналіз",
-      "resetFilters": "Перезавантаження фільтрів.",
+      "resetFilters": "Скинути фільтри",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "Мікшировані діаграми.",
+      "sectionAria": "Діаграми розподілу",
       "heading": "Змішати",
       "metaClickSlice": "Натисніть на фрагмент, щоб фільтрувати.",
-      "severityMix": "Поєднання різкості та тяжкості.",
-      "filterBarTitle": "Фільтр тільки на {key}.",
+      "severityMix": "Розподіл за серйозністю",
+      "filterBarTitle": "Фільтрувати лише за {key}",
       "donutTotal": "всього"
     },
     "todoHack": {
-      "sectionAria": "Тодо і хекс.",
+      "sectionAria": "TODO та HACK",
       "headingDisabled": "TODO та HACK",
       "metaDisabled": "Сканування відключено scan disabled",
       "scanOff": "Сканування робочої області вимкнено — увімкніть поверхню маркерів із файлів проекту.",
-      "enableScan": "Включити сканування Scan.",
+      "enableScan": "Увімкнути сканування",
       "heading": "TODO та HACK",
       "subsectionNone": "{title}: немає в діапазоні сканування.",
       "capNote": "Сканування досягло свого ліміту файлів, тому деякі файли були пропущені.",
-      "raiseCap": "Підніміть лімітний рівень.",
+      "raiseCap": "Підняти ліміт",
       "notePill": "примітка",
       "todosLabel": "TODO",
       "hacksLabel": "ЗЛОМИ"
@@ -1262,12 +1262,12 @@
       "headingNoServer": "Drift Advisor",
       "metaNoServer": "немає сервера",
       "noServerBlurb": "Сервер Drift Advisor не знайдений на налаштованих портах.",
-      "retry": "Перепробуйте повторно.",
+      "retry": "Повторити",
       "headingConnected": "Drift Advisor",
       "metaConnected": "підключено",
       "noIssues": "Підключено до {label} — поточних проблем немає.",
-      "refresh": "Відсвіжіть, освіждайте.",
-      "openBrowser": "Відкрити в браузері.",
+      "refresh": "Оновити",
+      "openBrowser": "Відкрити в браузері",
       "headingIssues": "Drift Advisor",
       "disable": "Виключити Drift Advisor"
     },
@@ -1288,9 +1288,9 @@
       "columnAction": "Дія"
     },
     "suppressions": {
-      "sectionAria": "Піддушення пригнічення.",
+      "sectionAria": "Придушення",
       "headingExport": "Видалення (експорт)",
-      "viewHidesHeading": "Вигляд проблем приховує перегляд.",
+      "viewHidesHeading": "Подання проблем приховує",
       "viewHidesMetaActive": "активний",
       "viewHidesMetaNone": "немає",
       "noneInExport": "Немає блокувань аналізатора в поточному експорті `violations.json`. Запустіть аналіз після редагування ігнорів або базових ліній для заповнення.",
@@ -1314,11 +1314,11 @@
       "perFileRulesSample": "Правила для кожного файлу (зобраз)"
     },
     "script": {
-      "announceCleared": "Всі фільтри очищені.",
+      "announceCleared": "Усі фільтри очищено",
       "announceFiltersPrefix": "Фільтри:",
       "announceStarted": "Аналіз розпочато",
       "announceComplete": "Аналіз завершено",
-      "announceFailed": "Аналіз провалився.",
+      "announceFailed": "Помилка аналізу",
       "removeRecentAria": "Видалити",
       "removeRecentTitle": "Видалити",
       "bulkSelectedTpl": "{n} вибрано",
@@ -1328,20 +1328,20 @@
     },
     "emptyState": {
       "hintAfterMessage": "Запустити Saropa Lints аналіз для генерації violations.json, а потім використовувати оновлення тут або знову відкрити цю панель.",
-      "refreshDisk": "Оновлення з диска."
+      "refreshDisk": "Оновити з диска"
     },
     "shortcuts": {
-      "focusTextFilter": "Фокусуйте текстовий фільтр.",
+      "focusTextFilter": "Перейти до текстового фільтра",
       "clearTextFilter": "Зберіть фокусований текстовий фільтр.",
       "activateKpi": "Активуйте фокусовану карту KPI або планку графічного штриху.",
       "activateKpiSpace": "Активуйте фокусовану карту KPI або планку графічного штриху.",
-      "showOverlay": "Показати цей короткий шлях перегортання."
+      "showOverlay": "Показати цю підказку клавіш"
     },
     "unknownAnalyzerKind": "Невідомо",
     "supplementary": {
-      "scannerPromo": "Включити сканер TODO/HACK.",
+      "scannerPromo": "Увімкнути сканер TODO/HACK",
       "tooltipScanner": "Сканер файлової системи Saropa — підраховує відкриті маркери TODO/HACK у джерелі.",
-      "tooltipPromoClickToOn": "Натисніть, щоб увімкнути."
+      "tooltipPromoClickToOn": "Натисніть, щоб увімкнути"
     }
   },
   "ruleExplain": {
@@ -1361,7 +1361,7 @@
     }
   },
   "triageDash": {
-    "showInIssues": "Показати в питаннях.",
+    "showInIssues": "Показати в проблемах",
     "disableRules": "Вимкнути правила",
     "enableRules": "Увімкнути правила",
     "issues": "Проблеми",
@@ -1371,7 +1371,7 @@
     "colIssues": "Проблеми",
     "zeroIssueRules": "{count} правил без проблем — автоматично ввімкнено на рівні.",
     "disabledOverrides": "{count} правил вимкнено через перевизначення у `analysis_options_custom.yaml`.",
-    "summaryRuleTriage": "Правило триажу.",
+    "summaryRuleTriage": "Сортування правил",
     "hintNoViolations": "`reports/.saropa_lints/violations.json` ще немає. Виконайте аналіз, а потім оновіть цю вкладку.",
     "hintUnreadable": "Експорт порушень відсутній. Спочатку запустіть аналіз Saropa Lints.",
     "hintStale": "Дані про триагу можуть бути застарілими (експорт {age} старий). Аналіз повторного запуску для поточних груп.",
@@ -1382,9 +1382,9 @@
   },
   "kbdOverlay": {
     "toggleTitle": "Показати короткі клавіші (?)",
-    "toggleAria": "Показати короткі клавіші.",
-    "dialogTitle": "Клавіатурні короткості.",
-    "closeAria": "Закрийте короткі клавіші.",
+    "toggleAria": "Показати комбінації клавіш",
+    "dialogTitle": "Комбінації клавіш",
+    "closeAria": "Закрити комбінації клавіш",
     "footer": "Натисніть Esc або клацніть поза вікном, щоб закрити."
   },
   "wideReport": {
@@ -1435,8 +1435,8 @@
       }
     },
     "detailPane": {
-      "aria": "Деталі упаковки.",
-      "title": "Деталі упаковки.",
+      "aria": "Відомості про пакет",
+      "title": "Відомості про пакет",
       "close": "Закрити подробиці",
       "copyForAi": "Копіюйте провід переоновлення для штучного інтелекту."
     },
@@ -1446,7 +1446,7 @@
       "gradeLine": "Рівень {grade} · {avg}/100",
       "flaggedCount": "{count} позначено",
       "flaggedTitle": "Заборонені або наприкінці терміну експлуатації.",
-      "lastScanLabel": "Сканували {when}.",
+      "lastScanLabel": "Проскановано {when}",
       "lastScanTitle": "Коли ці дані дашборду були отримані — {timestamp}. Натисніть, щоб пересканувати та перевірити оновлення пакетів.",
       "lastScanUnknown": "Сканування (часу невідоме)",
       "lastScanUnknownTitle": "Це сканування було запущено до того, як панель приладів відстежувала часові знаки. Натисніть, щоб пересканувати і перевірити наявність оновлень пакетів."
@@ -1464,37 +1464,37 @@
       "versionStamp": "Saropa Пакетний панель v{version}"
     },
     "progress": {
-      "aria": "Прогрес сканування пакетів.",
+      "aria": "Перебіг сканування пакетів",
       "starting": "Початок сканування..."
     },
     "gaugeTitle": "Оцінка пакетів проекту: {grade}",
     "summary": {
       "packages": "Пакети",
-      "projectGrade": "Класифікація пакету проектів.",
+      "projectGrade": "Оцінка пакетів проєкту",
       "totalSize": "Загальний розмір*",
       "gradeTooltip": "Оцінка проекту {avgGrade}\nСередній бал: {avgScore}/100\nПакети: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "Живий, яскравий.",
+      "vibrantTitle": "Життєздатні",
       "stableTitle": "Стабільна",
       "outdatedTitle": "Застарілі",
       "abandonedTitle": "Закинуті, покинутий",
-      "eolTitle": "Кінець життя.",
+      "eolTitle": "Кінець життєвого циклу",
       "updates": "Оновлення",
       "unused": "Невикористаний",
       "singleUse": "З одноразовим використанням",
       "vulnerable": "Вразливі",
-      "overrides": "Прийомні дії переоцінюють.",
+      "overrides": "Перевизначення",
       "caveatLine1": "*Відображені розміри коду (бібліотека + оголошені ресурси), повернення до розміру архіву pub.dev, коли розмір коду недоступний. Виключає dev_dependencies (build_runner, lints, saropa_lints тощо) — вони ніколи не надсилаються до пакета APK/IPA/web. Фактичний розмір програми стане меншим після струшування дерева.",
       "caveatLine2": "Прагові значення діяльності: 90d = застарений, 180d - неактивний (сплани зобов'язання + звільнення).",
       "upgradeTitle": "Оновлення потрібне"
     },
     "breakdown": {
       "title": "Чому оцінка {grade}? — {avgScore}/100 середнє для {pkgCount} пакетів",
-      "hint": "Натисніть, щоб розширити.",
-      "distributionHeading": "Розподіл дистрибуції.",
+      "hint": "Натисніть, щоб розгорнути",
+      "distributionHeading": "Розподіл",
       "signalsHeading": "Сигнали ризику, що затягують результат вниз.",
       "signalFlagged": "{count} зафіксовано (закинуті / наприкінці терміну експлуатації)",
-      "signalVulnerable": "{count} з відомими вразливостями.",
-      "signalUpdates": "{count} мають доступні оновлення.",
+      "signalVulnerable": "{count} з відомими вразливостями",
+      "signalUpdates": "{count} мають доступні оновлення",
       "bottomHeading": "Пакети з найнижчими оцінками",
       "thresholdsHeading": "Як бали відповідають оцінкам",
       "thresholdA": "70+ — Vibrant: активно підтримується, нещодавно опубліковано",
@@ -1515,16 +1515,16 @@
       "packages": "Пакети"
     },
     "toolbar": {
-      "openPubspecTitle": "Відкрийте pubspec.yaml.",
+      "openPubspecTitle": "Відкрити pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Копіюйте JSON-доповідь (всі рядки + деталі)",
       "copyAllLabel": "Копіювати",
       "copyOpportunitiesTitle": "Копіюйте підказки для модернізації AI для верхніх недооціненних пакетів в одну копію.",
-      "copyOpportunitiesLabel": "Копіюйте можливості для ШІ.",
+      "copyOpportunitiesLabel": "Копіювати можливості для ШІ",
       "saveAllTitle": "Заховувати JSON доповіді в звітах/РРРМДД/...",
       "saveAllLabel": "Зберегти",
       "saveUpgradeTitle": "Залиште звіт тільки пакетів із доступним оновленням до звітів/РРРМДД/...",
-      "saveUpgradeLabel": "Заховувати звіт про оновлення.",
+      "saveUpgradeLabel": "Зберегти звіт про оновлення",
       "resetViewTitle": "Відновити фільтри, сортувати і зберегти стан перегляду.",
       "resetViewLabel": "Скинути вигляд",
       "rescanTitle": "Повторне сканування пакетів — очищає кеш pub.dev і повторно отримує версії",
@@ -1537,27 +1537,27 @@
       "footprintOwnTitle": "Тільки власний розмір коду (lib + декларовані активи); повертається до pub.dev розміру архіву, коли він недоступний.",
       "footprintOwn": "Власний",
       "footprintUniqueTitle": "Собський розмір + транзитиви, які використовуються тільки цим відділом (збереження при його видаленні).",
-      "footprintUnique": "+ Унікальний.",
+      "footprintUnique": "+ Унікальні",
       "footprintTotalTitle": "Собський розмір + всі транзитиви, включаючи ті, які діляться з іншими відділеннями.",
       "footprintTotal": "+ Всі + Все",
       "searchLabel": "Пошук пакетів",
       "searchPlaceholder": "Пошук пакетів...",
       "clearSearchTitle": "Очистити пошук",
       "clearSearchAria": "Очистити пошук",
-      "ageFilterTitle": "Фільтруйте за віком публікації.",
-      "publishedAgeLabel": "Опублікована вік.",
+      "ageFilterTitle": "Фільтр за віком публікації",
+      "publishedAgeLabel": "Вік публікації",
       "ageMaxAll": "всі",
-      "presetFilterTitle": "Застосувати швидкі переднастрої фільтра.",
+      "presetFilterTitle": "Застосувати швидкі набори фільтрів",
       "presetLabel": "Набір налаштувань",
       "presetNone": "Немає",
       "presetModernization": "Модернізація",
       "presetRiskHotspots": "Зони ризику",
-      "presetCleanup": "Кандидати на очищення.",
+      "presetCleanup": "Кандидати на очищення",
       "presetDirectOnly": "Лише прямі",
       "devToggleTitle": "Включайте залежності від dev в таблиці та суми.",
-      "includeDev": "Включають dev.",
+      "includeDev": "Включно з dev",
       "activeFiltersLabel": "Активні фільтри:",
-      "clearAllFilters": "Все чисто, все вільне."
+      "clearAllFilters": "Очистити все"
     },
     "columns": {
       "name": {
@@ -1594,7 +1594,7 @@
       },
       "prs": {
         "label": "PR",
-        "tooltip": "Відкрийте GitHub pull-запроси."
+        "tooltip": "Відкрити запити на злиття в GitHub"
       },
       "size": {
         "label": "Розмір",
@@ -1609,7 +1609,7 @@
         "tooltip": "Кількість вихідних файлів, які імпортують цей пакет — натисніть для пошуку"
       },
       "transitives": {
-        "label": "Перехідні - транзитивні.",
+        "label": "Транзитивні",
         "tooltip": "Кількість перехідних (непрямих) залежностей, які цей пакет притягує."
       },
       "vulns": {
@@ -1638,7 +1638,7 @@
       }
     },
     "cells": {
-      "noGithub": "Не знайдено репозиторії GitHub.",
+      "noGithub": "Репозиторій GitHub не знайдено",
       "devBadge": "dev-залежність",
       "transitiveBadge": "транзитивна",
       "opportunitiesTooltip": "Невикористовувані можливості: {features}",
@@ -1650,23 +1650,23 @@
       "downloadsUnavailable": "pub.dev 30-денні завантаження недоступні.",
       "downloadsCount": "{count} завантаження в останні 30 днів.",
       "sizeUnavailable": "Розмір недоступний у pub.dev.",
-      "noVulnerabilities": "Не відомо про вразливість.",
+      "noVulnerabilities": "Відомих вразливостей немає",
       "licenseUnspecified": "Ліцензія не зазначена на pub.dev",
       "unusedBadge": "Невикористаний",
-      "packageInUse": "Пакет використовується."
+      "packageInUse": "Пакет використовується"
     },
     "row": {
       "expandDetails": "Розгорнути подробиці",
-      "copyRowJson": "Копіюйте ряд у вигляді JSON."
+      "copyRowJson": "Копіювати рядок як JSON"
     },
     "shortcuts": {
-      "focusSearch": "Фокусуйте поле пошуку на полі.",
+      "focusSearch": "Перейти до поля пошуку",
       "nextRow": "Виделюйте наступний ряд пакетів.",
       "prevRow": "Виделюйте попередній ряд пакети.",
       "toggleDetail": "Перемикайте виділений розширювач деталей упаковки.",
       "escapeSearch": "Пошук з чіткою орієнтацією; пошук, що має ясну Другий Esc зруйнує всі розширені рядки.",
       "historyBack": "Поверніться назад через історію навігації пакету.",
-      "showOverlay": "Показати цей короткий шлях перегортання.",
+      "showOverlay": "Показати цю підказку клавіш",
       "jumpToTab": "Перейдіть до вкладки 1-6 (Огляд, Оновлення, Повний звіт, Відомі проблеми, Порівняння, Налаштування)"
     },
     "versionTooltip": {
@@ -1681,8 +1681,8 @@
       "engagementLevel": "Рівень залучення: {value}",
       "popularity": "Популярність: {value}",
       "publisherTrust": "Довіра до видавця: {value}",
-      "codeCommits": "Код зобов'язує: Code commits: {age} минулої хвилини.",
-      "latestRelease": "Останній реліз: {age} минулої хвилини.",
+      "codeCommits": "Коміти коду: {age} тому",
+      "latestRelease": "Останній випуск: {age} тому",
       "activitySignal": "Сигнал активності: {signal}"
     },
     "size": {
@@ -1691,23 +1691,23 @@
       "onDisk": "На диску: {size}",
       "withUniqueTransitives": "З унікальними транзитивними: {size}",
       "withSharedTransitives": "Зі спільними транзитивними: {size}",
-      "openFolder": "Відкрийте локальну папку пакетів."
+      "openFolder": "Відкрити локальну папку пакета"
     },
     "references": {
       "noImports": "Не виявлено ніякого джерельного файлу імпорту.",
       "reExportLine": "{location} (реекспорт)",
       "publicApiSurface": "Публічний інтерфейс — принаймні одна використовувана частина є перерекладом.",
       "reExportedBadge": "Реекспортовано",
-      "openFileReferences": "Відкрити посилання на файли."
+      "openFileReferences": "Відкрити посилання на файли"
     },
     "deps": {
-      "noTransitives": "Немає перехідних залежностей.",
-      "showTransitives": "Покажіть перехідні залежності.",
+      "noTransitives": "Немає транзитивних залежностей",
+      "showTransitives": "Показати транзитивні залежності",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (спільний)",
-      "tooltipHeader": "{total} перехідні депси.",
+      "tooltipHeader": "Транзитивних залежностей: {total}",
       "tooltipHeaderShared": "Перехідні депи {total} (поділився {shared})",
-      "sharedBadgeTitle": "{count} поділяється з іншими пакетами."
+      "sharedBadgeTitle": "{count} спільних з іншими пакетами"
     },
     "dormancy": {
       "noActivity6mo": "Немає комітів і релізів понад 6 місяців",
@@ -1720,29 +1720,29 @@
       "healthy": "Код і активність випуска є здоровою (клас активності {grade})"
     },
     "detail": {
-      "codeCommitActivity": "Код зобов'язується діяльність.",
-      "releaseActivity": "Реліз діяльності Release Activity.",
+      "codeCommitActivity": "Активність комітів коду",
+      "releaseActivity": "Активність випусків",
       "dormancySignal": "Ознака неактивності",
-      "ago": "{age} минулої хвилини.",
+      "ago": "{age} тому",
       "qualityExample": "+приклад",
-      "qualityExampleTitle": "Випускається запущений демо-версія.",
-      "qualityTests": "+тести, які проводиться.",
-      "qualityTestsTitle": "Випускає тестовий комплект.",
-      "qualityTools": "+ інструменти.",
-      "qualityToolsTitle": "Інструменти для обслуговування суден.",
+      "qualityExampleTitle": "Містить демо, яке можна запустити",
+      "qualityTests": "+тести",
+      "qualityTestsTitle": "Містить набір тестів",
+      "qualityTools": "+інструменти",
+      "qualityToolsTitle": "Містить інструменти для супроводжувачів",
       "qualityDocs": "+docs",
-      "qualityDocsTitle": "Кораблі мають розширену документацію.",
-      "healthScore": "Health Score - оцінка здоров'я.",
+      "qualityDocsTitle": "Містить розширену документацію",
+      "healthScore": "Оцінка здоров'я",
       "resolutionVelocity": "Швидкість роздільної здатності Resolution Velocity",
       "engagementLevel": "Рівень участі Уровень залучення",
       "popularity": "Популярність",
-      "publisherTrust": "Trust Publisher - довіра видавця."
+      "publisherTrust": "Довіра до видавця"
     }
   },
   "commandCatalog": {
-    "documentTitle": "Saropa Каталог командних даних.",
-    "skipLink": "Перейти до каталогу командних дій.",
-    "heroTitle": "Saropa Каталог командних даних.",
+    "documentTitle": "Каталог команд Saropa",
+    "skipLink": "Перейти до каталогу команд",
+    "heroTitle": "Каталог команд Saropa",
     "status": {
       "internalHidden": "{count} лише контекстне меню (приховано)",
       "wordCommands": "команди",
@@ -1753,7 +1753,7 @@
       "placeholder": "Пошук заголовком, описом або ід команди ...",
       "ariaLabel": "Пошук команд",
       "clearAria": "Очистити пошук",
-      "hintLine1": "Збігається з кожним командним пунктом.",
+      "hintLine1": "Збігається з такими полями кожної команди:",
       "hintStrongTitle": "назва",
       "hintStrongDesc": "опис",
       "hintStrongId": "id",
@@ -1762,19 +1762,19 @@
       "hintLine2End": "без точок)."
     },
     "toolbar": {
-      "showInternal": "Показати команди контекстного меню.",
+      "showInternal": "Показати команди контекстного меню",
       "collapseAll": "Згорнути все"
     },
     "recentPopover": {
-      "title": "Останні пошукові дії.",
-      "clearTitle": "Очистити всі останні пошуки.",
+      "title": "Недавні пошуки",
+      "clearTitle": "Очистити всі недавні пошуки",
       "clearButton": "Очистити",
-      "listAria": "Останні пошукові дії."
+      "listAria": "Недавні пошуки"
     },
     "filterChips": {
       "ariaRegion": "Активні фільтри",
       "activeLabel": "Активні фільтри:",
-      "clearAll": "Все чисто, все вільне."
+      "clearAll": "Очистити все"
     },
     "bands": {
       "frequentTitle": "Часті",
@@ -1785,22 +1785,22 @@
     },
     "noResults": {
       "message": "Жоден командний код не відповідає вашому пошуку.",
-      "reset": "Перезавантаження фільтрів."
+      "reset": "Скинути фільтри"
     },
     "entry": {
       "internalBadgeTitle": "Використовується тільки з контекстних меню.",
       "internalBadge": "меню",
       "copyTitle": "Копіюйте ід команди ({id})",
-      "copyAria": "Копіюйте командний ід."
+      "copyAria": "Копіювати ідентифікатор команди"
     },
-    "categoryJumpTitle": "Перейти до {category}.",
+    "categoryJumpTitle": "Перейти до {category}",
     "shortcuts": {
-      "focusSearch": "Фокусуйте поле пошуку на полі.",
-      "navRows": "Навігувати по бачним командним рядам.",
+      "focusSearch": "Перейти до поля пошуку",
+      "navRows": "Переміщатися між видимими рядками команд",
       "homeEnd": "Перейти до першого або останнього видимого ряду.",
       "enterRun": "Запустити команду \"фокусований\"",
       "escClear": "Зберіть фільтри пошуку та перезавантаження.",
-      "showOverlay": "Показати цей короткий шлях перегортання."
+      "showOverlay": "Показати цю підказку клавіш"
     },
     "script": {
       "moreSuffix": "+{count} більше",
@@ -1808,35 +1808,35 @@
       "runSingular": " запуск",
       "runPlural": " запусків",
       "recentWord": "останній",
-      "expandAll": "Розширюйте все.",
+      "expandAll": "Розгорнути все",
       "collapseAll": "Згорнути все",
       "searchChip": "Пошук: \"{query}\"",
-      "internalChip": "Показ команд контекстного меню.",
+      "internalChip": "Показано команди контекстного меню",
       "removeFilterPrefix": "Видалити фільтр ",
       "matchOne": "{count} збіг",
       "matchOther": "{count} збігів"
     }
   },
   "codeHealth": {
-    "documentTitle": "Saropa Код панелі управління здоров'ям.",
-    "skipToTable": "Перейти до функцій таблиці.",
+    "documentTitle": "Панель здоров'я коду Saropa",
+    "skipToTable": "Перейти до таблиці функцій",
     "openWorkspaceFirst": "Спочатку відкрийте робочу зону Dart/Flutter.",
     "scan": {
-      "title": "Сканування проекту здоров'я людини.",
+      "title": "Сканування здоров'я проєкту",
       "subtitle": "Читаю ваш код. Приладочна панель заповнюється, коли сканування дізнається більше.",
       "waiting": "Початок сканування...",
       "launching": "Запуск сканера…",
       "collect": "Відкриття файлів...",
       "firstRunHint": "Перший запуск компілює сканер; У великих проектах потрібно трохи часу, щоб файли з'явилися.",
       "paused": "Пауза Постановка",
-      "stopped": "Сканування зупинилося.",
-      "elapsed": "Пройшло багато часу.",
+      "stopped": "Сканування зупинено",
+      "elapsed": "Минуло часу",
       "phase": {
-        "parse": "Розробка файлів для аналізу.",
-        "history": "Читання гіт-історії.",
+        "parse": "Розбір файлів",
+        "history": "Читання історії git",
         "blame": "Обчислення віку коду",
-        "usage": "Розраховуємо посилання.",
-        "score": "Функції оцінювання балів."
+        "usage": "Підрахунок посилань",
+        "score": "Оцінювання функцій"
       },
       "counter": {
         "files": "Файли",
@@ -1852,11 +1852,11 @@
       "btn": {
         "pause": "Пауза",
         "resume": "Відновити",
-        "restart": "Перезавантажити Рестартуйте.",
+        "restart": "Перезапустити",
         "cancel": "Відкласти скасувати"
       },
       "preview": {
-        "heading": "Проблеми, виявлені до цих пір.",
+        "heading": "Знайдені на цей час проблеми",
         "empty": "Ще не знайдено проблем..."
       },
       "version": {
@@ -1868,9 +1868,9 @@
     "runReportFirst": "Знову запустити звіт, а потім скопіювати JSON.",
     "copiedJson": "Code Health JSON скопійований в кліпборд.",
     "couldNotOpenFile": "Не вдалося відкрити файл: {path}",
-    "panelTitle": "Saropa Код панелі управління здоров'ям.",
+    "panelTitle": "Панель здоров'я коду Saropa",
     "hero": {
-      "title": "Saropa Код панелі управління здоров'ям.",
+      "title": "Панель здоров'я коду Saropa",
       "generated": "Вироблені генеруються",
       "functionOne": "{count} функція",
       "functionOther": "{count} функцій",
@@ -1891,58 +1891,58 @@
       "clickToFilter": "Натисніть, щоб фільтрувати таблицю до функцій з позначенням {flag}.",
       "noFlagged": "Немає функцій, зафіксованих {flag}.",
       "unused": "Невикористаний",
-      "unusedSub": "функції, на які ніде не посилаються.",
+      "unusedSub": "функції, на які ніде не посилаються",
       "uncovered": "Неприкритий розкритий",
-      "uncoveredSub": "не має покриття LCOV.",
-      "stubTested": "Проведено тест на стуб.",
+      "uncoveredSub": "немає покриття LCOV",
+      "stubTested": "Тестовані заглушками",
       "stubTestedSub": "Тести існують, але мало що підтверджують.",
       "suspiciousCoverage": "Подозрілий випадок охоплення",
-      "suspiciousCoverageSub": "Покриття виглядає виготовленою, фабрикціонованою.",
-      "testDrift": "Тестний дрейф випробування.",
-      "testDriftSub": "Тести відстають від функції."
+      "suspiciousCoverageSub": "покриття схоже на сфабриковане",
+      "testDrift": "Відставання тестів",
+      "testDriftSub": "тести відстають від функції"
     },
     "toolbar": {
       "ariaLabel": "Дії Code Health",
       "rescanTitle": "Перезапустити сканування стану коду і оновлення цієї панелі.",
       "rescan": "Повторне сканування",
       "copyJsonTitle": "Копіюйте JSON з необработаного коду здоров'я в кліпборд.",
-      "copyJson": "Копіюйте JSON.",
+      "copyJson": "Копіювати JSON",
       "settingsTitle": "Відкрийте Код настройки здоров'я.",
       "settingsButton": "Налаштування Code Health",
       "filterTitle": "Фільтруйте рядки за назвою, файлом або прапором.",
-      "filterLabel": "Рядки фільтрів.",
+      "filterLabel": "Фільтрувати рядки",
       "filterPlaceholder": "Рядки фільтрів..."
     },
     "table": {
-      "ariaLabel": "Найгірші функції за оцінкою.",
+      "ariaLabel": "Найгірші функції за оцінкою",
       "heading": "Найгірші функції",
       "colScore": "Оцінка",
       "colFunction": "Функція",
       "colFile": "Файл",
       "colLine": "Рядок",
       "colUsage": "Використання",
-      "colCoverage": "Покриття медичної допомоги.",
+      "colCoverage": "Покриття",
       "colComplexity": "Складність",
       "colFlags": "Прапорці",
       "noMatch": "Немає функцій, які відповідають поточним фільтрам.",
       "resetFiltersTitle": "Почистіть пошук і будь-який активний фільтр прапора.",
-      "resetFilters": "Перезавантаження фільтрів.",
-      "expanderAriaCollapsed": "Показати деталі проблеми.",
-      "expanderAriaExpanded": "Сховати деталі проблеми.",
+      "resetFilters": "Скинути фільтри",
+      "expanderAriaCollapsed": "Показати деталі проблеми",
+      "expanderAriaExpanded": "Сховати деталі проблеми",
       "detailHeading": "Чому ця функція отримала оцінку {score}",
       "detailNoIssues": "У цьому рядку немає позначок — оцінка визначається значеннями стовпця вище (використання, покриття, складність, вік, документація).",
-      "suppressLabel": "Підсумувати в файлі.",
+      "suppressLabel": "Придушити у файлі",
       "suppressTooltip": "Записує `// ignore_for_file: code_health:<flag>` у цей файл, щоб майбутні сканування видаляли цей прапор для всього файлу."
     },
     "flag": {
       "unused": {
-        "label": "Невикористані, не використані.",
-        "evidence": "0 абонентів, які дзвонили.",
+        "label": "не використовується",
+        "evidence": "0 викликів",
         "rule": "Флагується, коли жоден інший файл не посилається на цей ім'я функції."
       },
       "uncovered": {
-        "label": "Неприкритий, не прихований.",
-        "evidence": "{pct}% тестів випробувань.",
+        "label": "не покрито",
+        "evidence": "{pct}% тестами",
         "rule": "Зазначено, коли LCOV повідомляє про 0% покриття лінії."
       },
       "complex": {
@@ -1951,41 +1951,41 @@
         "rule": "Зазначено, коли цикломатична складності перевищує 10."
       },
       "undocumented": {
-        "label": "Недокументовані переселенці.",
-        "evidence": "CC {cc}, без документа.",
+        "label": "без документації",
+        "evidence": "CC {cc}, без документації",
         "rule": "Позначається, коли складна функція (CC > 10) не має коментарів до документа."
       },
       "test_drift": {
-        "label": "Тест на дрейф випробування.",
-        "evidence": "Тести відстають від функції.",
+        "label": "відставання тестів",
+        "evidence": "тести відстають від функції",
         "rule": "Зазначено, коли найновіший пов'язаний тестовий файл є значно старшим за вихідний файл функції."
       },
       "stub_tested": {
-        "label": "Проведено стуб-тестування.",
+        "label": "тестовано заглушками",
         "evidence": "тонкі твердження стверджують, що",
         "rule": "Зазначено, коли пов'язаний тест існує, але майже нічого не стверджує."
       },
       "suspicious_coverage": {
         "label": "Подозрілий випадок охоплення",
-        "evidence": "{pct}% без випробування.",
+        "evidence": "{pct}% без тестів",
         "rule": "Зазначено, коли LCOV повідомляє про високий рівень покриття, але жоден тест не вказує на функцію."
       },
       "fresh_code": {
-        "label": "Fresh Code - свіжий код.",
-        "evidence": "CC {cc}, нещодавно переписаний.",
+        "label": "свіжий код",
+        "evidence": "CC {cc}, нещодавно переписано",
         "rule": "Зазначено, коли цикломатична складності перевищує 10 і функція тіла була написана або переписана протягом останніх 90 днів. Нещодавно переписаний складний код викликав інциденти набагато частіше, ніж старий код під час валідації."
       }
     },
     "shortcuts": {
-      "focusFilter": "Фокусуйте рядковий фільтр.",
+      "focusFilter": "Перейти до фільтра рядків",
       "clearFilter": "Вичистіть фільтр фокусованого ряду.",
-      "activateKpi": "Активуйте фокусовану картку KPI.",
-      "activateKpiSpace": "Активуйте фокусовану картку KPI.",
-      "showOverlay": "Показати цей короткий шлях перегортання."
+      "activateKpi": "Активувати вибрану картку KPI",
+      "activateKpiSpace": "Активувати вибрану картку KPI",
+      "showOverlay": "Показати цю підказку клавіш"
     },
     "script": {
       "activeFiltersLabel": "Активні фільтри:",
-      "clearAll": "Все чисто, все вільне.",
+      "clearAll": "Очистити все",
       "neverRun": "не запускався"
     },
     "freshness": {
@@ -2005,9 +2005,9 @@
     },
     "scan": {
       "subtitle": "Сканування розміру проекту, складності та гарячих точок…",
-      "elapsed": "Пройшло багато часу.",
+      "elapsed": "Минуло часу",
       "cancel": "Відкласти скасувати",
-      "restart": "Перезавантажити Рестартуйте.",
+      "restart": "Перезапустити",
       "stopped": "Зупинився",
       "logHeading": "Діяльність Активність",
       "logEmpty": "Ще немає виводу — цей журнал заповнюється лише у випадку, якщо сканування виводить повідомлення діагностики.",
@@ -2060,13 +2060,13 @@
       "colFile": "Файл",
       "colLineNum": "Рядок",
       "colRule": "Статут Регуляція",
-      "colSeverity": "Важкість тяжкості.",
+      "colSeverity": "Серйозність",
       "colMessage": "повідомлення",
       "colKey": "Ключ"
     },
     "shortcuts": {
       "jumpToTab": "Перейти до вкладки 1-2 (Мапа, Звіти)",
-      "showOverlay": "Показати цей короткий шлях перегортання."
+      "showOverlay": "Показати цю підказку клавіш"
     },
     "hero": {
       "files": "Файли",
@@ -2080,7 +2080,7 @@
     "noKindBreakdown": "Немає розбивки за видом у цьому експорті.",
     "title": "Видалення (експорт)",
     "readOnlyNote": "(тільки для читання; відкрити результати для перегляду та дії.)",
-    "openFindings": "Відкрийте панель даних \"Знайдені результати\"."
+    "openFindings": "Відкрити панель знахідок"
   },
   "configMirrors": {
     "noFileRisk": "Немає розкладу ризиків по файлам (немає порушень в області дії).",
@@ -2093,31 +2093,31 @@
   },
   "telemetry": {
     "heroTitle": "Зв'язане правило Телеметрія",
-    "skipToCounters": "Перейдіть до телеметричних лічильників.",
+    "skipToCounters": "Перейти до лічильників телеметрії",
     "lastEvent": "Остання подія {relative}",
-    "noEvents": "Ніяких записів подій не було.",
+    "noEvents": "Подій не зафіксовано",
     "totalEventOne": "всього {count} подія",
     "totalEventOther": "всього {count} подій",
     "noCountersTitle": "Немає лічильників для перезавантаження.",
-    "resetTitle": "Перезавантажити всі лічильники.",
+    "resetTitle": "Скинути всі лічильники",
     "refreshTitle": "Перезавантажуйте телеметричні лічильники з диска.",
-    "refresh": "Відсвіжіть, освіждайте.",
-    "copyTitle": "Копіюйте сніпшот як JSON.",
-    "copyJson": "Копіюйте JSON.",
-    "resetCounters": "Рестатуйте лічильники, щоб перезавантажити.",
-    "countersAria": "Контактиватори.",
+    "refresh": "Оновити",
+    "copyTitle": "Копіювати знімок як JSON",
+    "copyJson": "Копіювати JSON",
+    "resetCounters": "Скинути лічильники",
+    "countersAria": "Лічильники",
     "countersHeading": "Лічильники подій",
     "thEvent": "Подія",
     "thCount": "Кількість",
     "emptyMessage": "Подій телеметрії ще не зареєстровано — відкрийте правило на інформаційній панелі результатів, щоб розпочати реєстрацію лічильників.",
     "openFindingsTitle": "Відкрийте Saropa Dashboard з висновками.",
-    "openFindings": "Відкрийте панель даних \"Знайдені результати\".",
-    "lastPropsHeading": "Свойства останньої події.",
+    "openFindings": "Відкрити панель знахідок",
+    "lastPropsHeading": "Властивості останньої події",
     "copiedJson": "Saropa Lints: JSON телеметрії пов’язаних правил скопійовано.",
     "countersReset": "Saropa Lints: скидання лічильників телеметрії пов’язаних правил."
   },
   "sidebarLayout": {
-    "summary": "Розклад панелі дійств.",
+    "summary": "Макет панелі активності",
     "hint": "Включіть або вимкніть секції Saropa activity-bar тут (захищено з робочим простором, не залишаючи приладової панелі)."
   },
   "securityPosture": {
@@ -2137,14 +2137,14 @@
       "row": {
         "vibrancyGrade": "Вимір вібрації Рівень життєздатності",
         "category": "Категорія",
-        "latestVersion": "Остання версія - найновіша.",
+        "latestVersion": "Остання версія",
         "published": "Видається Публікуються Опубліковано",
         "publisher": "Видавець",
         "pubPoints": "Pub Points - Пуб-поїнти",
         "githubStars": "GitHub Зірки зірок",
-        "openIssues": "Відкриті питання.",
+        "openIssues": "Відкриті питання",
         "codeSize": "Розмір коду",
-        "bloatRating": "Рейтинг Bloat Rating - набряк.",
+        "bloatRating": "Оцінка роздутості",
         "license": "Ліцензія",
         "platforms": "Платформи",
         "inThisProject": "У цьому проекті"
@@ -2156,44 +2156,44 @@
         "no": "Ні"
       },
       "badge": {
-        "inProject": "В проекті In Project."
+        "inProject": "У проєкті"
       }
     },
     "status": {
       "packagesSelected": "{count} вибрані пакети",
-      "packagesCompared": "{count} пакети порівняли.",
-      "dimensionsRankedOne": "{count} вимір ранжирований.",
-      "dimensionsRankedOther": "{count} розміри рангуються за рейтингом.",
+      "packagesCompared": "Порівняно пакетів: {count}",
+      "dimensionsRankedOne": "Ранжовано вимірів: {count}",
+      "dimensionsRankedOther": "Ранжовано вимірів: {count}",
       "morePackages": "+{count} більше"
     },
     "empty": {
-      "ariaLabel": "Без упаковок.",
+      "ariaLabel": "Немає пакетів",
       "message": "Не вибрано пакетів для порівняння. Правою кнопкою миші натисніть на два або більше пакетів в панелі управління Пакетами і виберіть {compare}.",
       "compareWord": "Порівняти",
-      "openDashboard": "Відкрийте панель управління пакетом.",
+      "openDashboard": "Відкрити панель пакетів",
       "openDashboardTitle": "Відкрийте Saropa Пакетну панель."
     },
     "a11y": {
-      "skipToTable": "Перейти до порівняльної таблиці.",
+      "skipToTable": "Перейти до таблиці порівняння",
       "recommendation": "Рекомендація",
-      "addingToProject": "Додавання {name} до проекту."
+      "addingToProject": "Додавання {name} до проєкту"
     },
     "shortcuts": {
-      "showOverlay": "Показати цей короткий шлях перегортання.",
+      "showOverlay": "Показати цю підказку клавіш",
       "closeOverlay": "Закрийте накладку короткостворки клавіатури."
     },
     "kpi": {
-      "ariaLabel": "Резюме порівняння.",
+      "ariaLabel": "Підсумок порівняння",
       "leading": "Провідні лідери",
       "leadingTitle": "Пакет, що очолює за більшою кількістю перемог.",
       "dimensionWinsOne": "{count} вимір перемоги",
-      "dimensionWinsOther": "{count} вимір виграє.",
+      "dimensionWinsOther": "Перемог за вимірами: {count}",
       "packages": "Пакети",
       "packagesTitle": "Кількість упаковок, порівняних один з одним.",
       "inComparison": "у порівнянні",
       "dimensions": "Розміри Вимірювання",
       "dimensionsTitle": "Кількість вимірів, в яких може бути визначений переможець.",
-      "ranked": "Посадований по рангу."
+      "ranked": "ранжовано"
     },
     "toolbar": {
       "ariaLabel": "Дії порівняння",
@@ -2325,9 +2325,9 @@
       "version": "ВЕРСІЯ",
       "update": "UPDATE",
       "suggestion": "ПРОПОЗИЦІЯ",
-      "community": "Співтовариство ЄС.",
+      "community": "СПІЛЬНОТА",
       "dependencies": "ЗАЛЕЖНОСТІ",
-      "alerts": "ОЗВІДНЕНИЯ ВЕДУКОВ.",
+      "alerts": "СПОВІЩЕННЯ",
       "platforms": "ПЛАТФОРМИ",
       "directDeps": "Прямі депозити (Direct Deposits)",
       "readmeImages": "README ІМЕЖИ ЗНАЧЕНІ В РОЛЬЗУ"
@@ -2356,9 +2356,9 @@
       "prs": "{count} PR",
       "activity90d": "90d: випуски {closed} закриті, {merged} PR об’єднані",
       "lastCommit": "Останній коміт: {time}",
-      "archived": "Репозиторій архівується.",
+      "archived": "Репозиторій заархівовано",
       "pubPoints": "{points}/160 паб-точок",
-      "latestRelease": "Останній реліз: {age} минулої хвилини.",
+      "latestRelease": "Останній випуск: {age} тому",
       "dependents": "{count} утриманці"
     },
     "dormancy": {
@@ -2369,7 +2369,7 @@
     },
     "dependencies": {
       "flagged": "({count} зафіксовано)",
-      "transitiveCount": "{count} перехідні пакети.",
+      "transitiveCount": "Транзитивних пакетів: {count}",
       "unique": "{count} унікальних",
       "shared": "{count} спільних ({pct}%)",
       "moreOverflow": "+{count} більше",
@@ -2383,17 +2383,17 @@
       "pubDev": "pub.dev",
       "documentation": "Документація",
       "changelog": "Журнал змін",
-      "repository": "Репозиторій даних Repository.",
+      "repository": "Репозиторій",
       "issues": "Проблеми",
       "reportIssue": "Повідомити про проблему"
     },
-    "logoAlt": "{packageName} логотип.",
+    "logoAlt": "Логотип {packageName}",
     "readMore": "ще",
-    "readmeImageAlt": "README зображення образу."
+    "readmeImageAlt": "Зображення з README"
   },
   "chart": {
     "toggle": {
-      "excludeShared": "Виключити спільне використання."
+      "excludeShared": "Виключити спільні"
     },
     "filter": {
       "clear": "Очистити"
@@ -2405,12 +2405,12 @@
     },
     "noun": {
       "package": "пакет",
-      "packages": "пакети, упаковки."
+      "packages": "пакетів"
     }
   },
   "suite": {
     "fix": {
-      "explainRule": "Поясніть це правило."
+      "explainRule": "Пояснити це правило"
     },
     "enableRule": {
       "done": "Включено правило {ruleId}. Використовувати повторний аналіз.",
@@ -2430,23 +2430,23 @@
     },
     "nudge": {
       "message": "Цей проект використовує Drift Advisor. Всталюйте Saropa Log Capture розширення, щоб співвідносити SQL під час виконання з цими статичними результатами.",
-      "install": "Інсталюйте лог-зйомку.",
-      "dismiss": "Відпустка від роботи."
+      "install": "Установити Log Capture",
+      "dismiss": "Закрити"
     },
     "driftRecommend": {
       "message": "Сервер Drift Advisor підключений. Встановити автономне Saropa розширення Drift Advisor для повного досвіду роботи з панелі проблем.",
       "install": "Інсталюйте Drift Advisor",
-      "dismiss": "Відпустка від роботи."
+      "dismiss": "Закрити"
     }
   },
   "notify": {
     "activation": {
-      "cacheCleared": "Вичищається кеш Vibrancy.",
-      "copiedInfo": "Копіював {package} інформацію в кліпборд.",
+      "cacheCleared": "Кеш Vibrancy очищено",
+      "copiedInfo": "Інформацію про {package} скопійовано в буфер обміну",
       "noPubspecOrLock": "No pubspec.yaml/pubspec.lock знайдено в робочому просторі.",
       "backfillComplete": "Package Vibrancy: одноразове заповнення історії завершено (імпортовано знімків: {count}).",
-      "runScanFirst": "Спочатку запустите сканування.",
-      "noUpgradable": "Не знайдено жодних оновлюваних пакетів.",
+      "runScanFirst": "Спочатку запустіть сканування",
+      "noUpgradable": "Не знайдено пакетів, які можна оновити",
       "proceedUpgrades": "Продовжуйте з {count} оновленням? Невдалі кроки повертаються назад, а план продовжується.",
       "actionExecute": "Виконати",
       "actionCancel": "Відкласти скасувати",
@@ -2454,11 +2454,11 @@
       "upgradeAllComplete": "Всі {count} оновлення успішно завершені.",
       "notPubspec": "Вибраний файл не є pubspec.yaml.",
       "suppressedPackage": "Вимкнено \"{package}\" — діагностика буде прихованою",
-      "noPackagesToSuppress": "Немає пакетів, які можна придушувати.",
+      "noPackagesToSuppress": "Немає пакетів для придушення",
       "suppressedCount": "Придушені пакети {count} (s)",
       "noUnhealthyToSuppress": "Не існує нездорових упаковок, які можна придушувати.",
       "suppressAllConfirm": "Придушити всі шкідливі пакети {count}? Це приховає всю діагностику.",
-      "noSuppressedPackages": "Немає пригнічених пакетів.",
+      "noSuppressedPackages": "Немає придушених пакетів",
       "unsuppressedCount": "Непідтримані пакети {count} (s)",
       "noPubspecWorkspace": "No pubspec.yaml знайдено в робочому просторі.",
       "depsAlreadySorted": "Залежності вже відсортовано",
@@ -2466,21 +2466,21 @@
       "noPubspec": "Не знайдено pubspec.yaml",
       "updatePrereleaseConfirm": "Оновлення {package} до попереднього випуску {version}? Пре-релізи можуть містити значні зміни.",
       "packageNotFound": "Пакет {package} не знайдено в пакеті pubspec.yaml.",
-      "updatedTo": "Оновлено {package} до {version}.",
+      "updatedTo": "{package} оновлено до {version}",
       "ciRunScanFirst": "Спочатку запустите сканування, щоб генерувати конфігурацію CI з відповідними порогами.",
-      "noWorkspace": "Папка \"No workspace folder open\" не відкрита для робочої зони.",
+      "noWorkspace": "Не відкрито папку робочої області",
       "ciOverwriteConfirm": "{path} вже існує. Переписати?",
       "actionOverwrite": "Перезаписати",
       "ciGenerated": "CI-конвеєр створено: {path}",
-      "compareSelectCount": "Виберіть 2-3 пакети для порівняння.",
-      "compareMax": "Максимально 3 пакети для порівняння.",
+      "compareSelectCount": "Виберіть 2-3 пакети для порівняння",
+      "compareMax": "Для порівняння — щонайбільше 3 пакети",
       "compareFetchFailed": "Не вдалося отримати достатньо пакетної кількості даних."
     },
     "main": {
       "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} помилка{suffix} — перегляд.",
       "regressionScoreDipped": "Показник опустився нижче {threshold} — переглянути проблеми.",
-      "actionViewViolations": "Порушення правил перегляду.",
+      "actionViewViolations": "Переглянути порушення",
       "noErrors": "Saropa Lints: Немає помилок!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: не відкрито жодної теки робочої області. Спочатку відкрийте свій Dart/Flutter проект.",
       "lintIntegrationOffCannotAnalyze": "Saropa Lints: сканування при збереженні вимкнено. Увімкніть його перед виконанням аналізу.",
@@ -2505,7 +2505,7 @@
       "bulkRuleToggleConfirm": "{verb} {count} правила? Це оновлює analysis_options_custom.yaml.",
       "setupPrompt": "Saropa Lints виявив проєкт Dart без налаштованого saropa_lints. Налаштуйте зараз, щоб отримати понад 2350 правил lint.",
       "actionSetUpProject": "Налаштувати проект",
-      "actionNotNow": "Не зараз, не тепер."
+      "actionNotNow": "Не зараз"
     },
     "lsp": {
       "noWorkspaceFolder": "Saropa Lints: неможливо запустити сервер LSP, оскільки не відкрито жодної теки робочої області.",
@@ -2531,7 +2531,7 @@
       "analysisScanning": "Сканування робочої області… {percent}% (проблем поки що: {count})",
       "configUpdated": "Конфігурацію Saropa Lints оновлено (рівень: {tier}).",
       "configWriteFailed": "Невдало написати конфігурацію. {details}",
-      "scaffoldGateTitle": "Композитний аналізатор плагін скелевий вал.",
+      "scaffoldGateTitle": "Каркас композитного плагіна аналізатора",
       "scaffoldGateDetail": "Буде створено новий пакет Dart у вашій робочій області (pubspec.yaml, lib/main.dart, README): один плагін custom_lint, який реєструє Saropa і залишає точки розширення для ваших власних правил.\n\nВикористовуйте це, лише якщо постачаєте власні правила аналізатора разом із Saropa. Звичайні проекти лише з Saropa можуть це пропустити — аналізатор дозволяє один запис плагіна на контекст.\n\nДалі: виберіть папку відносно робочої області. Якщо така папка вже існує, перед перезаписом буде запитано підтвердження.",
       "actionContinue": "Продовжити",
       "actionOpenGuide": "Відкрити посібник",
@@ -2539,7 +2539,7 @@
       "scaffoldFolderExists": "Папка вже існує: {folder}. Файли можуть бути додані або перезаписані. Продовжити?",
       "scaffoldCreated": "Створена композитна плагінна скеля. Відкритий генерується головний.дарт",
       "actionOpenMainDart": "Відкрийте основний.dart",
-      "actionOpenReadme": "Відкрийте README.",
+      "actionOpenReadme": "Відкрити README",
       "scaffoldFailed": "Не вдалося створити каркас. {details}",
       "scaffoldFailedHint": "Переконайтеся, що saropa_lints знаходиться в dev_dependencies, і запустіть pub get.",
       "alreadyOnTier": "Уже на {tier} рівні.",
@@ -2578,8 +2578,8 @@
       "crossFileHtmlReportFailed": "Не вдалося створити міжфайловий HTML-звіт: {message}",
       "crossFileReportNoIndex": "Звіт про перекрестний файл завершений, але index.html не був знайдений.",
       "crossFileHtmlReportGenerated": "Згенеровано крос-файловий HTML-доклад.",
-      "actionOpenInBrowser": "Відкрити в браузері.",
-      "actionOpenFile": "Відкрийте файл Open File.",
+      "actionOpenInBrowser": "Відкрити в браузері",
+      "actionOpenFile": "Відкрити файл",
       "crossFileSnapshotFailed": "Не вдалося створити міжфайловий знімок: {message}",
       "crossFileSnapshotNoJson": "Скриншот крос-файлів завершений, але файл JSON не був знайдений.",
       "crossFileSnapshotWritten": "Скриншот крос-файлів, написані в звітах/.saropa_lints/cross_file_snapshot.json",
@@ -2641,25 +2641,25 @@
       "needsPackageRow": "{actionLabel} потребує ряду пакетів з панелі управління пакетами (вкладка редактора).",
       "couldNotLocateConstraint": "Не вдалося знайти обмеження версії для {name}.",
       "deletedFromPubspec": "Видалено {name} з pubspec.yaml (загадка: backup: {backupName}) і є одним з основних факторів",
-      "runScanFirst": "Спочатку запустите сканування.",
+      "runScanFirst": "Спочатку запустіть сканування",
       "couldNotFindPubspec": "Не вдалося знайти pubspec.yaml.",
-      "updatedPackage": "Оновлено {name} до {constraint}.",
-      "failedToUpdate": "Не вдалося оновити {name}.",
-      "selectPackagesToCompare": "Виберіть 2-3 пакети для порівняння.",
-      "maxPackagesToCompare": "Максимально 3 пакети для порівняння.",
+      "updatedPackage": "{name} оновлено до {constraint}",
+      "failedToUpdate": "Не вдалося оновити {name}",
+      "selectPackagesToCompare": "Виберіть 2-3 пакети для порівняння",
+      "maxPackagesToCompare": "Для порівняння — щонайбільше 3 пакети",
       "couldNotFindLocalSource": "Не вдалося знайти локальний джерело для {name}.",
-      "registryAuthAdded": "✓ Додано аутентифікацію для {name}.",
+      "registryAuthAdded": "✓ Додано автентифікацію для {name}",
       "registryAddFailed": "Не вдалося додати реєстр: {message}",
-      "noConfiguredRegistries": "Не налаштовано реєстрів.",
-      "registryAuthRemoved": "✓ Вилучено аутентифікацію для {name}.",
+      "noConfiguredRegistries": "Немає налаштованих реєстрів",
+      "registryAuthRemoved": "✓ Вилучено автентифікацію для {name}",
       "registryRemoveFailed": "Не вдалося видалити реєстр: {message}",
-      "registryTokenUpdated": "✓ Токен оновлений.",
+      "registryTokenUpdated": "✓ Токен оновлено",
       "registryTokenUpdateFailed": "Не вдалося оновити токен: {message}",
       "actionRemove": "Видалити",
       "removeAuthPrompt": "Вилучити аутентифікацію для {name}?",
-      "annotateInProgress": "Анотація вже в процесі.",
+      "annotateInProgress": "Анотування вже триває",
       "noPubspecInWorkspace": "No pubspec.yaml знайдено в робочому просторі.",
-      "noDependenciesToAnnotate": "Немає залежних від аннотації.",
+      "noDependenciesToAnnotate": "Немає залежностей для анотування",
       "failedToApplyAnnotations": "Не вдалося застосувати анотації до pubspec.yaml.",
       "annotatedSummary": "Аннотація {parts} в {basename}",
       "upgradeInProgress": "Агрегація вже в процесі.",
@@ -2697,7 +2697,7 @@
       "upgradeCheckerCheckOutput": "Перевірте вихід.",
       "upgradeCheckerUpgraded": "Saropa Lints оновлено до {version}.",
       "actionUpgrade": "Оновити",
-      "actionViewChangelog": "Переглянути реєстр змін.",
+      "actionViewChangelog": "Переглянути журнал змін",
       "healthCodeLensEnabled": "Saropa Проектна карта тепла CodeLens включена.",
       "healthCodeLensDisabled": "Saropa Карта проекту тепловий CodeLens відключений.",
       "reportViewCopiedPath": "Шлях до звіту скопійовано: {path}",
@@ -2708,13 +2708,13 @@
       "reportViewSuppressed": "Приглушено '{flag}' у {file}.",
       "reportViewCouldNotSuppress": "Не вдалося приглушити '{flag}' у {file}: {error}",
       "actionRescan": "Повторне сканування",
-      "bulkUpdateNoUpdates": "Не доступні оновлення.",
-      "bulkUpdateNoUpdatesFiltered": "Немає доступних оновлень {filter}.",
+      "bulkUpdateNoUpdates": "Немає доступних оновлень",
+      "bulkUpdateNoUpdatesFiltered": "Немає доступних оновлень {filter}",
       "bulkUpdateFailed": "Не вдалося виконати масове оновлення: {error}",
-      "bulkUpdateUpdatedOne": "Оновлений пакет {count}.",
-      "bulkUpdateUpdatedOther": "Оновлені пакети {count}.",
+      "bulkUpdateUpdatedOne": "Оновлено {count} пакет",
+      "bulkUpdateUpdatedOther": "Оновлено пакетів: {count}",
       "detailViewConstraintNotFound": "Не вдалося знайти обмеження версії для {package}.",
-      "detailViewUpdated": "Оновлено {package} до {version}."
+      "detailViewUpdated": "{package} оновлено до {version}"
     }
   },
   "analysisOptimizer": {
@@ -3192,7 +3192,7 @@
       "cancelScan": "Відмінити сканування",
       "turnOffTypeResolution": "Вимкнути Вирішення Типу",
       "startAnyway": "Почати незважаючи на те",
-      "notNow": "Не зараз, не тепер.",
+      "notNow": "Не зараз",
       "neverAskDeep": "Не питати знову",
       "applyPlugin": "Застосувати",
       "noThanks": "Ні, дякую",
